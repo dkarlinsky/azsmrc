@@ -1,7 +1,7 @@
 /*
  * Created on Nov 16, 2005
  */
-package lbms.azsmrc.gui;
+package lbms.azsmrc.pugin.gui;
 
 
 

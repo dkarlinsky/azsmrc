@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
-import lbms.azsmrc.main.MultiUser;
-import lbms.azsmrc.main.MultiUserDownloadListener;
-import lbms.azsmrc.main.Plugin;
-import lbms.azsmrc.main.User;
-import lbms.azsmrc.main.Utilities;
+import lbms.azsmrc.pugin.main.MultiUser;
+import lbms.azsmrc.pugin.main.MultiUserDownloadListener;
+import lbms.azsmrc.pugin.main.Plugin;
+import lbms.azsmrc.pugin.main.User;
+import lbms.azsmrc.pugin.main.Utilities;
 import lbms.azsmrc.shared.DuplicatedUserException;
 import lbms.azsmrc.shared.EncodingUtil;
 import lbms.azsmrc.shared.RemoteConstants;

@@ -2,7 +2,7 @@ package lbms.azsmrc.web;
 
 import java.io.IOException;
 
-import lbms.azsmrc.main.User;
+import lbms.azsmrc.pugin.main.User;
 
 import org.gudy.azureus2.plugins.tracker.web.TrackerWebPageResponse;
 import org.jdom.*;

@@ -3,10 +3,10 @@
  * Created by omschaub
  * 
  */
-package lbms.azsmrc.gui;
+package lbms.azsmrc.pugin.gui;
 
 
-import lbms.azsmrc.main.Plugin;
+import lbms.azsmrc.pugin.main.Plugin;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;

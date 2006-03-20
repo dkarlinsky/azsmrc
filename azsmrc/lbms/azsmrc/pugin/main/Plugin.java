@@ -1,12 +1,12 @@
 /*
  * Created on Nov 16, 2005
  */
-package lbms.azsmrc.main;
+package lbms.azsmrc.pugin.main;
 
 import java.net.URL;
 import java.security.KeyStore;
 
-import lbms.azsmrc.gui.View;
+import lbms.azsmrc.pugin.gui.View;
 import lbms.azsmrc.shared.UserNotFoundException;
 import lbms.azsmrc.web.WebRequestHandler;
 

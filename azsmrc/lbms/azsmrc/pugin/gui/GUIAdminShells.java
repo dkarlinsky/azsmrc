@@ -3,14 +3,14 @@
  * Created by omschaub
  * 
  */
-package lbms.azsmrc.gui;
+package lbms.azsmrc.pugin.gui;
 
 
 
-import lbms.azsmrc.main.Plugin;
-import lbms.azsmrc.main.Timers;
-import lbms.azsmrc.main.User;
-import lbms.azsmrc.main.Utilities;
+import lbms.azsmrc.pugin.main.Plugin;
+import lbms.azsmrc.pugin.main.Timers;
+import lbms.azsmrc.pugin.main.User;
+import lbms.azsmrc.pugin.main.Utilities;
 import lbms.azsmrc.shared.UserNotFoundException;
 
 import org.eclipse.swt.SWT;

@@ -33,8 +33,8 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
-import lbms.azsmrc.main.Plugin;
-import lbms.azsmrc.main.User;
+import lbms.azsmrc.pugin.main.Plugin;
+import lbms.azsmrc.pugin.main.User;
 import lbms.azsmrc.shared.UserNotFoundException;
 
 import org.gudy.azureus2.core3.util.Debug;

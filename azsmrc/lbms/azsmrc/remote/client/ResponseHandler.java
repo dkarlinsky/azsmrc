@@ -2,7 +2,7 @@ package lbms.azsmrc.remote.client;
 
 import java.io.IOException;
 
-import lbms.azsmrc.main.User;
+import lbms.azsmrc.pugin.main.User;
 
 import org.jdom.*;
 

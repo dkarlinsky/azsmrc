@@ -3,7 +3,7 @@
  * Created by omschaub
  * 
  */
-package lbms.azsmrc.gui;
+package lbms.azsmrc.pugin.gui;
 
 //import java.util.*;
 import org.eclipse.swt.*;

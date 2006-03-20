@@ -3,15 +3,15 @@
  * Created by omschaub
  *
  */
-package lbms.azsmrc.gui;
+package lbms.azsmrc.pugin.gui;
 
 
 import java.io.File;
 import java.io.IOException;
 
-import lbms.azsmrc.main.Plugin;
-import lbms.azsmrc.main.User;
-import lbms.azsmrc.main.Utilities;
+import lbms.azsmrc.pugin.main.Plugin;
+import lbms.azsmrc.pugin.main.User;
+import lbms.azsmrc.pugin.main.Utilities;
 import lbms.azsmrc.shared.DuplicatedUserException;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.azsmrc.shared.UserNotFoundException;
