@@ -7,8 +7,8 @@ import java.net.URL;
 import java.security.KeyStore;
 
 import lbms.azsmrc.pugin.gui.View;
+import lbms.azsmrc.pugin.web.WebRequestHandler;
 import lbms.azsmrc.shared.UserNotFoundException;
-import lbms.azsmrc.web.WebRequestHandler;
 
 import org.eclipse.swt.widgets.Display;
 import org.gudy.azureus2.core3.util.AEMonitor;

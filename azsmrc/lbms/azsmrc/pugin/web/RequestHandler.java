@@ -1,4 +1,4 @@
-package lbms.azsmrc.web;
+package lbms.azsmrc.pugin.web;
 
 import java.io.IOException;
 
