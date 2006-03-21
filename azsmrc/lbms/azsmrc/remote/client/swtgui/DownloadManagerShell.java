@@ -176,7 +176,7 @@ public class DownloadManagerShell {
         }
 
 
-        if(TITLE == null) TITLE = "FireFrog";
+        if(TITLE == null) TITLE = "AzSMRC";
 
         DOWNLOAD_MANAGER_SHELL = new Shell(FireFrogMain.getFFM().getDisplay());
 
