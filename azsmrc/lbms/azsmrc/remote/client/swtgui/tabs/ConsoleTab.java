@@ -545,7 +545,7 @@ public class ConsoleTab {
 						int nbLinesNow = consoleText.getLineCount();
 						int colorIdx = -1;
 						//Color Based On Log
-                        if (record.getLoggerName().equalsIgnoreCase("lbms.azmultiuser.ff.debug"))
+                        if (record.getLoggerName().equalsIgnoreCase("lbms.azsmrc.ff.debug"))
 							colorIdx = SWT.COLOR_GRAY;
 						else
 							colorIdx = SWT.COLOR_GREEN;

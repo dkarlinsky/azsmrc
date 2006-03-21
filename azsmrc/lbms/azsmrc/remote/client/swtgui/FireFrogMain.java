@@ -65,8 +65,8 @@ import org.jdom.Element;
 
 public class FireFrogMain implements Launchable {
 
-	public static final String LOGGER_NORMAL = "lbms.azmultiuser.ff.normal";
-	public static final String LOGGER_DEBUG = "lbms.azmultiuser.ff.debug";
+	public static final String LOGGER_NORMAL = "lbms.azsmrc.ff.normal";
+	public static final String LOGGER_DEBUG = "lbms.azsmrc.ff.debug";
 	public static final String USER_DIR = System.getProperty("user.dir");
 	public static final String FSEP = System.getProperty("file.separator");
 
