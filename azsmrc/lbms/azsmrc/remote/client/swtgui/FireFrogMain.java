@@ -494,7 +494,7 @@ public class FireFrogMain implements Launchable {
 		});
 
 		try {
-			updater = new Updater(new URL("http://azcvsupdater.sourceforge.net/azmultiuser/ffupdate.xml.gz"),new File("update.xml.gz"),new File(USER_DIR));
+			updater = new Updater(new URL(RemoteConstants.UPDATE_URL),new File("update.xml.gz"),new File(USER_DIR));
 		} catch (MalformedURLException e2) {
 		}
 		updater.addListener(new UpdateListener() {
