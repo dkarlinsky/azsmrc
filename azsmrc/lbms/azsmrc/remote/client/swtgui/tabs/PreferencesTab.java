@@ -13,6 +13,7 @@ import java.util.Properties;
 import lbms.azsmrc.remote.client.Utilities;
 import lbms.azsmrc.remote.client.swtgui.FireFrogMain;
 import lbms.azsmrc.remote.client.swtgui.dialogs.UpdateDialog;
+import lbms.azsmrc.shared.RemoteConstants;
 import lbms.tools.updater.Update;
 import lbms.tools.updater.UpdateListener;
 import lbms.tools.updater.Updater;
@@ -446,7 +447,7 @@ public class PreferencesTab {
             public void handleEvent(Event arg0) {
                 final Updater updater;
                 try {
-                    updater = new Updater(new URL("http://azcvsupdater.sourceforge.net/azmultiuser/ffupdate.xml.gz"),new File("update.xml.gz"),new File(System.getProperty("user.dir")));
+                    updater = new Updater(new URL(RemoteConstants.UPDATE_URL),new File("update.xml.gz"),new File(System.getProperty("user.dir")));
                     updater.addListener(new UpdateListener() {
                         public void exception(Exception e) {
 
