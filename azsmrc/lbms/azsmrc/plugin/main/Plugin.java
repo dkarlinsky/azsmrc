@@ -62,7 +62,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		pi=pluginInterface;
 
 		UIManager   ui_manager = pluginInterface.getUIManager();
-		BasicPluginConfigModel config_model = ui_manager.createBasicPluginConfigModel( "plugins", "plugin.azmultiuser");
+		BasicPluginConfigModel config_model = ui_manager.createBasicPluginConfigModel( "plugins", "plugin.azsmrc");
 
 		//settings on main options panel
 		config_model.addBooleanParameter2("azsmrc_military_time","azsmrc.military.time",false);
