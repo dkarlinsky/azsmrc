@@ -65,12 +65,12 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		BasicPluginConfigModel config_model = ui_manager.createBasicPluginConfigModel( "plugins", "plugin.azmultiuser");
 
 		//settings on main options panel
-		config_model.addBooleanParameter2("azmultiuser_military_time","azmultiuser.military.time",false);
-		config_model.addBooleanParameter2("azmultiuser_auto_open","azmultiuser.auto.open",true);
-		config_model.addBooleanParameter2("singleUserMode", "azmultiuser.singleusermode", false);
-		config_model.addBooleanParameter2("use_ssl","azmultiuser.use.ssl",false);
-		config_model.addIntParameter2("remote_port", "azmultiuser.remote.port", 49009);
-		config_model.addLabelParameter2("azmultiuser.portchange.alert");
+		config_model.addBooleanParameter2("azsmrc_military_time","azsmrc.military.time",false);
+		config_model.addBooleanParameter2("azsmrc_auto_open","azsmrc.auto.open",true);
+		config_model.addBooleanParameter2("singleUserMode", "azsmrc.singleusermode", false);
+		config_model.addBooleanParameter2("use_ssl","azsmrc.use.ssl",false);
+		config_model.addIntParameter2("remote_port", "azsmrc.remote.port", 49009);
+		config_model.addLabelParameter2("azsmrc.portchange.alert");
 
 		//Load the config file
 		config = XMLConfig.loadConfigFile(pluginInterface.getPluginDirectoryName() + System.getProperty("file.separator") + "MultiUserConfig.xml");
@@ -166,8 +166,8 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 
 
-			final TableContextMenuItem menu1 = pluginInterface.getUIManager().getTableManager().addContextMenuItem(TableManager.TABLE_MYTORRENTS_COMPLETE,     "azmultiuser.mytorrents.menutext1" );
-			final TableContextMenuItem menu2 = pluginInterface.getUIManager().getTableManager().addContextMenuItem(TableManager.TABLE_MYTORRENTS_INCOMPLETE,     "azmultiuser.mytorrents.menutext1");
+			final TableContextMenuItem menu1 = pluginInterface.getUIManager().getTableManager().addContextMenuItem(TableManager.TABLE_MYTORRENTS_COMPLETE,     "azsmrc.mytorrents.menutext1" );
+			final TableContextMenuItem menu2 = pluginInterface.getUIManager().getTableManager().addContextMenuItem(TableManager.TABLE_MYTORRENTS_INCOMPLETE,     "azsmrc.mytorrents.menutext1");
 
 			menu1.addFillListener(fill_listener);
 			menu2.addFillListener(fill_listener);
@@ -265,7 +265,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 	 */
 	public static boolean isPluginAutoOpen(){
 		PluginConfig config_getter = getPluginInterface().getPluginconfig();
-		return config_getter.getPluginBooleanParameter("azmultiuser_auto_open",true);
+		return config_getter.getPluginBooleanParameter("azsmrc_auto_open",true);
 	}
 
 	/**
