@@ -749,7 +749,8 @@ public class DownloadManagerShell {
 
                                 }
                                 DownloadContainer dc = downloadsMap.get(downloads[i].getHash());
-                                dc.update(false);
+                                if(dc != null)
+                                    dc.update(false);
                             }else if(seedsMap.containsKey(downloads[i].getHash())){
                                 SeedContainer sc = seedsMap.get(downloads[i].getHash());
                                 sc.update(false);
