@@ -156,6 +156,7 @@ public class PreferencesTab {
                     break;
 
                     case(SWT.CANCEL):
+                        bModified = false;
                     break;
 
                     }
