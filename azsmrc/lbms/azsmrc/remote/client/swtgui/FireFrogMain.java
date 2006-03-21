@@ -382,7 +382,7 @@ public class FireFrogMain implements Launchable {
 				if(display != null)
 					display.syncExec(new Runnable() {
 						public void run() {
-							setTrayToolTip("FireFrog: D:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d)+" - U:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u));
+							setTrayToolTip("AzSMRC: D:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d)+" - U:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u));
 						}
 					});
 			}
@@ -667,7 +667,7 @@ public class FireFrogMain implements Launchable {
 	 */
 	public void setTrayIcon(int connection){
 		if(connection==0){
-			systrayItem.setToolTipText("FireFrog -- Not Connected");
+			systrayItem.setToolTipText("AzSMRC -- Not Connected");
 			systrayItem.setImage(ImageRepository.getImage("TrayIcon_Red"));
 		}else if(connection == 1){
 			systrayItem.setImage(ImageRepository.getImage("TrayIcon_Connecting"));
