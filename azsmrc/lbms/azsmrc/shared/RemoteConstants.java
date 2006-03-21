@@ -72,4 +72,9 @@ public class RemoteConstants {
 	public static final String CORE_PARAM_STRING_LOCAL_BIND_IP							= "CORE_PARAM_STRING_LOCAL_BIND_IP";
 	public static final String CORE_PARAM_BOOLEAN_FRIENDLY_HASH_CHECKING				= "CORE_PARAM_BOOLEAN_FRIENDLY_HASH_CHECKING";
 
+
+
+    //Update URL
+    public static final String UPDATE_URL = "http://azcvsupdater.sourceforge.net/azsmrc/ffupdate.xml.gz";
+
 }
