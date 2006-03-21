@@ -64,7 +64,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 		this.pluginInterface = pluginInterface;
 		locale_utils = pluginInterface.getUtilities().getLocaleUtilities();
-		locale_utils.integrateLocalisedMessageBundle("lbms.azmultiuser.internat.Messages");
+		locale_utils.integrateLocalisedMessageBundle("lbms.azsmrc.plugin.internat.Messages");
 		pi=pluginInterface;
 
 		UIManager   ui_manager = pluginInterface.getUIManager();
@@ -82,7 +82,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		config = XMLConfig.loadConfigFile(pluginInterface.getPluginDirectoryName() + System.getProperty("file.separator") + "MultiUserConfig.xml");
 
 		//initialize the logger
-		logger = pluginInterface.getLogger().getTimeStampedChannel("AzMultiUser");
+		logger = pluginInterface.getLogger().getTimeStampedChannel("AzSMRC");
 
 		//initialize the timer
 		Timers.initTimer();
