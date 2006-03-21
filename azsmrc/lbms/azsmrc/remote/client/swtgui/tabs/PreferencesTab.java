@@ -21,22 +21,23 @@ import lbms.tools.updater.Updater;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 
 public class PreferencesTab {
 
@@ -44,34 +45,58 @@ public class PreferencesTab {
     private Button autoOpen, autoConnect, autoUpdateCheck, autoUpdate;
     private Button trayMinimize, trayExit, popupsEnabled, autoClipboard, autoConsole;
 
+    private Composite cOptions;
+    private Properties properties;
+
+
+    private boolean bModified = false;
+
     public PreferencesTab(final CTabFolder parentTab){
+
+
+        //Open properties for reading and saving
+        properties = FireFrogMain.getFFM().getProperties();
+
 
         final CTabItem prefsTab = new CTabItem(parentTab, SWT.CLOSE);
         prefsTab.setText("Preferences");
 
-        //ScrollComp on shell
-        final ScrolledComposite scrolledComposite = new ScrolledComposite(parentTab,  SWT.V_SCROLL);
-        scrolledComposite.setExpandVertical(true);
-        scrolledComposite.setExpandHorizontal(true);
 
 
-        final Composite parent = new Composite(scrolledComposite, SWT.NULL);
-        parent.setLayout(new GridLayout(1,false));
+        final Composite parent = new Composite(parentTab, SWT.NULL);
+        parent.setLayout(new GridLayout(2,false));
         GridData gridData = new GridData(GridData.FILL_BOTH);
         gridData.grabExcessHorizontalSpace = true;
         gridData.horizontalSpan = 1;
         parent.setLayoutData(gridData);
+
+
+        prefsTab.addDisposeListener(new DisposeListener(){
+
+            public void widgetDisposed(DisposeEvent arg0) {
+                if(bModified){
+                    MessageBox box = new MessageBox(parent.getShell(),SWT.OK);
+                    box.setText("Usaved Changes");
+                    box.setMessage("You have made modifications to the preferences and " +
+                            "closed the tab before you saved.  All changes have been discarded");
+                    box.open();
+                }
+            }
+
+        });
+
+
 
         //top label
         Composite grayLabel = new Composite(parent,SWT.BORDER);
         grayLabel.setBackground(FireFrogMain.getFFM().getDisplay().getSystemColor(SWT.COLOR_GRAY));
         grayLabel.setLayout(new GridLayout(1,false));
         gridData = new GridData(GridData.FILL_HORIZONTAL);
-        gridData.horizontalSpan = 3;
+        gridData.horizontalSpan = 2;
         grayLabel.setLayoutData(gridData);
 
         Label title = new Label(grayLabel,SWT.NONE);
-        title.setText("No changes are actually made until committed");
+        title.setText("No changes are actually made until saved");
         title.setBackground(grayLabel.getBackground());
 
         //Set it bold
@@ -90,113 +115,106 @@ public class PreferencesTab {
 
 
 
-        //Open properties for reading and saving
-        final Properties properties = FireFrogMain.getFFM().getProperties();
+        final SashForm sash = new SashForm(parent,SWT.HORIZONTAL);
+        gridData = new GridData(GridData.FILL_BOTH);
+        gridData.horizontalSpan = 2;
+        sash.setLayoutData(gridData);
+        sash.setLayout(new GridLayout(1,false));
 
+
+        //Tree on left side
+        Tree tree = new Tree(sash,SWT.BORDER | SWT.H_SCROLL);
+        gridData = new GridData(GridData.FILL_BOTH);
+        gridData.horizontalSpan = 1;
+        tree.setLayoutData(gridData);
+
+        final TreeItem tiConnection = new TreeItem(tree,SWT.NULL);
+        tiConnection.setText("Connection");
+
+        final TreeItem tiMainWindow = new TreeItem(tree,SWT.NULL);
+        tiMainWindow.setText("Main Window");
+
+        final TreeItem tiMisc = new TreeItem(tree,SWT.NULL);
+        tiMisc.setText("Miscellaneous");
+
+        final TreeItem tiUpdate = new TreeItem(tree,SWT.NULL);
+        tiUpdate.setText("Update");
+        tree.addListener(SWT.Selection, new Listener(){
+
+            public void handleEvent(Event event) {
+                if(bModified){
+                    MessageBox box = new MessageBox(parent.getShell(),SWT.OK | SWT.CANCEL);
+                    box.setText("Usaved Changes");
+                    box.setMessage("You have made modifications to these settings\n" +
+                            "Click OK to apply these changes and continue\n" +
+                            "Click Cancel to discard these changes and continue");
+                    int answer = box.open();
+                    switch(answer){
+
+                    case(SWT.OK):
+                        save(parent);
+                    break;
+
+                    case(SWT.CANCEL):
+                    break;
+
+                    }
+
+                }
+
+
+                if(event.item.equals(tiConnection)){
+                    makeConnectionPreferences(cOptions);
+                }else if(event.item.equals(tiMainWindow)){
+                    makeMainWindowPreferences(cOptions);
+                }else if(event.item.equals(tiMisc)){
+                    makeMiscPreferences(cOptions);
+                }else if(event.item.equals(tiUpdate)){
+                    makeUpdatePreferences(cOptions);
+                }
+
+            }
+
+        });
+
+        cOptions = new Composite(sash,SWT.BORDER);
+        gridData = new GridData(GridData.FILL_BOTH);
+        gridData.horizontalSpan = 1;
+        cOptions.setLayoutData(gridData);
+        cOptions.setLayout(new GridLayout(2,false));
+
+        //default selection
+        tree.setSelection(new TreeItem[] {tiConnection});
+        makeConnectionPreferences(cOptions);
+
+        //set the sash weight
+        sash.setWeights(new int[] {80,320});
 
         //Buttons
         Composite button_comp = new Composite(parent, SWT.NULL);
         gridData = new GridData(GridData.GRAB_HORIZONTAL);
+        gridData.horizontalSpan = 2;
         button_comp.setLayoutData(gridData);
 
         GridLayout gridLayout = new GridLayout();
-        gridLayout.numColumns = 2;
+        gridLayout.numColumns = 3;
         gridLayout.marginWidth = 0;
         button_comp.setLayout(gridLayout);
 
 
-
+        Button apply = new Button (button_comp,SWT.PUSH);
+        apply.setText("Save Changes");
+        apply.addListener(SWT.Selection, new Listener(){
+            public void handleEvent(Event arg0) {
+               save(parent);
+            }
+        });
 
         Button commit = new Button(button_comp,SWT.PUSH);
-        commit.setText("Commit Changes");
+        commit.setText("Save Changes and Close");
         commit.addListener(SWT.Selection, new Listener(){
             public void handleEvent(Event e) {
-
-                String open = updateIntervalOpen_Text.getText();
-                String closed = updateIntervalClosed_Text.getText();
-                if(open.equalsIgnoreCase("") || closed.equalsIgnoreCase("") ){
-                    MessageBox messageBox = new MessageBox(parent.getShell(), SWT.ICON_ERROR | SWT.OK);
-                    messageBox.setText("Error");
-                    messageBox.setMessage("None of the intervals can be blank.");
-                    messageBox.open();
-                    return;
-                }else if(Long.parseLong(open) < 3){
-                    updateIntervalOpen_Text.setText("3");
-                    MessageBox messageBox = new MessageBox(parent.getShell(), SWT.ICON_ERROR | SWT.OK);
-                    messageBox.setText("Error");
-                    messageBox.setMessage("The interval for when the main window is open is too low.  Please set to 3 seconds or above.");
-                    messageBox.open();
-                    return;
-                }else if(Long.parseLong(closed) < 3){
-                    updateIntervalClosed_Text.setText("3");
-                    MessageBox messageBox = new MessageBox(parent.getShell(), SWT.ICON_ERROR | SWT.OK);
-                    messageBox.setText("Error");
-                    messageBox.setMessage("The interval for when the main window is closed is too low.  Please set to 3 seconds or above.");
-                    messageBox.open();
-                    return;
-                }else{
-                    properties.setProperty("connection_interval_open", String.valueOf(Long.parseLong(open)*1000));
-                    properties.setProperty("connection_interval_closed", String.valueOf(Long.parseLong(closed)*1000));
-                }
-
-                //Store AutoOpen
-                if(autoOpen.getSelection())
-                    properties.setProperty("auto_open", "true");
-                else
-                    properties.setProperty("auto_open", "false");
-
-                //Store AutoSave
-                if(autoConnect.getSelection())
-                    properties.setProperty("auto_connect", "true");
-                else
-                    properties.setProperty("auto_connect", "false");
-
-                //Store AutoUpdateCheck
-                if(autoUpdateCheck.getSelection())
-                    properties.setProperty("update.autocheck", "true");
-                else
-                    properties.setProperty("update.autocheck", "false");
-
-
-                //Store AutoUpdate
-                if(autoUpdate.getSelection())
-                    properties.setProperty("update.autoupdate", "true");
-                else
-                    properties.setProperty("update.autoupdate", "false");
-
-                //Store tray options
-                if(trayMinimize.getSelection())
-                    properties.setProperty("tray.minimize","true");
-                else
-                    properties.setProperty("tray.minimize","false");
-
-                if(trayExit.getSelection())
-                    properties.setProperty("tray.exit","true");
-                else
-                    properties.setProperty("tray.exit","false");
-
-                //Store popupsEnabled
-                if(popupsEnabled.getSelection())
-                    properties.setProperty("popups_enabled", "true");
-                else
-                    properties.setProperty("popups_enabled", "false");
-
-                //Store the autoClipboard setting
-                if(autoClipboard.getSelection())
-                    properties.setProperty("auto_clipboard", "true");
-                else
-                    properties.setProperty("auto_clipboard", "false");
-
-                //Store auto console setting
-                if(autoConsole.getSelection())
-                    properties.setProperty("auto_console", "true");
-                else
-                    properties.setProperty("auto_console", "false");
-
-                FireFrogMain.getFFM().saveConfig();
-
-
-                FireFrogMain.getFFM().updateTimer(true);
+                save(parent);
                 prefsTab.dispose();
             }
         });
@@ -211,36 +229,21 @@ public class PreferencesTab {
         });
 
 
+        prefsTab.setControl(parent);
+        parentTab.setSelection(prefsTab);
+    }
 
 
 
-        final Composite comp = new Composite(parent,SWT.NULL);
-        gridData = new GridData(GridData.FILL_BOTH);
-        comp.setLayoutData(gridData);
-
-        gridLayout = new GridLayout();
-        gridLayout.numColumns = 1;
-        gridLayout.marginWidth = 2;
-        comp.setLayout(gridLayout);
-
-        //---------------------- Connection Preferences -------------------\\
-
-        Group gConnection = new Group(comp,SWT.NULL);
-        gConnection.setText("Connection Preferences");
-        gridData = new GridData(GridData.FILL_HORIZONTAL);
-        gridData.grabExcessHorizontalSpace = true;
-        gConnection.setLayoutData(gridData);
-
-        gridLayout = new GridLayout();
-        gridLayout.numColumns = 2;
-        gridLayout.marginWidth = 0;
-        gConnection.setLayout(gridLayout);
-
-
+    public void makeConnectionPreferences(final Composite composite){
+        Control[] controls = composite.getChildren();
+        for(Control control:controls){
+            control.dispose();
+        }
 
         //Auto Connect
-        autoConnect = new Button(gConnection,SWT.CHECK);
-        gridData = new GridData(GridData.GRAB_HORIZONTAL);
+        autoConnect = new Button(composite,SWT.CHECK);
+        GridData gridData = new GridData(GridData.GRAB_HORIZONTAL);
         gridData.horizontalSpan = 2;
         autoConnect.setLayoutData(gridData);
         autoConnect.setText("AutoConnect: If connection data and password are saved, attempt last connection on startup");
@@ -248,13 +251,13 @@ public class PreferencesTab {
         if (Boolean.parseBoolean(properties.getProperty("auto_connect","true"))) {
             autoConnect.setSelection(true);
         }
-
+        addModListener(autoConnect,SWT.Selection);
 
         //Update Interval Open
-        Label updateIntervalOpen_Label = new Label(gConnection,SWT.NULL);
+        Label updateIntervalOpen_Label = new Label(composite,SWT.NULL);
         updateIntervalOpen_Label.setText("Update Interval while the main window is open (in seconds, minimum of 3):       ");
 
-        updateIntervalOpen_Text = new Text(gConnection, SWT.SINGLE | SWT.BORDER);
+        updateIntervalOpen_Text = new Text(composite, SWT.SINGLE | SWT.BORDER);
         gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
         gridData.widthHint = 30;
         updateIntervalOpen_Text.setLayoutData(gridData);
@@ -272,13 +275,14 @@ public class PreferencesTab {
                 }
             }
         });
+        addModListener(updateIntervalOpen_Text,SWT.Modify);
 
 
         //Update Interval Closed
-        Label updateIntervalClosed_Label = new Label(gConnection,SWT.NULL);
+        Label updateIntervalClosed_Label = new Label(composite,SWT.NULL);
         updateIntervalClosed_Label.setText("Update Interval while the main window is closed (in seconds, minimum of 3):      ");
 
-        updateIntervalClosed_Text = new Text(gConnection, SWT.SINGLE | SWT.BORDER);
+        updateIntervalClosed_Text = new Text(composite, SWT.SINGLE | SWT.BORDER);
         gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
         gridData.widthHint = 30;
         updateIntervalClosed_Text.setLayoutData(gridData);
@@ -296,26 +300,21 @@ public class PreferencesTab {
                 }
             }
         });
+        addModListener(updateIntervalClosed_Text,SWT.Modify);
+        composite.layout();
+    }
 
 
-
-        //---------------------- Main Window Preferences -------------------\\
-
-
-        Group gMW = new Group(comp,SWT.NULL);
-        gMW.setText("Main Window Preferences");
-        gridData = new GridData(GridData.FILL_HORIZONTAL);
-        gMW.setLayoutData(gridData);
-
-        gridLayout = new GridLayout();
-        gridLayout.numColumns = 2;
-        gridLayout.marginWidth = 0;
-        gMW.setLayout(gridLayout);
+    public void makeMainWindowPreferences(final Composite composite){
+        Control[] controls = composite.getChildren();
+        for(Control control:controls){
+            control.dispose();
+        }
 
 
         //Auto Open
-        autoOpen = new Button(gMW,SWT.CHECK);
-        gridData = new GridData(GridData.GRAB_HORIZONTAL);
+        autoOpen = new Button(composite,SWT.CHECK);
+        GridData gridData = new GridData(GridData.GRAB_HORIZONTAL);
         gridData.horizontalSpan = 2;
         autoOpen.setLayoutData(gridData);
         autoOpen.setText("AutoOpen: Auto open main window when program is started");
@@ -324,54 +323,51 @@ public class PreferencesTab {
             autoOpen.setSelection(true);
         }
 
-
+        addModListener(autoOpen,SWT.Selection);
 
 
         //Tray options
-        trayMinimize = new Button(gMW,SWT.CHECK);
+        trayMinimize = new Button(composite,SWT.CHECK);
         gridData = new GridData(GridData.GRAB_HORIZONTAL);
         gridData.horizontalSpan = 2;
         trayMinimize.setLayoutData(gridData);
         trayMinimize.setText("Minimizing the main window will send it to the tray");
         trayMinimize.setSelection(Boolean.parseBoolean(properties.getProperty("tray.minimize","true"))?true:false);
+        addModListener(trayMinimize,SWT.Selection);
+
 
         //Tray options
-        trayExit = new Button(gMW,SWT.CHECK);
+        trayExit = new Button(composite,SWT.CHECK);
         gridData = new GridData(GridData.GRAB_HORIZONTAL);
         gridData.horizontalSpan = 2;
         trayExit.setLayoutData(gridData);
         trayExit.setText("Exiting the main window will send it to the tray");
         trayExit.setSelection(Boolean.parseBoolean(properties.getProperty("tray.exit","true"))?true:false);
-
+        addModListener(trayExit,SWT.Selection);
 
 
         //auto console open
-        autoConsole = new Button(gMW,SWT.CHECK);
+        autoConsole = new Button(composite,SWT.CHECK);
         gridData = new GridData(GridData.GRAB_HORIZONTAL);
         gridData.horizontalSpan = 2;
         autoConsole.setLayoutData(gridData);
         autoConsole.setText("Auto open console when opening main window");
         autoConsole.setSelection(Boolean.parseBoolean(properties.getProperty("auto_console","false"))?true:false);
+        addModListener(autoConsole,SWT.Selection);
 
 
+        composite.layout();
+    }
 
 
-
-        //---------------------- Misc Preferences -------------------\\
-
-        Group gMisc = new Group(comp,SWT.NULL);
-        gMisc.setText("Miscellaneous Preferences");
-        gridData = new GridData(GridData.FILL_HORIZONTAL);
-        gMisc.setLayoutData(gridData);
-
-        gridLayout = new GridLayout();
-        gridLayout.numColumns = 2;
-        gridLayout.marginWidth = 0;
-        gMisc.setLayout(gridLayout);
-
+    public void makeMiscPreferences(final Composite composite){
+        Control[] controls = composite.getChildren();
+        for(Control control:controls){
+            control.dispose();
+        }
         //popupsEnabled
-        popupsEnabled = new Button(gMisc,SWT.CHECK);
-        gridData = new GridData(GridData.GRAB_HORIZONTAL);
+        popupsEnabled = new Button(composite,SWT.CHECK);
+        GridData gridData = new GridData(GridData.GRAB_HORIZONTAL);
         gridData.horizontalSpan = 2;
         popupsEnabled.setLayoutData(gridData);
         popupsEnabled.setText("Popup Alerts Enabled");
@@ -381,8 +377,10 @@ public class PreferencesTab {
         }else
             popupsEnabled.setSelection(false);
 
+        addModListener(popupsEnabled,SWT.Selection);
+
         //AutoClipboard
-        autoClipboard = new Button(gMisc,SWT.CHECK);
+        autoClipboard = new Button(composite,SWT.CHECK);
         gridData = new GridData(GridData.GRAB_HORIZONTAL);
         gridData.horizontalSpan = 2;
         autoClipboard.setLayoutData(gridData);
@@ -391,26 +389,22 @@ public class PreferencesTab {
         if (Boolean.parseBoolean(properties.getProperty("auto_clipboard",Utilities.isLinux()? "false" : "true"))) {
             autoClipboard.setSelection(true);
         }
-
-        //---------------------- Update Preferences -------------------\\
-
-
-        Group gUpdate = new Group(comp,SWT.NULL);
-        gUpdate.setText("Update Preferences");
-        gridData = new GridData(GridData.FILL_HORIZONTAL);
-        gUpdate.setLayoutData(gridData);
-
-        gridLayout = new GridLayout();
-        gridLayout.numColumns = 2;
-        gridLayout.marginWidth = 0;
-        gUpdate.setLayout(gridLayout);
+        addModListener(autoClipboard,SWT.Selection);
 
 
+        composite.layout();
+    }
 
+
+    public void makeUpdatePreferences(final Composite composite){
+        Control[] controls = composite.getChildren();
+        for(Control control:controls){
+            control.dispose();
+        }
         //Auto Update Check
 
-        autoUpdateCheck = new Button(gUpdate,SWT.CHECK);
-        gridData = new GridData(GridData.GRAB_HORIZONTAL);
+        autoUpdateCheck = new Button(composite,SWT.CHECK);
+        GridData gridData = new GridData(GridData.GRAB_HORIZONTAL);
         gridData.horizontalSpan = 2;
         autoUpdateCheck.setLayoutData(gridData);
         autoUpdateCheck.setText("Auto Check for Updates: Allow AzSMRC to check for and alert the user to updates");
@@ -419,10 +413,11 @@ public class PreferencesTab {
             autoUpdateCheck.setSelection(true);
         }
 
+        addModListener(autoUpdateCheck,SWT.Selection);
 
         //Perform Auto Update
 
-        autoUpdate = new Button(gUpdate,SWT.CHECK);
+        autoUpdate = new Button(composite,SWT.CHECK);
         gridData = new GridData(GridData.GRAB_HORIZONTAL);
         gridData.horizontalSpan = 2;
         autoUpdate.setLayoutData(gridData);
@@ -432,12 +427,10 @@ public class PreferencesTab {
             autoUpdate.setSelection(true);
         }
 
-
-
-
+        addModListener(autoUpdate,SWT.Selection);
 
         //update button
-        final Button updateCheck = new Button(gUpdate,SWT.PUSH);
+        final Button updateCheck = new Button(composite,SWT.PUSH);
         gridData = new GridData(GridData.GRAB_HORIZONTAL);
         gridData.horizontalSpan = 2;
         updateCheck.setLayoutData(gridData);
@@ -493,21 +486,134 @@ public class PreferencesTab {
             }
 
         });
+        composite.layout();
+    }
 
 
-        scrolledComposite.setContent(parent);
-
-        scrolledComposite.addControlListener(new ControlAdapter() {
-            public void controlResized(ControlEvent e) {
-                Rectangle r = scrolledComposite.getClientArea();
-                System.out.println(r.width + " : " + parent.computeSize(r.width,SWT.DEFAULT));
-                scrolledComposite.setMinSize(parent.computeSize(r.width, SWT.DEFAULT));
+    public void addModListener(Control control, int selectionType){
+        control.addListener(selectionType, new Listener(){
+            public void handleEvent(Event arg0) {
+                bModified = true;
             }
         });
-
-
-
-        prefsTab.setControl(scrolledComposite);
-        parentTab.setSelection(prefsTab);
     }
+
+    public void save(Composite parent){
+        if((updateIntervalOpen_Text != null && !updateIntervalOpen_Text.isDisposed())||
+                (updateIntervalClosed_Text != null && !updateIntervalClosed_Text.isDisposed())){
+            String open = updateIntervalOpen_Text.getText();
+            String closed = updateIntervalClosed_Text.getText();
+            if(open.equalsIgnoreCase("") || closed.equalsIgnoreCase("") ){
+                MessageBox messageBox = new MessageBox(parent.getShell(), SWT.ICON_ERROR | SWT.OK);
+                messageBox.setText("Error");
+                messageBox.setMessage("None of the intervals can be blank.");
+                messageBox.open();
+                return;
+            }else if(Long.parseLong(open) < 3){
+                updateIntervalOpen_Text.setText("3");
+                MessageBox messageBox = new MessageBox(parent.getShell(), SWT.ICON_ERROR | SWT.OK);
+                messageBox.setText("Error");
+                messageBox.setMessage("The interval for when the main window is open is too low.  Please set to 3 seconds or above.");
+                messageBox.open();
+                return;
+            }else if(Long.parseLong(closed) < 3){
+                updateIntervalClosed_Text.setText("3");
+                MessageBox messageBox = new MessageBox(parent.getShell(), SWT.ICON_ERROR | SWT.OK);
+                messageBox.setText("Error");
+                messageBox.setMessage("The interval for when the main window is closed is too low.  Please set to 3 seconds or above.");
+                messageBox.open();
+                return;
+            }else{
+                properties.setProperty("connection_interval_open", String.valueOf(Long.parseLong(open)*1000));
+                properties.setProperty("connection_interval_closed", String.valueOf(Long.parseLong(closed)*1000));
+            }
+        }
+
+
+        //Store AutoOpen
+        if(autoOpen != null && !autoOpen.isDisposed()){
+            if(autoOpen.getSelection())
+                properties.setProperty("auto_open", "true");
+            else
+                properties.setProperty("auto_open", "false");
+        }
+
+        //Store AutoSave
+        if(autoConnect != null && !autoConnect.isDisposed()){
+            if(autoConnect.getSelection())
+                properties.setProperty("auto_connect", "true");
+            else
+                properties.setProperty("auto_connect", "false");
+        }
+
+
+        //Store AutoUpdateCheck
+        if(autoUpdateCheck != null && !autoUpdateCheck.isDisposed()){
+            if(autoUpdateCheck.getSelection())
+                properties.setProperty("update.autocheck", "true");
+            else
+                properties.setProperty("update.autocheck", "false");
+        }
+
+
+
+        //Store AutoUpdate
+        if(autoUpdate != null && !autoUpdate.isDisposed()){
+            if(autoUpdate.getSelection())
+                properties.setProperty("update.autoupdate", "true");
+            else
+                properties.setProperty("update.autoupdate", "false");
+        }
+
+
+        //Store tray options
+        if(trayMinimize != null && !trayMinimize.isDisposed()){
+            if(trayMinimize.getSelection())
+                properties.setProperty("tray.minimize","true");
+            else
+                properties.setProperty("tray.minimize","false");
+        }
+
+        if(trayExit != null && !trayExit.isDisposed()){
+            if(trayExit.getSelection())
+                properties.setProperty("tray.exit","true");
+            else
+                properties.setProperty("tray.exit","false");
+        }
+
+        //Store popupsEnabled
+        if(popupsEnabled != null && !popupsEnabled.isDisposed()){
+            if(popupsEnabled.getSelection())
+                properties.setProperty("popups_enabled", "true");
+            else
+                properties.setProperty("popups_enabled", "false");
+        }
+
+
+        //Store the autoClipboard setting
+        if(autoClipboard != null && !autoClipboard.isDisposed()){
+            if(autoClipboard.getSelection())
+                properties.setProperty("auto_clipboard", "true");
+            else
+                properties.setProperty("auto_clipboard", "false");
+        }
+
+        //Store auto console setting
+        if(autoConsole != null && !autoConsole.isDisposed()){
+            if(autoConsole.getSelection())
+                properties.setProperty("auto_console", "true");
+            else
+                properties.setProperty("auto_console", "false");
+        }
+
+        //Reset the boolean for modified
+        bModified = false;
+
+        //Save all changes
+        FireFrogMain.getFFM().saveConfig();
+
+        //Update Timer
+        FireFrogMain.getFFM().updateTimer(true);
+    }
+
 }
