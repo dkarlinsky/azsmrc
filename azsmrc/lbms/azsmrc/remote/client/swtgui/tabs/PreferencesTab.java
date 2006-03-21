@@ -413,7 +413,7 @@ public class PreferencesTab {
         gridData = new GridData(GridData.GRAB_HORIZONTAL);
         gridData.horizontalSpan = 2;
         autoUpdateCheck.setLayoutData(gridData);
-        autoUpdateCheck.setText("Auto Check for Updates: Allow FireFrog to check for and alert the user to updates");
+        autoUpdateCheck.setText("Auto Check for Updates: Allow AzSMRC to check for and alert the user to updates");
 
         if (Boolean.parseBoolean(properties.getProperty("update.autocheck","true"))) {
             autoUpdateCheck.setSelection(true);
