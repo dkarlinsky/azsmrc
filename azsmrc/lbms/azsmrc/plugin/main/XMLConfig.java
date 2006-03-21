@@ -112,7 +112,7 @@ public class XMLConfig {
 			userList.put(user.getUsername(), user);
 		}
 		if (userList.isEmpty()) {
-			User admin = new User ("admin" , "azmultiuser");
+			User admin = new User ("admin" , "azsmrc");
 			admin.setRights(RemoteConstants.RIGHTS_ADMIN);
 			userList.put(admin.getUsername(), admin);
 		}
@@ -136,7 +136,7 @@ public class XMLConfig {
 				root.setAttribute("configVersion", Double.toString(configVersion));
 				Element users = new Element ("UserList");
 
-				User admin = new User ("admin" , "azmultiuser");
+				User admin = new User ("admin" , "azsmrc");
 				admin.setRights(RemoteConstants.RIGHTS_ADMIN);
 				users.addContent(admin.toElement());
 				root.addContent(users);
