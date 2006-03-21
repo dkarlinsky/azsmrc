@@ -363,7 +363,7 @@ public class WebRequestHandler	/*extends WebPlugin*/ implements TrackerWebPageGe
 			}
 		}
 		////////////////////////////////////////////////////////////////
-		InputStream is = WebRequestHandler.class.getClassLoader().getResourceAsStream("lbms/azmultiuser/web/resources" + url );//
+		InputStream is = WebRequestHandler.class.getClassLoader().getResourceAsStream("lbms/azsmrc/plugin/web/resources" + url );//
 
 		System.out.println("Trying to load per classloader: "+ url);
 		if ( is == null ) {
