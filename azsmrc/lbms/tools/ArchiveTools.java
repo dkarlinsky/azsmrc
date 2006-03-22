@@ -41,6 +41,7 @@ public class ArchiveTools {
 	public static Enumeration<ZipEntry> getZipEntries (File zipFile) throws IOException {
 		ZipFile zip = new ZipFile(zipFile);
 		Enumeration<ZipEntry> e =(Enumeration<ZipEntry>)zip.entries();
+		zip.close();
 		return e;
 	}
 
