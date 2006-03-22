@@ -524,17 +524,24 @@ public class FireFrogMain implements Launchable {
 
 				}
 			}
-			public void updateFailed() {
+			public void updateFailed(String reason) {
 				if (mainWindow != null) {
-					mainWindow.setStatusBarText("Update Failed",SWT.COLOR_RED);
+					mainWindow.setStatusBarText("Update Failed: "+reason,SWT.COLOR_RED);
 				}
-				normalLogger.info("Update Failed");
+				normalLogger.info("Update Failed: "+reason);
 			}
 			public void updateFinished() {
 				if (mainWindow != null) {
 					mainWindow.setStatusBarText("Update Finished");
 				}
 				normalLogger.info("Update Finished");
+			}
+
+			public void updateError(String error) {
+				if (mainWindow != null) {
+					mainWindow.setStatusBarText("Update Error: "+error,SWT.COLOR_RED);
+				}
+				normalLogger.info("Update Error: "+error);
 			}
 		});
 		if (Boolean.parseBoolean(properties.getProperty("update.autocheck", "true"))) {

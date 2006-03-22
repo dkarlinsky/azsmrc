@@ -48,6 +48,7 @@ public class Updater {
 	private Update remoteUpdate;
 	private boolean updateAvailable = false;
 	private boolean failed = false;
+	private String lastError = "";
 
 	public Updater (URL remoteUpdateFile, File currentUpdates, File dir) {
 		this.remoteUpdateFile = remoteUpdateFile;
@@ -221,6 +222,8 @@ public class Updater {
 								String localHash = CryptoTools.formatByte(CryptoTools.messageDigestFile(localLoc.getAbsolutePath(), "SHA-1"));
 								if (!localHash.equalsIgnoreCase(u.getHash())) {
 									failed = true;
+									lastError = "File "+u.getName()+" failed Hash check";
+									callListenerUpdateError(lastError);
 									continue;
 								}
 								if (u.isExtract()) {
@@ -241,7 +244,7 @@ public class Updater {
 					}
 				}
 				if (failed) {
-					callListenerUpdateFailed();
+					callListenerUpdateFailed(lastError);
 				} else {
 					if (currentUpdates != null) {
 						OutputStream os = null;
@@ -290,9 +293,15 @@ public class Updater {
 		}
 	}
 
-	private void callListenerUpdateFailed() {
+	private void callListenerUpdateFailed(String reason) {
 		for (UpdateListener l:listeners) {
-			l.updateFailed();
+			l.updateFailed(reason);
+		}
+	}
+
+	private void callListenerUpdateError(String error) {
+		for (UpdateListener l:listeners) {
+			l.updateError(error);
 		}
 	}
 

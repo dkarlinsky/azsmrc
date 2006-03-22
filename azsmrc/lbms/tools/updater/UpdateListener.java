@@ -5,5 +5,6 @@ public interface UpdateListener {
 	public void updateAvailable(Update update);
 	public void noUpdate();
 	public void updateFinished();
-	public void updateFailed();
+	public void updateError (String error);
+	public void updateFailed(String reason);
 }
