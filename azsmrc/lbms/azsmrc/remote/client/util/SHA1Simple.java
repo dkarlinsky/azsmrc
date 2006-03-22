@@ -26,7 +26,6 @@ package lbms.azsmrc.remote.client.util;
 import java.util.Arrays;
 import java.util.Random;
 
-import org.gudy.azureus2.core3.util.ByteFormatter;
 
 
 /**

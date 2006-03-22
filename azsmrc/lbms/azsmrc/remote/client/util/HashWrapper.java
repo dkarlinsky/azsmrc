@@ -22,8 +22,6 @@ package lbms.azsmrc.remote.client.util;
 
 import java.util.Arrays;
 
-import org.gudy.azureus2.plugins.utils.ByteArrayWrapper;
-
 /**
  * @author Olivier
  * 

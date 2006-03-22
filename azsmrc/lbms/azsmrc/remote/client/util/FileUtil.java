@@ -22,15 +22,6 @@
 
 package lbms.azsmrc.remote.client.util;
 
-import org.gudy.azureus2.core3.config.COConfigurationManager;
-import org.gudy.azureus2.core3.logging.*;
-import org.gudy.azureus2.core3.torrent.TOTorrent;
-import org.gudy.azureus2.core3.torrent.TOTorrentFactory;
-import org.gudy.azureus2.platform.PlatformManager;
-import org.gudy.azureus2.platform.PlatformManagerFactory;
-import org.gudy.azureus2.platform.PlatformManagerCapabilities;
-import org.gudy.azureus2.plugins.platform.PlatformManagerException;
-
 import java.io.*;
 import java.net.URI;
 import java.util.ArrayList;
@@ -39,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lbms.azsmrc.remote.client.torrent.TOTorrentFactory;
 import lbms.azsmrc.shared.RemoteConstants;
 
 /**
@@ -82,45 +74,7 @@ public class FileUtil {
   }
 
 
-  /**
-   * Deletes the given dir and all files/dirs underneath
-   */
-  public static void recursiveDelete(File f) {
-	String defSaveDir = COConfigurationManager.getStringParameter("Default save path", "");
-	String moveToDir = COConfigurationManager.getStringParameter("Completed Files Directory", "");
 
-	try{
-		moveToDir = new File(moveToDir).getCanonicalPath();
-	}catch( Throwable e ){
-	}
-	try{
-		defSaveDir = new File(defSaveDir).getCanonicalPath();
-	}catch( Throwable e ){
-	}
-
-	try {
-
-	  if (f.getCanonicalPath().equals(moveToDir)) {
-		System.out.println("FileUtil::recursiveDelete:: not allowed to delete the MoveTo dir !");
-		return;
-	  }
-	  if (f.getCanonicalPath().equals(defSaveDir)) {
-		System.out.println("FileUtil::recursiveDelete:: not allowed to delete the default data dir !");
-		return;
-	  }
-
-	  if (f.isDirectory()) {
-		File[] files = f.listFiles();
-		for (int i = 0; i < files.length; i++) {
-		  recursiveDelete(files[i]);
-		}
-		f.delete();
-	  }
-	  else {
-		f.delete();
-	  }
-	} catch (Exception ignore) {/*ignore*/}
-  }
 
   public static long
   getFileOrDirectorySize(
@@ -456,17 +410,14 @@ public class FileUtil {
 		File		to_file )
 	{
 		if ( to_file.exists()){
-			Logger.log(new LogAlert(LogAlert.REPEATABLE, LogAlert.AT_ERROR,
-					"renameFile: target file '" + to_file + "' already exists, failing"));
+			System.out.println(
+					"renameFile: target file '" + to_file + "' already exists, failing");
 
 			return( false );
 		}
 
 		if ( !from_file.exists()){
-			Logger
-					.log(new LogAlert(LogAlert.REPEATABLE, LogAlert.AT_ERROR,
-							"renameFile: source file '" + from_file
-									+ "' doesn't exist, failing"));
+			System.out.println("renameFile: source file '" + from_file+ "' doesn't exist, failing");
 
 			return( false );
 		}
@@ -502,9 +453,9 @@ public class FileUtil {
 					}
 				}catch( Throwable e ){
 
-					Logger.log(new LogAlert(LogAlert.REPEATABLE,
-							"renameFile: failed to rename file '" + ff.toString() + "' to '"
-									+ tf.toString() + "'", e));
+					System.out.println("renameFile: failed to rename file '" + ff.toString() + "' to '"
+									+ tf.toString() + "'");
+					e.printStackTrace();
 
 					break;
 				}
@@ -515,15 +466,14 @@ public class FileUtil {
 				File[]	remaining = from_file.listFiles();
 
 				if ( remaining != null && remaining.length > 0 ){
-					Logger.log(new LogAlert(LogAlert.REPEATABLE, LogAlert.AT_ERROR,
-							"renameFile: files remain in '" + from_file.toString()
-									+ "', not deleting"));
+					System.out.println("renameFile: files remain in '" + from_file.toString()
+									+ "', not deleting");
 
 				}else{
 
 					if ( !from_file.delete()){
-						Logger.log(new LogAlert(LogAlert.REPEATABLE, LogAlert.AT_ERROR,
-								"renameFile: failed to delete '" + from_file.toString() + "'"));
+						System.out.println(
+								"renameFile: failed to delete '" + from_file.toString() + "'");
 					}
 				}
 
@@ -540,14 +490,13 @@ public class FileUtil {
 				try{
 
 					if ( !renameFile( tf, ff )){
-						Logger.log(new LogAlert(LogAlert.REPEATABLE, LogAlert.AT_ERROR,
-								"renameFile: recovery - failed to move file '" + tf.toString()
-										+ "' to '" + ff.toString() + "'"));
+						System.out.println("renameFile: recovery - failed to move file '" + tf.toString()
+										+ "' to '" + ff.toString() + "'");
 					}
 				}catch( Throwable e ){
-					Logger.log(new LogAlert(LogAlert.REPEATABLE,
-							"renameFile: recovery - failed to move file '" + tf.toString()
-									+ "' to '" + ff.toString() + "'", e));
+					System.out.println("renameFile: recovery - failed to move file '" + tf.toString()
+									+ "' to '" + ff.toString() + "'");
+					e.printStackTrace();
 
 				}
 			  }
@@ -555,7 +504,7 @@ public class FileUtil {
 			  return( false );
 
 		}else{
-			if ( 	(!COConfigurationManager.getBooleanParameter("Copy And Delete Data Rather Than Move")) &&
+			if ( 	/*(!COConfigurationManager.getBooleanParameter("Copy And Delete Data Rather Than Move")) &&*/
 					from_file.renameTo( to_file )){
 
 				return( true );
@@ -598,9 +547,8 @@ public class FileUtil {
 					fis = null;
 
 					if ( !from_file.delete()){
-						Logger.log(new LogAlert(LogAlert.REPEATABLE,
-								LogAlert.AT_ERROR, "renameFile: failed to delete '"
-										+ from_file.toString() + "'"));
+						System.out.println("renameFile: failed to delete '"
+										+ from_file.toString() + "'");
 
 						throw( new Exception( "Failed to delete '" + from_file.toString() + "'"));
 					}
@@ -611,9 +559,9 @@ public class FileUtil {
 
 				}catch( Throwable e ){
 
-					Logger.log(new LogAlert(LogAlert.REPEATABLE,
-							"renameFile: failed to rename '" + from_file.toString()
-									+ "' to '" + to_file.toString() + "'", e));
+					System.out.println("renameFile: failed to rename '" + from_file.toString()
+									+ "' to '" + to_file.toString() + "'");
+					e.printStackTrace();
 
 					return( false );
 
@@ -667,34 +615,5 @@ public class FileUtil {
 		 t.printStackTrace();
 	  }
 
-	}
-
-	public static boolean
-	deleteWithRecycle(
-		File		file )
-	{
-		if ( COConfigurationManager.getBooleanParameter("Move Deleted Data To Recycle Bin" )){
-
-			try{
-				final PlatformManager	platform  = PlatformManagerFactory.getPlatformManager();
-
-				if (platform.hasCapability(PlatformManagerCapabilities.RecoverableFileDelete)){
-
-					platform.performRecoverableFileDelete( file.getAbsolutePath());
-
-					return( true );
-
-				}else{
-
-					return( file.delete());
-				}
-			}catch( PlatformManagerException e ){
-
-				return( file.delete());
-			}
-		}else{
-
-			return( file.delete());
-		}
 	}
 }

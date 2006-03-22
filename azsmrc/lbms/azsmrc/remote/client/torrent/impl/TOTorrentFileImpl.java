@@ -25,11 +25,10 @@ package lbms.azsmrc.remote.client.torrent.impl;
 import java.io.*;
 import java.util.*;
 
-import org.gudy.azureus2.core3.util.FileUtil;
-
 import lbms.azsmrc.remote.client.internat.LocaleUtil;
 import lbms.azsmrc.remote.client.internat.LocaleUtilDecoder;
 import lbms.azsmrc.remote.client.torrent.*;
+import lbms.azsmrc.remote.client.util.FileUtil;
 import lbms.azsmrc.shared.RemoteConstants;
 
 

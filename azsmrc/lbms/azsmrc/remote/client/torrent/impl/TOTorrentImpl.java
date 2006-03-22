@@ -26,9 +26,9 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import org.gudy.azureus2.core3.util.ByteFormatter;
 
 import lbms.azsmrc.remote.client.torrent.*;
+import lbms.azsmrc.remote.client.util.ByteFormatter;
 import lbms.azsmrc.remote.client.util.HashWrapper;
 import lbms.azsmrc.remote.client.util.SHA1Hasher;
 import lbms.azsmrc.shared.*;
