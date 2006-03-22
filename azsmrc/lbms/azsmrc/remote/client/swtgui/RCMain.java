@@ -549,7 +549,7 @@ public class RCMain implements Launchable {
 				mainWindow.setStatusBarText("Checking for Updates");
 			}
 			normalLogger.info("Checking for Updates");
-			updater.checkForUpdates(false); //TODO
+			updater.checkForUpdates(Boolean.parseBoolean(properties.getProperty("update.beta", "false")));
 		}
 		timer = new Timer("Main Timer",5);
 	}
