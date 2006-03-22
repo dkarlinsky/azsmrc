@@ -549,7 +549,7 @@ public class FireFrogMain implements Launchable {
 				mainWindow.setStatusBarText("Checking for Updates");
 			}
 			normalLogger.info("Checking for Updates");
-			updater.checkForUpdates();
+			updater.checkForUpdates(false); //TODO
 		}
 		timer = new Timer("Main Timer",5);
 	}

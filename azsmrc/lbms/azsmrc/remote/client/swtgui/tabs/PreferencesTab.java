@@ -482,7 +482,7 @@ public class PreferencesTab {
 						}
 					});
 
-					updater.checkForUpdates();
+					updater.checkForUpdates(false); //TODO fix the config thing or whatever
 				} catch (MalformedURLException e2) {
 				}
 

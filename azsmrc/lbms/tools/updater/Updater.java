@@ -46,6 +46,7 @@ public class Updater {
 
 	private Update localUpdate;
 	private Update remoteUpdate;
+	private UpdateList remoteUList;
 	private boolean updateAvailable = false;
 	private boolean failed = false;
 	private String lastError = "";
@@ -70,7 +71,7 @@ public class Updater {
 		return updateAvailable;
 	}
 
-	public void checkForUpdates() {
+	public void checkForUpdates(boolean beta) {
 		Thread t = new Thread (new Runnable() {
 			public void run() {
 				InputStream is = null;
