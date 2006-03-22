@@ -499,7 +499,9 @@ public class PreferencesTab {
 						}
 					});
 
-					updater.checkForUpdates(false); //TODO fix the config thing or whatever
+					updater.checkForUpdates(Boolean.parseBoolean(properties.getProperty("update.beta", "false")));
+                    properties.setProperty("update.lastcheck",Long.toString(System.currentTimeMillis()));
+                    RCMain.getRCMain().saveConfig();
 				} catch (MalformedURLException e2) {
 				}
 
