@@ -337,17 +337,14 @@ public class RequestManager {
 						TorrentAttribute ta = torrentManager.getAttribute(TorrentAttribute.TA_CATEGORY);
 						Torrent newTorrent = torrentManager.createFromBEncodedData(EncodingUtil.decode(torrentData));
 
-						List<Element> fileOptions = xmlRequest.getChild("Torrent").getChildren("FileOptions");
-						if (fileOptions.size()>0) {
-							Integer[] options = new Integer[fileOptions.size()];
-							for (int i=0;i<options.length;i++) {
-								try {
-									options[i] = fileOptions.get(i).getAttribute("options").getIntValue();
-								} catch (DataConversionException e) {
-									options[i] = 1;
-									e.printStackTrace();
-								}
+						String fileOptions = xmlRequest.getChild("Torrent").getAttributeValue("fileOptions");
+						if (fileOptions!=null) {
+							int[] opt = EncodingUtil.StringToIntArray(fileOptions);
+							Integer[] options = new Integer[opt.length];
+							for (int i=0; i<opt.length;i++) {
+								options[i] = opt[i];
 							}
+							downloadControlList.put(EncodingUtil.encode(newTorrent.getHash()), options);
 						}
 
 						Download dl = Plugin.getPluginInterface().getDownloadManager().addDownload(newTorrent);

@@ -296,10 +296,17 @@ public class Client {
 	}
 
 	public void sendAddDownload(File torrentFile) {
+		sendAddDownload(torrentFile, null);
+	}
+
+	public void sendAddDownload(File torrentFile, int[] fileOptions) {
 		Element sendElement = getSendElement();
 		sendElement.setAttribute("switch", "addDownload");
 		sendElement.setAttribute("location", "XML");
 		Element torrent = new Element ("Torrent");
+		if (fileOptions != null) {
+			torrent.setAttribute("fileOptions", EncodingUtil.IntArrayToString(fileOptions));
+		}
 		FileInputStream fis = null;
 		try {
 			fis = new FileInputStream(torrentFile);
