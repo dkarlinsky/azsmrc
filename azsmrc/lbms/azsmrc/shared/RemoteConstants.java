@@ -1,6 +1,22 @@
 package lbms.azsmrc.shared;
 
+import java.nio.charset.Charset;
+
+
 public class RemoteConstants {
+
+	public static final String  OSName = System.getProperty("os.name");
+
+	  public static final boolean isOSX				= OSName.equalsIgnoreCase("Mac OS X");
+	  public static final boolean isLinux			= OSName.equalsIgnoreCase("Linux");
+	  public static final boolean isSolaris			= OSName.equalsIgnoreCase("SunOS");
+	  public static final boolean isWindowsXP		= OSName.equalsIgnoreCase("Windows XP");
+	  public static final boolean isWindows95		= OSName.equalsIgnoreCase("Windows 95");
+	  public static final boolean isWindows98		= OSName.equalsIgnoreCase("Windows 98");
+	  public static final boolean isWindowsME		= OSName.equalsIgnoreCase("Windows ME");
+	  public static final boolean isWindows9598ME	= isWindows95 || isWindows98 || isWindowsME;
+
+	  public static final boolean isWindows	= !(isOSX || isLinux || isSolaris);
 
 	public static final double CURRENT_VERSION = 1;
 
@@ -74,7 +90,24 @@ public class RemoteConstants {
 
 
 
-    //Update URL
-    public static final String UPDATE_URL = "http://azcvsupdater.sourceforge.net/azsmrc/ffupdate.xml.gz";
+	//Update URL
+	public static final String UPDATE_URL = "http://azcvsupdater.sourceforge.net/azsmrc/ffupdate.xml.gz";
+
+	//Encoder stuff
+	public static final String DEFAULT_ENCODING 	= "UTF8";
+	public static final String BYTE_ENCODING 		= "ISO-8859-1";
+	public static Charset	DEFAULT_CHARSET;
+	public static Charset	BYTE_CHARSET;
+
+	static{
+		try{
+			BYTE_CHARSET 	= Charset.forName( RemoteConstants.BYTE_ENCODING );
+			DEFAULT_CHARSET = Charset.forName( RemoteConstants.DEFAULT_ENCODING );
+
+  	}catch( Throwable e ){
+
+  		e.printStackTrace();
+  	}
+	}
 
 }

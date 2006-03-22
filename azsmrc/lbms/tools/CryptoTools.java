@@ -2,6 +2,7 @@ package lbms.tools;
 
 import java.io.FileInputStream;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class CryptoTools {
 
@@ -17,6 +18,12 @@ public class CryptoTools {
 		} finally {
 			if (in!=null) in.close();
 		}
+	  }
+
+	public static byte[] messageDigest( byte[] bytes, String algo ) throws NoSuchAlgorithmException   {
+		MessageDigest messagedigest = MessageDigest.getInstance( algo );
+		messagedigest.update(bytes);
+		return messagedigest.digest();
 	  }
 
 	public static String formatByte (byte[] digest) {
