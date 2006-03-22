@@ -7,9 +7,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import lbms.tools.CryptoTools;
 
@@ -70,7 +74,6 @@ public class UpdateCreator {
 		f.setPath(path);
 		f.setSize(file.length());
 		String fn = file.getName();
-
 		int pos = fn.indexOf('_');
 		int end = fn.lastIndexOf('.');
 		if (pos ==-1 || end-pos < 2) {
@@ -78,11 +81,38 @@ public class UpdateCreator {
 		} else {
 			f.setVersion(new Version(fn.substring(pos+1, end)));
 		}
-
 		f.setType(type);
-		f.setHash(CryptoTools.formatByte(CryptoTools.messageDigestFile(file.getAbsolutePath(), "SHA-1")));
+
+		f.setHash(CryptoTools.formatByte(CryptoTools.messageDigestFile(file.getAbsolutePath(), UpdateFile.HASH_ALGORITHM)));
 		update.addFile(f);
 		return f;
+	}
+
+	public void setZipArchivFiles (File file, UpdateFile uf) throws Exception {
+		ZipFile zip = new ZipFile(file);
+		Enumeration<ZipEntry> e =(Enumeration<ZipEntry>)zip.entries();
+		while (e.hasMoreElements()) {
+			ZipEntry ze = e.nextElement();
+			UpdateFile f = new UpdateFile();
+			f.setInArchive(true);
+			f.setUrl("");
+			f.setPath("");
+			f.setSize(ze.getSize());
+			f.setType(UpdateFile.TYPE_DND);
+			String fn = ze.getName();
+			f.setName(fn);
+			int pos = fn.indexOf('_');
+			int end = fn.lastIndexOf('.');
+			if (pos ==-1 || end-pos < 2) {
+				f.setVersion(new Version("0"));
+			} else {
+				f.setVersion(new Version(fn.substring(pos+1, end)));
+			}
+			InputStream in = zip.getInputStream(ze);
+			f.setHash(CryptoTools.formatByte(CryptoTools.messageDigestStream(in, UpdateFile.HASH_ALGORITHM)));
+			in.close();
+		}
+		zip.close();
 	}
 
 	public void removeFile (UpdateFile f) {

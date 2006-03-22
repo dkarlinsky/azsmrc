@@ -1,10 +1,21 @@
 package lbms.tools.updater;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jdom.DataConversionException;
 import org.jdom.Element;
 
 public class UpdateFile {
 
+
+	public final static String HASH_ALGORITHM = "SHA-1";
+
+	/**
+	 * Indicates that this file will not be directly downloaded
+	 * used for Files in Archives
+	 */
+	public final static int TYPE_DND = 0;
 	/**
 	 * Indicates that the URL is a normal URL and will just
 	 * try to download.
@@ -24,7 +35,9 @@ public class UpdateFile {
 	private String hash;
 	private int type;
 	private long size;
-	private boolean extract;
+	private boolean isArchive;
+	private boolean isInArchive;
+	private List<UpdateFile> archivFiles = new ArrayList<UpdateFile>();
 
 	public UpdateFile() {
 
@@ -44,14 +57,22 @@ public class UpdateFile {
 			} else {
 				url = file.getAttributeValue("url");
 			}
-			if (file.getAttribute("extract") == null) {
-				extract = false;
+			if (file.getAttribute("isArchive") == null) {
+				isArchive = false;
 			} else {
-				extract = Boolean.parseBoolean(file.getAttributeValue("extract"));
+				isArchive = Boolean.parseBoolean(file.getAttributeValue("isArchive"));
+			}
+			if (file.getAttribute("isInArchive") == null) {
+				isInArchive = false;
+			} else {
+				isInArchive = Boolean.parseBoolean(file.getAttributeValue("isInArchive"));
 			}
 			hash = file.getAttributeValue("hash");
 			type = file.getAttribute("type").getIntValue();
 			size = file.getAttribute("size").getLongValue();
+			List<Element> files = file.getChildren("File");
+			for (Element f:files)
+				archivFiles.add(new UpdateFile(f));
 		} catch (DataConversionException e) {
 			e.printStackTrace();
 		}
@@ -66,10 +87,15 @@ public class UpdateFile {
 		if (url!="")
 			file.setAttribute("url", url);
 		file.setAttribute("hash", hash);
-		if (extract)
-			file.setAttribute("extract", Boolean.toString(extract));
+		if (isArchive)
+			file.setAttribute("isArchive", Boolean.toString(isArchive));
+		if (isInArchive)
+			file.setAttribute("isInArchive", Boolean.toString(isInArchive));
 		file.setAttribute("type",Integer.toString(type));
 		file.setAttribute("size", Long.toString(size));
+		for (UpdateFile f:archivFiles) {
+			file.addContent(f.toElement());
+		}
 		return file;
 	}
 
@@ -166,18 +192,50 @@ public class UpdateFile {
 	/**
 	 * @return Returns the extract.
 	 */
-	public boolean isExtract() {
-		return extract;
+	public boolean isArchive() {
+		return isArchive;
 	}
 
 	/**
 	 * @param extract The extract to set.
 	 */
-	protected void setExtract(boolean extract) {
-		this.extract = extract;
+	protected void setArchive(boolean isArchiv) {
+		this.isArchive = isArchiv;
 	}
 
+	/**
+	 * @return Returns the isInArchive.
+	 */
+	public boolean isInArchive() {
+		return isInArchive;
+	}
 
+	/**
+	 * @param isInArchive The isInArchive to set.
+	 */
+	protected void setInArchive(boolean isInArchiv) {
+		this.isInArchive = isInArchiv;
+	}
 
+	/**
+	 * @return Returns the archivFiles.
+	 */
+	public List<UpdateFile> getArchivFiles() {
+		return archivFiles;
+	}
 
+	/**
+	 * @param archivFiles The archivFiles to set.
+	 */
+	protected void setArchivFiles(List<UpdateFile> archivFiles) {
+		this.archivFiles = archivFiles;
+	}
+
+	protected void addArchivFile (UpdateFile f) {
+		this.archivFiles.add(f);
+	}
+
+	protected void removeArchivFile (UpdateFile f) {
+		this.archivFiles.remove(f);
+	}
 }

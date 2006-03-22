@@ -855,7 +855,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                         unpackFile.setEnabled(false);
                         unpackFile.addActionListener(new ActionListener(){
                             public void actionPerformed(ActionEvent arg0) {
-                                currentUF.setExtract(unpackFile.isSelected());
+                                currentUF.setArchive(unpackFile.isSelected());
                             }
                         });
                         //END <<  unpackFile
@@ -908,7 +908,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 											.getSize()));
                                         if(currentUF.getName().endsWith(".zip") || currentUF.getName().endsWith(".gz")){
                                             unpackFile.setEnabled(true);
-                                            unpackFile.setSelected(currentUF.isExtract());
+                                            unpackFile.setSelected(currentUF.isArchive());
                                         }else{
                                             unpackFile.setSelected(false);
                                             unpackFile.setEnabled(false);

@@ -231,7 +231,7 @@ public class Updater {
 									callListenerUpdateError(lastError);
 									continue;
 								}
-								if (u.isExtract()) {
+								if (u.isArchive()) {
 									if (u.getName().endsWith(".gz")) {
 										ArchiveTools.unpackGZipFile(localLoc, dir);
 									} else if (u.getName().endsWith(".zip")){
@@ -310,7 +310,9 @@ public class Updater {
 	}
 
 	private void callListenerException (Exception e) {
+		System.out.println("ListenerException " + e.getMessage());
 		for (UpdateListener l:listeners) {
+			System.out.println("X");
 			l.exception(e);
 		}
 	}
