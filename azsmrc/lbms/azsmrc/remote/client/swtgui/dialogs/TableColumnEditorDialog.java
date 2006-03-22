@@ -2,7 +2,7 @@ package lbms.azsmrc.remote.client.swtgui.dialogs;
 
 import java.util.List;
 
-import lbms.azsmrc.remote.client.swtgui.FireFrogMain;
+import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.container.Container;
 import lbms.azsmrc.remote.client.swtgui.container.DownloadContainer;
@@ -54,7 +54,7 @@ public class TableColumnEditorDialog {
 
 
         RowData rd;
-        display = FireFrogMain.getFFM().getDisplay();
+        display = RCMain.getRCMain().getDisplay();
 
         blue = new Color(display,0,0,128);
 
@@ -279,7 +279,7 @@ public class TableColumnEditorDialog {
             SeedContainer.saveColumns();
 
         //redraw the tables
-        FireFrogMain.getFFM().getMainWindow().redrawColumnsonTables();
+        RCMain.getRCMain().getMainWindow().redrawColumnsonTables();
     }
 
 

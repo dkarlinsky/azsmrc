@@ -7,7 +7,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 
 import lbms.azsmrc.remote.client.Download;
-import lbms.azsmrc.remote.client.swtgui.FireFrogMain;
+import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.shared.EncodingUtil;
 import lbms.azsmrc.shared.RemoteConstants;
 
@@ -55,18 +55,18 @@ public class DownloadContainer extends Container {
 
 
 	public static void loadColumns() {
-		String colls = FireFrogMain.getFFM().getProperties().getProperty("downloadTable.columns", null);
+		String colls = RCMain.getRCMain().getProperties().getProperty("downloadTable.columns", null);
 		if (colls == null) return;
 		tableColumns.clear();
 		tableColumns = EncodingUtil.StringToIntegerList(colls);
 	}
 
 	public static void saveColumns() {
-		FireFrogMain.getFFM().getProperties().setProperty("downloadTable.columns", EncodingUtil.IntListToString(tableColumns));
+		RCMain.getRCMain().getProperties().setProperty("downloadTable.columns", EncodingUtil.IntListToString(tableColumns));
 	}
 
 	public void removeFromTable(){
-		Display display = FireFrogMain.getFFM().getDisplay();
+		Display display = RCMain.getRCMain().getDisplay();
 		display.asyncExec(new Runnable(){
 			public void run() {
 				item.getParent().remove(item.getParent().indexOf(item));

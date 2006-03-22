@@ -27,7 +27,7 @@ public class GUI_Utilities {
         shell.pack();
 
         //Center Shell
-        Monitor primary = FireFrogMain.getFFM().getDisplay().getPrimaryMonitor ();
+        Monitor primary = RCMain.getRCMain().getDisplay().getPrimaryMonitor ();
         Rectangle bounds = primary.getBounds ();
         Rectangle rect = shell.getBounds ();
         int x = bounds.x + (bounds.width - rect.width) / 2;

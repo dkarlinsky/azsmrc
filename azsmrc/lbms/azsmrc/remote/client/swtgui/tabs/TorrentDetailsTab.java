@@ -16,7 +16,7 @@ import lbms.azsmrc.remote.client.DownloadFileManager;
 import lbms.azsmrc.remote.client.DownloadStats;
 import lbms.azsmrc.remote.client.events.ClientUpdateListener;
 import lbms.azsmrc.remote.client.swtgui.ColorUtilities;
-import lbms.azsmrc.remote.client.swtgui.FireFrogMain;
+import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.shared.EncodingUtil;
 
@@ -150,13 +150,13 @@ public class TorrentDetailsTab {
         };
 
         //Add the CUL to the Client
-        FireFrogMain.getFFM().getClient().addClientUpdateListener(cul);
+        RCMain.getRCMain().getClient().addClientUpdateListener(cul);
 
 
         //Listen for when tab is closed and make sure to remove the client update listener
         masterTab.addDisposeListener(new DisposeListener(){
             public void widgetDisposed(DisposeEvent arg0) {
-                FireFrogMain.getFFM().getClient().removeClientUpdateListener(cul);
+                RCMain.getRCMain().getClient().removeClientUpdateListener(cul);
 
                 //TODO store table column widths
             }
@@ -378,8 +378,8 @@ public class TorrentDetailsTab {
         trackerURL = new Label(info1, SWT.NULL);
         trackerURL.setText(das.getTrackerUrl());
         trackerURL.setToolTipText("Click to open main tracker page in browser");
-        trackerURL.setCursor(FireFrogMain.getFFM().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
-        trackerURL.setForeground(FireFrogMain.getFFM().getDisplay().getSystemColor(SWT.COLOR_DARK_BLUE));
+        trackerURL.setCursor(RCMain.getRCMain().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+        trackerURL.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_DARK_BLUE));
         trackerURL.addListener(SWT.MouseDown, new Listener(){
             public void handleEvent(Event arg0) {
                 String url = trackerURL.getText();
@@ -454,8 +454,8 @@ public class TorrentDetailsTab {
 
 
     private void update_elements(){
-        if(FireFrogMain.getFFM().getDisplay() == null || FireFrogMain.getFFM().getDisplay().isDisposed()) return;
-        FireFrogMain.getFFM().getDisplay().asyncExec(new Runnable(){
+        if(RCMain.getRCMain().getDisplay() == null || RCMain.getRCMain().getDisplay().isDisposed()) return;
+        RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
 
             public void run() {
                 //----Put all update elements here-----\\
@@ -691,7 +691,7 @@ public class TorrentDetailsTab {
      */
     public void redrawTable(){
         // Reset the data so that the SWT.Virtual picks up the array
-        FireFrogMain.getFFM().getDisplay().syncExec(new Runnable() {
+        RCMain.getRCMain().getDisplay().syncExec(new Runnable() {
             public void run() {
                 if (filesTable == null || filesTable.isDisposed())
                     return;

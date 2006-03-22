@@ -16,7 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import lbms.azsmrc.remote.client.swtgui.FireFrogMain;
+import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 
 import org.eclipse.swt.SWT;
@@ -117,10 +117,10 @@ public class ConsoleTab {
 	public ConsoleTab(CTabFolder parentTab){
 		final CTabItem detailsTab = new CTabItem(parentTab, SWT.CLOSE);
 		detailsTab.setText("Console");
-		normalLogger = FireFrogMain.getFFM().getNormalLogger();
-		debugLogger = FireFrogMain.getFFM().getDebugLogger();
+		normalLogger = RCMain.getRCMain().getNormalLogger();
+		debugLogger = RCMain.getRCMain().getDebugLogger();
 
-		final Properties props = FireFrogMain.getFFM().getProperties();
+		final Properties props = RCMain.getRCMain().getProperties();
 
 		bShowDebug = Boolean.parseBoolean(props.getProperty("logger.debug.show", "true"));
 		bShowNormal = Boolean.parseBoolean(props.getProperty("logger.normal.show", "true"));
@@ -259,7 +259,7 @@ public class ConsoleTab {
                     size = 250;
 
                 props.setProperty("console_lines", String.valueOf(size));
-                FireFrogMain.getFFM().saveConfig();
+                RCMain.getRCMain().saveConfig();
 
                 PREFERRED_LINES = size;
                 MAX_LINES = 512 + PREFERRED_LINES;
@@ -422,7 +422,7 @@ public class ConsoleTab {
 				Button btn = (Button) e.widget;
 				bShowDebug = btn.getSelection();
                 props.setProperty("logger.debug.show", bShowDebug ? "true" : "false");
-                FireFrogMain.getFFM().saveConfig();
+                RCMain.getRCMain().saveConfig();
 			}
 		});
 		buttonShowDebug.setSelection(bShowDebug);
@@ -438,7 +438,7 @@ public class ConsoleTab {
 				Button btn = (Button) e.widget;
 				bShowNormal = btn.getSelection();
                 props.setProperty("logger.normal.show", bShowNormal ? "true" : "false");
-                FireFrogMain.getFFM().saveConfig();
+                RCMain.getRCMain().saveConfig();
 			}
 		});
 		buttonShowNormal.setSelection(bShowNormal);
@@ -470,7 +470,7 @@ public class ConsoleTab {
             public void widgetSelected(SelectionEvent arg0) {
                 debugLevel = integerToLevel(debugCombo.getSelectionIndex());
                 props.setProperty("logger.debug.level", debugLevel.toString());
-                FireFrogMain.getFFM().saveConfig();
+                RCMain.getRCMain().saveConfig();
             }
             public void widgetDefaultSelected(SelectionEvent arg0) {
             }
@@ -492,7 +492,7 @@ public class ConsoleTab {
             public void widgetSelected(SelectionEvent arg0) {
                 normalLevel = integerToLevel(normalCombo.getSelectionIndex());
                 props.setProperty("logger.normal.level", normalLevel.toString());
-                FireFrogMain.getFFM().saveConfig();
+                RCMain.getRCMain().saveConfig();
             }
             public void widgetDefaultSelected(SelectionEvent arg0) {
             }
@@ -520,7 +520,7 @@ public class ConsoleTab {
 			return;
 
 		try {
-			final Display display = FireFrogMain.getFFM().getDisplay();
+			final Display display = RCMain.getRCMain().getDisplay();
 			if(display == null || display.isDisposed()) return;
 			display.asyncExec(new Runnable(){
 				public void run() {

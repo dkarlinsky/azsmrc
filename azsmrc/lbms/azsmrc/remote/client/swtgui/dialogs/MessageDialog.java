@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import lbms.azsmrc.remote.client.swtgui.FireFrogMain;
+import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.util.TimerEvent;
 import lbms.azsmrc.remote.client.util.TimerEventPerformer;
@@ -55,7 +55,7 @@ public class MessageDialog {
 
 	public MessageDialog(final Display display, final boolean bautoclose, final int timeToClose, final int steps, final String title, final String message){
 
-		if(!Boolean.parseBoolean(FireFrogMain.getFFM().getProperties().getProperty("popups_enabled", "true")))
+		if(!Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("popups_enabled", "true")))
 			return;
 
 		this.display = display;
@@ -83,12 +83,12 @@ public class MessageDialog {
 					fontData[i].setStyle(SWT.NORMAL);
 					fontData[i].setHeight(fontData[i].getHeight() + 2);
 				}
-				Font messageFont = new Font(FireFrogMain.getFFM().getDisplay(), fontData);
+				Font messageFont = new Font(RCMain.getRCMain().getDisplay(), fontData);
 				for (int i = 0; i < fontData.length; i++) {
 					fontData[i].setStyle(SWT.BOLD);
 					fontData[i].setHeight(fontData[i].getHeight() + 6);
 				}
-				Font titleFont = new Font(FireFrogMain.getFFM().getDisplay(), fontData);
+				Font titleFont = new Font(RCMain.getRCMain().getDisplay(), fontData);
 				gc.setFont(titleFont);
 				gc.drawText(title, 10, 8, true);
 				titleFont.dispose();
@@ -130,7 +130,7 @@ public class MessageDialog {
 				splash.layout();
 
 
-				timerEvent = FireFrogMain.getFFM().getMainTimer().addEvent(System.currentTimeMillis()+timeToClose, new TimerEventPerformer() {
+				timerEvent = RCMain.getRCMain().getMainTimer().addEvent(System.currentTimeMillis()+timeToClose, new TimerEventPerformer() {
 					public void perform(TimerEvent event) {
 						hideShell();
 					}

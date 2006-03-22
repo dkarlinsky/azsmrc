@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import lbms.azsmrc.remote.client.swtgui.DownloadManagerShell;
-import lbms.azsmrc.remote.client.swtgui.FireFrogMain;
+import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.URLTransfer;
@@ -173,7 +173,7 @@ public class OpenByFileDialog {
                     for(String file:(String[])files.toArray(new String[] {})){
                         File test = new File(file);
                         if(test.exists() && test.canRead()){
-                            FireFrogMain.getFFM().getClient().sendAddDownload(test);
+                            RCMain.getRCMain().getClient().sendAddDownload(test);
                         }else{
                             MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
                             messageBox.setText("Error");
@@ -305,7 +305,7 @@ public class OpenByFileDialog {
 
         }
         catch( Throwable t ) {
-            FireFrogMain.getFFM().getDebugLogger().severe("failed to init drag-n-drop + \n" + t);
+            RCMain.getRCMain().getDebugLogger().severe("failed to init drag-n-drop + \n" + t);
         }
       }
 
@@ -331,7 +331,7 @@ public class OpenByFileDialog {
                 if (sURL != null || !source.exists()) {
                     //openTorrentWindow(null, new String[] { sURL }, bOverrideToStopped);
                     //System.out.println("Dropped is a URL: " + sURL);
-                    MessageBox messageBox = new MessageBox(FireFrogMain.getFFM().getMainWindow().getShell(), SWT.ICON_ERROR | SWT.OK);
+                    MessageBox messageBox = new MessageBox(RCMain.getRCMain().getMainWindow().getShell(), SWT.ICON_ERROR | SWT.OK);
                     messageBox.setText("Error");
                     messageBox.setMessage("You have dropped a URL:\n" + sURL + "\nPlease drop only torrent files.");
                     messageBox.open();
@@ -340,7 +340,7 @@ public class OpenByFileDialog {
                     String filename = source.getAbsolutePath();
                     try {
                         if (!DownloadManagerShell.isTorrentFile(filename)) {
-                            FireFrogMain.getFFM().getDebugLogger().info("openDroppedTorrents: file not a torrent file");
+                            RCMain.getRCMain().getDebugLogger().info("openDroppedTorrents: file not a torrent file");
 
                         } else {
                            //System.out.println("Dropped file IS torrent -- to open: " + filename);
@@ -361,10 +361,10 @@ public class OpenByFileDialog {
                            }
                         }
                     } catch (Exception e) {
-                        FireFrogMain.getFFM().getDebugLogger().info("Torrent open fails for '" + filename + "'\n"  + e.toString());
+                        RCMain.getRCMain().getDebugLogger().info("Torrent open fails for '" + filename + "'\n"  + e.toString());
                     }
                 } else if (source.isDirectory()) {
-                    MessageBox messageBox = new MessageBox(FireFrogMain.getFFM().getMainWindow().getShell(), SWT.ICON_ERROR | SWT.OK);
+                    MessageBox messageBox = new MessageBox(RCMain.getRCMain().getMainWindow().getShell(), SWT.ICON_ERROR | SWT.OK);
                     messageBox.setText("Error");
                     messageBox.setMessage("You have dropped a directory, please drop one file at a time.");
                     messageBox.open();

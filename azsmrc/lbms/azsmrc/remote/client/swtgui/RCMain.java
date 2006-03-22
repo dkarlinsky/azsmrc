@@ -63,16 +63,16 @@ import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
 import org.jdom.Element;
 
-public class FireFrogMain implements Launchable {
+public class RCMain implements Launchable {
 
-	public static final String LOGGER_NORMAL = "lbms.azsmrc.ff.normal";
-	public static final String LOGGER_DEBUG = "lbms.azsmrc.ff.debug";
+	public static final String LOGGER_NORMAL = "lbms.azsmrc.normal";
+	public static final String LOGGER_DEBUG = "lbms.azsmrc.debug";
 	public static final String USER_DIR = System.getProperty("user.dir");
 	public static final String FSEP = System.getProperty("file.separator");
 
 	protected Shell shell;
 	protected Display display;
-	private static FireFrogMain fireFrogMain;
+	private static RCMain rcMain;
 	private Client client;
 	private Properties properties;
 	private File confFile;
@@ -97,8 +97,8 @@ public class FireFrogMain implements Launchable {
 
 	public static void start(String[] args) {
 		try {
-			fireFrogMain = new FireFrogMain();
-			fireFrogMain.open();
+			rcMain = new RCMain();
+			rcMain.open();
 		} catch (Throwable e) {
 			e.printStackTrace();
 			File error = new File(System.getProperty("user.dir")+System.getProperty("file.separator")+"error.log");
@@ -303,7 +303,7 @@ public class FireFrogMain implements Launchable {
 
 	}
 
-	public FireFrogMain () {
+	public RCMain () {
 		confFile = new File(USER_DIR+FSEP+"config.cfg");
 		properties = new Properties();
 		if (confFile.exists() && confFile.canRead()) {
@@ -429,11 +429,11 @@ public class FireFrogMain implements Launchable {
 					}
 					failedConnection = true;
 					 if(client.getFailedConnections() > 0 && client.getFailedConnections()%3 == 0){
-							new MessageDialog(FireFrogMain.getFFM().getDisplay(),
+							new MessageDialog(RCMain.getRCMain().getDisplay(),
 									true,
 									10000,
 									20,
-									"Connection Error", "Failed " + FireFrogMain.getFFM().getClient().getFailedConnections() + " connection attempts. Please check your settings.");
+									"Connection Error", "Failed " + RCMain.getRCMain().getClient().getFailedConnections() + " connection attempts. Please check your settings.");
 							return;
 						}
 				} else if (failedConnection && state == ST_CONNECTED) {
@@ -619,8 +619,8 @@ public class FireFrogMain implements Launchable {
 		}
 	}
 
-	public static FireFrogMain getFFM() {
-		return fireFrogMain;
+	public static RCMain getRCMain() {
+		return rcMain;
 	}
 
 	public Client getClient() {

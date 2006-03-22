@@ -17,18 +17,18 @@ public class ColorUtilities {
     public static Color getBackgroundColor(){
 
 
-            if(FireFrogMain.getFFM().getDisplay()==null && FireFrogMain.getFFM().getDisplay().isDisposed()){
+            if(RCMain.getRCMain().getDisplay()==null && RCMain.getRCMain().getDisplay().isDisposed()){
                 BACKGROUND = null;
                 return BACKGROUND;
             }
             try{
-                BACKGROUND = new Color(FireFrogMain.getFFM().getDisplay() ,
-                        new RGB(FireFrogMain.getFFM().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRed()-10,
-                                FireFrogMain.getFFM().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getGreen()-10,
-                                FireFrogMain.getFFM().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getBlue()-10));
+                BACKGROUND = new Color(RCMain.getRCMain().getDisplay() ,
+                        new RGB(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRed()-10,
+                                RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getGreen()-10,
+                                RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getBlue()-10));
 
             }catch(Exception e){
-                BACKGROUND = FireFrogMain.getFFM().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
+                BACKGROUND = RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
             }
 
 
@@ -39,17 +39,17 @@ public class ColorUtilities {
     public static Color getDark_BackgroundColor(){
 
 
-            if(FireFrogMain.getFFM().getDisplay()==null && FireFrogMain.getFFM().getDisplay().isDisposed()){
+            if(RCMain.getRCMain().getDisplay()==null && RCMain.getRCMain().getDisplay().isDisposed()){
                 DARK_BACKGROUND = null;
                 return DARK_BACKGROUND;
             }
             try{
-                DARK_BACKGROUND = new Color(FireFrogMain.getFFM().getDisplay() ,
-                        new RGB(FireFrogMain.getFFM().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND).getRed()-10,
-                                FireFrogMain.getFFM().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND).getGreen()-10,
-                                FireFrogMain.getFFM().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND).getBlue()-10));
+                DARK_BACKGROUND = new Color(RCMain.getRCMain().getDisplay() ,
+                        new RGB(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND).getRed()-10,
+                                RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND).getGreen()-10,
+                                RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND).getBlue()-10));
             }catch(Exception e){
-                DARK_BACKGROUND = FireFrogMain.getFFM().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+                DARK_BACKGROUND = RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
             }
 
 

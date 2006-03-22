@@ -10,7 +10,7 @@ import java.net.URL;
 import java.util.Properties;
 
 import lbms.azsmrc.remote.client.Client;
-import lbms.azsmrc.remote.client.swtgui.FireFrogMain;
+import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.shared.RemoteConstants;
@@ -34,7 +34,7 @@ public class ConnectionDialog {
     private int remoteConstants = RemoteConstants.ST_ALL;
 
     public ConnectionDialog(Display display){
-        Properties properties = FireFrogMain.getFFM().getProperties();
+        Properties properties = RCMain.getRCMain().getProperties();
 
 
         //Shell
@@ -112,7 +112,7 @@ public class ConnectionDialog {
         Label help = new Label(miniComp2,SWT.NULL);
         help.setImage(ImageRepository.getImage("information"));
         help.setToolTipText("Click for insturctions on setting up a SSL connection");
-        help.setCursor(FireFrogMain.getFFM().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+        help.setCursor(RCMain.getRCMain().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
         help.addListener(SWT.MouseDown, new Listener(){
             public void handleEvent(Event arg0) {
                 MessageBox messageBox = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK);
@@ -292,7 +292,7 @@ public class ConnectionDialog {
                     messageBox.open();
                     return;
                 }
-                Properties properties = FireFrogMain.getFFM().getProperties();
+                Properties properties = RCMain.getRCMain().getProperties();
                 if(save_settings.getSelection()){
                     properties.setProperty("connection_url", url_text.getText());
                     if(use_https.getSelection())
@@ -317,20 +317,20 @@ public class ConnectionDialog {
                     properties.remove("connection_lastURL");
 
                 }
-                FireFrogMain.getFFM().saveConfig();
+                RCMain.getRCMain().saveConfig();
 
                 final String username = username_text.getText();
                 final String password = password_text.getText();
 
-                Client client = FireFrogMain.getFFM().getClient();
+                Client client = RCMain.getRCMain().getClient();
                 client.setServer(url);
                 client.setUsername(username);
                 client.setPassword(password);
                 client.sendListTransfers(remoteConstants);
-                FireFrogMain.getFFM().connect(true);
+                RCMain.getRCMain().connect(true);
 
                 //once connection is established.. send for all the right data
-                FireFrogMain.getFFM().getMainWindow().initializeConnection();
+                RCMain.getRCMain().getMainWindow().initializeConnection();
 
                 shell.close();
              }

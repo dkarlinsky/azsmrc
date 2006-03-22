@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lbms.azsmrc.remote.client.Download;
-import lbms.azsmrc.remote.client.swtgui.FireFrogMain;
+import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.shared.EncodingUtil;
 import lbms.azsmrc.shared.RemoteConstants;
 
@@ -52,13 +52,13 @@ public class SeedContainer extends Container{
 
 
 	public static void loadColumns() {
-		String colls = FireFrogMain.getFFM().getProperties().getProperty("seedTable.columns", null);
+		String colls = RCMain.getRCMain().getProperties().getProperty("seedTable.columns", null);
 		if (colls == null) return;
 		tableColumns.clear();
 		tableColumns = EncodingUtil.StringToIntegerList(colls);
 	}
 
 	public static void saveColumns() {
-		FireFrogMain.getFFM().getProperties().setProperty("seedTable.columns", EncodingUtil.IntListToString(tableColumns));
+		RCMain.getRCMain().getProperties().setProperty("seedTable.columns", EncodingUtil.IntListToString(tableColumns));
 	}
 }

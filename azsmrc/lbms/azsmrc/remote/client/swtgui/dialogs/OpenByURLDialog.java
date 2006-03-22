@@ -5,7 +5,7 @@
  */
 package lbms.azsmrc.remote.client.swtgui.dialogs;
 
-import lbms.azsmrc.remote.client.swtgui.FireFrogMain;
+import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 
 import org.eclipse.swt.SWT;
@@ -156,9 +156,9 @@ public class OpenByURLDialog {
                         messageBox.open();
                         return;
                     }else
-                        FireFrogMain.getFFM().getClient().sendAddDownload(url, username_text.getText(), password_text.getText());
+                        RCMain.getRCMain().getClient().sendAddDownload(url, username_text.getText(), password_text.getText());
                 }else{
-                        FireFrogMain.getFFM().getClient().sendAddDownload(url);
+                        RCMain.getRCMain().getClient().sendAddDownload(url);
 
                 }
                 shell.close();
@@ -176,7 +176,7 @@ public class OpenByURLDialog {
                 shell.close();
                 //Re-Add the AWT monitor
                 //cb.dispose();
-                FireFrogMain.getFFM().addAWTClipboardMonitor();
+                RCMain.getRCMain().addAWTClipboardMonitor();
              }
          });
 

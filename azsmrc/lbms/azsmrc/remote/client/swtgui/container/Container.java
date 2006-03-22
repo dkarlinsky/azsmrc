@@ -9,7 +9,7 @@ import lbms.azsmrc.remote.client.Download;
 import lbms.azsmrc.remote.client.DownloadStats;
 import lbms.azsmrc.remote.client.Utilities;
 import lbms.azsmrc.remote.client.swtgui.CustomProgressBar;
-import lbms.azsmrc.remote.client.swtgui.FireFrogMain;
+import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.shared.RemoteConstants;
@@ -87,7 +87,7 @@ public abstract class Container implements Comparable<Container> {
 	public Container (final Download dl, final Table parent, final int style) {
 		this.dl = dl;
 		this.ds = dl.getStats();
-		final Display display = FireFrogMain.getFFM().getDisplay();
+		final Display display = RCMain.getRCMain().getDisplay();
 
 		if(Utilities.isLinux()){
 			rowWidth = 120 - 4;
@@ -118,7 +118,7 @@ public abstract class Container implements Comparable<Container> {
 
 	public void addToTable (final Table parent, final int style, int position) {
 		if (item != null) return;
-		 final Display display = FireFrogMain.getFFM().getDisplay();
+		 final Display display = RCMain.getRCMain().getDisplay();
 		 display.syncExec(new Runnable(){
 			 public void run() {
 				 try {
@@ -141,7 +141,7 @@ public abstract class Container implements Comparable<Container> {
 
 	public void update(final boolean bForce) {
 
-		final Display display = FireFrogMain.getFFM().getDisplay();
+		final Display display = RCMain.getRCMain().getDisplay();
 		if(display == null || display.isDisposed()) return;
 		display.syncExec(new Runnable(){
 			public void run() {
@@ -155,7 +155,7 @@ public abstract class Container implements Comparable<Container> {
 	}
 
 	public void updateData(final List<Integer> tableColumns, final boolean bForce) {
-		final Display display = FireFrogMain.getFFM().getDisplay();
+		final Display display = RCMain.getRCMain().getDisplay();
         if(display == null || display.isDisposed()) return;
 		display.syncExec(new Runnable(){
 			public void run() {
@@ -387,7 +387,7 @@ public abstract class Container implements Comparable<Container> {
 	}
 
 	public void changePosition (final int newPos, final Table parent) {
-		Display display = FireFrogMain.getFFM().getDisplay();
+		Display display = RCMain.getRCMain().getDisplay();
 		display.asyncExec(new Runnable(){
 			public void run() {
 				try {
@@ -404,7 +404,7 @@ public abstract class Container implements Comparable<Container> {
 	}
 
 	public void removeFromTable(){
-		Display display = FireFrogMain.getFFM().getDisplay();
+		Display display = RCMain.getRCMain().getDisplay();
 		display.asyncExec(new Runnable(){
 			public void run() {
 				try {
@@ -450,7 +450,7 @@ public abstract class Container implements Comparable<Container> {
 
 
 	private Image resizeHealthIcon(Image oldHealthIcon,int iconColWidth, int newPBWidth){
-		Image newImage = new Image(FireFrogMain.getFFM().getDisplay(),newPBWidth,rowHeight);
+		Image newImage = new Image(RCMain.getRCMain().getDisplay(),newPBWidth,rowHeight);
 		GC gc = new GC(newImage);
 		int x = (iconColWidth /2) - (oldHealthIcon.getImageData().width / 2);
 		gc.drawImage(oldHealthIcon, x, 0);
@@ -460,7 +460,7 @@ public abstract class Container implements Comparable<Container> {
 		int whitePixel = newData.palette.getPixel(new RGB(255,255,255));
 		newData.transparentPixel = whitePixel;
 
-		return new Image(FireFrogMain.getFFM().getDisplay(),newData);
+		return new Image(RCMain.getRCMain().getDisplay(),newData);
 	}
 
 

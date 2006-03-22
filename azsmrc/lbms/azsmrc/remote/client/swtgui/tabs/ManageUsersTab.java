@@ -11,7 +11,7 @@ import lbms.azsmrc.remote.client.User;
 import lbms.azsmrc.remote.client.UserManager;
 import lbms.azsmrc.remote.client.events.ClientUpdateListener;
 import lbms.azsmrc.remote.client.swtgui.ColorUtilities;
-import lbms.azsmrc.remote.client.swtgui.FireFrogMain;
+import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.shared.DuplicatedUserException;
@@ -57,7 +57,7 @@ public class ManageUsersTab {
         final CTabItem detailsTab = new CTabItem(parentTab, SWT.CLOSE);
         detailsTab.setText("Manage Users");
 
-        userManager = FireFrogMain.getFFM().getClient().getUserManager();
+        userManager = RCMain.getRCMain().getClient().getUserManager();
         userManager.update();
 
 
@@ -96,12 +96,12 @@ public class ManageUsersTab {
         };
 
         //Add the CUL to the Client
-        FireFrogMain.getFFM().getClient().addClientUpdateListener(cul);
+        RCMain.getRCMain().getClient().addClientUpdateListener(cul);
 
         //Listen for when tab is closed and make sure to remove the client update listener
         detailsTab.addDisposeListener(new DisposeListener(){
             public void widgetDisposed(DisposeEvent arg0) {
-                FireFrogMain.getFFM().getClient().removeClientUpdateListener(cul);
+                RCMain.getRCMain().getClient().removeClientUpdateListener(cul);
             }
         });
 
@@ -125,7 +125,7 @@ public class ManageUsersTab {
         userTable_group.setLayoutData(gridData);
 
 
-        userTable_group.setText("Connected to the server as:  " + FireFrogMain.getFFM().getClient().getUsername());
+        userTable_group.setText("Connected to the server as:  " + RCMain.getRCMain().getClient().getUsername());
         //Toolbar for the usertable
         ToolBar userTable_toolbar = new ToolBar(userTable_group,SWT.FLAT | SWT.HORIZONTAL);
 
@@ -140,7 +140,7 @@ public class ManageUsersTab {
         //Listener for add user
         final Listener addNew_listener = new Listener() {
             public void handleEvent(Event e) {
-                FireFrogMain.getFFM().getDisplay().asyncExec(new Runnable (){
+                RCMain.getRCMain().getDisplay().asyncExec(new Runnable (){
                     public void run () {
                         addNewUser();
                     }
@@ -154,15 +154,15 @@ public class ManageUsersTab {
         //Listener for delete user
         final Listener deleteUser_listener = new Listener() {
             public void handleEvent(Event e) {
-                FireFrogMain.getFFM().getDisplay().asyncExec(new Runnable (){
+                RCMain.getRCMain().getDisplay().asyncExec(new Runnable (){
                     public void run () {
                         //Pull the selected items
                         TableItem[] items = userTable.getSelection();
 
                         //Check if only one
                         if(items.length > 0 ){
-                            if(items[0].getText(0).equalsIgnoreCase(FireFrogMain.getFFM().getClient().getUsername())){
-                                MessageBox mb = new MessageBox(FireFrogMain.getFFM().getDisplay().getActiveShell(),SWT.ICON_ERROR);
+                            if(items[0].getText(0).equalsIgnoreCase(RCMain.getRCMain().getClient().getUsername())){
+                                MessageBox mb = new MessageBox(RCMain.getRCMain().getDisplay().getActiveShell(),SWT.ICON_ERROR);
                                 mb.setText("Error");
                                 mb.setMessage("Cannot delete the currently logged in user (yourself).");
                                 mb.open();
@@ -303,7 +303,7 @@ public class ManageUsersTab {
 
                 TableItem[] item = userTable.getSelection();
                 if(item.length == 1){
-                    if(!isAdmin && item[0].getText(0).equalsIgnoreCase(FireFrogMain.getFFM().getClient().getUsername())){
+                    if(!isAdmin && item[0].getText(0).equalsIgnoreCase(RCMain.getRCMain().getClient().getUsername())){
                         changePassword.setEnabled(true);
                         editUser.setEnabled(true);
                     }else if(isAdmin){
@@ -337,7 +337,7 @@ public class ManageUsersTab {
      */
     public void redrawTable(){
         // Reset the data so that the SWT.Virtual picks up the array
-        FireFrogMain.getFFM().getDisplay().syncExec(new Runnable() {
+        RCMain.getRCMain().getDisplay().syncExec(new Runnable() {
             public void run() {
                 if (userTable == null || userTable.isDisposed())
                     return;
@@ -363,9 +363,9 @@ public class ManageUsersTab {
      *
      */
     public void addNewUser(){
-        if(FireFrogMain.getFFM().getDisplay()==null && FireFrogMain.getFFM().getDisplay().isDisposed())
+        if(RCMain.getRCMain().getDisplay()==null && RCMain.getRCMain().getDisplay().isDisposed())
             return;
-        FireFrogMain.getFFM().getDisplay().asyncExec( new Runnable() {
+        RCMain.getRCMain().getDisplay().asyncExec( new Runnable() {
             public void run() {
                 //Shell Initialize
 
@@ -466,7 +466,7 @@ public class ManageUsersTab {
                 gridData.horizontalSpan = 3;
                 dir_text.setLayoutData( gridData );
                 dir_text.setText(" Remeber:  Directories here are ON the server, not local ");
-                dir_text.setBackground(FireFrogMain.getFFM().getDisplay().getSystemColor(SWT.COLOR_GRAY));
+                dir_text.setBackground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_GRAY));
 
                 //output directory
                 Label outputDir_text = new Label(backup_composite, SWT.NONE);
@@ -530,7 +530,7 @@ public class ManageUsersTab {
                                 verify.getText().equalsIgnoreCase("")   ||
                                 outputDir.getText().equalsIgnoreCase("")||
                                 importDir.getText().equalsIgnoreCase("")){
-                            MessageBox mb = new MessageBox(FireFrogMain.getFFM().getDisplay().getActiveShell(),SWT.ICON_ERROR);
+                            MessageBox mb = new MessageBox(RCMain.getRCMain().getDisplay().getActiveShell(),SWT.ICON_ERROR);
                             mb.setText("Error");
                             mb.setMessage("Please fill out all of the information.");
                             mb.open();
@@ -549,7 +549,7 @@ public class ManageUsersTab {
                                         combo.getSelectionIndex());
 
                             } catch (DuplicatedUserException e1) {
-                                MessageBox mb = new MessageBox(FireFrogMain.getFFM().getDisplay().getActiveShell(),SWT.ICON_ERROR);
+                                MessageBox mb = new MessageBox(RCMain.getRCMain().getDisplay().getActiveShell(),SWT.ICON_ERROR);
                                 mb.setText("Error");
                                 mb.setMessage("A User of this name already exists, please choose another username.");
                                 mb.open();
@@ -565,7 +565,7 @@ public class ManageUsersTab {
                             redrawTable();
 
                         }else{
-                            MessageBox mb = new MessageBox(FireFrogMain.getFFM().getDisplay().getActiveShell(),SWT.ICON_ERROR);
+                            MessageBox mb = new MessageBox(RCMain.getRCMain().getDisplay().getActiveShell(),SWT.ICON_ERROR);
                             mb.setText("Error");
                             mb.setMessage("Passwords are not the same.");
                             mb.open();
@@ -623,7 +623,7 @@ public class ManageUsersTab {
      * @return
      */
     public boolean deleteUser(String userName){
-        MessageBox mb = new MessageBox(FireFrogMain.getFFM().getDisplay().getActiveShell(),SWT.YES| SWT.NO |SWT.ICON_QUESTION);
+        MessageBox mb = new MessageBox(RCMain.getRCMain().getDisplay().getActiveShell(),SWT.YES| SWT.NO |SWT.ICON_QUESTION);
         mb.setText("Delete User");
         mb.setMessage("Please verify that you wish to remove user: " + userName );
         int response = mb.open();
@@ -650,9 +650,9 @@ public class ManageUsersTab {
     public void changePassword(final String user){
         final Thread addNew_thread = new Thread() {
             public void run() {
-                if(FireFrogMain.getFFM().getDisplay()==null && FireFrogMain.getFFM().getDisplay().isDisposed())
+                if(RCMain.getRCMain().getDisplay()==null && RCMain.getRCMain().getDisplay().isDisposed())
                     return;
-                FireFrogMain.getFFM().getDisplay().asyncExec( new Runnable() {
+                RCMain.getRCMain().getDisplay().asyncExec( new Runnable() {
                     public void run() {
                         //Shell Initialize
 
@@ -751,7 +751,7 @@ public class ManageUsersTab {
                                         verify.getText().equalsIgnoreCase("") ||
                                         oldPassword.getText().equalsIgnoreCase("")){
 
-                                    MessageBox mb = new MessageBox(FireFrogMain.getFFM().getDisplay().getActiveShell(),SWT.ICON_ERROR);
+                                    MessageBox mb = new MessageBox(RCMain.getRCMain().getDisplay().getActiveShell(),SWT.ICON_ERROR);
                                     mb.setText("Error");
                                     mb.setMessage("Please fill out all of the information.");
                                     mb.open();
@@ -803,7 +803,7 @@ public class ManageUsersTab {
                                     //GUIMain.redrawTable();
 
                                 }else{
-                                    MessageBox mb = new MessageBox(FireFrogMain.getFFM().getDisplay().getActiveShell(),SWT.ICON_ERROR);
+                                    MessageBox mb = new MessageBox(RCMain.getRCMain().getDisplay().getActiveShell(),SWT.ICON_ERROR);
                                     mb.setText("Error");
                                     mb.setMessage("New passwords are not the same.");
                                     mb.open();
@@ -862,9 +862,9 @@ public class ManageUsersTab {
     public void editUserInfo(final String user, final boolean isAdmin){
         final Thread editUser_thread = new Thread() {
             public void run() {
-                if(FireFrogMain.getFFM().getDisplay()==null && FireFrogMain.getFFM().getDisplay().isDisposed())
+                if(RCMain.getRCMain().getDisplay()==null && RCMain.getRCMain().getDisplay().isDisposed())
                     return;
-                FireFrogMain.getFFM().getDisplay().asyncExec( new Runnable() {
+                RCMain.getRCMain().getDisplay().asyncExec( new Runnable() {
                     public void run() {
                         //Shell Initialize
 
@@ -1079,7 +1079,7 @@ public class ManageUsersTab {
                                 if(userName.getText().equalsIgnoreCase("")      ||
                                         outputDir.getText().equalsIgnoreCase("")||
                                         importDir.getText().equalsIgnoreCase("")){
-                                    MessageBox mb = new MessageBox(FireFrogMain.getFFM().getDisplay().getActiveShell(),SWT.ICON_ERROR);
+                                    MessageBox mb = new MessageBox(RCMain.getRCMain().getDisplay().getActiveShell(),SWT.ICON_ERROR);
                                     mb.setText("Error");
                                     mb.setMessage("Please fill out all of the information.");
                                     mb.open();

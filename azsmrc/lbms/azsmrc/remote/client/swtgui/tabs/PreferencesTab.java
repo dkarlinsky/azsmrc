@@ -11,7 +11,7 @@ import java.net.URL;
 import java.util.Properties;
 
 import lbms.azsmrc.remote.client.Utilities;
-import lbms.azsmrc.remote.client.swtgui.FireFrogMain;
+import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.dialogs.UpdateDialog;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.tools.updater.Update;
@@ -55,7 +55,7 @@ public class PreferencesTab {
 
 
 		//Open properties for reading and saving
-		properties = FireFrogMain.getFFM().getProperties();
+		properties = RCMain.getRCMain().getProperties();
 
 
 		final CTabItem prefsTab = new CTabItem(parentTab, SWT.CLOSE);
@@ -89,7 +89,7 @@ public class PreferencesTab {
 
 		//top label
 		Composite grayLabel = new Composite(parent,SWT.BORDER);
-		grayLabel.setBackground(FireFrogMain.getFFM().getDisplay().getSystemColor(SWT.COLOR_GRAY));
+		grayLabel.setBackground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_GRAY));
 		grayLabel.setLayout(new GridLayout(1,false));
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 2;
@@ -106,7 +106,7 @@ public class PreferencesTab {
 			fontData[i].setStyle(SWT.BOLD);
 			fontData[i].setHeight(fontData[i].getHeight() + 2);
 		}
-		Font newFont = new Font(FireFrogMain.getFFM().getDisplay(), fontData);
+		Font newFont = new Font(RCMain.getRCMain().getDisplay(), fontData);
 		title.setFont(newFont);
 		newFont.dispose();
 
@@ -448,33 +448,33 @@ public class PreferencesTab {
 
 						}
 						public void noUpdate() {
-							if (FireFrogMain.getFFM().getMainWindow() != null) {
-								FireFrogMain.getFFM().getMainWindow().setStatusBarText("No Update Available");
+							if (RCMain.getRCMain().getMainWindow() != null) {
+								RCMain.getRCMain().getMainWindow().setStatusBarText("No Update Available");
 							}
-							FireFrogMain.getFFM().getNormalLogger().info("No Update Available");
+							RCMain.getRCMain().getNormalLogger().info("No Update Available");
 						}
 						public void updateAvailable(Update update) {
-							if (FireFrogMain.getFFM().getMainWindow() != null) {
-								FireFrogMain.getFFM().getMainWindow().setStatusBarText("Update Available: Version "+update.getVersion());
+							if (RCMain.getRCMain().getMainWindow() != null) {
+								RCMain.getRCMain().getMainWindow().setStatusBarText("Update Available: Version "+update.getVersion());
 							}
-							FireFrogMain.getFFM().getNormalLogger().info("Update Available: Version "+update.getVersion());
+							RCMain.getRCMain().getNormalLogger().info("Update Available: Version "+update.getVersion());
 							if (Boolean.parseBoolean(properties.getProperty("update.autoupdate", "false"))) {
 								updater.doUpdate();
 							}else{
-								new UpdateDialog(FireFrogMain.getFFM().getDisplay(),update,updater);
+								new UpdateDialog(RCMain.getRCMain().getDisplay(),update,updater);
 							}
 						}
 						public void updateFailed(String reason) {
-							if (FireFrogMain.getFFM().getMainWindow() != null) {
-								FireFrogMain.getFFM().getMainWindow().setStatusBarText("Update Failed",SWT.COLOR_RED);
+							if (RCMain.getRCMain().getMainWindow() != null) {
+								RCMain.getRCMain().getMainWindow().setStatusBarText("Update Failed",SWT.COLOR_RED);
 							}
-							FireFrogMain.getFFM().getNormalLogger().info("Update Failed");
+							RCMain.getRCMain().getNormalLogger().info("Update Failed");
 						}
 						public void updateFinished() {
-							if (FireFrogMain.getFFM().getMainWindow() != null) {
-								FireFrogMain.getFFM().getMainWindow().setStatusBarText("Update Finished");
+							if (RCMain.getRCMain().getMainWindow() != null) {
+								RCMain.getRCMain().getMainWindow().setStatusBarText("Update Finished");
 							}
-							FireFrogMain.getFFM().getNormalLogger().info("Update Finished");
+							RCMain.getRCMain().getNormalLogger().info("Update Finished");
 						}
 						public void updateError(String error) {
 							// TODO Auto-generated method stub
@@ -615,10 +615,10 @@ public class PreferencesTab {
 		bModified = false;
 
 		//Save all changes
-		FireFrogMain.getFFM().saveConfig();
+		RCMain.getRCMain().saveConfig();
 
 		//Update Timer
-		FireFrogMain.getFFM().updateTimer(true);
+		RCMain.getRCMain().updateTimer(true);
 	}
 
 }

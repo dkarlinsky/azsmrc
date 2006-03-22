@@ -11,8 +11,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -44,9 +42,9 @@ public class Updater {
 	private File currentUpdates;
 	private File dir;
 
-	private Update localUpdate;
-	private Update remoteUpdate;
-	private UpdateList remoteUList;
+	private UpdateList localUpdateList;
+	private UpdateList remoteUpdateList;
+	private Update choosenUpdate;
 	private boolean updateAvailable = false;
 	private boolean failed = false;
 	private String lastError = "";
@@ -71,7 +69,7 @@ public class Updater {
 		return updateAvailable;
 	}
 
-	public void checkForUpdates(boolean beta) {
+	public void checkForUpdates(final boolean beta) {
 		Thread t = new Thread (new Runnable() {
 			public void run() {
 				InputStream is = null;
@@ -81,26 +79,32 @@ public class Updater {
 					conn.setDoInput(true);
 					is =  conn.getInputStream();
 					if (remoteUpdateFile.toExternalForm().contains(".gz")) {
-						remoteUpdate = readCompressedUpdate(is);
+						remoteUpdateList = readCompressedUpdateList(is);
 					} else {
-						remoteUpdate = readUpdate(is);
+						remoteUpdateList = readUpdateList(is);
+					}
+					if (beta) {
+						choosenUpdate = remoteUpdateList.getLatest();
+					} else {
+						choosenUpdate = remoteUpdateList.getLatestStable();
 					}
 					if (currentUpdates!=null && currentUpdates.exists()) {
 						fis = new FileInputStream(currentUpdates);
 						if (currentUpdates.toString().contains(".gz")) {
-							localUpdate = readCompressedUpdate(fis);
+							localUpdateList = readCompressedUpdateList(fis);
 						} else {
-							localUpdate = readUpdate(fis);
+							localUpdateList = readUpdateList(fis);
 						}
-						if (localUpdate.compareTo(remoteUpdate) < 0) {
+
+						if (localUpdateList.getLatest().compareTo(choosenUpdate) < 0) {
 							updateAvailable = true;
-							callListenerUpdate(remoteUpdate);
+							callListenerUpdate(choosenUpdate);
 						} else {
 							callListenerNoUpdate();
 						}
 					} else {
 						updateAvailable = true;
-						callListenerUpdate(remoteUpdate);
+						callListenerUpdate(choosenUpdate);
 					}
 				} catch (IOException e) {
 					callListenerException(e);
@@ -125,18 +129,18 @@ public class Updater {
 		t.start();
 	}
 
-	private Update readCompressedUpdate (InputStream is) throws IOException {
+	private UpdateList readCompressedUpdateList (InputStream is) throws IOException {
 		GZIPInputStream gis = new GZIPInputStream(is);
-		return readUpdate(gis);
+		return readUpdateList(gis);
 	}
 
-	private Update readUpdate (InputStream is) throws IOException {
+	private UpdateList readUpdateList (InputStream is) throws IOException {
 		try {
 			SAXBuilder builder = new SAXBuilder();
 			Document xmlDom = builder.build(is);
-			Update update = new Update(xmlDom);
-			new XMLOutputter(Format.getPrettyFormat()).output(update.toDocument(), System.out);
-			return update;
+			UpdateList updateUl = new UpdateList(xmlDom);
+			new XMLOutputter(Format.getPrettyFormat()).output(updateUl.toDocument(), System.out);
+			return updateUl;
 		} catch (JDOMException e) {
 			callListenerException(e);
 			e.printStackTrace();
@@ -150,14 +154,14 @@ public class Updater {
 			public void run() {
 				System.out.println("Updater: commencing update");
 				List<Download> downloads = new ArrayList<Download>();
-				List<UpdateFile> files = remoteUpdate.getFileList();
+				List<UpdateFile> files = choosenUpdate.getFileList();
 				for (UpdateFile u:files) {
 					try {
 						URL remoteLoc;
 						if (u.getUrl() != null && u.getUrl().length() != 0) {
 							remoteLoc = new URL(u.getUrl());
 						} else {
-							remoteLoc = new URL (remoteUpdate.getUrl()+"/"+u.getPath()+u.getName());
+							remoteLoc = new URL (choosenUpdate.getUrl()+"/"+u.getPath()+u.getName());
 						}
 						File localLoc = new File(dir,u.getPath()+u.getName());
 						if (localLoc.exists()) {
@@ -255,7 +259,7 @@ public class Updater {
 							} else {
 								os = new FileOutputStream(currentUpdates);
 							}
-							new XMLOutputter(Format.getCompactFormat()).output(remoteUpdate.toDocument(), os);
+							new XMLOutputter(Format.getCompactFormat()).output(remoteUpdateList.toDocument(), os);
 						} catch (FileNotFoundException e) {
 							e.printStackTrace();
 						} catch (IOException e) {
@@ -274,6 +278,35 @@ public class Updater {
 		t.setPriority(Thread.MIN_PRIORITY);
 		t.setDaemon(true);
 		t.start();
+	}
+
+
+	/**
+	 * @return Returns the localUpdateList.
+	 */
+	public UpdateList getLocalUpdateList() {
+		return localUpdateList;
+	}
+
+	/**
+	 * @return Returns the remoteUpdate.
+	 */
+	public UpdateList getRemoteUpdateList() {
+		return remoteUpdateList;
+	}
+
+	/**
+	 * @return Returns the choosenUpdate.
+	 */
+	public Update getChoosenUpdate() {
+		return choosenUpdate;
+	}
+
+	/**
+	 * @param choosenUpdate The choosenUpdate to set.
+	 */
+	public void setChoosenUpdate(Update choosenUpdate) {
+		this.choosenUpdate = choosenUpdate;
 	}
 
 	private void callListenerException (Exception e) {

@@ -167,7 +167,7 @@ public class DownloadManagerShell {
     private int drag_drop_line_start = -1;
 
     public void open(){
-        debugLogger = FireFrogMain.getFFM().getDebugLogger();
+        debugLogger = RCMain.getRCMain().getDebugLogger();
         if(DOWNLOAD_MANAGER_SHELL != null && !DOWNLOAD_MANAGER_SHELL.isDisposed()){
             DOWNLOAD_MANAGER_SHELL.setVisible(true);
             DOWNLOAD_MANAGER_SHELL.forceFocus();
@@ -178,7 +178,7 @@ public class DownloadManagerShell {
 
         if(TITLE == null) TITLE = "AzSMRC";
 
-        DOWNLOAD_MANAGER_SHELL = new Shell(FireFrogMain.getFFM().getDisplay());
+        DOWNLOAD_MANAGER_SHELL = new Shell(RCMain.getRCMain().getDisplay());
 
         DOWNLOAD_MANAGER_SHELL.setImage(ImageRepository.getImage("TrayIcon_Blue"));
 
@@ -208,7 +208,7 @@ public class DownloadManagerShell {
         login.setToolTipText("Connect to server");
         login.addListener(SWT.Selection, new Listener(){
             public void handleEvent (Event e){
-                new ConnectionDialog(FireFrogMain.getFFM().getDisplay());
+                new ConnectionDialog(RCMain.getRCMain().getDisplay());
             }
         });
 
@@ -218,15 +218,15 @@ public class DownloadManagerShell {
         quickconnect.setToolTipText("Quickconnect using last saved settings");
         quickconnect.addListener(SWT.Selection, new Listener(){
             public void handleEvent (Event e){
-                Properties properties = FireFrogMain.getFFM().getProperties();
+                Properties properties = RCMain.getRCMain().getProperties();
                 if (
                         properties.getProperty("connection_lastURL",null) != null &&
                         properties.getProperty("connection_username",null) != null &&
                         properties.getProperty("connection_password",null) != null) {
-                    FireFrogMain.getFFM().connect(true);
-                    FireFrogMain.getFFM().getClient().sendListTransfers(RemoteConstants.ST_ALL);
+                    RCMain.getRCMain().connect(true);
+                    RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
                 } else
-                    new ConnectionDialog(FireFrogMain.getFFM().getDisplay());
+                    new ConnectionDialog(RCMain.getRCMain().getDisplay());
             }
         });
 
@@ -235,10 +235,10 @@ public class DownloadManagerShell {
         logout.setToolTipText("Disconnect from server");
         logout.addListener(SWT.Selection, new Listener(){
             public void handleEvent (Event e){
-                FireFrogMain.getFFM().disconnect();
+                RCMain.getRCMain().disconnect();
                 setLogInOutButtons(false);
                 DOWNLOAD_MANAGER_SHELL.setText(TITLE);
-                FireFrogMain.getFFM().setTrayIcon(0);
+                RCMain.getRCMain().setTrayIcon(0);
                 downloadsMap.clear();
                 seedsMap.clear();
                 downloadsTable.removeAll();
@@ -258,8 +258,8 @@ public class DownloadManagerShell {
         refresh.setToolTipText("Refresh");
         refresh.addListener(SWT.Selection, new Listener(){
             public void handleEvent (Event e){
-                if(FireFrogMain.getFFM().connected())
-                    FireFrogMain.getFFM().getClient().sendListTransfers(RemoteConstants.ST_ALL);
+                if(RCMain.getRCMain().connected())
+                    RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
 
                 //new UpdateDialog(DOWNLOAD_MANAGER_SHELL,SWT.NULL).open();
             }
@@ -276,7 +276,7 @@ public class DownloadManagerShell {
         addTorrent_by_file.setToolTipText("Add a torrent from a local file");
         addTorrent_by_file.addListener(SWT.Selection, new Listener(){
             public void handleEvent(Event e) {
-                Shell[] shells = FireFrogMain.getFFM().getDisplay().getShells();
+                Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
                 for(int i = 0; i < shells.length; i++){
                     if(shells[i].getText().equalsIgnoreCase("Send Torrent File to Server")){
                         shells[i].setActive();
@@ -284,7 +284,7 @@ public class DownloadManagerShell {
                         return;
                     }
                 }
-                new OpenByFileDialog(FireFrogMain.getFFM().getDisplay());
+                new OpenByFileDialog(RCMain.getRCMain().getDisplay());
             }
         });
 
@@ -294,7 +294,7 @@ public class DownloadManagerShell {
         addTorrent_by_url.setToolTipText("Add a torrent from a URL");
         addTorrent_by_url.addListener(SWT.Selection, new Listener(){
             public void handleEvent(Event e) {
-                Shell[] shells = FireFrogMain.getFFM().getDisplay().getShells();
+                Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
                 for(int i = 0; i < shells.length; i++){
                     if(shells[i].getText().equalsIgnoreCase("Add a Torrent by URL")){
                         shells[i].setActive();
@@ -302,7 +302,7 @@ public class DownloadManagerShell {
                         return;
                     }
                 }
-                new OpenByURLDialog(FireFrogMain.getFFM().getDisplay());
+                new OpenByURLDialog(RCMain.getRCMain().getDisplay());
             }
         });
 
@@ -428,14 +428,14 @@ public class DownloadManagerShell {
                     if(items.length == 0 || items.length > 1) return;
                     Container container = (Container)items[0].getData();
                     container.getDownload().stopAndQueue();
-                    FireFrogMain.getFFM().getClient().transactionCommit();
+                    RCMain.getRCMain().getClient().transactionCommit();
                     setToolBarTorrentIcons(false,true,true);
                 }else{
                     TableItem[] items = seedsTable.getSelection();
                     if(items.length == 0 || items.length > 1) return;
                     Container container = (Container)items[0].getData();
                     container.getDownload().stopAndQueue();
-                    FireFrogMain.getFFM().getClient().transactionCommit();
+                    RCMain.getRCMain().getClient().transactionCommit();
                     setToolBarTorrentIcons(false,true,true);
                 }
             }
@@ -452,14 +452,14 @@ public class DownloadManagerShell {
                     if(items.length == 0 || items.length > 1) return;
                     Container container = (Container)items[0].getData();
                     container.getDownload().stop();
-                    FireFrogMain.getFFM().getClient().transactionCommit();
+                    RCMain.getRCMain().getClient().transactionCommit();
                     setToolBarTorrentIcons(true,false,true);
                 }else{
                     TableItem[] items = seedsTable.getSelection();
                     if(items.length == 0 || items.length > 1) return;
                     Container container = (Container)items[0].getData();
                     container.getDownload().stop();
-                    FireFrogMain.getFFM().getClient().transactionCommit();
+                    RCMain.getRCMain().getClient().transactionCommit();
                     setToolBarTorrentIcons(true,false,true);
                 }
             }
@@ -486,7 +486,7 @@ public class DownloadManagerShell {
                     }else if(downloadsMap.containsKey(container.getDownload().getHash())){
                         downloadsMap.remove(container.getDownload().getHash());
                     }
-                    FireFrogMain.getFFM().getClient().transactionCommit();
+                    RCMain.getRCMain().getClient().transactionCommit();
                 }else{
                     TableItem[] items = seedsTable.getSelection();
                     if(items.length == 0 || items.length > 1) return;
@@ -498,7 +498,7 @@ public class DownloadManagerShell {
                     }else if(downloadsMap.containsKey(container.getDownload().getHash())){
                         downloadsMap.remove(container.getDownload().getHash());
                     }
-                    FireFrogMain.getFFM().getClient().transactionCommit();
+                    RCMain.getRCMain().getClient().transactionCommit();
 
 
                 }
@@ -516,7 +516,7 @@ public class DownloadManagerShell {
         pauseAll.setToolTipText("Pause all torrents");
         pauseAll.addListener(SWT.Selection, new Listener(){
             public void handleEvent (Event e){
-                FireFrogMain.getFFM().getClient().sendStopAll();
+                RCMain.getRCMain().getClient().sendStopAll();
             }
         });
 
@@ -526,7 +526,7 @@ public class DownloadManagerShell {
         resumeAll.setToolTipText("Resume all paused torrents");
         resumeAll.addListener(SWT.Selection, new Listener(){
             public void handleEvent (Event e){
-                FireFrogMain.getFFM().getClient().sendStartAll();
+                RCMain.getRCMain().getClient().sendStartAll();
             }
         });
 
@@ -624,14 +624,14 @@ public class DownloadManagerShell {
             }
         };
 
-        FireFrogMain.getFFM().getClient().addSpeedUpdateListener(sul);
+        RCMain.getRCMain().getClient().addSpeedUpdateListener(sul);
 
         final ConnectionListener cl = new ConnectionListener() {
 
             public void connectionState(final int state) {
                 setConnectionStatusBar(state);
                 if(state > 0){
-                    if (FireFrogMain.getFFM().getClient().isSSLEncrypted()) {
+                    if (RCMain.getRCMain().getClient().isSSLEncrypted()) {
                         setSSLStatusBar(true,true);
                     } else {
                         setSSLStatusBar(true,false);
@@ -642,10 +642,10 @@ public class DownloadManagerShell {
                 if(state > 0){
                     setLogInOutButtons(true);
                     //reset the title of MyTorrents once Logged in
-                    FireFrogMain.getFFM().getDisplay().asyncExec(new Runnable(){
+                    RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
 
                         public void run() {
-                            String userLoggedIn = FireFrogMain.getFFM().getClient().getUsername();
+                            String userLoggedIn = RCMain.getRCMain().getClient().getUsername();
                             if(myTorrents != null || !myTorrents.isDisposed()){
                                 if(bSingleUserMode){
                                     myTorrents.setText("ALL Torrents");
@@ -664,19 +664,19 @@ public class DownloadManagerShell {
             }
         };
 
-        FireFrogMain.getFFM().getClient().addConnectionListener(cl);
+        RCMain.getRCMain().getClient().addConnectionListener(cl);
 
         final DownloadManagerListener dml = new DownloadManagerListener(){
 
             public void downloadAdded(final Download download) {
                 try {
                     if (DOWNLOAD_MANAGER_SHELL.isDisposed()) {
-                        FireFrogMain.getFFM().getClient().getDownloadManager().removeListener(this);
+                        RCMain.getRCMain().getClient().getDownloadManager().removeListener(this);
                         return;
                     }
 
                     semaphore.acquire();
-                    FireFrogMain.getFFM().getDisplay().syncExec(new Runnable() {
+                    RCMain.getRCMain().getDisplay().syncExec(new Runnable() {
                         public void run() {
                             if(download.getState() == Download.ST_SEEDING || download.getStats().getCompleted() == 1000){
                                 if (!seedsMap.containsKey(download.getHash())) {
@@ -718,13 +718,13 @@ public class DownloadManagerShell {
             }
         };
 
-        FireFrogMain.getFFM().getClient().getDownloadManager().addListener(dml);
+        RCMain.getRCMain().getClient().getDownloadManager().addListener(dml);
 
         final ClientUpdateListener cul = new ClientUpdateListener(){
 
             public void update(long updateSwitches) {
                 if ((updateSwitches & Constants.UPDATE_LIST_TRANSFERS) != 0){
-                    Download[] downloads = FireFrogMain.getFFM().getClient().getDownloadManager().getSortedDownloads();
+                    Download[] downloads = RCMain.getRCMain().getClient().getDownloadManager().getSortedDownloads();
                     for (int i = 0; i < downloads.length; i++){
                         if(!downloadsMap.containsKey(downloads[i].getHash()) && !seedsMap.containsKey(downloads[i].getHash())){
                             if(downloads[i].getState() == Download.ST_SEEDING || downloads[i].getStats().getCompleted() == 1000){
@@ -774,7 +774,7 @@ public class DownloadManagerShell {
             }
         };
 
-        FireFrogMain.getFFM().getClient().addClientUpdateListener(cul);
+        RCMain.getRCMain().getClient().addClientUpdateListener(cul);
 
 
         final ParameterListener pl = new ParameterListener(){
@@ -804,7 +804,7 @@ public class DownloadManagerShell {
             }
         };
 
-        FireFrogMain.getFFM().getClient().addParameterListener(pl);
+        RCMain.getRCMain().getClient().addParameterListener(pl);
 
         //------------CtabFolder initialization here----------\\
         tabFolder = new CTabFolder(DOWNLOAD_MANAGER_SHELL,SWT.BORDER);
@@ -818,7 +818,7 @@ public class DownloadManagerShell {
         tabFolder.setSimple(false);
 
         //Set the tabs to the OS color scheme
-        Display display = FireFrogMain.getFFM().getDisplay();
+        Display display = RCMain.getRCMain().getDisplay();
         tabFolder.setSelectionForeground(display.getSystemColor(SWT.COLOR_TITLE_FOREGROUND));
         tabFolder.setSelectionBackground(
                 new Color[]{display.getSystemColor(SWT.COLOR_TITLE_BACKGROUND),
@@ -1014,7 +1014,7 @@ public class DownloadManagerShell {
                         setTorrentMoveButtons(false,false,false,false);
                     }else{
                         TableItem[] items = seedsTable.getSelection();
-                        if(items.length > 1) return;FireFrogMain.getFFM().getClient().addParameterListener(pl);
+                        if(items.length > 1) return;RCMain.getRCMain().getClient().addParameterListener(pl);
                         Container sc = (Container)items[0].getData();
                         //Check for one already open
                         CTabItem[] ctabs = tabFolder.getItems();
@@ -1034,13 +1034,13 @@ public class DownloadManagerShell {
 
         createDragDrop(seedsTable);
 
-        Properties properties = FireFrogMain.getFFM().getProperties();
+        Properties properties = RCMain.getRCMain().getProperties();
         if(properties.containsKey("sash0_weight")){
             sash.setWeights(new int[] {Integer.parseInt((String)properties.get("sash0_weight")),
                     Integer.parseInt((String)properties.get("sash1_weight"))});
 
         }
-        String userLoggedIn = FireFrogMain.getFFM().getClient().getUsername();
+        String userLoggedIn = RCMain.getRCMain().getClient().getUsername();
         if(bSingleUserMode)
             myTorrents.setText("ALL Torrents");
         else if(userLoggedIn != null)
@@ -1102,7 +1102,7 @@ public class DownloadManagerShell {
         //Double click listener for down and up
         Listener speedUpdate = new Listener(){
             public void handleEvent(Event arg0) {
-                Client client = FireFrogMain.getFFM().getClient();
+                Client client = RCMain.getRCMain().getClient();
                 client.transactionStart();
                 client.sendGetAzParameter(
                         RemoteConstants.CORE_PARAM_INT_MAX_UPLOAD_SPEED_KBYTES_PER_SEC,
@@ -1140,7 +1140,7 @@ public class DownloadManagerShell {
                 item.setText("Unlimited");
                 item.addListener(SWT.Selection,new Listener() {
                     public void handleEvent(Event e) {
-                        FireFrogMain.getFFM().getClient().sendSetAzParameter(
+                        RCMain.getRCMain().getClient().sendSetAzParameter(
                                 RemoteConstants.CORE_PARAM_INT_MAX_UPLOAD_SPEED_KBYTES_PER_SEC,
                                 "0",
                                 RemoteConstants.PARAMETER_INT);
@@ -1154,7 +1154,7 @@ public class DownloadManagerShell {
                     public void widgetSelected(SelectionEvent e) {
                         if(((MenuItem)e.widget).getSelection()){
                             String value = String.valueOf(((MenuItem)e.widget).getData("speed"));
-                            FireFrogMain.getFFM().getClient().sendSetAzParameter(
+                            RCMain.getRCMain().getClient().sendSetAzParameter(
                                     RemoteConstants.CORE_PARAM_INT_MAX_UPLOAD_SPEED_KBYTES_PER_SEC,
                                     value,
                                     RemoteConstants.PARAMETER_INT);
@@ -1221,7 +1221,7 @@ public class DownloadManagerShell {
                 item.setText("Unlimited");
                 item.addListener(SWT.Selection,new Listener() {
                     public void handleEvent(Event e) {
-                        FireFrogMain.getFFM().getClient().sendSetAzParameter(
+                        RCMain.getRCMain().getClient().sendSetAzParameter(
                                 RemoteConstants.CORE_PARAM_INT_MAX_DOWNLOAD_SPEED_KBYTES_PER_SEC,
                                 "0",
                                 RemoteConstants.PARAMETER_INT);
@@ -1234,7 +1234,7 @@ public class DownloadManagerShell {
                     public void widgetSelected(SelectionEvent e) {
                         if(((MenuItem)e.widget).getSelection()){
                             String value = String.valueOf(((MenuItem)e.widget).getData("speed"));
-                            FireFrogMain.getFFM().getClient().sendSetAzParameter(
+                            RCMain.getRCMain().getClient().sendSetAzParameter(
                                     RemoteConstants.CORE_PARAM_INT_MAX_DOWNLOAD_SPEED_KBYTES_PER_SEC,
                                     value,
                                     RemoteConstants.PARAMETER_INT);
@@ -1291,11 +1291,11 @@ public class DownloadManagerShell {
             public void shellActivated(ShellEvent arg0) {}
 
             public void shellClosed(ShellEvent arg0) {
-                FireFrogMain.getFFM().updateTimer(false);
-                FireFrogMain.getFFM().getClient().removeSpeedUpdateListener(sul);
-                FireFrogMain.getFFM().getClient().removeConnectionListener(cl);
-                FireFrogMain.getFFM().getClient().removeClientUpdateListener(cul);
-                FireFrogMain.getFFM().getClient().removeParameterListener(pl);
+                RCMain.getRCMain().updateTimer(false);
+                RCMain.getRCMain().getClient().removeSpeedUpdateListener(sul);
+                RCMain.getRCMain().getClient().removeConnectionListener(cl);
+                RCMain.getRCMain().getClient().removeClientUpdateListener(cul);
+                RCMain.getRCMain().getClient().removeParameterListener(pl);
 
                 //Remove all DownloadListeners
                 Set<String> keys = downloadsMap.keySet();
@@ -1319,7 +1319,7 @@ public class DownloadManagerShell {
 
                 int position_x = DOWNLOAD_MANAGER_SHELL.getLocation().x;
                 int position_y = DOWNLOAD_MANAGER_SHELL.getLocation().y;
-                Properties properties = FireFrogMain.getFFM().getProperties();
+                Properties properties = RCMain.getRCMain().getProperties();
 
                 if (!sash.isDisposed()) {
                     int[] weights = sash.getWeights();
@@ -1352,10 +1352,10 @@ public class DownloadManagerShell {
                 }
 
                 //Save Everything!
-                FireFrogMain.getFFM().saveConfig();
+                RCMain.getRCMain().saveConfig();
                 DOWNLOAD_MANAGER_SHELL = null;
-                if(!Boolean.parseBoolean(FireFrogMain.getFFM().getProperties().getProperty("tray.exit","true"))){
-                    FireFrogMain.getFFM().close();
+                if(!Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("tray.exit","true"))){
+                    RCMain.getRCMain().close();
                 }
 
             }
@@ -1371,7 +1371,7 @@ public class DownloadManagerShell {
             }
 
             public void shellIconified(ShellEvent arg0) {
-                if(Boolean.parseBoolean(FireFrogMain.getFFM().getProperties().getProperty("tray.minimize","true"))){
+                if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("tray.minimize","true"))){
                     DOWNLOAD_MANAGER_SHELL.setVisible(false);
                 }
 
@@ -1390,10 +1390,10 @@ public class DownloadManagerShell {
         initializeConnection();
 
         //open shell
-        if(!FireFrogMain.getFFM().getProperties().containsKey("DMS_SIZE_x"))
+        if(!RCMain.getRCMain().getProperties().containsKey("DMS_SIZE_x"))
             GUI_Utilities.centerShellandOpen(DOWNLOAD_MANAGER_SHELL);
         else{
-            properties = FireFrogMain.getFFM().getProperties();
+            properties = RCMain.getRCMain().getProperties();
             int size_x = Integer.parseInt((String)properties.get("DMS_SIZE_x"));
             int size_y = Integer.parseInt((String)properties.get("DMS_SIZE_y"));
             int position_x = Integer.parseInt((String)properties.get("DMS_POSITION_x"));
@@ -1410,8 +1410,8 @@ public class DownloadManagerShell {
             e.printStackTrace();
         }
 
-        FireFrogMain.getFFM().updateTimer(true);
-        FireFrogMain.getFFM().getClient().transactionCommit();
+        RCMain.getRCMain().updateTimer(true);
+        RCMain.getRCMain().getClient().transactionCommit();
 
 
     }
@@ -1474,7 +1474,7 @@ public class DownloadManagerShell {
     }
 
     public void setSSLStatusBar(boolean benabled, boolean buse_ssl){
-        Display display = FireFrogMain.getFFM().getDisplay();
+        Display display = RCMain.getRCMain().getDisplay();
         if(display == null || display.isDisposed()) return;
         if(benabled){
             if(buse_ssl){
@@ -1523,7 +1523,7 @@ public class DownloadManagerShell {
 
 
     public void setTorrentMoveButtons(final boolean bTop, final boolean bUp, final boolean bDown, final boolean bBottom){
-        Display display = FireFrogMain.getFFM().getDisplay();
+        Display display = RCMain.getRCMain().getDisplay();
         if(display == null || display.isDisposed()) return;
         display.asyncExec(new Runnable() {
             public void run() {
@@ -1542,7 +1542,7 @@ public class DownloadManagerShell {
 
 
     public void setLogInOutButtons(final boolean bLoggedIn){
-        Display display = FireFrogMain.getFFM().getDisplay();
+        Display display = RCMain.getRCMain().getDisplay();
         if(display == null || display.isDisposed()) return;
         display.asyncExec(new Runnable() {
             public void run() {
@@ -1558,7 +1558,7 @@ public class DownloadManagerShell {
                         addTorrent_by_url.setEnabled(true);
                         pauseAll.setEnabled(true);
                         resumeAll.setEnabled(true);
-                        User user = FireFrogMain.getFFM().getClient().getUserManager().getActiveUser();
+                        User user = RCMain.getRCMain().getClient().getUserManager().getActiveUser();
                         if(user == null){
                             manage_users.setEnabled(false);
                         }else{
@@ -1617,7 +1617,7 @@ public class DownloadManagerShell {
 
 
         //Be sure to save down the column widths
-        FireFrogMain.getFFM().getMainWindow().saveColumnWidthsToPreferencesFile();
+        RCMain.getRCMain().getMainWindow().saveColumnWidthsToPreferencesFile();
     }
 
     private void addDownloadManagerMenu(final Table table){
@@ -1630,12 +1630,12 @@ public class DownloadManagerShell {
             public void handleEvent(Event arg0) {
                 if(table != null || !table.isDisposed()){
                     TableItem[] items = table.getSelection();
-                    FireFrogMain.getFFM().getClient().transactionStart();
+                    RCMain.getRCMain().getClient().transactionStart();
                     for(TableItem item : items){
                         Container container = (Container)item.getData();
                         container.getDownload().restart();
                     }
-                    FireFrogMain.getFFM().getClient().transactionCommit();
+                    RCMain.getRCMain().getClient().transactionCommit();
                 }
             }
         });
@@ -1646,12 +1646,12 @@ public class DownloadManagerShell {
             public void handleEvent(Event arg0) {
                 if(table != null || !table.isDisposed()){
                     TableItem[] items = table.getSelection();
-                    FireFrogMain.getFFM().getClient().transactionStart();
+                    RCMain.getRCMain().getClient().transactionStart();
                     for(TableItem item : items){
                         Container container = (Container)item.getData();
                         container.getDownload().setForceStart(forceStart.getSelection());
                     }
-                    FireFrogMain.getFFM().getClient().transactionCommit();
+                    RCMain.getRCMain().getClient().transactionCommit();
                 }
             }
         });
@@ -1664,12 +1664,12 @@ public class DownloadManagerShell {
             public void handleEvent(Event arg0) {
                 if(table != null || !table.isDisposed()){
                     TableItem[] items = table.getSelection();
-                    FireFrogMain.getFFM().getClient().transactionStart();
+                    RCMain.getRCMain().getClient().transactionStart();
                     for(TableItem item : items){
                         Container container = (Container)item.getData();
                         container.getDownload().stop();
                     }
-                    FireFrogMain.getFFM().getClient().transactionCommit();
+                    RCMain.getRCMain().getClient().transactionCommit();
                 }
             }
         });
@@ -1683,7 +1683,7 @@ public class DownloadManagerShell {
             public void handleEvent(Event arg0) {
                 if(table != null || !table.isDisposed()){
                     TableItem[] items = table.getSelection();
-                    FireFrogMain.getFFM().getClient().transactionStart();
+                    RCMain.getRCMain().getClient().transactionStart();
                     for(TableItem item : items){
                         Container container = (Container)item.getData();
 
@@ -1703,7 +1703,7 @@ public class DownloadManagerShell {
                             downloadsMap.remove(container.getDownload().getHash());
                         }
                     }
-                    FireFrogMain.getFFM().getClient().transactionCommit();
+                    RCMain.getRCMain().getClient().transactionCommit();
 
                 }
             }
@@ -1723,7 +1723,7 @@ public class DownloadManagerShell {
             public void handleEvent(Event arg0) {
                 if(table != null || !table.isDisposed()){
                     TableItem[] items = table.getSelection();
-                    FireFrogMain.getFFM().getClient().transactionStart();
+                    RCMain.getRCMain().getClient().transactionStart();
                     for(TableItem item : items){
 
 
@@ -1747,7 +1747,7 @@ public class DownloadManagerShell {
                             downloadsMap.remove(container.getDownload().getHash());
                         }
                     }
-                    FireFrogMain.getFFM().getClient().transactionCommit();
+                    RCMain.getRCMain().getClient().transactionCommit();
 
                 }
             }
@@ -1765,7 +1765,7 @@ public class DownloadManagerShell {
                     int response = messageBox.open();
                     switch (response){
                     case SWT.OK:
-                        FireFrogMain.getFFM().getClient().transactionStart();
+                        RCMain.getRCMain().getClient().transactionStart();
                         for(TableItem item : items){
                             Container container = (Container)item.getData();
                             container.getDownload().remove(false, true);
@@ -1776,7 +1776,7 @@ public class DownloadManagerShell {
                                 downloadsMap.remove(container.getDownload().getHash());
                             }
                         }
-                        FireFrogMain.getFFM().getClient().transactionCommit();
+                        RCMain.getRCMain().getClient().transactionCommit();
                         break;
                     case SWT.CANCEL:
                         break;
@@ -1800,7 +1800,7 @@ public class DownloadManagerShell {
                     int response = messageBox.open();
                     switch (response){
                     case SWT.OK:
-                        FireFrogMain.getFFM().getClient().transactionStart();
+                        RCMain.getRCMain().getClient().transactionStart();
                         for(TableItem item : items){
                             Container container = (Container)item.getData();
 
@@ -1820,7 +1820,7 @@ public class DownloadManagerShell {
                                 downloadsMap.remove(container.getDownload().getHash());
                             }
                         }
-                        FireFrogMain.getFFM().getClient().transactionCommit();
+                        RCMain.getRCMain().getClient().transactionCommit();
                         break;
                     case SWT.CANCEL:
                         break;
@@ -1837,12 +1837,12 @@ public class DownloadManagerShell {
                     TableItem[] items = table.getSelection();
                     if(items.length > 1) return;
 
-                    FireFrogMain.getFFM().getClient().transactionStart();
+                    RCMain.getRCMain().getClient().transactionStart();
                     for(TableItem item : items){
                         Container container = (Container)item.getData();
                         container.getDownload().recheckData();
                     }
-                    FireFrogMain.getFFM().getClient().transactionCommit();
+                    RCMain.getRCMain().getClient().transactionCommit();
 
                 }
             }
@@ -1925,7 +1925,7 @@ public class DownloadManagerShell {
      * @param color
      */
     public void setStatusBarText(final String text, final int color){
-        final Display display = FireFrogMain.getFFM().getDisplay();
+        final Display display = RCMain.getRCMain().getDisplay();
         if(display == null || display.isDisposed()) return;
         display.asyncExec(new Runnable(){
             public void run() {
@@ -1965,7 +1965,7 @@ public class DownloadManagerShell {
 
 
     public void setToolBarTorrentIcons(final boolean bQueue, final boolean bStop, final boolean bRemove){
-        FireFrogMain.getFFM().getDisplay().syncExec(new Runnable(){
+        RCMain.getRCMain().getDisplay().syncExec(new Runnable(){
             public void run() {
                 if(queueTorrent != null || !queueTorrent.isDisposed()){
                     queueTorrent.setEnabled(bQueue);
@@ -1988,7 +1988,7 @@ public class DownloadManagerShell {
 
 
     public void sortTable(final Table table){
-        FireFrogMain.getFFM().getDisplay().syncExec(new Runnable(){
+        RCMain.getRCMain().getDisplay().syncExec(new Runnable(){
             public void run() {
                 TableItem[] items = table.getItems();
                 int minimum;
@@ -2052,7 +2052,7 @@ public class DownloadManagerShell {
         };
 
         List<Integer> column_width_list = new ArrayList<Integer>();
-        Properties properties = FireFrogMain.getFFM().getProperties();
+        Properties properties = RCMain.getRCMain().getProperties();
         if(table.equals(downloadsTable)){
             if(properties.containsKey("downloadsTable.columns.widths"))
                 column_width_list =  EncodingUtil.StringToIntegerList(properties.getProperty("downloadsTable.columns.widths"));
@@ -2347,7 +2347,7 @@ public class DownloadManagerShell {
             options |= i;
         }
         options |= RemoteConstants.ST_STATE; //set state since we need it
-        FireFrogMain.getFFM().getProperties().setProperty("transfer_states", Integer.toString(options));
+        RCMain.getRCMain().getProperties().setProperty("transfer_states", Integer.toString(options));
     }
 
     /*private void createDropTarget(final Control control) {
@@ -2454,7 +2454,7 @@ public class DownloadManagerShell {
     public void clearMapsAndChildred(){
         downloadsMap.clear();
         seedsMap.clear();
-        FireFrogMain.getFFM().getDisplay().syncExec(new Runnable(){
+        RCMain.getRCMain().getDisplay().syncExec(new Runnable(){
             public void run() {
                 try {
                     downloadsTable.removeAll();
@@ -2472,7 +2472,7 @@ public class DownloadManagerShell {
     }
 
     public void refreshStatusBar(){
-        FireFrogMain.getFFM().getDisplay().syncExec(new Runnable(){
+        RCMain.getRCMain().getDisplay().syncExec(new Runnable(){
             public void run() {
                 try {
                     if(statusDown != null || !statusDown.isDisposed()){
@@ -2504,8 +2504,8 @@ public class DownloadManagerShell {
      *
      */
     public void initializeConnection(){
-        if (FireFrogMain.getFFM().connected()) {
-            Client client = FireFrogMain.getFFM().getClient();
+        if (RCMain.getRCMain().connected()) {
+            Client client = RCMain.getRCMain().getClient();
             client.transactionStart();
             client.sendListTransfers(RemoteConstants.ST_ALL);
             client.getUserManager().update();
@@ -2607,8 +2607,8 @@ public class DownloadManagerShell {
                                 if(container.getDownload().getPosition() == drag_drop_line_start+1){
                                     System.out.println("Moving " + container.getDownload().getName()+ " From position " + (drag_drop_line_start +1) + " to " + (drag_drop_line_end+1));
                                     container.getDownload().setPosition(drag_drop_line_end+1);
-                                    if(FireFrogMain.getFFM().connected())
-                                        FireFrogMain.getFFM().getClient().sendListTransfers(RemoteConstants.ST_ALL);
+                                    if(RCMain.getRCMain().connected())
+                                        RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
                                 }
                             }
                         }else{
@@ -2618,8 +2618,8 @@ public class DownloadManagerShell {
                                 if(container.getDownload().getPosition() == drag_drop_line_start){
                                     System.out.println("Moving " + container.getDownload().getName()+ " From position " + (drag_drop_line_start +1) + " to " + (drag_drop_line_end+1));
                                     container.getDownload().setPosition(drag_drop_line_end+1);
-                                    if(FireFrogMain.getFFM().connected())
-                                        FireFrogMain.getFFM().getClient().sendListTransfers(RemoteConstants.ST_ALL);
+                                    if(RCMain.getRCMain().connected())
+                                        RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
                                 }
                             }
                         }
@@ -2630,7 +2630,7 @@ public class DownloadManagerShell {
 
         }
         catch( Throwable t ) {
-            FireFrogMain.getFFM().getDebugLogger().severe("failed to init drag-n-drop + \n" + t);
+            RCMain.getRCMain().getDebugLogger().severe("failed to init drag-n-drop + \n" + t);
         }
     }
 
@@ -2670,24 +2670,24 @@ public class DownloadManagerShell {
                 if (sURL != null || !source.exists()) {
                     //openTorrentWindow(null, new String[] { sURL }, bOverrideToStopped);
                     //System.out.println("Dropped is a URL: " + sURL);
-                    new OpenByURLDialog(FireFrogMain.getFFM().getDisplay(),sURL);
+                    new OpenByURLDialog(RCMain.getRCMain().getDisplay(),sURL);
                 } else if (source.isFile()) {
                     String filename = source.getAbsolutePath();
                     try {
                         if (!isTorrentFile(filename)) {
-                            FireFrogMain.getFFM().getDebugLogger().info("openDroppedTorrents: file not a torrent file");
+                            RCMain.getRCMain().getDebugLogger().info("openDroppedTorrents: file not a torrent file");
 
 
                             //Torrent creation if we ever support that in FF
                             //ShareUtils.shareFile(azureus_core, filename);
                         } else {
                             System.out.println("Dropped file IS torrent -- to open: " + filename);
-                            new OpenByFileDialog(FireFrogMain.getFFM().getDisplay(),new String[] {filename});
+                            new OpenByFileDialog(RCMain.getRCMain().getDisplay(),new String[] {filename});
                             /* openTorrentWindow(null, new String[] { filename },
 										bOverrideToStopped);*/
                         }
                     } catch (Exception e) {
-                        FireFrogMain.getFFM().getDebugLogger().info("Torrent open fails for '" + filename + "'\n"  + e.toString());
+                        RCMain.getRCMain().getDebugLogger().info("Torrent open fails for '" + filename + "'\n"  + e.toString());
                     }
                 } else if (source.isDirectory()) {
 
@@ -2729,18 +2729,18 @@ public class DownloadManagerShell {
         if (!check.canRead())
             throw new IOException("File "+filename+" cannot be read.");
         if (check.isDirectory()){
-            FireFrogMain.getFFM().getDebugLogger().info("File "+filename+" is a directory.");
+            RCMain.getRCMain().getDebugLogger().info("File "+filename+" is a directory.");
             return false;
         }
 
         try {
             if(!check.isFile()) {
-                FireFrogMain.getFFM().getDebugLogger().info("Torrent must be a file ('" + check.getName() + "')");
+                RCMain.getRCMain().getDebugLogger().info("Torrent must be a file ('" + check.getName() + "')");
                 return false;
             }
 
             if ( check.length() == 0 ){
-                FireFrogMain.getFFM().getDebugLogger().info("Torrent is zero length('" + check.getName() + "')");
+                RCMain.getRCMain().getDebugLogger().info("Torrent is zero length('" + check.getName() + "')");
             }
 
 
@@ -2752,7 +2752,7 @@ public class DownloadManagerShell {
                 //               construct( fis );
 
             }catch( IOException e ){
-                FireFrogMain.getFFM().getDebugLogger().info("IO Exception reading torrent ('" + check.getName() + "')");
+                RCMain.getRCMain().getDebugLogger().info("IO Exception reading torrent ('" + check.getName() + "')");
 
             }finally{
 
@@ -2764,7 +2764,7 @@ public class DownloadManagerShell {
 
                     }catch( IOException e ){
 
-                        FireFrogMain.getFFM().getDebugLogger().severe( e.toString() );
+                        RCMain.getRCMain().getDebugLogger().severe( e.toString() );
                         return false;
                     }
                 }
@@ -2862,12 +2862,12 @@ public class DownloadManagerShell {
 
 
     public void saveColumnWidthsToPreferencesFile(){
-        Display display = FireFrogMain.getFFM().getDisplay();
+        Display display = RCMain.getRCMain().getDisplay();
         if(display == null || display.isDisposed()) return;
         display.asyncExec(new Runnable(){
 
             public void run() {
-                Properties properties = FireFrogMain.getFFM().getProperties();
+                Properties properties = RCMain.getRCMain().getProperties();
                 //save the downloadsTable column widths
                 if (!downloadsTable.isDisposed()) {
                     TableColumn[] columns = downloadsTable.getColumns();
@@ -2889,7 +2889,7 @@ public class DownloadManagerShell {
                 }
 
                 //Save Everything!
-                FireFrogMain.getFFM().saveConfig();
+                RCMain.getRCMain().saveConfig();
 
 
             }
