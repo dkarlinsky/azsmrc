@@ -28,6 +28,7 @@ import org.gudy.azureus2.plugins.download.DownloadException;
 import org.gudy.azureus2.plugins.download.DownloadRemovalVetoException;
 import org.gudy.azureus2.plugins.download.DownloadScrapeResult;
 import org.gudy.azureus2.plugins.download.DownloadStats;
+import org.gudy.azureus2.plugins.download.DownloadWillBeAddedListener;
 import org.gudy.azureus2.plugins.peers.PeerManagerStats;
 import org.gudy.azureus2.plugins.torrent.Torrent;
 import org.gudy.azureus2.plugins.torrent.TorrentAttribute;
@@ -42,6 +43,32 @@ import org.jdom.output.XMLOutputter;
 public class RequestManager {
 	private Map<String,RequestHandler> handlerList = new HashMap<String, RequestHandler>();
 	private static RequestManager instance = new RequestManager();
+	private Map<String, Integer[]> downloadControlList = new HashMap<String, Integer[]>();
+	private DownloadWillBeAddedListener dwbaL = new DownloadWillBeAddedListener() {
+		public void initialised(Download dl) {
+			String hash = EncodingUtil.encode(dl.getTorrent().getHash());
+			if (downloadControlList.containsKey(hash)) {
+				Integer[] options = downloadControlList.get(hash);
+				DiskManagerFileInfo[] dmfi=  dl.getDiskManagerFileInfo();
+				if (dmfi.length != downloadControlList.size()) {
+					System.out.println("DownloadWillBeAddedListener Array Sizes don't match.");
+					return;
+				}
+				for (int i=0; i<dmfi.length;i++) {
+					 switch (options[i]) {
+					 case 1:
+						 break;
+					 case 2:
+						 dmfi[i].setPriority(true);
+						 break;
+					 case 0:
+						 dmfi[i].setSkipped(true);
+						 break;
+					 }
+				}
+			}
+		};
+	};
 
 	/**
 	 * @return Returns the instance.
@@ -309,6 +336,20 @@ public class RequestManager {
 						TorrentManager torrentManager = Plugin.getPluginInterface().getTorrentManager();
 						TorrentAttribute ta = torrentManager.getAttribute(TorrentAttribute.TA_CATEGORY);
 						Torrent newTorrent = torrentManager.createFromBEncodedData(EncodingUtil.decode(torrentData));
+
+						List<Element> fileOptions = xmlRequest.getChild("Torrent").getChildren("FileOptions");
+						if (fileOptions.size()>0) {
+							Integer[] options = new Integer[fileOptions.size()];
+							for (int i=0;i<options.length;i++) {
+								try {
+									options[i] = fileOptions.get(i).getAttribute("options").getIntValue();
+								} catch (DataConversionException e) {
+									options[i] = 1;
+									e.printStackTrace();
+								}
+							}
+						}
+
 						Download dl = Plugin.getPluginInterface().getDownloadManager().addDownload(newTorrent);
 
 						user.addDownload(dl);
