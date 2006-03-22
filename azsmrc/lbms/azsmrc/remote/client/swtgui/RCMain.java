@@ -545,11 +545,15 @@ public class RCMain implements Launchable {
 			}
 		});
 		if (Boolean.parseBoolean(properties.getProperty("update.autocheck", "true"))) {
-			if (mainWindow != null) {
-				mainWindow.setStatusBarText("Checking for Updates");
+			long lastcheck = Long.parseLong(properties.getProperty("update.lastcheck", "0"));
+			if (lastcheck-System.currentTimeMillis() > 1000*60*60*24) {
+				if (mainWindow != null) {
+					mainWindow.setStatusBarText("Checking for Updates");
+				}
+				normalLogger.info("Checking for Updates");
+				updater.checkForUpdates(Boolean.parseBoolean(properties.getProperty("update.beta", "false")));
+				properties.setProperty("update.lastcheck",Long.toString(System.currentTimeMillis()));
 			}
-			normalLogger.info("Checking for Updates");
-			updater.checkForUpdates(Boolean.parseBoolean(properties.getProperty("update.beta", "false")));
 		}
 		timer = new Timer("Main Timer",5);
 	}
