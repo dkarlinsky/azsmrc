@@ -44,6 +44,7 @@ public class PreferencesTab {
 	private Text updateIntervalOpen_Text, updateIntervalClosed_Text;
 	private Button autoOpen, autoConnect, autoUpdateCheck, autoUpdate;
 	private Button trayMinimize, trayExit, popupsEnabled, autoClipboard, autoConsole;
+	private Button updateBeta;
 
 	private Composite cOptions;
 	private Properties properties;
@@ -402,10 +403,26 @@ public class PreferencesTab {
 		for(Control control:controls){
 			control.dispose();
 		}
+
+        //Update betas
+        updateBeta = new Button(composite,SWT.CHECK);
+        updateBeta.setText("Use Beta Builds:  Allow updates to include potentially non-stable, beta builds of AzSMRC" );
+        GridData gridData = new GridData(GridData.GRAB_HORIZONTAL);
+        gridData.horizontalSpan = 2;
+        updateBeta.setLayoutData(gridData);
+
+        if(Boolean.parseBoolean(properties.getProperty("update.beta", "false"))){
+            updateBeta.setSelection(true);
+        }else
+            updateBeta.setSelection(false);
+
+        addModListener(updateBeta,SWT.Selection);
+
+
 		//Auto Update Check
 
 		autoUpdateCheck = new Button(composite,SWT.CHECK);
-		GridData gridData = new GridData(GridData.GRAB_HORIZONTAL);
+		gridData = new GridData(GridData.GRAB_HORIZONTAL);
 		gridData.horizontalSpan = 2;
 		autoUpdateCheck.setLayoutData(gridData);
 		autoUpdateCheck.setText("Auto Check for Updates: Allow AzSMRC to check for and alert the user to updates");
@@ -550,6 +567,16 @@ public class PreferencesTab {
 			else
 				properties.setProperty("auto_connect", "false");
 		}
+
+        //update Beta
+        if(updateBeta != null && !updateBeta.isDisposed()){
+            if(updateBeta.getSelection())
+                properties.setProperty("update.beta", "true");
+            else
+                properties.setProperty("update.beta", "false");
+        }
+
+
 
 
 		//Store AutoUpdateCheck
