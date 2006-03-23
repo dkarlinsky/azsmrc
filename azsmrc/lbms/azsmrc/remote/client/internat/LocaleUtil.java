@@ -323,7 +323,7 @@ LocaleUtil
   		}
   	}
 
-  	return( null );
+  	return( system_decoder ); //TODO original is return null
   }
 
 	public LocaleUtilDecoder
