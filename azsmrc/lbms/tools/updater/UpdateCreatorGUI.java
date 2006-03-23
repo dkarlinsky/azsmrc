@@ -1,6 +1,9 @@
 package lbms.tools.updater;
 
 import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -130,6 +133,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 	private File updateCreatorFile;
     private File currentDir;
 	private Changelog log = new Changelog();
+    private JTree fileTree;
     private JButton writeChangelog;
     private JScrollPane chTreeScrollPane;
     private JButton chRemove;
@@ -162,17 +166,23 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 				{
 					jTabbedPane1 = new JTabbedPane();
 					getContentPane().add(jTabbedPane1, BorderLayout.CENTER);
-					jTabbedPane1.setPreferredSize(new java.awt.Dimension(649, 390));
+					jTabbedPane1.setPreferredSize(new java.awt.Dimension(805, 424));
+                    jTabbedPane1.setSize(805, 450);
 
 				}
 
 				{
 					jPanel2 = new JPanel();
-					jPanel2.setLayout(null);
+                    GridBagLayout jPanel2Layout = new GridBagLayout();
+                    jPanel2Layout.rowWeights = new double[] {0.1, 0.1, 0.1, 0.1, 0.1, 0.1};
+                    jPanel2Layout.rowHeights = new int[] {7, 7, 7, 7, 7, 7};
+                    jPanel2Layout.columnWeights = new double[] {0.1, 0.1, 0.0, 0.1, 0.1};
+                    jPanel2Layout.columnWidths = new int[] {7, 7, 7, 7, 7};
+					jPanel2.setLayout(jPanel2Layout);
 					jTabbedPane1.addTab("General", null, jPanel2, null);
 					{
 						create = new JButton();
-						jPanel2.add(create);
+						jPanel2.add(create, new GridBagConstraints(3, 5, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 						create.setText("Create Update");
 						create.setBounds(392, 301, 154, 28);
 						create.addActionListener(new ActionListener() {
@@ -284,21 +294,26 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 					}
 					{
 						updateCreatorPanel = new JPanel();
-						updateCreatorPanel.setLayout(null);
-						jPanel2.add(updateCreatorPanel);
+                        GridBagLayout updateCreatorPanelLayout = new GridBagLayout();
+                        updateCreatorPanelLayout.rowWeights = new double[] {0.1, 0.1, 0.1, 0.1, 0.1};
+                        updateCreatorPanelLayout.rowHeights = new int[] {7, 7, 7, 7, 7};
+                        updateCreatorPanelLayout.columnWeights = new double[] {0.1};
+                        updateCreatorPanelLayout.columnWidths = new int[] {7};
+						updateCreatorPanel.setLayout(updateCreatorPanelLayout);
+						jPanel2.add(updateCreatorPanel, new GridBagConstraints(0, 1, 2, 4, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 						updateCreatorPanel.setBounds(14, 49, 287, 231);
 						updateCreatorPanel.setBackground(new java.awt.Color(255,255,255));
 						updateCreatorPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 						{
 							UpdateCreatorDir = new JTextPane();
-							updateCreatorPanel.add(UpdateCreatorDir);
+							updateCreatorPanel.add(UpdateCreatorDir, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 							UpdateCreatorDir.setText("Not Selected Yet");
 							UpdateCreatorDir.setPreferredSize(new java.awt.Dimension(273, 70));
 							UpdateCreatorDir.setBounds(7, 119, 273, 70);
 						}
 						{
 							UpdateCreatorCompressed = new JCheckBox();
-							updateCreatorPanel.add(UpdateCreatorCompressed);
+							updateCreatorPanel.add(UpdateCreatorCompressed, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 							UpdateCreatorCompressed.setText("Compress Update");
 							UpdateCreatorCompressed.setBackground(new java.awt.Color(255,255,255));
 							UpdateCreatorCompressed.setBounds(14, 182, 245, 49);
@@ -332,7 +347,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 						}
 						{
 							UpdateCreatorDirLabel = new JLabel();
-							updateCreatorPanel.add(UpdateCreatorDirLabel);
+							updateCreatorPanel.add(UpdateCreatorDirLabel, new GridBagConstraints(0, 2, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 							UpdateCreatorDirLabel.setText("Update Save Location:");
 							UpdateCreatorDirLabel.setPreferredSize(new java.awt.Dimension(273, 28));
 							UpdateCreatorDirLabel.setBorder(new LineBorder(new java.awt.Color(0,0,0), 1, false));
@@ -341,7 +356,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 						}
 						{
 							UpdateCreatorName = new JLabel();
-							updateCreatorPanel.add(UpdateCreatorName);
+							updateCreatorPanel.add(UpdateCreatorName, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 							UpdateCreatorName.setText("Not Selected Yet");
 							UpdateCreatorName.setPreferredSize(new java.awt.Dimension(273, 28));
 							UpdateCreatorName.setBounds(7, 49, 273, 28);
@@ -349,7 +364,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 
 						{
 							UpdateCreatorNameLabel = new JLabel();
-							updateCreatorPanel.add(UpdateCreatorNameLabel);
+							updateCreatorPanel.add(UpdateCreatorNameLabel, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 							UpdateCreatorNameLabel.setLayout(null);
 							UpdateCreatorNameLabel.setText("Update Name:");
 							UpdateCreatorNameLabel.setPreferredSize(new java.awt.Dimension(273, 28));
@@ -360,7 +375,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 					}
 					{
 						savePackageFile = new JButton();
-						jPanel2.add(savePackageFile);
+						jPanel2.add(savePackageFile, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 						savePackageFile.setText("Choose Update File");
 						savePackageFile.setBounds(73, 14, 161, 28);
 						savePackageFile.addActionListener(new ActionListener() {
@@ -482,8 +497,13 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 					}
 					{
 						updaterOptionsPanel = new JPanel();
-						updaterOptionsPanel.setLayout(null);
-						jPanel2.add(updaterOptionsPanel);
+                        GridBagLayout updaterOptionsPanelLayout = new GridBagLayout();
+                        updaterOptionsPanelLayout.rowWeights = new double[] {0.1, 0.1, 0.1, 0.1, 0.1};
+                        updaterOptionsPanelLayout.rowHeights = new int[] {7, 7, 7, 7, 7};
+                        updaterOptionsPanelLayout.columnWeights = new double[] {0.1, 0.1};
+                        updaterOptionsPanelLayout.columnWidths = new int[] {7, 7};
+						updaterOptionsPanel.setLayout(updaterOptionsPanelLayout);
+						jPanel2.add(updaterOptionsPanel, new GridBagConstraints(3, 1, 2, 4, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 						updaterOptionsPanel.setBounds(308, 49, 322, 231);
 						updaterOptionsPanel.setBackground(new java.awt.Color(225,225,225));
 						updaterOptionsPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
@@ -491,27 +511,27 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 							ComboBoxModel UpdaterTypeModel = new DefaultComboBoxModel(
 								new String[] { "Maintenance", "Stable","Beta" });
 							UpdaterType = new JComboBox();
-							updaterOptionsPanel.add(UpdaterType);
+							updaterOptionsPanel.add(UpdaterType, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 							UpdaterType.setModel(UpdaterTypeModel);
 							UpdaterType.setBounds(126, 189, 189, 28);
 						}
 						{
 							UpdaterTypeLabel = new JLabel();
-							updaterOptionsPanel.add(UpdaterTypeLabel);
+							updaterOptionsPanel.add(UpdaterTypeLabel, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 							UpdaterTypeLabel.setText("Update Type:");
-							UpdaterTypeLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+							UpdaterTypeLabel.setHorizontalAlignment(SwingConstants.CENTER);
 							UpdaterTypeLabel.setBounds(7, 182, 105, 35);
 						}
 						{
 							UpdaterImportanceLabel = new JLabel();
-							updaterOptionsPanel.add(UpdaterImportanceLabel);
+							updaterOptionsPanel.add(UpdaterImportanceLabel, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 							UpdaterImportanceLabel.setText("Update Level:");
-							UpdaterImportanceLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+							UpdaterImportanceLabel.setHorizontalAlignment(SwingConstants.CENTER);
 							UpdaterImportanceLabel.setBounds(7, 133, 105, 35);
 						}
 						{
 							updaterLabel = new JLabel();
-							updaterOptionsPanel.add(updaterLabel);
+							updaterOptionsPanel.add(updaterLabel, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 							updaterLabel.setText("Update Options");
 							updaterLabel.setPreferredSize(new java.awt.Dimension(288, 14));
 							updaterLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -520,15 +540,15 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 						}
 						{
 							updaterURLLabel = new JLabel();
-							updaterOptionsPanel.add(updaterURLLabel);
+							updaterOptionsPanel.add(updaterURLLabel, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 							updaterURLLabel.setText("Update URL:");
 							updaterURLLabel.setPreferredSize(new java.awt.Dimension(98, 35));
-							updaterURLLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+							updaterURLLabel.setHorizontalAlignment(SwingConstants.CENTER);
 							updaterURLLabel.setBounds(7, 49, 98, 35);
 						}
 						{
 							updaterURL = new JTextField();
-							updaterOptionsPanel.add(updaterURL);
+							updaterOptionsPanel.add(updaterURL, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 							updaterURL.setPreferredSize(new java.awt.Dimension(203, 21));
 							updaterURL.setBounds(112, 56, 203, 21);
                             updaterURL.addFocusListener(new FocusListener(){
@@ -551,21 +571,22 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 							ComboBoxModel UpdaterImportanceModel = new DefaultComboBoxModel(
 								new String[] { "Low", "Feature","Change","BugFix","Security Risk" });
 							UpdaterImportance = new JComboBox();
-							updaterOptionsPanel.add(UpdaterImportance);
+							updaterOptionsPanel.add(UpdaterImportance, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 							UpdaterImportance.setModel(UpdaterImportanceModel);
 							UpdaterImportance.setBounds(126, 133, 189, 28);
 						}
 						{
 							updateVersionLabel = new JLabel();
-							updaterOptionsPanel.add(updateVersionLabel);
+							updaterOptionsPanel.add(updateVersionLabel, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 							updateVersionLabel.setText("Update Version:");
 							updateVersionLabel.setBounds(7, 91, 98, 28);
-							updateVersionLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+							updateVersionLabel.setHorizontalAlignment(SwingConstants.CENTER);
 						}
 						{
 							updateVersion = new JTextField();
-							updaterOptionsPanel.add(updateVersion);
+							updaterOptionsPanel.add(updateVersion, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 							updateVersion.setBounds(112, 94, 203, 21);
+                            updateVersion.setPreferredSize(new java.awt.Dimension(4, 21));
 						}
 
 
@@ -577,20 +598,30 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 				this.setTitle("UpdateCreatorGUI");
 				{
 					jPanel1 = new JPanel();
+                    GridBagLayout jPanel1Layout = new GridBagLayout();
+                    jPanel1Layout.rowWeights = new double[] {0.1, 0.1, 0.1, 0.1, 0.1};
+                    jPanel1Layout.rowHeights = new int[] {7, 7, 7, 7, 7};
+                    jPanel1Layout.columnWeights = new double[] {0.1, 0.0, 0.1, 0.1, 0.1};
+                    jPanel1Layout.columnWidths = new int[] {7, 7, 7, 7, 7};
 
 					jTabbedPane1.addTab("Files", null, jPanel1, null);
-					jPanel1.setLayout(null);
-					jPanel1.setPreferredSize(new java.awt.Dimension(644, 329));
+					jPanel1.setLayout(jPanel1Layout);
+					jPanel1.setPreferredSize(new java.awt.Dimension(644, 415));
 					{
 						detailsPanel = new JPanel();
-						detailsPanel.setLayout(null);
-						jPanel1.add(detailsPanel);
+                        GridBagLayout detailsPanelLayout = new GridBagLayout();
+                        detailsPanelLayout.rowWeights = new double[] {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1};
+                        detailsPanelLayout.rowHeights = new int[] {7, 7, 7, 7, 7, 7, 7, 7, 7};
+                        detailsPanelLayout.columnWeights = new double[] {0.1, 0.1, 0.1};
+                        detailsPanelLayout.columnWidths = new int[] {7, 7, 7};
+						detailsPanel.setLayout(detailsPanelLayout);
+						jPanel1.add(detailsPanel, new GridBagConstraints(2, 1, 3, 4, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 						detailsPanel.setBorder(BorderFactory
 							.createBevelBorder(BevelBorder.LOWERED));
 						detailsPanel.setBounds(245, 42, 399, 273);
 						{
 							label1 = new JLabel();
-							detailsPanel.add(label1);
+							detailsPanel.add(label1, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 							label1.setText("UpdateFile Details:");
 							label1.setBounds(7, 7, 385, 21);
 							label1.setBorder(new LineBorder(new java.awt.Color(
@@ -602,51 +633,58 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 						}
 						{
 							NameLabel = new JLabel();
-							detailsPanel.add(NameLabel);
+							detailsPanel.add(NameLabel, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 							NameLabel.setText("Name:");
 							NameLabel.setBounds(7, 28, 63, 28);
+                            NameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 						}
 						{
 							PathLabel = new JLabel();
-							detailsPanel.add(PathLabel);
+							detailsPanel.add(PathLabel, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 							PathLabel.setText("Path:");
 							PathLabel.setBounds(7, 53, 63, 28);
+                            PathLabel.setHorizontalAlignment(SwingConstants.CENTER);
 						}
 						{
 							VersionLabel = new JLabel();
-							detailsPanel.add(VersionLabel);
+							detailsPanel.add(VersionLabel, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 							VersionLabel.setText("Version:");
 							VersionLabel.setBounds(7, 79, 63, 28);
+                            VersionLabel.setHorizontalAlignment(SwingConstants.CENTER);
 						}
 						{
 							URLLabel = new JLabel();
-							detailsPanel.add(URLLabel);
+							detailsPanel.add(URLLabel, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 							URLLabel.setText("URL:");
 							URLLabel.setBounds(7, 105, 63, 28);
+                            URLLabel.setHorizontalAlignment(SwingConstants.CENTER);
 						}
 						{
 							HashLabel = new JLabel();
-							detailsPanel.add(HashLabel);
+							detailsPanel.add(HashLabel, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 							HashLabel.setText("Hash:");
 							HashLabel.setBounds(7, 135, 63, 28);
+                            HashLabel.setHorizontalAlignment(SwingConstants.CENTER);
 						}
 						{
 							SizeLabel = new JLabel();
-							detailsPanel.add(SizeLabel);
+							detailsPanel.add(SizeLabel, new GridBagConstraints(0, 7, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 							SizeLabel.setText("Size:");
 							SizeLabel.setBounds(7, 205, 63, 28);
+                            SizeLabel.setHorizontalAlignment(SwingConstants.CENTER);
 						}
 						{
 							TypeLabel = new JLabel();
-							detailsPanel.add(TypeLabel);
+							detailsPanel.add(TypeLabel, new GridBagConstraints(0, 6, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 							TypeLabel.setText("Type:");
 							TypeLabel.setBounds(7, 168, 63, 28);
+                            TypeLabel.setHorizontalAlignment(SwingConstants.CENTER);
 						}
 						{
 							ComboBoxModel TypeComboModel = new DefaultComboBoxModel(
 								new String[] { "Normal", "SourceForge" });
 							TypeCombo = new JComboBox();
-							detailsPanel.add(TypeCombo);
+							detailsPanel.add(TypeCombo, new GridBagConstraints(1, 6, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 							TypeCombo.setModel(TypeComboModel);
 							TypeCombo.setBounds(63, 172, 196, 21);
 							TypeCombo.addActionListener(new ActionListener() {
@@ -666,7 +704,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 						}
 						{
 							name = new JTextField();
-							detailsPanel.add(name);
+							detailsPanel.add(name, new GridBagConstraints(1, 1, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 							name.setBounds(63, 35, 329, 21);
 							name.addActionListener(new ActionListener() {
 
@@ -707,7 +745,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 						}
 						{
 							path = new JTextField();
-							detailsPanel.add(path);
+							detailsPanel.add(path, new GridBagConstraints(1, 2, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 							path.setBounds(63, 58, 329, 21);
 							path.addActionListener(new ActionListener() {
 
@@ -752,7 +790,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 						}
 						{
 							version = new JTextField();
-							detailsPanel.add(version);
+							detailsPanel.add(version, new GridBagConstraints(1, 4, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 							version.setBounds(63, 81, 329, 21);
 							version.addActionListener(new ActionListener() {
 
@@ -804,7 +842,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 						}
 						{
 							url = new JTextField();
-							detailsPanel.add(url);
+							detailsPanel.add(url, new GridBagConstraints(1, 3, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 							url.setBounds(63, 105, 329, 21);
 							url.addActionListener(new ActionListener() {
 
@@ -839,20 +877,21 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 						}
 						{
 							hash = new JLabel();
-							detailsPanel.add(hash);
+							detailsPanel.add(hash, new GridBagConstraints(1, 5, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 							hash.setBounds(63, 138, 329, 21);
 						}
 						{
 							size = new JLabel();
-							detailsPanel.add(size);
+							detailsPanel.add(size, new GridBagConstraints(1, 7, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 							size.setBounds(63, 208, 329, 21);
 						}
                         //START >>  unpackFile
                         unpackFile = new JCheckBox();
-                        detailsPanel.add(unpackFile);
+                        detailsPanel.add(unpackFile, new GridBagConstraints(0, 8, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
                         unpackFile.setText("Unpack this file");
                         unpackFile.setBounds(7, 238, 385, 28);
                         unpackFile.setEnabled(false);
+                        unpackFile.setHorizontalAlignment(SwingConstants.CENTER);
                         unpackFile.addActionListener(new ActionListener(){
                             public void actionPerformed(ActionEvent arg0) {
                                 currentUF.setArchive(unpackFile.isSelected());
@@ -863,11 +902,12 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 					{
 						fileListModel = new DefaultListModel();
 						fileList = new JList();
-						jPanel1.add(fileList);
+						jPanel1.add(fileList, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.SOUTH, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 						fileList.setModel(fileListModel);
 						fileList.setBorder(BorderFactory
 							.createBevelBorder(BevelBorder.LOWERED));
 						fileList.setBounds(7, 42, 224, 273);
+                        fileList.setPreferredSize(new java.awt.Dimension(-36, 10));
 						fileList
 							.addListSelectionListener(new ListSelectionListener() {
 
@@ -921,7 +961,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 					}
 					{
 						addFile = new JButton();
-						jPanel1.add(addFile);
+						jPanel1.add(addFile, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 						addFile.setText("Add File");
 						addFile.setBounds(7, 7, 105, 28);
 						addFile.addActionListener(new ActionListener() {
@@ -960,7 +1000,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 					}
 					{
 						remove = new JButton();
-						jPanel1.add(remove);
+						jPanel1.add(remove, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 						remove.setText("Remove Selected");
 						remove.setEnabled(false);
 						remove.setBounds(119, 7, 140, 28);
@@ -1003,25 +1043,30 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 							}
 						});
 					}
-
-
-
-
+                    //START >>  fileTree
+                    fileTree = new JTree();
+                    jPanel1.add(fileTree, new GridBagConstraints(0, 1, 1, 3, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+                    //END <<  fileTree
 
 				}
 				{
 					jPanel3 = new JPanel();
+                    GridBagLayout jPanel3Layout = new GridBagLayout();
+                    jPanel3Layout.rowWeights = new double[] {0.1, 0.5, 0.1, 1.0, 0.1};
+                    jPanel3Layout.rowHeights = new int[] {7, 7, 7, 7, 7};
+                    jPanel3Layout.columnWeights = new double[] {0.1, 0.1, 0.1};
+                    jPanel3Layout.columnWidths = new int[] {7, 20, 7};
 					jTabbedPane1.addTab("Changelog", null, jPanel3, null);
-					jPanel3.setLayout(null);
+					jPanel3.setLayout(jPanel3Layout);
 					{
 						chLabel1 = new JLabel();
-						jPanel3.add(chLabel1);
+						jPanel3.add(chLabel1, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 						chLabel1.setText("Enter Changelog Text then choose type then hit \"Enter\"");
 						chLabel1.setBounds(35, 7, 483, 28);
 					}
 					{
 						chArea = new JTextArea();
-						jPanel3.add(chArea);
+						jPanel3.add(chArea, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 20, 0, 20), 0, 0));
 						chArea.setText("");
 						chArea.setBounds(35, 42, 574, 56);
 						chArea.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
@@ -1030,13 +1075,13 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 						ComboBoxModel chTypeModel = new DefaultComboBoxModel(
 							new String[] { "Bug Fix", "Change", "Feature" });
 						chType = new JComboBox();
-						jPanel3.add(chType);
+						jPanel3.add(chType, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 20, 0, 0), 0, 0));
 						chType.setModel(chTypeModel);
 						chType.setBounds(42, 105, 245, 28);
 					}
 					{
 						chEnter = new JButton();
-						jPanel3.add(chEnter);
+						jPanel3.add(chEnter, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 20, 0, 20), 0, 0));
 						chEnter.setText("Enter");
 						chEnter.setBounds(483, 105, 119, 28);
 						chEnter.addActionListener(new ActionListener(){
@@ -1078,7 +1123,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 					}
                     //START >>  chRemove
                     chRemove = new JButton();
-                    jPanel3.add(chRemove);
+                    jPanel3.add(chRemove, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
                     chRemove.setText("Remove Selected");
                     chRemove.setBounds(35, 312, 147, 28);
                     chRemove.addActionListener(new ActionListener(){
@@ -1107,7 +1152,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                     //END <<  chRemove
                     //START >>  chTreeScrollPane
                     chTreeScrollPane = new JScrollPane();
-                    jPanel3.add(chTreeScrollPane);
+                    jPanel3.add(chTreeScrollPane, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
                     chTreeScrollPane.setBounds(7, 140, 630, 168);
                     //START >>  chTree
                     bugNode = new DefaultMutableTreeNode("BugFixes");
@@ -1130,7 +1175,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                     //END <<  chTreeScrollPane
                     //START >>  writeChangelog
                     writeChangelog = new JButton();
-                    jPanel3.add(writeChangelog);
+                    jPanel3.add(writeChangelog, new GridBagConstraints(2, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
                     writeChangelog.setText("Write Changelog to File");
                     writeChangelog.setBounds(399, 313, 210, 28);
                     writeChangelog.addActionListener(new ActionListener(){
@@ -1167,7 +1212,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 			}
 			updateCreator = new UpdateCreator();
 			update = updateCreator.getCurrentUpdate();
-			this.setSize(657, 419);
+			this.setSize(813, 400);
 			{
 				jMenuBar1 = new JMenuBar();
 				setJMenuBar(jMenuBar1);
