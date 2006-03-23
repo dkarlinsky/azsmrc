@@ -1,0 +1,13 @@
+Changelog for Version: 0.9.4
+
+***New Features***
+
+- File Selection on addDownload
+- Builtin - Updater
+- SingleUserMode for all those who don't want to use the multiuser part
+
+***Changes***
+
+- Totally improved preferences Tab
+- Message Box now has "Hide All" Button
+

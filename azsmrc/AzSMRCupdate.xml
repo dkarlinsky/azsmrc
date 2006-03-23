@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Updates>
+  <Update url="http://azsmrc.sourceforge.net" version="0.9.4" type="1" importance="50">
+    <Changelog>
+      <Feature>File Selection on addDownload</Feature>
+      <Feature>Builtin - Updater</Feature>
+      <Feature>SingleUserMode for all those who don't want to use the multiuser part</Feature>
+      <Change>Totally improved preferences Tab</Change>
+    </Changelog>
+    <Files>
+      <File name="Libraries.zip" version="1.0" url="http://prdownloads.sourceforge.net/azsmrc/Libraries.zip" hash="be2950f730f825b5a5d98f26cc9cecda7f71e4" extract="true" type="2" size="186472" />
+    </Files>
+  </Update>
+</Updates>
+
