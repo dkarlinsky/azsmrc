@@ -16,13 +16,12 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JList;
+
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -36,8 +35,10 @@ import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.LineBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+
+
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -76,13 +77,11 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 	private JPanel jPanel1;
 	private JPanel detailsPanel;
 	private JLabel label1;
-	private JList fileList;
 	private JMenuItem exitMenuItem;
 	private JButton remove;
 	private JButton addFile;
 	private JMenu jMenu3;
 	private JMenuBar jMenuBar1;
-	private DefaultListModel fileListModel;
 	private JLabel size;
 	private JLabel hash;
 	private JTextField url;
@@ -133,7 +132,9 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 	private File updateCreatorFile;
     private File currentDir;
 	private Changelog log = new Changelog();
+    private JScrollPane TreeScrollPane;
     private JTree fileTree;
+    private DefaultMutableTreeNode fileTop;
     private JButton writeChangelog;
     private JScrollPane chTreeScrollPane;
     private JButton chRemove;
@@ -146,6 +147,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
     private DefaultMutableTreeNode featureNode;
     private DefaultMutableTreeNode rootNode;
     private DefaultTreeModel treeModel;
+    private DefaultTreeModel fileTreeModel;
 
 	/**
 	 * Auto-generated main method to display this JFrame
@@ -452,9 +454,13 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                                             if(update != null){
                                                 List<UpdateFile> files = update.getFileList();
                                                 for(int i = 0; i < files.size(); i++){
-                                                    fileListModel.addElement(files.get(i).getName());
+                                                    DefaultMutableTreeNode nodeToAdd = new DefaultMutableTreeNode(files.get(i).getName());
+                                                    fileTreeModel.insertNodeInto(nodeToAdd, fileTop, fileTop.getChildCount());
                                                 }
-                                                fileList.setSelectedIndex(0);
+
+
+                                                fileTree.scrollPathToVisible(new TreePath(fileTree.getPathForRow(fileTreeModel.getChildCount(fileTop))));
+
                                             }
 
                                             //pull in the changelog and populate 3rd tab
@@ -615,7 +621,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                         detailsPanelLayout.columnWeights = new double[] {0.1, 0.1, 0.1};
                         detailsPanelLayout.columnWidths = new int[] {7, 7, 7};
 						detailsPanel.setLayout(detailsPanelLayout);
-						jPanel1.add(detailsPanel, new GridBagConstraints(2, 1, 3, 4, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+						jPanel1.add(detailsPanel, new GridBagConstraints(2, 1, 3, 3, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 						detailsPanel.setBorder(BorderFactory
 							.createBevelBorder(BevelBorder.LOWERED));
 						detailsPanel.setBounds(245, 42, 399, 273);
@@ -714,9 +720,8 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 											.equalsIgnoreCase(name.getText())) {
 
 										currentUF.setName(name.getText());
-										fileListModel.setElementAt(name
-											.getText(), fileList
-											.getSelectedIndex());
+                                        TreePath tPath = fileTree.getSelectionPath();
+										fileTreeModel.valueForPathChanged(tPath,name.getText());
 									}
 
 								}
@@ -734,9 +739,8 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 											.equalsIgnoreCase(name.getText())) {
 
 										currentUF.setName(name.getText());
-										fileListModel.setElementAt(name
-											.getText(), fileList
-											.getSelectedIndex());
+                                        TreePath tPath = fileTree.getSelectionPath();
+                                        fileTreeModel.valueForPathChanged(tPath, name.getText());
 									}
 
 								}
@@ -899,66 +903,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                         });
                         //END <<  unpackFile
 					}
-					{
-						fileListModel = new DefaultListModel();
-						fileList = new JList();
-						jPanel1.add(fileList, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.SOUTH, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
-						fileList.setModel(fileListModel);
-						fileList.setBorder(BorderFactory
-							.createBevelBorder(BevelBorder.LOWERED));
-						fileList.setBounds(7, 42, 224, 273);
-                        fileList.setPreferredSize(new java.awt.Dimension(-36, 10));
-						fileList
-							.addListSelectionListener(new ListSelectionListener() {
 
-								public void valueChanged(ListSelectionEvent e) {
-									//currentUF = null;
-									int index = fileList.getSelectedIndex();
-									if(index < 0){
-										currentUF = null;
-										return;
-									}
-									List<UpdateFile> ufList = update
-										.getFileList();
-									Iterator iterator = ufList.iterator();
-
-									while (iterator.hasNext()) {
-										UpdateFile uf = (UpdateFile) iterator
-											.next();
-										if (uf.getName().equalsIgnoreCase(
-											(String) fileListModel
-												.getElementAt(index))) {
-											currentUF = uf;
-											break;
-										}
-									}
-									if (currentUF != null) {
-										name.setText(currentUF.getName());
-										path.setText(currentUF.getPath());
-										version.setText(currentUF.getVersion()
-											.toString());
-										url.setText(currentUF.getUrl());
-										hash.setText(currentUF.getHash());
-										if (currentUF.getType() == 1) {
-											TypeCombo.setSelectedIndex(0);
-										} else
-											TypeCombo.setSelectedIndex(1);
-
-										size.setText(String.valueOf(currentUF
-											.getSize()));
-                                        if(currentUF.getName().endsWith(".zip") || currentUF.getName().endsWith(".gz")){
-                                            unpackFile.setEnabled(true);
-                                            unpackFile.setSelected(currentUF.isArchive());
-                                        }else{
-                                            unpackFile.setSelected(false);
-                                            unpackFile.setEnabled(false);
-                                        }
-
-									}
-								}
-
-							});
-					}
 					{
 						addFile = new JButton();
 						jPanel1.add(addFile, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
@@ -986,11 +931,13 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 									} catch (Exception e) {
 										e.printStackTrace();
 									}
-									fileListModel.addElement(currentDirFile
-										.getName());
-									fileList.setSelectedIndex(fileListModel
-										.getSize() - 1);
-									remove.setEnabled(true);
+									//add to the tree
+									DefaultMutableTreeNode nodeToAdd = new DefaultMutableTreeNode(currentDirFile.getName());
+									fileTreeModel.insertNodeInto(nodeToAdd, fileTop, fileTop.getChildCount());
+									fileTree.scrollPathToVisible(new TreePath(nodeToAdd.getPath()));
+
+
+                                    remove.setEnabled(true);
 								} else {
 									System.out
 										.println("Open command cancelled by user.");
@@ -1006,7 +953,32 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 						remove.setBounds(119, 7, 140, 28);
 						remove.addActionListener(new ActionListener() {
 							public void actionPerformed(ActionEvent evt) {
-								int index = fileList.getSelectedIndex();
+								TreePath[] tPaths = fileTree.getSelectionPaths();
+                                for(TreePath tPath:tPaths){
+                                    String treeName = tPath.getLastPathComponent().toString();
+                                    DefaultMutableTreeNode node = (DefaultMutableTreeNode)fileTree.getSelectionPath().getLastPathComponent();
+                                    List<UpdateFile> ufList = update.getFileList();
+                                    Iterator iterator = ufList.iterator();
+                                    while (iterator.hasNext()) {
+                                        UpdateFile uf = (UpdateFile) iterator
+                                            .next();
+                                        if (uf.getName().equalsIgnoreCase(treeName)){
+                                            fileTreeModel.removeNodeFromParent(node);
+                                            updateCreator.removeFile(uf);
+                                            name.setText("");
+                                            path.setText("");
+                                            version.setText("");
+                                            url.setText("");
+                                            hash.setText("");
+                                            size.setText("");
+                                            TypeCombo.setSelectedIndex(0);
+                                            break;
+                                        }
+                                    }
+                                }
+
+
+                            /*    int index = fileList.getSelectedIndex();
 								List<UpdateFile> ufList = update.getFileList();
 								Iterator iterator = ufList.iterator();
 								while (iterator.hasNext()) {
@@ -1026,27 +998,82 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 										TypeCombo.setSelectedIndex(0);
 										break;
 									}
-								}
-								int size = fileListModel.getSize();
+								}*/
+								int size = fileTreeModel.getChildCount(fileTop);
 								if (size == 0) { //Nobody's left, disable firing.
 									remove.setEnabled(false);
 
 								} else { //Select an index.
-									if (index == fileListModel.getSize()) {
+
+
+                      /*              if (index == fileListModel.getSize()) {
 										//removed item in last position
 										index--;
 									}
 
 									fileList.setSelectedIndex(index);
-									fileList.ensureIndexIsVisible(index);
+									fileList.ensureIndexIsVisible(index);*/
 								}
 							}
 						});
 					}
+                    //START >>  TreeScrollPane
+                    TreeScrollPane = new JScrollPane();
+                    jPanel1.add(TreeScrollPane, new GridBagConstraints(0, 1, 1, 3, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
                     //START >>  fileTree
-                    fileTree = new JTree();
-                    jPanel1.add(fileTree, new GridBagConstraints(0, 1, 1, 3, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+                    fileTop = new DefaultMutableTreeNode("Files");
+                    fileTreeModel = new DefaultTreeModel(fileTop);
+                    fileTree = new JTree(fileTreeModel);
+                    GridBagLayout fileTreeLayout = new GridBagLayout();
+                    fileTreeLayout.rowWeights = new double[] {0.1, 0.1, 0.1, 0.1};
+                    fileTreeLayout.rowHeights = new int[] {7, 7, 7, 7};
+                    fileTreeLayout.columnWeights = new double[] {0.1, 0.1, 0.1, 0.1};
+                    fileTreeLayout.columnWidths = new int[] {7, 7, 7, 7};
+                    fileTree.setLayout(fileTreeLayout);
+                    TreeScrollPane.setViewportView(fileTree);
+                    fileTree.addTreeSelectionListener(new TreeSelectionListener() {
+                        public void valueChanged(TreeSelectionEvent evt) {
+                            //if(evt.getPaths().length > 1) return;
+                            List<UpdateFile> ufList = update.getFileList();
+                            Iterator iterator = ufList.iterator();
+
+                            while (iterator.hasNext()) {
+                                UpdateFile uf = (UpdateFile) iterator
+                                .next();
+                                if (uf.getName().equalsIgnoreCase(
+                                        evt.getPath().getLastPathComponent().toString())) {
+                                    currentUF = uf;
+                                    break;
+                                }
+                            }
+                            if (currentUF != null) {
+                                name.setText(currentUF.getName());
+                                path.setText(currentUF.getPath());
+                                version.setText(currentUF.getVersion()
+                                        .toString());
+                                url.setText(currentUF.getUrl());
+                                hash.setText(currentUF.getHash());
+                                if (currentUF.getType() == 1) {
+                                    TypeCombo.setSelectedIndex(0);
+                                } else
+                                    TypeCombo.setSelectedIndex(1);
+
+                                size.setText(String.valueOf(currentUF
+                                        .getSize()));
+                                if(currentUF.getName().endsWith(".zip") || currentUF.getName().endsWith(".gz")){
+                                    unpackFile.setEnabled(true);
+                                    unpackFile.setSelected(currentUF.isArchive());
+                                }else{
+                                    unpackFile.setSelected(false);
+                                    unpackFile.setEnabled(false);
+                                }
+
+                            }
+                        }
+                    });
+
                     //END <<  fileTree
+                    //END <<  TreeScrollPane
 
 				}
 				{
@@ -1212,7 +1239,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 			}
 			updateCreator = new UpdateCreator();
 			update = updateCreator.getCurrentUpdate();
-			this.setSize(813, 400);
+			this.setSize(813, 475);
 			{
 				jMenuBar1 = new JMenuBar();
 				setJMenuBar(jMenuBar1);
@@ -1276,7 +1303,9 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 
         //Clear 2nd tab
         currentUF = null;
-        fileListModel.removeAllElements();
+        fileTop = new DefaultMutableTreeNode("Files");
+        fileTreeModel = new DefaultTreeModel(fileTop);
+        fileTree.setModel(fileTreeModel);
         name.setText("");
         path.setText("");
         version.setText("");
