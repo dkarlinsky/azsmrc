@@ -147,6 +147,7 @@ public class DownloadManagerShell {
     private ToolItem refresh,manage_users, preferences, console;
     private ToolItem addTorrent_by_file,addTorrent_by_url, pauseAll, resumeAll ;
     private ToolItem stopTorrent, queueTorrent, removeTorrent;
+    private MenuItem menuLogin,menuLogout,menuQuickconnect;
     public ConsoleTab consoleTab;
 
     //status bar labels
@@ -191,6 +192,155 @@ public class DownloadManagerShell {
         gridLayout.marginWidth = 0;
         DOWNLOAD_MANAGER_SHELL.setLayout(gridLayout);
         DOWNLOAD_MANAGER_SHELL.setMinimumSize(400,250);
+
+        //-----------------------MAIN TOP MENU----------------------------\\
+        Menu menuBar = new Menu (DOWNLOAD_MANAGER_SHELL, SWT.BAR);
+        DOWNLOAD_MANAGER_SHELL.setMenuBar (menuBar);
+
+        MenuItem fileItem = new MenuItem(menuBar,SWT.CASCADE);
+        fileItem.setText("&File");
+
+        Menu fileSubmenu = new Menu (DOWNLOAD_MANAGER_SHELL, SWT.DROP_DOWN);
+        fileItem.setMenu (fileSubmenu);
+
+        MenuItem toolItem = new MenuItem(menuBar,SWT.CASCADE);
+        toolItem.setText("&Tools");
+
+        Menu toolSubmenu = new Menu (DOWNLOAD_MANAGER_SHELL, SWT.DROP_DOWN);
+        toolItem.setMenu (toolSubmenu);
+
+
+        MenuItem helpItem = new MenuItem(menuBar,SWT.CASCADE);
+        helpItem.setText("&Help");
+
+        Menu helpSubmenu = new Menu (DOWNLOAD_MANAGER_SHELL, SWT.DROP_DOWN);
+        helpItem.setMenu (helpSubmenu);
+
+
+        //----File submenu
+
+        //Login
+        menuLogin = new MenuItem(fileSubmenu,SWT.PUSH);
+        menuLogin.setText("&Connect to Server");
+        menuLogin.addListener(SWT.Selection, new Listener(){
+            public void handleEvent (Event e){
+                new ConnectionDialog(RCMain.getRCMain().getDisplay());
+            }
+        });
+
+        //QuickConnect
+        menuQuickconnect = new MenuItem(fileSubmenu,SWT.PUSH);
+        menuQuickconnect.setText("&Quickconnect");
+        menuQuickconnect.addListener(SWT.Selection, new Listener(){
+            public void handleEvent (Event e){
+                Properties properties = RCMain.getRCMain().getProperties();
+                if (
+                        properties.getProperty("connection_lastURL",null) != null &&
+                        properties.getProperty("connection_username",null) != null &&
+                        properties.getProperty("connection_password",null) != null) {
+                    RCMain.getRCMain().connect(true);
+                    RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
+                } else
+                    new ConnectionDialog(RCMain.getRCMain().getDisplay());
+            }
+        });
+
+        //Logout
+        menuLogout = new MenuItem(fileSubmenu,SWT.PUSH);
+        menuLogout.setText("&Disconnect from Server");
+        menuLogout.addListener(SWT.Selection, new Listener(){
+            public void handleEvent (Event e){
+                RCMain.getRCMain().disconnect();
+                setLogInOutButtons(false);
+                DOWNLOAD_MANAGER_SHELL.setText(TITLE);
+                RCMain.getRCMain().setTrayIcon(0);
+                downloadsMap.clear();
+                seedsMap.clear();
+                downloadsTable.removeAll();
+                seedsTable.removeAll();
+                Control[] children_downloads = downloadsTable.getChildren();
+                for(Control child:children_downloads) child.dispose();
+                Control[] children_seeds = seedsTable.getChildren();
+                for(Control child:children_seeds) child.dispose();
+            }
+        });
+
+        //Separator
+        new MenuItem(fileSubmenu,SWT.SEPARATOR);
+
+        //Exit
+        MenuItem exitItem = new MenuItem (fileSubmenu, SWT.PUSH);
+        exitItem.setText ("E&xit\tCtrl+Q");
+        exitItem.setAccelerator (SWT.CTRL + 'Q');
+        exitItem.addListener (SWT.Selection, new Listener () {
+            public void handleEvent (Event e) {
+                MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
+                messageBox.setText("Confirm Exit");
+                messageBox.setMessage("Are you sure you wish to exit AzSMRC entirely?");
+                int response = messageBox.open();
+                switch (response){
+                case SWT.OK:
+                    RCMain.getRCMain().close();
+                    break;
+                case SWT.CANCEL:
+                    break;
+                }
+            }
+        });
+
+        //-----Tools Submenu
+
+        MenuItem menuConsole = new MenuItem(toolSubmenu,SWT.PUSH);
+        menuConsole.setText("&Console\tCtrl+C");
+        menuConsole.setAccelerator(SWT.CTRL + 'C');
+        menuConsole.addListener(SWT.Selection, new Listener(){
+            public void handleEvent(Event e){
+                CTabItem[] tabs = tabFolder.getItems();
+                for(CTabItem tab:tabs){
+                    if(tab.getText().equalsIgnoreCase("Console")){
+                        tabFolder.setSelection(tab);
+                        return;
+                    }
+                }
+                consoleTab = new ConsoleTab(tabFolder);
+            }
+        });
+
+
+        MenuItem menuPrefs = new MenuItem(toolSubmenu,SWT.PUSH);
+        menuPrefs.setText("&Preferences");
+        menuPrefs.addListener(SWT.Selection, new Listener(){
+            public void handleEvent(Event e) {
+
+                CTabItem[] tabs = tabFolder.getItems();
+                for(CTabItem tab:tabs){
+                    if(tab.getText().equalsIgnoreCase("Preferences")){
+                        tabFolder.setSelection(tab);
+                        return;
+                    }
+                }
+                new PreferencesTab(tabFolder);
+            }
+        });
+
+
+        //-----Help Submenu
+
+        MenuItem menuAbout = new MenuItem(helpSubmenu,SWT.PUSH);
+        menuAbout.setText("&User Guide");
+        menuAbout.addListener(SWT.Selection, new Listener(){
+            public void handleEvent (Event e){
+                //open readme shell here
+                CTabItem[] tabs = tabFolder.getItems();
+                for(CTabItem tab:tabs){
+                    if(tab.getText().equalsIgnoreCase("Information")){
+                        tabFolder.setSelection(tab);
+                        return;
+                    }
+                }
+                new ReadmeTab(tabFolder);
+            }
+        });
 
 
         //--------------------------TOOLBAR--------------------------------\\
@@ -548,9 +698,6 @@ public class DownloadManagerShell {
                     }
                 }
                 new PreferencesTab(tabFolder);
-
-                //new PreferencesDialog(FireFrogMain.getFFM().getDisplay());
-                //new MessageDialog(FireFrogMain.getFFM().getDisplay(),true,10000,20,"Error", "I need a background picture!");
             }
         });
 
@@ -1550,8 +1697,11 @@ public class DownloadManagerShell {
                     if(bLoggedIn){
 
                         login.setEnabled(false);
+                        menuLogin.setEnabled(false);
+                        menuLogout.setEnabled(true);
                         logout.setEnabled(true);
                         quickconnect.setEnabled(false);
+                        menuQuickconnect.setEnabled(false);
                         refresh.setEnabled(true);
                         preferences.setEnabled(true);
                         addTorrent_by_file.setEnabled(true);
@@ -1571,8 +1721,11 @@ public class DownloadManagerShell {
 
                     }else{
                         login.setEnabled(true);
+                        menuLogin.setEnabled(true);
+                        menuLogout.setEnabled(false);
                         logout.setEnabled(false);
                         quickconnect.setEnabled(true);
+                        menuQuickconnect.setEnabled(true);
                         refresh.setEnabled(false);
                         preferences.setEnabled(true);
                         addTorrent_by_file.setEnabled(false);
