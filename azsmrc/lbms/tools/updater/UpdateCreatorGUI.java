@@ -184,7 +184,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 								}
 
 								//check to make sure the UpdateCreator has some file
-								List<UpdateFile> files = updateCreator.getUpdate().getFileList();
+								List<UpdateFile> files = updateCreator.getCurrentUpdate().getFileList();
 								if(files.size() == 0){
 									JOptionPane.showMessageDialog(jPanel2, "Please add some files to this package.");
 									return;
@@ -388,7 +388,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                                         if(updateCreatorFile.exists()){
 
                                             updateCreator = new UpdateCreator(updateCreatorFile);
-                                            update = updateCreator.getUpdate();
+                                            update = updateCreator.getCurrentUpdate();
 
                                             //Fill out the update info
                                             if(update != null){
@@ -1147,7 +1147,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                                 File changelogFile = fc.getSelectedFile();
 
                                 try {
-                                    updateCreator.generateChanglogTxt(changelogFile);
+                                    updateCreator.generateChangelogTxt(changelogFile);
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
@@ -1166,7 +1166,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 
 			}
 			updateCreator = new UpdateCreator();
-			update = updateCreator.getUpdate();
+			update = updateCreator.getCurrentUpdate();
 			this.setSize(657, 419);
 			{
 				jMenuBar1 = new JMenuBar();
@@ -1214,7 +1214,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
     public void clearAll(){
         //Remake the elements
         updateCreator = new UpdateCreator();
-        update = updateCreator.getUpdate();
+        update = updateCreator.getCurrentUpdate();
         log = new Changelog();
         currentDirFile = null;
         updateCreatorFile = null;

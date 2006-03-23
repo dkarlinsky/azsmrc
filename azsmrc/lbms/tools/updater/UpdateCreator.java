@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.SortedSet;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
@@ -25,10 +26,13 @@ import org.jdom.output.XMLOutputter;
 
 public class UpdateCreator {
 
-	private Update update;
+	private Update currentUpdate;
+	private UpdateList uList;
 
 	public UpdateCreator() {
-		update = new Update();
+		uList = new UpdateList();
+		currentUpdate = new Update();
+		uList.addUpdate(currentUpdate);
 	}
 
 	public UpdateCreator (File updateFile) {
@@ -36,19 +40,41 @@ public class UpdateCreator {
 		try {
 			fis = new FileInputStream(updateFile);
 			if (updateFile.toString().contains(".gz")) {
-				update = readCompressedUpdate(fis);
+				uList = readCompressedUpdateList(fis);
+				currentUpdate = uList.getLatest();
 			} else {
-				update = readUpdate(fis);
+				uList = readUpdateList(fis);
+				currentUpdate = uList.getLatest();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			update = new Update();
+			uList = new UpdateList();
+			currentUpdate = new Update();
+			uList.addUpdate(currentUpdate);
 		} finally {
 			if (fis!=null)
 				try {
 					fis.close();
 				} catch (IOException e) {}
 		}
+	}
+
+	private UpdateList readCompressedUpdateList (InputStream is) throws IOException {
+		GZIPInputStream gis = new GZIPInputStream(is);
+		return readUpdateList(gis);
+	}
+
+	private UpdateList readUpdateList (InputStream is) throws IOException {
+		try {
+			SAXBuilder builder = new SAXBuilder();
+			Document xmlDom = builder.build(is);
+			UpdateList updateUl = new UpdateList(xmlDom);
+			new XMLOutputter(Format.getPrettyFormat()).output(updateUl.toDocument(), System.out);
+			return updateUl;
+		} catch (JDOMException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	private Update readCompressedUpdate (InputStream is) throws IOException {
@@ -84,7 +110,7 @@ public class UpdateCreator {
 		f.setType(type);
 
 		f.setHash(CryptoTools.formatByte(CryptoTools.messageDigestFile(file.getAbsolutePath(), UpdateFile.HASH_ALGORITHM)));
-		update.addFile(f);
+		currentUpdate.addFile(f);
 		return f;
 	}
 
@@ -116,24 +142,38 @@ public class UpdateCreator {
 	}
 
 	public void removeFile (UpdateFile f) {
-		update.removeFile(f);
+		currentUpdate.removeFile(f);
 	}
 
-	public Update getUpdate() {
-		return this.update;
+	public Update getCurrentUpdate() {
+		return this.currentUpdate;
+	}
+
+	/**
+	 * @param currentUpdate The currentUpdate to set.
+	 */
+	public void setCurrentUpdate(Update currentUpdate) {
+		this.currentUpdate = currentUpdate;
+	}
+
+	/**
+	 * @return Returns the uList.
+	 */
+	public UpdateList getUpdateList() {
+		return uList;
 	}
 
 	public boolean construct (File file, boolean compress) throws IOException {
-		if (!update.isComplete()) return false;
+		//if (!currentUpdate.isComplete()) return false;
 		FileOutputStream fos = null;
 		try {
 			fos = new FileOutputStream(file);
 			if (compress) {
 				GZIPOutputStream gos = new GZIPOutputStream(fos);
-				new XMLOutputter(Format.getCompactFormat()).output(update.toDocument(), gos);
+				new XMLOutputter(Format.getCompactFormat()).output(uList.toDocument(), gos);
 				gos.close();
 			} else {
-				new XMLOutputter(Format.getPrettyFormat()).output(update.toDocument(), fos);
+				new XMLOutputter(Format.getPrettyFormat()).output(uList.toDocument(), fos);
 			}
 		} finally {
 			if (fos!=null) fos.close();
@@ -141,39 +181,60 @@ public class UpdateCreator {
 		return true;
 	}
 
-	public boolean generateChanglogTxt (File f) throws IOException {
-		if (update.getChangeLog()==null) return false;
+	public String generateChangelog(Update u) {
+		String changelog = "";
+		List<String> clog = u.getChangeLog().getFeatures();
+		changelog += "Changelog for Version: "+currentUpdate.getVersion()+"\n\n";
+		if (clog.size()>0) {
+			changelog += "***New Features***\n\n";
+			for (String c:clog) {
+				changelog += "- "+c+"\n";
+			}
+			changelog += "\n";
+		}
+		clog = u.getChangeLog().getChanges();
+		if (clog.size()>0) {
+			changelog += "***Changes***\n\n";
+			for (String c:clog) {
+				changelog += "- "+c+"\n";
+			}
+			changelog += "\n";
+		}
+		clog = u.getChangeLog().getBugFixes();
+		if (clog.size()>0) {
+			changelog += "***BugFixes***\n\n";
+			for (String c:clog) {
+				changelog += "- "+c+"\n";
+			}
+		}
+		return changelog;
+	}
+
+	public boolean generateChangelogTxt (File f) throws IOException {
+		if (currentUpdate.getChangeLog()==null) return false;
 		PrintWriter pw = null;
 		try {
 			pw = new PrintWriter(f);
-			List<String> clog = update.getChangeLog().getFeatures();
-			pw.println("Changelog for Version: "+update.getVersion()+"\n");
-			if (clog.size()>0) {
-				pw.println("***New Features***\n");
-				for (String c:clog) {
-					pw.println("- "+c);
-				}
-				pw.println();
-			}
-			clog = update.getChangeLog().getChanges();
-			if (clog.size()>0) {
-				pw.println("***Changes***\n");
-				for (String c:clog) {
-					pw.println("- "+c);
-				}
-				pw.println();
-			}
-			clog = update.getChangeLog().getBugFixes();
-			if (clog.size()>0) {
-				pw.println("***BugFixes***\n");
-				for (String c:clog) {
-					pw.println("- "+c);
-				}
+			pw.println(generateChangelog(getCurrentUpdate()));
+		} finally {
+			if (pw!=null) pw.close();
+		}
+		return true;
+	}
+
+	public boolean generateCombinedChangelogTxt (File f) throws IOException {
+		if (currentUpdate.getChangeLog()==null) return false;
+		PrintWriter pw = null;
+		try {
+			pw = new PrintWriter(f);
+			Iterator<Update> uIter = uList.getUpdateSet().iterator();
+			while (uIter.hasNext()) {
+				pw.println(generateChangelog(uIter.next()));
+				pw.println("\n");
 			}
 		} finally {
 			if (pw!=null) pw.close();
 		}
-
 		return true;
 	}
 }
