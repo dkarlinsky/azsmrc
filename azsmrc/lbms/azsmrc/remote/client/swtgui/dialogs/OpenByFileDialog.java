@@ -225,7 +225,7 @@ public class OpenByFileDialog {
 
         // detailsTAble for each torrent
         detailsTable = new Table(detailsGroup, SWT.BORDER | SWT.V_SCROLL
-                | SWT.H_SCROLL | SWT.CHECK);
+                | SWT.H_SCROLL | SWT.CHECK | SWT.MULTI);
         gridData = new GridData(GridData.FILL_BOTH);
         gridData.horizontalSpan = 3;
         gridData.verticalSpan = 20;
@@ -287,13 +287,8 @@ public class OpenByFileDialog {
                     while (iterator.hasNext()) {
                         AddTorrentContainer container = tMap.get(iterator.next());
                         int[] props = container.getFileProperties();
-
+                        //Main add to Azureus
                         RCMain.getRCMain().getClient().sendAddDownload(container.getTorrentFile(), props);
-                        //System.out.println(container.getTorrentFile().getName());
-
-                      /*  for(int prop:props){
-                            System.out.println(String.valueOf(prop));
-                        }*/
                     }
                 }
                 shell.close();
