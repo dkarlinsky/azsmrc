@@ -29,12 +29,18 @@ public class UpdateCreator {
 	private Update currentUpdate;
 	private UpdateList uList;
 
+	/**
+	 * 
+	 */
 	public UpdateCreator() {
 		uList = new UpdateList();
 		currentUpdate = new Update();
 		uList.addUpdate(currentUpdate);
 	}
 
+	/**
+	 * @param updateFile
+	 */
 	public UpdateCreator (File updateFile) {
 		FileInputStream fis = null;
 		try {
@@ -82,6 +88,11 @@ public class UpdateCreator {
 		return readUpdate(gis);
 	}
 
+	/**
+	 * @param is
+	 * @return
+	 * @throws IOException
+	 */
 	private Update readUpdate (InputStream is) throws IOException {
 		try {
 			SAXBuilder builder = new SAXBuilder();
@@ -93,6 +104,14 @@ public class UpdateCreator {
 		return null;
 	}
 
+	/**
+	 * @param file
+	 * @param path
+	 * @param url
+	 * @param type
+	 * @return
+	 * @throws Exception
+	 */
 	public UpdateFile addFile(File file, String path, String url, int type) throws Exception{
 		UpdateFile f = new UpdateFile();
 		f.setUrl(url);
@@ -114,6 +133,14 @@ public class UpdateCreator {
 		return f;
 	}
 
+	/**
+	 * This will update uf with fileinfo about the files contained 
+	 * in the archiv 
+	 * 
+	 * @param file zip file to read from
+	 * @param uf UpdateFile to add fileinfo to
+	 * @throws Exception
+	 */
 	public void setZipArchivFiles (File file, UpdateFile uf) throws Exception {
 		ZipFile zip = new ZipFile(file);
 		Enumeration<ZipEntry> e =(Enumeration<ZipEntry>)zip.entries();
@@ -141,10 +168,16 @@ public class UpdateCreator {
 		zip.close();
 	}
 
+	/**
+	 * @param f
+	 */
 	public void removeFile (UpdateFile f) {
 		currentUpdate.removeFile(f);
 	}
 
+	/**
+	 * @return
+	 */
 	public Update getCurrentUpdate() {
 		return this.currentUpdate;
 	}
@@ -157,12 +190,36 @@ public class UpdateCreator {
 	}
 
 	/**
+	 * @param version
+	 * @param type
+	 */
+	public void addUpdate (String version, int type) {
+		Update u = new Update();
+		u.setVersion(new Version (version));
+		u.setType(type);
+		uList.addUpdate(u);
+	}
+
+	/**
+	 * @param u
+	 */
+	public void removeUpdate (Update u) {
+		uList.removeUpdate(u);
+	}
+
+	/**
 	 * @return Returns the uList.
 	 */
 	public UpdateList getUpdateList() {
 		return uList;
 	}
 
+	/**
+	 * @param file
+	 * @param compress
+	 * @return
+	 * @throws IOException
+	 */
 	public boolean construct (File file, boolean compress) throws IOException {
 		//if (!currentUpdate.isComplete()) return false;
 		FileOutputStream fos = null;
@@ -181,6 +238,12 @@ public class UpdateCreator {
 		return true;
 	}
 
+	/**
+	 * This will return a textual Changelog for the Update
+	 * 
+	 * @param u Update to pull the Changelog from
+	 * @return the Changelog
+	 */
 	public String generateChangelog(Update u) {
 		String changelog = "";
 		List<String> clog = u.getChangeLog().getFeatures();
@@ -210,6 +273,13 @@ public class UpdateCreator {
 		return changelog;
 	}
 
+	/**
+	 * This will generate a clog for the currentUpdate
+	 * 
+	 * @param f File to write to
+	 * @return whether the update was complete or not
+	 * @throws IOException
+	 */
 	public boolean generateChangelogTxt (File f) throws IOException {
 		if (currentUpdate.getChangeLog()==null) return false;
 		PrintWriter pw = null;
@@ -222,8 +292,13 @@ public class UpdateCreator {
 		return true;
 	}
 
-	public boolean generateCombinedChangelogTxt (File f) throws IOException {
-		if (currentUpdate.getChangeLog()==null) return false;
+	/**
+	 * This will generate a Changelog for all Updates in uList 
+	 * 
+	 * @param f ile to write to
+	 * @throws IOException
+	 */
+	public void generateCombinedChangelogTxt (File f) throws IOException {
 		PrintWriter pw = null;
 		try {
 			pw = new PrintWriter(f);
@@ -235,6 +310,5 @@ public class UpdateCreator {
 		} finally {
 			if (pw!=null) pw.close();
 		}
-		return true;
 	}
 }

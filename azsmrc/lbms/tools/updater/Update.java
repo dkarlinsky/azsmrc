@@ -100,7 +100,10 @@ public class Update implements Comparable<Update>{
 	}
 
 	public int compareTo(Update o) {
-		return version.compareTo(o.version);
+		int v = version.compareTo(o.version);
+		if (v==0) {
+			return this.type-o.type;
+		} else return v;
 	}
 
 	public void addFile (UpdateFile f) {
