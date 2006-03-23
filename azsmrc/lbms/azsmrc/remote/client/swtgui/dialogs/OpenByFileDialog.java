@@ -176,7 +176,7 @@ public class OpenByFileDialog {
 
         gridData = new GridData(GridData.FILL_BOTH);
         gridData.horizontalSpan = 3;
-        gridData.verticalSpan = 50;
+        gridData.verticalSpan = 100;
         gridData.grabExcessVerticalSpace = true;
         sash.setLayoutData(gridData);
 
@@ -219,7 +219,7 @@ public class OpenByFileDialog {
         detailsGroup.setLayout(gl);
         gridData = new GridData(GridData.FILL_BOTH);
         gridData.horizontalSpan = 3;
-        gridData.verticalSpan = 20;
+        gridData.verticalSpan = 50;
         gridData.grabExcessVerticalSpace = true;
         detailsGroup.setLayoutData(gridData);
 
@@ -288,12 +288,12 @@ public class OpenByFileDialog {
                         AddTorrentContainer container = tMap.get(iterator.next());
                         int[] props = container.getFileProperties();
 
-                        RCMain.getRCMain().getClient().sendAddDownload(container.getTorrentFile(), container.getFileProperties());
-                        System.out.println(container.getTorrentFile().getName());
+                        RCMain.getRCMain().getClient().sendAddDownload(container.getTorrentFile(), props);
+                        //System.out.println(container.getTorrentFile().getName());
 
-                        for(int prop:props){
+                      /*  for(int prop:props){
                             System.out.println(String.valueOf(prop));
-                        }
+                        }*/
                     }
                 }
                 shell.close();
@@ -527,13 +527,8 @@ public class OpenByFileDialog {
                         SWT.NULL);
                 String name = files[i].getRelativePath();
 
-                if (name == null || name.length() == 0
-                        || name.equalsIgnoreCase("")) {
-                    try {
-                        name = container.getName();
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
+                if (name == null || name.length() == 0 || name.equalsIgnoreCase("")) {
+                    name = "Error Decoding Name";
                 }
 
                 if (properties != null && properties[i] == 1) {
