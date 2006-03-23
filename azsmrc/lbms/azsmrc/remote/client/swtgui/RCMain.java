@@ -304,8 +304,10 @@ public class RCMain implements Launchable {
 	}
 
 	public RCMain () {
+		System.out.println("Starting up RCMain.");
 		confFile = new File(USER_DIR+FSEP+"config.cfg");
 		properties = new Properties();
+		System.out.println("Loading Properties.");
 		if (confFile.exists() && confFile.canRead()) {
 			FileInputStream fin = null;
 			try {
@@ -324,8 +326,7 @@ public class RCMain implements Launchable {
 				if (fin!=null) try { fin.close(); } catch (IOException e) {}
 			}
 		}
-
-
+		System.out.println("Creating Logger.");
 		normalLogger = Logger.getLogger(LOGGER_NORMAL);
 		debugLogger = Logger.getLogger(LOGGER_DEBUG);
 		normalLogger.setLevel(Level.FINEST);
@@ -372,6 +373,7 @@ public class RCMain implements Launchable {
 				return true;
 			}
 		});
+		System.out.println("Creating Client.");
 		client = new Client();
 		client.setDebugLogger(debugLogger);
 		client.setServer(properties.getProperty("connection_lastURL",null));
@@ -493,13 +495,19 @@ public class RCMain implements Launchable {
 			}
 		});
 
+		System.out.println("Creating Updater.");
 		try {
 			updater = new Updater(new URL(RemoteConstants.UPDATE_URL),new File("update.xml.gz"),new File(USER_DIR));
 		} catch (MalformedURLException e2) {
 		}
 		updater.addListener(new UpdateListener() {
 			public void exception(Exception e) {
-				// TODO Auto-generated method stub
+				System.out.println("Update Exception: "+e.getLocalizedMessage());
+				System.out.println("Update Exception: "+e.getMessage());
+				if (mainWindow != null) {
+					mainWindow.setStatusBarText("Update Exception: "+e.getLocalizedMessage(),SWT.COLOR_RED);
+				}
+				normalLogger.severe("Update Exception: "+e.getLocalizedMessage());
 
 			}
 			public void noUpdate() {
@@ -555,7 +563,9 @@ public class RCMain implements Launchable {
 				properties.setProperty("update.lastcheck",Long.toString(System.currentTimeMillis()));
 			}
 		}
+		System.out.println("Creating Timer.");
 		timer = new Timer("Main Timer",5);
+		System.out.println("Finished Startup.");
 	}
 
 	private void shutdown() {
