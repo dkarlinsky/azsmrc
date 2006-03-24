@@ -7,6 +7,7 @@ import java.net.URL;
 import java.security.KeyStore;
 
 import lbms.azsmrc.plugin.gui.View;
+import lbms.azsmrc.plugin.web.RequestManager;
 import lbms.azsmrc.plugin.web.WebRequestHandler;
 import lbms.azsmrc.shared.UserNotFoundException;
 
@@ -176,7 +177,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 		//-------------------------------------------------------\\
 
-
+		RequestManager.getInstance().initialize(pi);
 
 		try{
 			TrackerWebContext	context;
