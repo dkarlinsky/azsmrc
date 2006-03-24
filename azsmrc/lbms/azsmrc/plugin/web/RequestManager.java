@@ -44,37 +44,44 @@ public class RequestManager {
 	private Map<String,RequestHandler> handlerList = new HashMap<String, RequestHandler>();
 	private static RequestManager instance = new RequestManager();
 	private Map<String, Integer[]> downloadControlList = new HashMap<String, Integer[]>();
-	private DownloadWillBeAddedListener dwbaL = new DownloadWillBeAddedListener() {
-		public void initialised(Download dl) {
-			String hash = EncodingUtil.encode(dl.getTorrent().getHash());
-			if (downloadControlList.containsKey(hash)) {
-				Integer[] options = downloadControlList.get(hash);
-				DiskManagerFileInfo[] dmfi=  dl.getDiskManagerFileInfo();
-				if (dmfi.length != downloadControlList.size()) {
-					System.out.println("DownloadWillBeAddedListener Array Sizes don't match.");
-					return;
-				}
-				for (int i=0; i<dmfi.length;i++) {
-					 switch (options[i]) {
-					 case 1:
-						 break;
-					 case 2:
-						 dmfi[i].setPriority(true);
-						 break;
-					 case 0:
-						 dmfi[i].setSkipped(true);
-						 break;
-					 }
-				}
-			}
-		};
-	};
 
 	/**
 	 * @return Returns the instance.
 	 */
 	public static RequestManager getInstance() {
 		return instance;
+	}
+
+	public void initialize (PluginInterface pi) {
+		System.out.println("AzSMRC: adding DownloadWillBeAddedListener");
+		pi.getDownloadManager().addDownloadWillBeAddedListener(new DownloadWillBeAddedListener() {
+			public void initialised(Download dl) {
+				String hash = EncodingUtil.encode(dl.getTorrent().getHash());
+				System.out.println("DownloadWillBeAddedListener checking: "+hash);
+				if (downloadControlList.containsKey(hash)) {
+					System.out.println("DownloadWillBeAddedListener found: "+hash);
+					Integer[] options = downloadControlList.get(hash);
+					DiskManagerFileInfo[] dmfi=  dl.getDiskManagerFileInfo();
+					if (dmfi.length != options.length) {
+						System.out.println("DownloadWillBeAddedListener Array Sizes don't match.");
+						System.out.println("localFiles: "+dmfi.length+", remote: "+options.length);
+						return;
+					}
+					for (int i=0; i<dmfi.length;i++) {
+						 switch (options[i]) {
+						 case 1:
+							 break;
+						 case 2:
+							 dmfi[i].setPriority(true);
+							 break;
+						 case 0:
+							 dmfi[i].setSkipped(true);
+							 break;
+						 }
+					}
+				}
+			};
+		});
 	}
 
 	public void addHandler (String request, RequestHandler handler) {
@@ -340,11 +347,13 @@ public class RequestManager {
 						String fileOptions = xmlRequest.getChild("Torrent").getAttributeValue("fileOptions");
 						if (fileOptions!=null) {
 							int[] opt = EncodingUtil.StringToIntArray(fileOptions);
+							System.out.println("AzSMRC addDL: found FileOptions: "+EncodingUtil.IntArrayToString(opt));
 							Integer[] options = new Integer[opt.length];
 							for (int i=0; i<opt.length;i++) {
 								options[i] = opt[i];
 							}
 							downloadControlList.put(EncodingUtil.encode(newTorrent.getHash()), options);
+							System.out.println("AzSMRC addDL downloadControlList.size:" +downloadControlList.size());
 						}
 
 						Download dl = Plugin.getPluginInterface().getDownloadManager().addDownload(newTorrent);
