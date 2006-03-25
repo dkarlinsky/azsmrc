@@ -14,6 +14,7 @@ import lbms.azsmrc.shared.UserNotFoundException;
 import org.eclipse.swt.widgets.Display;
 import org.gudy.azureus2.core3.util.AEMonitor;
 import org.gudy.azureus2.plugins.PluginConfig;
+import org.gudy.azureus2.plugins.PluginConfigListener;
 import org.gudy.azureus2.plugins.PluginInterface;
 import org.gudy.azureus2.plugins.download.Download;
 import org.gudy.azureus2.plugins.download.DownloadManager;
@@ -69,6 +70,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		config_model.addBooleanParameter2("azsmrc_military_time","azsmrc.military.time",false);
 		config_model.addBooleanParameter2("azsmrc_auto_open","azsmrc.auto.open",true);
 		config_model.addBooleanParameter2("singleUserMode", "azsmrc.singleusermode", false);
+		config_model.addBooleanParameter2("disableAutoImport", "azsmrc.disable.auto.import", false);
 		config_model.addBooleanParameter2("use_ssl","azsmrc.use.ssl",false);
 		config_model.addIntParameter2("remote_port", "azsmrc.remote.port", 49009);
 		config_model.addLabelParameter2("azsmrc.portchange.alert");
@@ -81,6 +83,19 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 		//initialize the timer
 		Timers.initTimer();
+		if (!pluginInterface.getPluginconfig().getPluginBooleanParameter("disableAutoImport",false)) {
+			Timers.stopCheckDirsTimer();
+		}
+
+		pluginInterface.getPluginconfig().addListener(new PluginConfigListener() {
+			public void configSaved() {
+				if (pluginInterface.getPluginconfig().getPluginBooleanParameter("disableAutoImport",false)) {
+					Timers.stopCheckDirsTimer();
+				} else {
+					Timers.startCheckDirsTimer();
+				}
+			};
+		});
 
 		//add the download listeners to the downloads
 		DownloadManager dm = pluginInterface.getDownloadManager();
@@ -177,6 +192,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 		//-------------------------------------------------------\\
 
+		//Initialize Request Manager
 		RequestManager.getInstance().initialize(pi);
 
 		try{
