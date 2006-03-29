@@ -91,13 +91,16 @@ public class RCMain implements Launchable {
 		start(args);
 	}
 
-	public void launch(String[] args) {
+	public boolean launch(String[] args) {
 		start(args);
+		return false;
 	}
 
 	public static void start(String[] args) {
 		try {
-			rcMain = new RCMain();
+			if (rcMain == null) { //if it is launched by launchable then rcMain should already exist
+				new RCMain();
+			}
 			rcMain.open();
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -566,6 +569,7 @@ public class RCMain implements Launchable {
 		System.out.println("Creating Timer.");
 		timer = new Timer("Main Timer",5);
 		System.out.println("Finished Startup.");
+		rcMain = this;
 	}
 
 	private void shutdown() {
