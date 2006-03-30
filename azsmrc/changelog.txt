@@ -1,13 +1,21 @@
-Changelog for Version: 0.9.4
+Changelog for Version: 0.9.3
 
 ***New Features***
 
 - File Selection on addDownload
 - Builtin - Updater
 - SingleUserMode for all those who don't want to use the multiuser part
+- Clipboardmonitor for Torrent URLs
 
 ***Changes***
 
 - Totally improved preferences Tab
-- Message Box now has "Hide All" Button
+- You can disable AutoImport now
+- Added some more buttons to the Toolsbar, like start, stop and remove
+- Added MenuBar
+- You can disable minimize to tray on close, this will close the program if you close the shell
+
+***BugFixes***
+
+- column share ratio can now be selected
 

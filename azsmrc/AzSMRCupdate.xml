@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Updates>
-  <Update url="http://azsmrc.sourceforge.net" version="0.9.4" type="1" importance="50">
+  <Update url="http://azsmrc.sourceforge.net" version="0.9.3" type="1" importance="50">
     <Changelog>
+      <BugFix>column share ratio can now be selected</BugFix>
       <Feature>File Selection on addDownload</Feature>
       <Feature>Builtin - Updater</Feature>
       <Feature>SingleUserMode for all those who don't want to use the multiuser part</Feature>
+      <Feature>Clipboardmonitor for Torrent URLs</Feature>
       <Change>Totally improved preferences Tab</Change>
+      <Change>You can disable AutoImport now</Change>
+      <Change>Added some more buttons to the Toolsbar, like start, stop and remove</Change>
+      <Change>Added MenuBar</Change>
+      <Change>You can disable minimize to tray on close, this will close the program if you close the shell</Change>
     </Changelog>
     <Files>
-      <File name="Libraries.zip" version="1.0" url="http://prdownloads.sourceforge.net/azsmrc/Libraries.zip" hash="be2950f730f825b5a5d98f26cc9cecda7f71e4" extract="true" type="2" size="186472" />
+      <File name="AzSMRC_0.9.3.jar" version="0.9.3" url="http://prdownloads.sourceforge.net/azsmrc/AzSMRC_0.9.3.jar" hash="974b8e3055e1cb6a93bbfdbaad2d169582d274f" type="2" size="664494" />
     </Files>
   </Update>
 </Updates>
