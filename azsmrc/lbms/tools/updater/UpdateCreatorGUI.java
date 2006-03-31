@@ -22,6 +22,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 
+import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -135,6 +136,8 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
     private Update currentUpdate;
 
     private Changelog log = new Changelog();
+    private JButton jButton1;
+    private JButton editSelected;
     private JButton addUpdate;
     private JComboBox updateCombo;
     private JScrollPane TreeScrollPane;
@@ -159,6 +162,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
      */
     public static void main(String[] args) {
         UpdateCreatorGUI inst = new UpdateCreatorGUI();
+        inst.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         inst.setVisible(true);
     }
 
@@ -512,7 +516,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                                                 updateComboModel.removeAllElements();
                                                 updateComboModel.addElement(s);
                                                 updateComboModel.setSelectedItem(s);
-                                                
+
                                             }
 
 
@@ -742,7 +746,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                             ComboBoxModel TypeComboModel = new DefaultComboBoxModel(
                                     new String[] { "Normal", "SourceForge" });
                             TypeCombo = new JComboBox();
-                            detailsPanel.add(TypeCombo, new GridBagConstraints(1, 6, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+                            detailsPanel.add(TypeCombo, new GridBagConstraints(1, 6, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
                             TypeCombo.setModel(TypeComboModel);
                             TypeCombo.setBounds(63, 172, 196, 21);
                             TypeCombo.addActionListener(new ActionListener() {
@@ -1202,7 +1206,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                     }
                     //START >>  chRemove
                     chRemove = new JButton();
-                    jPanel3.add(chRemove, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+                    jPanel3.add(chRemove, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
                     chRemove.setText("Remove Selected");
                     chRemove.setBounds(35, 312, 147, 28);
                     chRemove.addActionListener(new ActionListener(){
@@ -1254,7 +1258,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                     //END <<  chTreeScrollPane
                     //START >>  writeChangelog
                     writeChangelog = new JButton();
-                    jPanel3.add(writeChangelog, new GridBagConstraints(2, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+                    jPanel3.add(writeChangelog, new GridBagConstraints(2, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
                     writeChangelog.setText("Write Changelog to File");
                     writeChangelog.setBounds(399, 313, 210, 28);
                     writeChangelog.addActionListener(new ActionListener(){
@@ -1271,7 +1275,14 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                                 File changelogFile = fc.getSelectedFile();
 
                                 try {
-                                    updateCreator.generateChangelogTxt(changelogFile);
+                                    System.out.println(updateCreator.toString());
+                                    if(updateCreator == null){
+                                        JOptionPane.showMessageDialog(jPanel2,
+                                                "No Update File selcted yet.  Please go to the first tab and select a file before adding Changelogs to it.",
+                                                "Inane warning",
+                                                JOptionPane.WARNING_MESSAGE);
+                                    }else
+                                        updateCreator.generateChangelogTxt(changelogFile);
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
@@ -1285,6 +1296,75 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 
                     });
                     //END <<  writeChangelog
+                    //START >>  editSelected
+                    editSelected = new JButton();
+                    jPanel3.add(editSelected, new GridBagConstraints(
+                        1,
+                        3,
+                        1,
+                        1,
+                        0.0,
+                        0.0,
+                        GridBagConstraints.CENTER,
+                        GridBagConstraints.NONE,
+                        new Insets(0, 0, 0, 0),
+                        0,
+                        0));
+                    editSelected.setText("Edit Selected");
+                    //END <<  editSelected
+                    //START >>  jButton1
+                    jButton1 = new JButton();
+                    jPanel3.add(jButton1, new GridBagConstraints(
+                        1,
+                        4,
+                        1,
+                        1,
+                        0.0,
+                        0.0,
+                        GridBagConstraints.CENTER,
+                        GridBagConstraints.NONE,
+                        new Insets(0, 0, 0, 0),
+                        0,
+                        0));
+                    jButton1.setText("Edit Selected");
+                    jButton1.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent evt) {
+                            DefaultMutableTreeNode node = (DefaultMutableTreeNode)chTree.getSelectionPath().getLastPathComponent();
+                            if(node.isRoot()) return;
+
+                            String s = (String)JOptionPane.showInputDialog(
+                                    jPanel3,
+                                    "Edit Changlog Message",
+                                    "Customized Dialog",
+                                    JOptionPane.PLAIN_MESSAGE,
+                                    null,
+                                    null,
+                                    node.toString());
+
+
+                            if ((s != null) && (s.length() > 0)) {
+                                int location = bugNode.getIndex(node);
+
+                                if(node.getParent().equals(bugNode)){
+                                    log.removeBugFix(node.toString());
+                                    log.addBugFix(s);
+                                    treeModel.removeNodeFromParent(node);
+                                    DefaultMutableTreeNode bugChildNode = new DefaultMutableTreeNode(s);
+                                    treeModel.insertNodeInto(bugChildNode, bugNode, location);
+                                    chTree.scrollPathToVisible(new TreePath(bugChildNode.getPath()));
+                                }else if(node.getParent().equals(changeNode)){
+                                    log.removeChange(node.toString());
+                                    treeModel.removeNodeFromParent(node);
+                                }else if(node.getParent().equals(featureNode)){
+                                    log.removeFeature(node.toString());
+                                    treeModel.removeNodeFromParent(node);
+                                }
+                            }
+
+
+                        }
+                    });
+                    //END <<  jButton1
 
                 }
 
