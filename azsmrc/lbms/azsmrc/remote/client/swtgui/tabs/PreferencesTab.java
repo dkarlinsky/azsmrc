@@ -12,7 +12,6 @@ import java.util.Properties;
 
 import lbms.azsmrc.remote.client.Utilities;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
-import lbms.azsmrc.remote.client.swtgui.SplashScreen;
 import lbms.azsmrc.remote.client.swtgui.dialogs.UpdateDialog;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.tools.updater.Update;
