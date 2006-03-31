@@ -47,17 +47,24 @@ public class Scraper {
 		char first_separator = scrapeURL.indexOf('?') == -1 ? '?' : '&';
 		scrapeURL = scrapeURL.replace("announce", "scrape");
 		scrapeURL += first_separator+"info_hash="+infoHash+"&peer_id="+peer_id;
-		System.out.println(scrapeURL);
+//		System.out.println(scrapeURL);
 		try {
 			URL realScrapeURL = new URL (scrapeURL);
 			HTTPDownload dl = new HTTPDownload(realScrapeURL);
 			dl.run();
-			System.out.println(dl.getBuffer().toString());
-			byte[] scrapeRes = dl.getBuffer().toString().getBytes();
+//			System.out.println(dl.getBuffer().toString());
+			byte[] scrapeRes = dl.getBuffer().toString().getBytes(RemoteConstants.BYTE_ENCODING);
 			scrapeResult = new ScrapeResult(scrapeRes);
-		} catch (MalformedURLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return true;
+	}
+
+	/**
+	 * @return Returns the scrapeResult.
+	 */
+	public ScrapeResult getScrapeResult() {
+		return scrapeResult;
 	}
 }
