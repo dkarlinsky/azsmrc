@@ -4,19 +4,26 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 
 import lbms.azsmrc.remote.client.torrent.TOTorrent;
 import lbms.azsmrc.remote.client.torrent.TOTorrentException;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.tools.HTTPDownload;
 
-public class Scraper {
+public class Scraper implements Runnable {
 	private static String peer_id = "Scraper_"+Long.toString(System.currentTimeMillis()%1000000000000l);
 	private TOTorrent torrent;
 	private ScrapeResult scrapeResult;
+	private List<ScrapeListener> listeners = new ArrayList<ScrapeListener>();
 
 	public Scraper (TOTorrent torrent ) {
 		this.torrent = torrent;
+	}
+
+	public void run() {
+		doScrape();
 	}
 
 	/**
@@ -66,5 +73,13 @@ public class Scraper {
 	 */
 	public ScrapeResult getScrapeResult() {
 		return scrapeResult;
+	}
+
+	public void addListener (ScrapeListener l) {
+		listeners.add(l);
+	}
+
+	public void removeListener (ScrapeListener l) {
+		listeners.remove(l);
 	}
 }
