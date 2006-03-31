@@ -64,7 +64,10 @@ public class UpdateDialog{
                     updateLabel1LData.horizontalSpan = 2;
                     updateLabel1LData.horizontalAlignment = GridData.FILL;
                     updateLabel1.setLayoutData(updateLabel1LData);
-                    updateLabel1.setText("Update To Version " + update.getVersion().toString() + " Available\nImportance Level: " + getImportanceLevelString(update.getImportance_level())+"\nTotal Update Size: " + DisplayFormatters.formatByteCountToBase10KBEtc(totalSize));
+                    updateLabel1.setText("Update To Version " + update.getVersion().toString() +
+                            " Available\nImportance Level: " + getImportanceLevelString(update.getImportance_level())+
+                            "\nUpdate Type: " + getTypeString(update.getType()) +
+                            "\nTotal Update Size: " + DisplayFormatters.formatByteCountToBase10KBEtc(totalSize));
                     updateLabel1.setAlignment(SWT.CENTER);
                     updateLabel1.setBackground(dialogShell.getDisplay().getSystemColor(SWT.COLOR_GRAY));
                     //END <<  updateLabel1
@@ -202,6 +205,13 @@ public class UpdateDialog{
         else if(level == Update.LV_FEATURE) return "Feature Enhancement";
         else if(level == Update.LV_LOW) return "Low";
         else if(level == Update.LV_SEC_RISK) return "Security Risk";
+        else return "NULL";
+    }
+
+    private String getTypeString(int type){
+        if(type == Update.TYPE_BETA) return "Beta Release";
+        else if(type == Update.TYPE_MAINTENANCE) return "Maintenance Release";
+        else if(type == Update.TYPE_STABLE) return "Stable Release";
         else return "NULL";
     }
 
