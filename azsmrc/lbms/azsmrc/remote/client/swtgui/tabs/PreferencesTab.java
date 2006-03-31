@@ -44,7 +44,8 @@ public class PreferencesTab {
 
 	private Text updateIntervalOpen_Text, updateIntervalClosed_Text;
 	private Button autoOpen, autoConnect, autoUpdateCheck, autoUpdate;
-	private Button trayMinimize, trayExit, showSplash, popupsEnabled, autoClipboard, autoConsole;
+	private Button trayMinimize, trayExit, showSplash, popupsEnabled;
+    private Button autoClipboard, autoConsole, exitConfirm;
 	private Button updateBeta;
 
 	private Composite cOptions;
@@ -348,6 +349,14 @@ public class PreferencesTab {
 		trayExit.setSelection(Boolean.parseBoolean(properties.getProperty("tray.exit","true"))?true:false);
 		addModListener(trayExit,SWT.Selection);
 
+        //Exit Confirmation
+        exitConfirm = new Button(composite,SWT.CHECK);
+        gridData = new GridData(GridData.GRAB_HORIZONTAL);
+        gridData.horizontalSpan = 2;
+        exitConfirm.setLayoutData(gridData);
+        exitConfirm.setText("Show confirmation dialog on exit");
+        exitConfirm.setSelection(Boolean.parseBoolean(properties.getProperty("confirm.exit","true"))?true:false);
+        addModListener(exitConfirm,SWT.Selection);
 
 		//auto console open
 		autoConsole = new Button(composite,SWT.CHECK);
@@ -631,6 +640,15 @@ public class PreferencesTab {
 			else
 				properties.setProperty("tray.exit","false");
 		}
+
+
+        //Store Confirm exit
+        if(exitConfirm != null && !exitConfirm.isDisposed()){
+            if(exitConfirm.getSelection())
+                properties.setProperty("confirm.exit", "true");
+            else
+                properties.setProperty("confirm.exit", "false");
+        }
 
 		//Store popupsEnabled
 		if(popupsEnabled != null && !popupsEnabled.isDisposed()){

@@ -274,17 +274,22 @@ public class DownloadManagerShell {
 		exitItem.setAccelerator (SWT.CTRL + 'Q');
 		exitItem.addListener (SWT.Selection, new Listener () {
 			public void handleEvent (Event e) {
-				MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
-				messageBox.setText("Confirm Exit");
-				messageBox.setMessage("Are you sure you wish to exit AzSMRC entirely?");
-				int response = messageBox.open();
-				switch (response){
-				case SWT.OK:
-					RCMain.getRCMain().close();
-					break;
-				case SWT.CANCEL:
-					break;
-				}
+				if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("confirm.exit","true"))){
+                    MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
+                    messageBox.setText("Confirm Exit");
+                    messageBox.setMessage("Are you sure you wish to exit AzSMRC entirely?");
+                    int response = messageBox.open();
+                    switch (response){
+                    case SWT.OK:
+                        RCMain.getRCMain().close();
+                        break;
+                    case SWT.CANCEL:
+                        break;
+                    }
+                }else{
+                    RCMain.getRCMain().close();
+                }
+
 			}
 		});
 
@@ -1500,20 +1505,34 @@ public class DownloadManagerShell {
 
 				//Save Everything!
 				RCMain.getRCMain().saveConfig();
-				DOWNLOAD_MANAGER_SHELL = null;
-				if(!Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("tray.exit","true"))){
-					RCMain.getRCMain().close();
-				}
 
+				if(!Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("tray.exit","true"))){
+                    if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("confirm.exit","true"))){
+                        MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
+                        messageBox.setText("Confirm Exit");
+                        messageBox.setMessage("Are you sure you wish to exit AzSMRC entirely?");
+                        int response = messageBox.open();
+                        switch (response){
+                        case SWT.OK:
+                            RCMain.getRCMain().close();
+                            break;
+                        case SWT.CANCEL:
+                            DOWNLOAD_MANAGER_SHELL = null;
+                            RCMain.getRCMain().openMainWindow();
+                            break;
+                        }
+                    }else{
+                        RCMain.getRCMain().close();
+                    }
+				}
+                DOWNLOAD_MANAGER_SHELL = null;
 			}
 
 			public void shellDeactivated(ShellEvent arg0) {
-				// TODO Auto-generated method stub
 
 			}
 
 			public void shellDeiconified(ShellEvent arg0) {
-				// TODO Auto-generated method stub
 
 			}
 
