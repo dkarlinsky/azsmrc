@@ -10,7 +10,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 
+import lbms.azsmrc.remote.client.Client;
 import lbms.azsmrc.remote.client.Utilities;
+import lbms.azsmrc.remote.client.events.ParameterListener;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.dialogs.UpdateDialog;
 import lbms.azsmrc.shared.RemoteConstants;
@@ -31,6 +33,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -41,15 +44,17 @@ import org.eclipse.swt.widgets.TreeItem;
 
 public class PreferencesTab {
 
+    private Label pluginLabel;
 	private Text updateIntervalOpen_Text, updateIntervalClosed_Text;
 	private Button autoOpen, autoConnect, autoUpdateCheck, autoUpdate;
 	private Button trayMinimize, trayExit, showSplash, popupsEnabled;
     private Button autoClipboard, autoConsole, exitConfirm;
-	private Button updateBeta;
+	private Button updateBeta, singleUser;
 
 	private Composite cOptions;
 	private Properties properties;
 
+    private ParameterListener pl;
 
 	private boolean bModified = false;
 
@@ -83,6 +88,7 @@ public class PreferencesTab {
 							"closed the tab before you saved.  All changes have been discarded");
 					box.open();
 				}
+                if(pl != null) RCMain.getRCMain().getClient().removeParameterListener(pl);
 			}
 
 		});
@@ -141,7 +147,11 @@ public class PreferencesTab {
 
 		final TreeItem tiUpdate = new TreeItem(tree,SWT.NULL);
 		tiUpdate.setText("Update");
-		tree.addListener(SWT.Selection, new Listener(){
+
+        final TreeItem tiPlugin = new TreeItem(tree,SWT.NULL);
+        tiPlugin.setText("Plugin Settings");
+
+        tree.addListener(SWT.Selection, new Listener(){
 
 			public void handleEvent(Event event) {
 				if(bModified){
@@ -174,7 +184,9 @@ public class PreferencesTab {
 					makeMiscPreferences(cOptions);
 				}else if(event.item.equals(tiUpdate)){
 					makeUpdatePreferences(cOptions);
-				}
+				}else if(event.item.equals(tiPlugin)){
+                    makePlugPreferences(cOptions);
+                }
 
 			}
 
@@ -218,7 +230,8 @@ public class PreferencesTab {
 		commit.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
 				save(parent);
-				prefsTab.dispose();
+				if(pl != null) RCMain.getRCMain().getClient().removeParameterListener(pl);
+                prefsTab.dispose();
 			}
 		});
 
@@ -227,7 +240,8 @@ public class PreferencesTab {
 		cancel.setText("Cancel");
 		cancel.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
-				prefsTab.dispose();
+                if(pl != null) RCMain.getRCMain().getClient().removeParameterListener(pl);
+                prefsTab.dispose();
 			}
 		});
 
@@ -539,6 +553,82 @@ public class PreferencesTab {
 	}
 
 
+    public void makePlugPreferences(final Composite composite){
+        Control[] controls = composite.getChildren();
+        for(Control control:controls){
+            control.dispose();
+        }
+        pluginLabel = new Label(composite,SWT.NULL);
+        if(!RCMain.getRCMain().connected()){
+            pluginLabel.setText("You are not currently connected to the server, therefore no settings are available under this option");
+        }else{
+            Client client = RCMain.getRCMain().getClient();
+            client.transactionStart();
+
+            client.sendGetPluginParameter("singleUserMode", RemoteConstants.PARAMETER_BOOLEAN);
+
+            client.transactionCommit();
+
+
+            //Add listener for the preferences
+            pl = new ParameterListener(){
+
+                public void azParameter(String key, String value, int type) {
+
+                }
+
+                public void pluginParameter(String key, final String value, int type) {
+                    if(key.equalsIgnoreCase("singleUserMode")){
+                        Display display = RCMain.getRCMain().getDisplay();
+                        if(display != null && !display.isDisposed()){
+                            display.asyncExec(new Runnable(){
+
+                                public void run() {
+                                    if(pluginLabel != null && !pluginLabel.isDisposed())
+                                        pluginLabel.setText("Properties received from server");
+                                    singleUser.setEnabled(true);
+                                    if (Boolean.parseBoolean(value)) {
+                                        singleUser.setSelection(true);
+                                    }else
+                                        singleUser.setSelection(false);
+                                }
+
+                            });
+                        }
+
+
+                    }
+
+                }
+            };
+
+            RCMain.getRCMain().getClient().addParameterListener(pl);
+
+
+            pluginLabel.setText("Sending request to server for settings.. Please wait");
+
+            //Single User
+            singleUser = new Button(composite,SWT.CHECK);
+            GridData gridData = new GridData(GridData.GRAB_HORIZONTAL);
+            gridData.horizontalSpan = 2;
+            singleUser.setLayoutData(gridData);
+            singleUser.setText("Enable Single User Mode");
+            singleUser.setEnabled(false);
+
+
+            addModListener(singleUser,SWT.Selection);
+
+
+
+
+
+        }
+
+        RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
+        composite.layout();
+    }
+
+
 	public void addModListener(Control control, int selectionType){
 		control.addListener(selectionType, new Listener(){
 			public void handleEvent(Event arg0) {
@@ -681,6 +771,26 @@ public class PreferencesTab {
 			else
 				properties.setProperty("auto_console", "false");
 		}
+
+        //Plugin Setting to core
+        if(singleUser != null && !singleUser.isDisposed()){
+            Client client = RCMain.getRCMain().getClient();
+            client.transactionStart();
+
+            if(singleUser.getSelection())
+                client.sendSetPluginParameter("singleUserMode", "true", RemoteConstants.PARAMETER_BOOLEAN);
+            else{
+                client.sendSetPluginParameter("singleUserMode", "false", RemoteConstants.PARAMETER_BOOLEAN);
+                RCMain.getRCMain().getMainWindow().setStatusBarText("Connected in Multi User Mode", SWT.COLOR_DARK_GREEN);
+            }
+
+            client.transactionCommit();
+
+        }
+
+
+
+
 
 		//Reset the boolean for modified
 		bModified = false;
