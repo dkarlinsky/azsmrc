@@ -1166,7 +1166,7 @@ public class DownloadManagerShell {
 						setTorrentMoveButtons(false,false,false,false);
 					}else{
 						TableItem[] items = seedsTable.getSelection();
-						if(items.length > 1) return;RCMain.getRCMain().getClient().addParameterListener(pl);
+						if(items.length > 1) return;
 						Container sc = (Container)items[0].getData();
 						//Check for one already open
 						CTabItem[] ctabs = tabFolder.getItems();
@@ -1577,9 +1577,9 @@ public class DownloadManagerShell {
 		}
 
 		RCMain.getRCMain().updateTimer(true);
-		RCMain.getRCMain().getClient().transactionCommit();
 
 
+        RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
 	}
 
 	public void close_shell () {
