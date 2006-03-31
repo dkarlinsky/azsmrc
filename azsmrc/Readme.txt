@@ -1,20 +1,23 @@
-AzMultiUser Readme
+AzSMRC Readme
 ------------------
 Index
-1.  What is AzMultiUser
+1.  What is AzSMRC
 2.  System Requirements
 3.  Installation
 4.  Setup
-5.  Manually starting the remote (FireFrog)
+5.  Manually starting the remote
+6.	Website
 ------------------
 
-1.  What is AzMultiUser?
+1.  What is AzSMRC?
 
-AzMultiUser is a two part remote control and multi-user system for
-the BitTorrent client Azureus.  With AzMultiUser, you can have
+AzSMRC is a two part remote control and multi-user system for
+the BitTorrent client Azureus.  With AzSMRC, you can have
 several people using a single installation of Azureus at one time.
-Even if you do not want multiple users for Azureus, AzMultiUser
+Even if you do not want multiple users for Azureus, AzSMRC
 is the most complete remote control system for Azureus to date.
+
+AzSMRC is pronounced AzSmirk
 
 
 2. System Requirements
@@ -23,10 +26,10 @@ is the most complete remote control system for Azureus to date.
 	support (Windows, Linux, MacOSX, etc.)
 
 	Server system:
-	1. A running version of Azureus 2.4.0.0 or greater
+	1. A running version of Azureus 2.4.0.3 (currently CVS only) or greater
 	2. Java 1.5 or greater
 	3. SWT version 3.1 or greater
-		Note:  A fresh installation of Azureus 2.4.0.0 will provide
+		Note:  A fresh installation of Azureus 2.4.0.3 will provide
 		this automatically
 	4. Functioning internet connection with at least one port
 		available for communication to the server
@@ -46,10 +49,10 @@ is the most complete remote control system for Azureus to date.
 
 3.  Installation
 
-Installation of AzMultiUser comes in two parts:
+Installation of AzSMRC comes in two parts:
 
 (1) Installing the plugin into Azureus
-(2) Installing the remote control program (FireFrog)
+(2) Installing the remote control program
 
 3.1  Installing the plugin into Azureus
 
@@ -66,7 +69,7 @@ Installation of AzMultiUser comes in two parts:
 	Next, make a new directory in the plugins folder called 'azmultiuser'
 	Go into this directory and copy the following items into there:
 
-		1.  azmultiuser_x.x.x.jar
+		1.  azsmrcPlugin_x.x.x.jar
 		2.  jdom_1.0.jar
 		3.  commons-codec_1.3.jar
 
@@ -76,7 +79,7 @@ Installation of AzMultiUser comes in two parts:
 
 	Finally, restart Azureus
 
-3.2  Installing the remote control program (FireFrog)
+3.2  Installing the remote control program
 
 		1.  Create a directory of your choice and extract the
 			contents of the FireFrog.zip as well as lib.zip there
@@ -90,13 +93,13 @@ Installation of AzMultiUser comes in two parts:
 
 4.  Setup
 
-Setting up AzMultiUser can be accomplished in two ways.  The easiest
-is to use the GUI provided with AzMultiUser in Azureus.  When you
+Setting up AzSMRC can be accomplished in two ways.  The easiest
+is to use the GUI provided with AzSMRC in Azureus.  When you
 open the GUI you are presented with a login screen.
 
 	The default login is:
 		username:  admin
-		password:  azmultiuser
+		password:  azsmrc
 
 
 Once you have logged into the plugin, add a new user via the green
@@ -104,7 +107,7 @@ plus sign.  Be sure to fill in all of the details there, and click
 ok.
 
 The connection port for the remote can be changed by going to
-Tools->Options->Plugins->AzMultiUser
+Tools->Options->Plugins->AzSMRC
 
 Another way to setup the server is to use the remote itself.
 Simply start the remote and log in to the server with the above
@@ -115,7 +118,7 @@ remote
 Once there, click on the User Managment tools and add / edit users
 from there
 
-5.  Manually starting the remote (FireFrog) client
+5.  Manually starting the remote client
 
 	For Windows:
 
@@ -130,3 +133,10 @@ java -classpath launcher.jar lbms.tools.launcher.Launcher
 	For Linux:
 
 	java -classpath launcher.jar  -Djava.library.path=. lbms.tools.launcher.Launcher
+
+6.	Website
+
+Our ProjectPage is: http://sourceforge.net/projects/azsmrc
+
+Please use the tools there, like the BugTracker or the Feature Requests.
+You can find the forum there too.
