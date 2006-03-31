@@ -26,6 +26,10 @@ public class ImageRepository {
 
 	public static void loadImages(Display display) {
 
+        //Splash Screen Pic
+        loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/AzSMRC_Splash.png","splash",255);
+
+
 		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/right_arrow.gif","right_arrow",255);
 		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/down_arrow.gif","down_arrow",255);
 		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/background.png","backgroundImage",255);

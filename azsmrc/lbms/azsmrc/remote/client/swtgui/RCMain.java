@@ -127,6 +127,7 @@ public class RCMain implements Launchable {
 		display = Display.getDefault();
 		terminated = false;
 
+
 		connect = (Boolean.parseBoolean(properties.getProperty("auto_connect","false")));
 		createContents();
 		if (connect) {
@@ -155,6 +156,11 @@ public class RCMain implements Launchable {
 	protected void createContents() {
 		shell = new Shell();
 		ImageRepository.loadImages(display);
+
+        //Show Splash
+        if(Boolean.parseBoolean(properties.getProperty("show_splash","true"))){
+            new SplashScreen(RCMain.getRCMain().getDisplay(),30);
+        }
 
 		final Tray systray = display.getSystemTray ();
 		systrayItem = new TrayItem (systray, SWT.NONE);

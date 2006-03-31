@@ -12,6 +12,7 @@ import java.util.Properties;
 
 import lbms.azsmrc.remote.client.Utilities;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
+import lbms.azsmrc.remote.client.swtgui.SplashScreen;
 import lbms.azsmrc.remote.client.swtgui.dialogs.UpdateDialog;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.tools.updater.Update;
@@ -43,7 +44,7 @@ public class PreferencesTab {
 
 	private Text updateIntervalOpen_Text, updateIntervalClosed_Text;
 	private Button autoOpen, autoConnect, autoUpdateCheck, autoUpdate;
-	private Button trayMinimize, trayExit, popupsEnabled, autoClipboard, autoConsole;
+	private Button trayMinimize, trayExit, showSplash, popupsEnabled, autoClipboard, autoConsole;
 	private Button updateBeta;
 
 	private Composite cOptions;
@@ -381,6 +382,22 @@ public class PreferencesTab {
 
 		addModListener(popupsEnabled,SWT.Selection);
 
+
+        //show splash screen
+        showSplash = new Button(composite,SWT.CHECK);
+        gridData = new GridData(GridData.GRAB_HORIZONTAL);
+        gridData.horizontalSpan = 2;
+        showSplash.setLayoutData(gridData);
+        showSplash.setText("Show splash screen on startup");
+
+        if(Boolean.parseBoolean(properties.getProperty("show_splash","true"))){
+            showSplash.setSelection(true);
+        }else
+            showSplash.setSelection(false);
+
+        addModListener(showSplash,SWT.Selection);
+
+
 		//AutoClipboard
 		autoClipboard = new Button(composite,SWT.CHECK);
 		gridData = new GridData(GridData.GRAB_HORIZONTAL);
@@ -623,6 +640,14 @@ public class PreferencesTab {
 				properties.setProperty("popups_enabled", "false");
 		}
 
+
+        //Store Splash Screen Setting
+        if(showSplash != null && !showSplash.isDisposed()){
+            if(showSplash.getSelection())
+                properties.setProperty("show_splash","true");
+            else
+                properties.setProperty("show_splash","false");
+        }
 
 		//Store the autoClipboard setting
 		if(autoClipboard != null && !autoClipboard.isDisposed()){
