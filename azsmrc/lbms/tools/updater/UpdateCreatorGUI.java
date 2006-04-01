@@ -568,21 +568,34 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 
                                 public void focusLost(FocusEvent arg0) {
                                     if(!update.getVersion().toString().equalsIgnoreCase(updateVersion.getText())){
-                                        updateComboModel.removeElement(update.getVersion());
+                                        String oldVer = update.getVersion().toString();
                                         update.setVersion(new Version(updateVersion.getText()));
-                                        updateComboModel.addElement(update.getVersion());
-                                        updateComboModel.setSelectedItem(update.getVersion());
+                                        updateComboModel.insertElementAt(update.getVersion(), updateCombo.getSelectedIndex());
+                                        for(int i = 0; i < updateComboModel.getSize(); i++){
+                                            Version ver = (Version)updateComboModel.getElementAt(i);
+                                            if(ver.toString().equalsIgnoreCase(oldVer)){
+                                                updateComboModel.removeElementAt(i);
+                                                break;
+                                            }
+                                        }
                                     }
                                 }
                             });
 
                             updateVersion.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent evt) {
-                                    updateComboModel.removeElement(update.getVersion());
-                                    update.setVersion(new Version(updateVersion.getText()));
-                                    updateComboModel.addElement(update.getVersion());
-                                    updateComboModel.setSelectedItem(update.getVersion());
-                                }
+                                    if(!update.getVersion().toString().equalsIgnoreCase(updateVersion.getText())){
+                                        String oldVer = update.getVersion().toString();
+                                        update.setVersion(new Version(updateVersion.getText()));
+                                        updateComboModel.insertElementAt(update.getVersion(), updateCombo.getSelectedIndex());
+                                        for(int i = 0; i < updateComboModel.getSize(); i++){
+                                            Version ver = (Version)updateComboModel.getElementAt(i);
+                                            if(ver.toString().equalsIgnoreCase(oldVer)){
+                                                updateComboModel.removeElementAt(i);
+                                                break;
+                                            }
+                                        }
+                                    }                                }
                             });
 
 
@@ -1006,7 +1019,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                                                 }
                                             }
 
-
+//TODO
 
                                         }
                                     } catch (Exception e) {
@@ -1138,13 +1151,17 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 
                             if (currentUF != null) {
                                 if(bCurrentUFisArch){
-                                    path.setEnabled(false);
+                                    path.setText("");
+                                    url.setText("");
+                                    path.setEditable(false);
+                                    name.setEditable(false);
                                     TypeCombo.setEnabled(false);
                                     url.setEditable(false);
                                     unpackFile.setSelected(false);
                                     unpackFile.setEnabled(false);
                                 }else{
-                                    path.setEnabled(true);
+                                    name.setEditable(true);
+                                    path.setEditable(true);
                                     TypeCombo.setEnabled(true);
                                     url.setEditable(true);
                                     path.setText(currentUF.getPath());
@@ -1620,10 +1637,23 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 
         List<UpdateFile> files = updateToLoad.getFileList();
         for(int i = 0; i < files.size(); i++){
-            DefaultMutableTreeNode nodeToAdd = new DefaultMutableTreeNode(files.get(i).getName());
+            UpdateFile uf = files.get(i);
+            DefaultMutableTreeNode nodeToAdd = new DefaultMutableTreeNode(uf.getName());
             fileTreeModel.insertNodeInto(nodeToAdd, fileTop, fileTop.getChildCount());
             fileTree.scrollPathToVisible(new TreePath(nodeToAdd.getPath()));
 
+            if(uf.isArchive()){
+                if(uf.getArchivFiles().size() > 0){
+                    List<UpdateFile> archList = uf.getArchivFiles();
+                    Iterator it = archList.iterator();
+                    while(it.hasNext()){
+                        UpdateFile nextUF = (UpdateFile)it.next();
+                        DefaultMutableTreeNode archNodeToAdd = new DefaultMutableTreeNode(nextUF.getName());
+                        fileTreeModel.insertNodeInto(archNodeToAdd, nodeToAdd, nodeToAdd.getChildCount());
+                        fileTree.scrollPathToVisible(new TreePath(archNodeToAdd.getPath()));
+                    }
+                }
+            }
         }
 
         //pull in the changelog and populate 3rd tab
