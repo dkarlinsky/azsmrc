@@ -34,7 +34,6 @@ public class UpdateList {
 		Document doc = new Document();
 		Element root = new Element ("Updates");
 		Iterator<Update> it = uSet.iterator();
-		Update result = null;
 		while (it.hasNext()) {
 			root.addContent(it.next().toElement());
 		}
