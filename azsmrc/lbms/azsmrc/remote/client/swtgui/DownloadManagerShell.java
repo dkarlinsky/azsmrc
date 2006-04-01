@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -40,6 +42,7 @@ import lbms.azsmrc.remote.client.swtgui.dialogs.ConnectionDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByFileDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByURLDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.TableColumnEditorDialog;
+import lbms.azsmrc.remote.client.swtgui.dialogs.UpdateDialog;
 import lbms.azsmrc.remote.client.swtgui.tabs.ConsoleTab;
 import lbms.azsmrc.remote.client.swtgui.tabs.ManageUsersTab;
 import lbms.azsmrc.remote.client.swtgui.tabs.PreferencesTab;
@@ -48,6 +51,9 @@ import lbms.azsmrc.remote.client.swtgui.tabs.TorrentDetailsTab;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.shared.EncodingUtil;
 import lbms.azsmrc.shared.RemoteConstants;
+import lbms.tools.updater.Update;
+import lbms.tools.updater.UpdateListener;
+import lbms.tools.updater.Updater;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
@@ -327,6 +333,66 @@ public class DownloadManagerShell {
 				new PreferencesTab(tabFolder);
 			}
 		});
+
+        new MenuItem(toolSubmenu,SWT.SEPARATOR);
+
+        MenuItem menuUpdate = new MenuItem(toolSubmenu,SWT.PUSH);
+        menuUpdate.setText("Check for &Updates");
+        menuUpdate.addListener(SWT.Selection, new Listener(){
+            public void handleEvent(Event e) {
+                final Updater updater;
+                try {
+                    final Properties properties = RCMain.getRCMain().getProperties();
+                    updater = new Updater(new URL(RemoteConstants.UPDATE_URL),new File("update.xml.gz"),new File(System.getProperty("user.dir")));
+                    updater.addListener(new UpdateListener() {
+                        public void exception(Exception e) {
+                            System.out.println(e);
+
+                        }
+                        public void noUpdate() {
+                            if (RCMain.getRCMain().getMainWindow() != null) {
+                                RCMain.getRCMain().getMainWindow().setStatusBarText("No Update Available");
+                            }
+                            RCMain.getRCMain().getNormalLogger().info("No Update Available");
+                        }
+                        public void updateAvailable(Update update) {
+                            if (RCMain.getRCMain().getMainWindow() != null) {
+                                RCMain.getRCMain().getMainWindow().setStatusBarText("Update Available: Version "+update.getVersion());
+                            }
+                            RCMain.getRCMain().getNormalLogger().info("Update Available: Version "+update.getVersion());
+                            if (Boolean.parseBoolean(properties.getProperty("update.autoupdate", "false"))) {
+                                updater.doUpdate();
+                            }else{
+                                new UpdateDialog(RCMain.getRCMain().getDisplay(),update,updater);
+                            }
+                        }
+                        public void updateFailed(String reason) {
+                            if (RCMain.getRCMain().getMainWindow() != null) {
+                                RCMain.getRCMain().getMainWindow().setStatusBarText("Update Failed",SWT.COLOR_RED);
+                            }
+                            RCMain.getRCMain().getNormalLogger().info("Update Failed");
+                        }
+                        public void updateFinished() {
+                            if (RCMain.getRCMain().getMainWindow() != null) {
+                                RCMain.getRCMain().getMainWindow().setStatusBarText("Update Finished");
+                            }
+                            RCMain.getRCMain().getNormalLogger().info("Update Finished");
+                        }
+                        public void updateError(String error) {
+                            if (RCMain.getRCMain().getMainWindow() != null) {
+                                RCMain.getRCMain().getMainWindow().setStatusBarText("Update Error");
+                            }
+                            RCMain.getRCMain().getNormalLogger().info(error);
+                        }
+                    });
+
+                    updater.checkForUpdates(Boolean.parseBoolean(properties.getProperty("update.beta", "false")));
+                    properties.setProperty("update.lastcheck",Long.toString(System.currentTimeMillis()));
+                    RCMain.getRCMain().saveConfig();
+                } catch (MalformedURLException e2) {
+                }
+            }
+        });
 
 
 		//-----Help Submenu
