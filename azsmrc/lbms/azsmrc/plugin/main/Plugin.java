@@ -83,7 +83,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 		//initialize the timer
 		Timers.initTimer();
-		if (!pluginInterface.getPluginconfig().getPluginBooleanParameter("disableAutoImport",false)) {
+		if (pluginInterface.getPluginconfig().getPluginBooleanParameter("disableAutoImport",false)) {
 			Timers.stopCheckDirsTimer();
 		}
 
