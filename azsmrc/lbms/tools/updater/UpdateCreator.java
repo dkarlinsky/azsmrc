@@ -193,11 +193,12 @@ public class UpdateCreator {
 	 * @param version
 	 * @param type
 	 */
-	public void addUpdate (String version, int type) {
+	public Update addUpdate (String version, int type) {
 		Update u = new Update();
 		u.setVersion(new Version (version));
 		u.setType(type);
 		uList.addUpdate(u);
+		return u;
 	}
 
 	/**
