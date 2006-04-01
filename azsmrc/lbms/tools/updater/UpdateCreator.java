@@ -164,6 +164,7 @@ public class UpdateCreator {
 			InputStream in = zip.getInputStream(ze);
 			f.setHash(CryptoTools.formatByte(CryptoTools.messageDigestStream(in, UpdateFile.HASH_ALGORITHM)));
 			in.close();
+			uf.addArchivFile(f);
 		}
 		zip.close();
 	}
