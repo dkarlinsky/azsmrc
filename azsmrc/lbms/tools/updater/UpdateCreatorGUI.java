@@ -127,6 +127,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 
 
     private UpdateFile currentUF;
+    private boolean bCurrentUFisArch;
     private JTextPane UpdateCreatorDir;
     private JComboBox UpdaterType;
     private JLabel UpdaterTypeLabel;
@@ -1060,16 +1061,8 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                                 if (size == 0) { //Nobody's left, disable firing.
                                     remove.setEnabled(false);
 
-                                } else { //Select an index.
+                                } else {
 
-
-                                    /*              if (index == fileListModel.getSize()) {
-										//removed item in last position
-										index--;
-									}
-
-									fileList.setSelectedIndex(index);
-									fileList.ensureIndexIsVisible(index);*/
                                 }
                             }
                         });
@@ -1090,41 +1083,88 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                     TreeScrollPane.setViewportView(fileTree);
                     fileTree.addTreeSelectionListener(new TreeSelectionListener() {
                         public void valueChanged(TreeSelectionEvent evt) {
-                            //if(evt.getPaths().length > 1) return;
+                            currentUF = null;
+
+
                             List<UpdateFile> ufList = update.getFileList();
                             Iterator iterator = ufList.iterator();
 
-                            while (iterator.hasNext()) {
-                                UpdateFile uf = (UpdateFile) iterator
-                                .next();
-                                if (uf.getName().equalsIgnoreCase(
-                                        evt.getPath().getLastPathComponent().toString())) {
-                                    currentUF = uf;
-                                    break;
-                                }
-                            }
-                            if (currentUF != null) {
-                                name.setText(currentUF.getName());
-                                path.setText(currentUF.getPath());
-                                version.setText(currentUF.getVersion()
-                                        .toString());
-                                url.setText(currentUF.getUrl());
-                                hash.setText(currentUF.getHash());
-                                if (currentUF.getType() == 1) {
-                                    TypeCombo.setSelectedIndex(0);
-                                } else
-                                    TypeCombo.setSelectedIndex(1);
+                            //If the user selects the root, return
+                            if(evt.getPath().getLastPathComponent().toString().equalsIgnoreCase("Files")) return;
 
-                                size.setText(String.valueOf(currentUF
-                                        .getSize()));
-                                if(currentUF.getName().endsWith(".zip") || currentUF.getName().endsWith(".gz")){
-                                    unpackFile.setEnabled(true);
-                                    unpackFile.setSelected(currentUF.isArchive());
-                                }else{
+                            //Check to see if root is parent
+                            if(evt.getPath().getParentPath().getLastPathComponent().toString().equalsIgnoreCase("Files")){
+                                while (iterator.hasNext()) {
+                                    UpdateFile uf = (UpdateFile) iterator
+                                    .next();
+                                    if (uf.getName().equalsIgnoreCase(
+                                            evt.getPath().getLastPathComponent().toString())) {
+                                        currentUF = uf;
+                                        bCurrentUFisArch = false;
+                                        break;
+                                    }
+                                }
+                            }else{
+                                //we are dealing with an archive.. so we need to step through the muck
+                                UpdateFile parentUF = null;
+                                while (iterator.hasNext()) {
+                                    UpdateFile uf = (UpdateFile) iterator
+                                    .next();
+                                    if (uf.getName().equalsIgnoreCase(
+                                            evt.getPath().getParentPath().getLastPathComponent().toString())) {
+                                        parentUF = uf;
+                                        break;
+                                    }
+                                }
+
+                                //we now have the parentUF .. so we need to step through IT to find the right one!
+
+                                if(parentUF == null)return;
+
+                                List<UpdateFile> ufArchiveList = parentUF.getArchivFiles();
+                                Iterator archIterator = ufArchiveList.iterator();
+                                while (archIterator.hasNext()) {
+                                    UpdateFile uf = (UpdateFile) archIterator.next();
+                                    if (uf.getName().equalsIgnoreCase(
+                                            evt.getPath().getLastPathComponent().toString())) {
+                                        currentUF = uf;
+                                        bCurrentUFisArch = true;
+                                        break;
+                                    }
+                                }
+
+                            }
+
+
+                            if (currentUF != null) {
+                                if(bCurrentUFisArch){
+                                    path.setEnabled(false);
+                                    TypeCombo.setEnabled(false);
+                                    url.setEditable(false);
                                     unpackFile.setSelected(false);
                                     unpackFile.setEnabled(false);
+                                }else{
+                                    path.setEnabled(true);
+                                    TypeCombo.setEnabled(true);
+                                    url.setEditable(true);
+                                    path.setText(currentUF.getPath());
+                                    url.setText(currentUF.getUrl());
+                                    if (currentUF.getType() == 1) {
+                                        TypeCombo.setSelectedIndex(0);
+                                    } else
+                                        TypeCombo.setSelectedIndex(1);
+                                    if(currentUF.getName().endsWith(".zip") || currentUF.getName().endsWith(".gz")){
+                                        unpackFile.setEnabled(true);
+                                        unpackFile.setSelected(currentUF.isArchive());
+                                    }else{
+                                        unpackFile.setSelected(false);
+                                        unpackFile.setEnabled(false);
+                                    }
                                 }
-
+                                name.setText(currentUF.getName());
+                                version.setText(currentUF.getVersion().toString());
+                                hash.setText(currentUF.getHash());
+                                size.setText(String.valueOf(currentUF.getSize()));
                             }
                         }
                     });
