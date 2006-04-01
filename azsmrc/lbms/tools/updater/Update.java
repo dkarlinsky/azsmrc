@@ -27,7 +27,7 @@ public class Update implements Comparable<Update>{
 	private Changelog changeLog;
 
 	public Update() {
-
+		version = new Version("0");
 	}
 
 	public Update (Document update) {
