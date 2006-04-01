@@ -189,15 +189,16 @@ public class UpdateCreator {
 		this.currentUpdate = currentUpdate;
 	}
 
+	/**
+	 * @return
+	 */
 	public Update newUpdate () {
 		Update u = new Update();
 		this.currentUpdate = u;
 		return u;
 	}
-
 	/**
-	 * @param version
-	 * @param type
+	 * @param u
 	 */
 	public void addUpdateToList (Update u) {
 		uList.addUpdate(u);
