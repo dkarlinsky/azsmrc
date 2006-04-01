@@ -51,8 +51,6 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-//import org.parg.azureus.plugins.azhtmlwebui.HTMLWebUIFormDecoder;
-//import org.parg.azureus.plugins.azhtmlwebui.HTMLWebUIFormDecoder.formField;
 
 
 public class WebRequestHandler	/*extends WebPlugin*/ implements TrackerWebPageGenerator {
@@ -94,7 +92,7 @@ public class WebRequestHandler	/*extends WebPlugin*/ implements TrackerWebPageGe
 
 		torrent_categories = pluginInterface.getTorrentManager().getAttribute(TorrentAttribute.TA_CATEGORY);
 		///////////////////////////////
-		file_root = utilities.getAzureusUserDir() + File.separator + "plugins" + File.separator + "AZMultiUser" + File.separator + "web";
+		file_root = utilities.getAzureusUserDir() + File.separator + "plugins" + File.separator + "azsmrc" + File.separator + "web";
 
 		Plugin.addToLog(file_root);
 		welcome_files = new File[welcome_pages.length];
