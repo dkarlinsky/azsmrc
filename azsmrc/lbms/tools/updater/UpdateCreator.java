@@ -189,16 +189,18 @@ public class UpdateCreator {
 		this.currentUpdate = currentUpdate;
 	}
 
+	public Update newUpdate () {
+		Update u = new Update();
+		this.currentUpdate = u;
+		return u;
+	}
+
 	/**
 	 * @param version
 	 * @param type
 	 */
-	public Update addUpdate (String version, int type) {
-		Update u = new Update();
-		u.setVersion(new Version (version));
-		u.setType(type);
+	public void addUpdateToList (Update u) {
 		uList.addUpdate(u);
-		return u;
 	}
 
 	/**
