@@ -238,4 +238,8 @@ public class UpdateFile {
 	protected void removeArchivFile (UpdateFile f) {
 		this.archivFiles.remove(f);
 	}
+
+	protected void clearArcive() {
+		this.archivFiles.clear();
+	}
 }
