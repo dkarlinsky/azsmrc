@@ -8,10 +8,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.ComboBoxModel;
@@ -133,7 +136,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
     private File currentDirFile;
     private File updateCreatorFile;
     private File currentDir;
-    private Update currentUpdate;
+
 
     private Changelog log = new Changelog();
     private JButton jButton1;
@@ -204,85 +207,34 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                                     return;
                                 }
 
-                                //check to make sure the UpdateCreator has some file
-                                List<UpdateFile> files = updateCreator.getCurrentUpdate().getFileList();
-                                if(files.size() == 0){
-                                    JOptionPane.showMessageDialog(jPanel2, "Please add some files to this package.");
-                                    return;
+                                //check to make sure the UpdateCreator has a file
+
+                                Iterator it = updateCreator.getUpdateList().getUpdateSet().iterator();
+                                while(it.hasNext()){
+                                    List<UpdateFile> files = ((Update)it.next()).getFileList();
+                                    if(files.size() == 0){
+                                        JOptionPane.showMessageDialog(jPanel2, "Please add files to each update in this package.");
+                                        return;
+                                    }
                                 }
+
 
                                 //Make sure that the changelog is what the user wants
-                                if(log.getBugFixes().size() == 0 &&
-                                        log.getChanges().size() == 0 &&
-                                        log.getFeatures().size() == 0)
-                                {
-                                    JOptionPane.showMessageDialog(jPanel2, "Please add at least one changelog to this package.");
-                                    return;
+                                it = updateCreator.getUpdateList().getUpdateSet().iterator();
+                                while(it.hasNext()){
+                                    Changelog tempLog = ((Update)it.next()).getChangeLog();
+                                    if(tempLog.getBugFixes().size() == 0 &&
+                                            tempLog.getChanges().size() == 0 &&
+                                            tempLog.getFeatures().size() == 0)
+                                    {
+                                        JOptionPane.showMessageDialog(jPanel2, "Please add at least one changelog to each update in this package.");
+                                        return;
+                                    }
+
                                 }
+
 
                                 //Everthing looks ok..
-                                //time to set all the values for the update and make the package
-
-                                //-- URL
-                                String urlText = updaterURL.getText();
-
-                                if(urlText.endsWith("/"))
-                                    urlText = urlText.substring(0, urlText.length()-1);
-
-                                update.setUrl(urlText);
-
-                                //-- Version
-                                update.setVersion(new Version(updateVersion.getText()));
-
-                                //-- Level
-                                switch(UpdaterImportance.getSelectedIndex()){
-                                case(0):
-                                    update.setImportance_level(Update.LV_LOW);
-                                break;
-
-                                case(1):
-                                    update.setImportance_level(Update.LV_FEATURE);
-                                break;
-
-                                case(2):
-                                    update.setImportance_level(Update.LV_CHANGE);
-                                break;
-
-                                case(3):
-                                    update.setImportance_level(Update.LV_BUGFIX);
-                                break;
-
-                                case(4):
-                                    update.setImportance_level(Update.LV_SEC_RISK);
-                                break;
-
-                                default:
-                                    update.setImportance_level(Update.LV_LOW);
-                                break;
-                                }
-
-                                //-- Type
-                                switch(UpdaterType.getSelectedIndex()){
-                                case(0):
-                                    update.setType(Update.TYPE_MAINTENANCE);
-                                break;
-
-                                case(1):
-                                    update.setType(Update.TYPE_STABLE);
-                                break;
-
-                                case(2):
-                                    update.setType(Update.TYPE_BETA);
-                                break;
-
-                                default:
-                                    update.setType(Update.TYPE_MAINTENANCE);
-                                break;
-                                }
-
-                                //--Changelog
-                                update.setChangeLog(log);
-
 
                                 //Do the master creation
                                 try {
@@ -402,7 +354,6 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                                     try {
                                         updateCreatorFile = fc.getSelectedFile();
-                                        String smallName = updateCreatorFile.getName();
                                         if((!updateCreatorFile.getName().endsWith(".xml")) &&
                                                 (!updateCreatorFile.getName().endsWith(".gz"))){
                                             String newFile = updateCreatorFile.getPath() + ".xml";
@@ -417,122 +368,46 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                                             updateCreator = new UpdateCreator(updateCreatorFile);
                                             update = updateCreator.getCurrentUpdate();
 
-                                            //Fill out the update info
-                                            if(update != null){
-                                                switch(update.getType()){
-                                                case(Update.TYPE_BETA):
-                                                    UpdaterType.setSelectedIndex(2);
-                                                break;
-
-                                                case(Update.TYPE_STABLE):
-                                                    UpdaterType.setSelectedIndex(1);
-                                                break;
-
-                                                case(Update.TYPE_MAINTENANCE):
-                                                    UpdaterType.setSelectedIndex(1);
-                                                break;
-                                                }
-
-
-                                                updaterURL.setText(update.getUrl());
-                                                //"Low", "Feature","Change","BugFix","Security Risk"
-                                                switch(update.getImportance_level()){
-                                                case(Update.LV_LOW):
-                                                    UpdaterImportance.setSelectedIndex(0);
-                                                break;
-
-                                                case(Update.LV_FEATURE):
-                                                    UpdaterImportance.setSelectedIndex(1);
-                                                break;
-
-                                                case(Update.LV_CHANGE):
-                                                    UpdaterImportance.setSelectedIndex(2);
-                                                break;
-
-                                                case(Update.LV_BUGFIX):
-                                                    UpdaterImportance.setSelectedIndex(3);
-                                                break;
-
-                                                case(Update.LV_SEC_RISK):
-                                                    UpdaterImportance.setSelectedIndex(4);
-                                                }
-
-                                                updateVersion.setText(update.getVersion().toString());
+                                            updateComboModel.removeAllElements();
+                                            UpdateList updateList = updateCreator.getUpdateList();
+                                            Set updateSet = updateList.getUpdateSet();
+                                            Iterator iterator = updateSet.iterator();
+                                            while(iterator.hasNext()){
+                                                Update nextUpdate = (Update)iterator.next();
+                                                updateComboModel.addElement(nextUpdate.getVersion());
                                             }
 
-                                            //Add in previous files if they exist
-                                            if(update != null){
-                                                List<UpdateFile> files = update.getFileList();
-                                                for(int i = 0; i < files.size(); i++){
-                                                    DefaultMutableTreeNode nodeToAdd = new DefaultMutableTreeNode(files.get(i).getName());
-                                                    fileTreeModel.insertNodeInto(nodeToAdd, fileTop, fileTop.getChildCount());
-                                                }
+                                            update = updateList.getUpdateSet().first();
+                                            updateComboModel.setSelectedItem(update.getVersion());
+                                            updateCreator.setCurrentUpdate(update);
+                                            loadUpdate(update);
 
-
-                                                fileTree.scrollPathToVisible(new TreePath(fileTree.getPathForRow(fileTreeModel.getChildCount(fileTop))));
-
-                                            }
-
-                                            //pull in the changelog and populate 3rd tab
-                                            log = update.getChangeLog();
-                                            List<String> bugList = log.getBugFixes();
-                                            List<String> changeList = log.getChanges();
-                                            List<String> featureList = log.getFeatures();
-
-                                            for (int i = 0; i < bugList.size(); i++){
-                                                DefaultMutableTreeNode node = new DefaultMutableTreeNode(bugList.get(i));
-                                                treeModel.insertNodeInto(node, bugNode, bugNode.getChildCount());
-                                                chTree.scrollPathToVisible(new TreePath(node.getPath()));
-                                            }
-
-                                            for (int i = 0; i < changeList.size(); i++){
-                                                DefaultMutableTreeNode node = new DefaultMutableTreeNode(changeList.get(i));
-                                                treeModel.insertNodeInto(node, changeNode, changeNode.getChildCount());
-                                                chTree.scrollPathToVisible(new TreePath(node.getPath()));
-                                            }
-
-                                            for (int i = 0; i < featureList.size(); i++){
-                                                DefaultMutableTreeNode node = new DefaultMutableTreeNode(featureList.get(i));
-                                                treeModel.insertNodeInto(node, featureNode, featureNode.getChildCount());
-                                                chTree.scrollPathToVisible(new TreePath(node.getPath()));
-                                            }
-
-                                        }
-
-                                        else{
-                                            //pop up dialog to let the user name the first update in the file
-                                            String s = (String)JOptionPane.showInputDialog(
-                                                    jPanel2,
-                                                    "Please give name of default update in the UpdateFile:\n",
-                                                    "Customized Dialog",
-                                                    JOptionPane.PLAIN_MESSAGE,
-                                                    null,
-                                                    null,
-                                                    smallName);
-
-
-                                            if ((s != null) && (s.length() > 0)) {
-                                                System.out.println(s);
-                                                updateComboModel.removeAllElements();
-                                                updateComboModel.addElement(s);
-                                                updateComboModel.setSelectedItem(s);
-
-                                            }
-
-
-
+                                        }else{
+                                            clearAll(false);
+                                            updateCreator = new UpdateCreator();
+                                            update = updateCreator.getCurrentUpdate();
+                                            update.setImportance_level(Update.LV_LOW);
+                                            update.setType(Update.TYPE_MAINTENANCE);
+                                            update.setUrl("");
+                                            updateComboModel.removeAllElements();
+                                            updateComboModel.addElement(update.getVersion());
+                                            updateComboModel.setSelectedItem(update.getVersion());
+                                            updateVersion.setText(update.getVersion().toString());
+                                            loadUpdate(update);
                                         }
 
 
                                         UpdateCreatorName.setText(updateCreatorFile.getName());
                                         UpdateCreatorDir.setText(updateCreatorFile.getAbsolutePath());
                                         currentDir = new File(updateCreatorFile.getParent());
+
+                                        //Turn on everything!
+                                        setEnabledAll(true);
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
                                 } else {
-                                    System.out
-                                    .println("Save command cancelled by user.");
+                                    System.out.println("Save command cancelled by user.");
                                 }
                             }
                         });
@@ -556,6 +431,31 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                             updaterOptionsPanel.add(UpdaterType, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
                             UpdaterType.setModel(UpdaterTypeModel);
                             UpdaterType.setBounds(126, 189, 189, 28);
+                            UpdaterType.addItemListener(new ItemListener(){
+
+                                public void itemStateChanged(ItemEvent arg0) {
+                                    //-- Type
+                                    switch(UpdaterType.getSelectedIndex()){
+                                    case(0):
+                                        update.setType(Update.TYPE_MAINTENANCE);
+                                    break;
+
+                                    case(1):
+                                        update.setType(Update.TYPE_STABLE);
+                                    break;
+
+                                    case(2):
+                                        update.setType(Update.TYPE_BETA);
+                                    break;
+
+                                    default:
+                                        update.setType(Update.TYPE_MAINTENANCE);
+                                    break;
+                                    }
+
+                                }
+
+                            });
                         }
                         {
                             UpdaterTypeLabel = new JLabel();
@@ -601,10 +501,9 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                                     String text = updaterURL.getText();
                                     if(text.endsWith("/")){
                                         text = text.substring(0,text.length()-1);
-                                        update.setUrl(text);
                                         updaterURL.setText(text);
                                     }
-
+                                    update.setUrl(text);
                                 }
 
                             });
@@ -616,6 +515,39 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                             updaterOptionsPanel.add(UpdaterImportance, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
                             UpdaterImportance.setModel(UpdaterImportanceModel);
                             UpdaterImportance.setBounds(126, 133, 189, 28);
+                            UpdaterImportance.addItemListener(new ItemListener(){
+                                public void itemStateChanged(ItemEvent e) {
+
+                                    switch(UpdaterImportance.getSelectedIndex()){
+                                    case(0):
+                                        update.setImportance_level(Update.LV_LOW);
+                                    break;
+
+                                    case(1):
+                                        update.setImportance_level(Update.LV_FEATURE);
+                                    break;
+
+                                    case(2):
+                                        update.setImportance_level(Update.LV_CHANGE);
+                                    break;
+
+                                    case(3):
+                                        update.setImportance_level(Update.LV_BUGFIX);
+                                    break;
+
+                                    case(4):
+                                        update.setImportance_level(Update.LV_SEC_RISK);
+                                    break;
+
+                                    default:
+                                        update.setImportance_level(Update.LV_LOW);
+                                    break;
+                                    }
+
+
+                                }
+
+                            });
                         }
                         {
                             updateVersionLabel = new JLabel();
@@ -629,6 +561,30 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                             updaterOptionsPanel.add(updateVersion, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
                             updateVersion.setBounds(112, 94, 203, 21);
                             updateVersion.setPreferredSize(new java.awt.Dimension(4, 21));
+                            updateVersion.addFocusListener(new FocusListener(){
+
+                                public void focusGained(FocusEvent arg0) { }
+
+                                public void focusLost(FocusEvent arg0) {
+                                    if(!update.getVersion().toString().equalsIgnoreCase(updateVersion.getText())){
+                                        updateComboModel.removeElement(update.getVersion());
+                                        update.setVersion(new Version(updateVersion.getText()));
+                                        updateComboModel.addElement(update.getVersion());
+                                        updateComboModel.setSelectedItem(update.getVersion());
+                                    }
+                                }
+                            });
+
+                            updateVersion.addActionListener(new ActionListener() {
+                                public void actionPerformed(ActionEvent evt) {
+                                    updateComboModel.removeElement(update.getVersion());
+                                    update.setVersion(new Version(updateVersion.getText()));
+                                    updateComboModel.addElement(update.getVersion());
+                                    updateComboModel.setSelectedItem(update.getVersion());
+                                }
+                            });
+
+
                         }
 
 
@@ -638,20 +594,66 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                     //START >>  updateCombo
                     updateComboModel = new DefaultComboBoxModel();
                     updateComboModel.addElement("Not Selected Yet");
-                    /*ComboBoxModel updateComboModel = new DefaultComboBoxModel(
-                            new String[] { "Item One", "Item Two" });
-                    */
+
                     updateCombo = new JComboBox();
                     jPanel2.add(updateCombo, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
                     updateCombo.setModel(updateComboModel);
+                    updateCombo.addItemListener(new ItemListener() {
+                        public void itemStateChanged(ItemEvent arg0) {
+                            if(updateComboModel.getSize() <=1) return;
+                            Version tempVer = (Version) updateComboModel.getSelectedItem();
+                            if(tempVer == null) return;
+                            Iterator it = updateCreator.getUpdateList().getUpdateSet().iterator();
+                            while(it.hasNext()){
+                                Update nextUpdate = (Update) it.next();
+                                if(nextUpdate.getVersion().compareTo(tempVer) == 0){
+                                    updateCreator.setCurrentUpdate(nextUpdate);
+                                    update = nextUpdate;
+                                    loadUpdate(update);
+                                    return;
+                                }
+                            }
+                        }
+                    });
                     //END <<  updateCombo
+
+
                     //START >>  addUpdate
                     addUpdate = new JButton();
                     jPanel2.add(addUpdate, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
-                    addUpdate.setText("Add New Update");
+                    addUpdate.setText("Add New Update to Package");
                     addUpdate.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent evt) {
-                            //TODO fix!
+                            update = updateCreator.newUpdate();
+                            int sizeOfSet = updateCreator.getUpdateList().getUpdateSet().size();
+                            boolean bcontainsUpdateVersion = false;
+                            for(int i = 0 ; i < updateComboModel.getSize(); i++){
+                                Version testV = (Version)updateComboModel.getElementAt(i);
+                                if(testV.toString().equalsIgnoreCase(String.valueOf(sizeOfSet))){
+                                    bcontainsUpdateVersion = true;
+                                }
+                            }
+                            if(!bcontainsUpdateVersion){
+                                update.setVersion(new Version(String.valueOf(updateCreator.getUpdateList().getUpdateSet().size())));
+                            }else
+                                update.setVersion(new Version("0"));
+                            update.setChangeLog(new Changelog());
+
+                            //add it to the updateCreator list
+                            updateCreator.addUpdateToList(update);
+
+                            //Set the defaults
+                            update.setImportance_level(Update.LV_LOW);
+                            update.setType(Update.TYPE_MAINTENANCE);
+                            update.setUrl("");
+
+                            //load it's stats in the tabs
+                            loadUpdate(update);
+
+                            //add it to the comboboxmodel and select it
+                            updateComboModel.addElement(update.getVersion());
+                            updateComboModel.setSelectedItem(update.getVersion());
+
                         }
                     });
                     //END <<  addUpdate
@@ -979,18 +981,37 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                                     currentDirFile = fc.getSelectedFile();
                                     currentDir = new File(currentDirFile.getParent());
                                     try {
-                                        updateCreator.addFile(
+                                        UpdateFile uf = updateCreator.addFile(
                                                 currentDirFile,
                                                 "",
                                                 "",
                                                 1);
+
+                                        //add to the tree
+                                        DefaultMutableTreeNode nodeToAdd = new DefaultMutableTreeNode(uf.getName());
+                                        fileTreeModel.insertNodeInto(nodeToAdd, fileTop, fileTop.getChildCount());
+                                        fileTree.scrollPathToVisible(new TreePath(nodeToAdd.getPath()));
+                                        String ufName = uf.getName();
+                                        if(ufName.endsWith(".gz") || ufName.endsWith(".zip")){
+                                            updateCreator.setZipArchivFiles(currentDirFile, uf);
+                                            if(uf.getArchivFiles().size() > 0){
+                                                List<UpdateFile> archList = uf.getArchivFiles();
+                                                Iterator it = archList.iterator();
+                                                while(it.hasNext()){
+                                                    UpdateFile nextUF = (UpdateFile)it.next();
+                                                    DefaultMutableTreeNode archNodeToAdd = new DefaultMutableTreeNode(nextUF.getName());
+                                                    fileTreeModel.insertNodeInto(archNodeToAdd, nodeToAdd, nodeToAdd.getChildCount());
+                                                    fileTree.scrollPathToVisible(new TreePath(archNodeToAdd.getPath()));
+                                                }
+                                            }
+
+
+
+                                        }
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
-                                    //add to the tree
-                                    DefaultMutableTreeNode nodeToAdd = new DefaultMutableTreeNode(currentDirFile.getName());
-                                    fileTreeModel.insertNodeInto(nodeToAdd, fileTop, fileTop.getChildCount());
-                                    fileTree.scrollPathToVisible(new TreePath(nodeToAdd.getPath()));
+
 
 
                                     remove.setEnabled(true);
@@ -1010,6 +1031,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                         remove.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent evt) {
                                 TreePath[] tPaths = fileTree.getSelectionPaths();
+                                if(tPaths == null) return;
                                 for(TreePath tPath:tPaths){
                                     String treeName = tPath.getLastPathComponent().toString();
                                     DefaultMutableTreeNode node = (DefaultMutableTreeNode)fileTree.getSelectionPath().getLastPathComponent();
@@ -1034,27 +1056,6 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                                 }
 
 
-                                /*    int index = fileList.getSelectedIndex();
-								List<UpdateFile> ufList = update.getFileList();
-								Iterator iterator = ufList.iterator();
-								while (iterator.hasNext()) {
-									UpdateFile uf = (UpdateFile) iterator
-										.next();
-									if (uf.getName().equalsIgnoreCase(
-										(String) fileListModel
-											.getElementAt(index))) {
-										fileListModel.remove(index);
-										updateCreator.removeFile(uf);
-										name.setText("");
-										path.setText("");
-										version.setText("");
-										url.setText("");
-										hash.setText("");
-										size.setText("");
-										TypeCombo.setSelectedIndex(0);
-										break;
-									}
-								}*/
                                 int size = fileTreeModel.getChildCount(fileTop);
                                 if (size == 0) { //Nobody's left, disable firing.
                                     remove.setEnabled(false);
@@ -1276,7 +1277,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 
                                 try {
                                     System.out.println(updateCreator.toString());
-                                    if(updateCreator == null){
+                                    if(updateCreator.getCurrentUpdate().getChangeLog()==null){
                                         JOptionPane.showMessageDialog(jPanel2,
                                                 "No Update File selcted yet.  Please go to the first tab and select a file before adding Changelogs to it.",
                                                 "Inane warning",
@@ -1331,7 +1332,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                         public void actionPerformed(ActionEvent evt) {
                             DefaultMutableTreeNode node = (DefaultMutableTreeNode)chTree.getSelectionPath().getLastPathComponent();
                             if(node.isRoot()) return;
-
+                            if(node.equals(bugNode)|| node.equals(changeNode) || node.equals(featureNode)) return;
                             String s = (String)JOptionPane.showInputDialog(
                                     jPanel3,
                                     "Edit Changlog Message",
@@ -1343,9 +1344,10 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 
 
                             if ((s != null) && (s.length() > 0)) {
-                                int location = bugNode.getIndex(node);
+
 
                                 if(node.getParent().equals(bugNode)){
+                                    int location = bugNode.getIndex(node);
                                     log.removeBugFix(node.toString());
                                     log.addBugFix(s);
                                     treeModel.removeNodeFromParent(node);
@@ -1353,11 +1355,21 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                                     treeModel.insertNodeInto(bugChildNode, bugNode, location);
                                     chTree.scrollPathToVisible(new TreePath(bugChildNode.getPath()));
                                 }else if(node.getParent().equals(changeNode)){
+                                    int location = changeNode.getIndex(node);
                                     log.removeChange(node.toString());
+                                    log.addChange(s);
                                     treeModel.removeNodeFromParent(node);
+                                    DefaultMutableTreeNode changeChildNode = new DefaultMutableTreeNode(s);
+                                    treeModel.insertNodeInto(changeChildNode, changeNode, location);
+                                    chTree.scrollPathToVisible(new TreePath(changeChildNode.getPath()));
                                 }else if(node.getParent().equals(featureNode)){
+                                    int location = featureNode.getIndex(node);
                                     log.removeFeature(node.toString());
+                                    log.addFeature(s);
                                     treeModel.removeNodeFromParent(node);
+                                    DefaultMutableTreeNode featureChildNode = new DefaultMutableTreeNode(s);
+                                    treeModel.insertNodeInto(featureChildNode, featureNode, location);
+                                    chTree.scrollPathToVisible(new TreePath(featureChildNode.getPath()));
                                 }
                             }
 
@@ -1371,6 +1383,10 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
             }
             updateCreator = new UpdateCreator();
             update = updateCreator.getCurrentUpdate();
+
+            //Turn off everything!
+            setEnabledAll(false);
+
             this.setSize(813, 475);
             {
                 jMenuBar1 = new JMenuBar();
@@ -1387,7 +1403,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                         newPackage.setText("New Package");
                         newPackage.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent evt) {
-                                clearAll();
+                                clearAll(true);
 
                             }
                         });
@@ -1415,13 +1431,19 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
         }
     }
 
-    public void clearAll(){
+    /**
+     * Clears everything.. and remaps the updates if bClearUpdate is true
+     * @param bClearUpdates
+     */
+    public void clearAll(boolean bClearUpdates){
         //Remake the elements
-        updateCreator = new UpdateCreator();
-        update = updateCreator.getCurrentUpdate();
-        log = new Changelog();
-        currentDirFile = null;
-        updateCreatorFile = null;
+        if(bClearUpdates){
+            updateCreator = new UpdateCreator();
+            update = updateCreator.getCurrentUpdate();
+            log = new Changelog();
+            currentDirFile = null;
+            updateCreatorFile = null;
+        }
 
         //Clear 1st tab
         UpdateCreatorName.setText("Not Selected Yet");
@@ -1432,6 +1454,10 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
         UpdaterType.setSelectedIndex(0);
         updaterURL.setText("");
         updateVersion.setText("");
+
+
+        updateComboModel.removeAllElements();
+        updateComboModel.addElement("Not Selected Yet");
 
         //Clear 2nd tab
         currentUF = null;
@@ -1457,6 +1483,149 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
         rootNode.add(featureNode);
         treeModel = new DefaultTreeModel(rootNode);
         chTree.setModel(treeModel);
+
+        //turn off everything!
+        setEnabledAll(false);
+    }
+
+    public void setEnabledAll(boolean bEnabled){
+        remove.setEnabled(bEnabled);
+        addFile.setEnabled(bEnabled);
+        url.setEnabled(bEnabled);
+        version.setEnabled(bEnabled);
+        path.setEnabled(bEnabled);
+        name.setEnabled(bEnabled);
+        TypeCombo.setEnabled(bEnabled);
+        updaterURL.setEnabled(bEnabled);
+        UpdateCreatorCompressed.setEnabled(bEnabled);
+        create.setEnabled(bEnabled);
+        chEnter.setEnabled(bEnabled);
+        chType.setEnabled(bEnabled);
+        UpdaterType.setEnabled(bEnabled);
+        UpdaterImportance.setEnabled(bEnabled);
+        jButton1.setEnabled(bEnabled);
+        editSelected.setEnabled(bEnabled);
+        addUpdate.setEnabled(bEnabled);
+        updateCombo.setEnabled(bEnabled);
+        writeChangelog.setEnabled(bEnabled);
+        chRemove.setEnabled(bEnabled);
+        unpackFile.setEnabled(bEnabled);
+        updateVersion.setEnabled(bEnabled);
+    }
+
+
+    public void loadUpdate(Update updateToLoad){
+        //Fill out the update info
+        if(updateToLoad == null) return;
+
+        switch(updateToLoad.getType()){
+        case(Update.TYPE_BETA):
+            UpdaterType.setSelectedIndex(2);
+        break;
+
+        case(Update.TYPE_STABLE):
+            UpdaterType.setSelectedIndex(1);
+        break;
+
+        case(Update.TYPE_MAINTENANCE):
+            UpdaterType.setSelectedIndex(1);
+        break;
+        }
+
+
+        updaterURL.setText(updateToLoad.getUrl());
+
+
+        //"Low", "Feature","Change","BugFix","Security Risk"
+        switch(updateToLoad.getImportance_level()){
+        case(Update.LV_LOW):
+            UpdaterImportance.setSelectedIndex(0);
+        break;
+
+        case(Update.LV_FEATURE):
+            UpdaterImportance.setSelectedIndex(1);
+        break;
+
+        case(Update.LV_CHANGE):
+            UpdaterImportance.setSelectedIndex(2);
+        break;
+
+        case(Update.LV_BUGFIX):
+            UpdaterImportance.setSelectedIndex(3);
+        break;
+
+        case(Update.LV_SEC_RISK):
+            UpdaterImportance.setSelectedIndex(4);
+        }
+
+        updateVersion.setText(updateToLoad.getVersion().toString());
+
+
+        //Add in previous files if they exist
+
+
+        //Clear 2nd tab
+        currentUF = null;
+        fileTop = new DefaultMutableTreeNode("Files");
+        fileTreeModel = new DefaultTreeModel(fileTop);
+        fileTree.setModel(fileTreeModel);
+        name.setText("");
+        path.setText("");
+        version.setText("");
+        url.setText("");
+        hash.setText("");
+        TypeCombo.setSelectedIndex(0);
+        size.setText("");
+
+
+        List<UpdateFile> files = updateToLoad.getFileList();
+        for(int i = 0; i < files.size(); i++){
+            DefaultMutableTreeNode nodeToAdd = new DefaultMutableTreeNode(files.get(i).getName());
+            fileTreeModel.insertNodeInto(nodeToAdd, fileTop, fileTop.getChildCount());
+            fileTree.scrollPathToVisible(new TreePath(nodeToAdd.getPath()));
+
+        }
+
+        //pull in the changelog and populate 3rd tab
+        if(updateToLoad.getChangeLog() == null)
+            updateToLoad.setChangeLog(new Changelog());
+        log = updateToLoad.getChangeLog();
+        List<String> bugList = log.getBugFixes();
+        List<String> changeList = log.getChanges();
+        List<String> featureList = log.getFeatures();
+
+
+
+        //Clear 3rd Tab
+        chArea.setText("");
+        bugNode = new DefaultMutableTreeNode("BugFixes");
+        changeNode = new DefaultMutableTreeNode("Changes");
+        featureNode = new DefaultMutableTreeNode("Features");
+        rootNode = new DefaultMutableTreeNode("Changelog");
+        rootNode.add(bugNode);
+        rootNode.add(changeNode);
+        rootNode.add(featureNode);
+        treeModel = new DefaultTreeModel(rootNode);
+        chTree.setModel(treeModel);
+
+        for (int i = 0; i < bugList.size(); i++){
+            DefaultMutableTreeNode node = new DefaultMutableTreeNode(bugList.get(i));
+            treeModel.insertNodeInto(node, bugNode, bugNode.getChildCount());
+            chTree.scrollPathToVisible(new TreePath(node.getPath()));
+        }
+
+        for (int i = 0; i < changeList.size(); i++){
+            DefaultMutableTreeNode node = new DefaultMutableTreeNode(changeList.get(i));
+            treeModel.insertNodeInto(node, changeNode, changeNode.getChildCount());
+            chTree.scrollPathToVisible(new TreePath(node.getPath()));
+        }
+
+        for (int i = 0; i < featureList.size(); i++){
+            DefaultMutableTreeNode node = new DefaultMutableTreeNode(featureList.get(i));
+            treeModel.insertNodeInto(node, featureNode, featureNode.getChildCount());
+            chTree.scrollPathToVisible(new TreePath(node.getPath()));
+        }
+
     }
 
 }
