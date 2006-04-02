@@ -153,7 +153,7 @@ public class DownloadManagerShell {
 	private ToolItem refresh,manage_users, preferences, console;
 	private ToolItem addTorrent_by_file,addTorrent_by_url, pauseAll, resumeAll ;
 	private ToolItem stopTorrent, queueTorrent, removeTorrent;
-	private MenuItem menuLogin,menuLogout,menuQuickconnect;
+	private MenuItem menuLogin,menuLogout,menuQuickconnect, menuRestartAzureus;
 	public ConsoleTab consoleTab;
 
 	//status bar labels
@@ -333,6 +333,24 @@ public class DownloadManagerShell {
 				new PreferencesTab(tabFolder);
 			}
 		});
+
+        menuRestartAzureus = new MenuItem(toolSubmenu,SWT.PUSH);
+        menuRestartAzureus.setText("&Restart Server");
+        menuRestartAzureus.addListener(SWT.Selection, new Listener(){
+            public void handleEvent(Event e){
+                MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
+                messageBox.setText("Restart Azureus");
+                messageBox.setMessage("Are you sure you wish to restart the Azureus Server itself?");
+                int response = messageBox.open();
+                switch (response){
+                case SWT.OK:
+                    RCMain.getRCMain().getClient().sendRestartAzureus();
+                    break;
+                case SWT.CANCEL:
+                    break;
+                }
+            }
+        });
 
         new MenuItem(toolSubmenu,SWT.SEPARATOR);
 
