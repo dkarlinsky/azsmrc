@@ -544,6 +544,12 @@ public class Client {
 		enqueue(sendElement);
 	}
 
+	public void sendRestartAzureus() {
+		Element sendElement = getSendElement();
+		sendElement.setAttribute("switch", "restartAzureus");
+		enqueue(sendElement);
+	}
+
 	public void sendGetGlobalStats() {
 		send(); //globalStats are allways requested so just send here
 	}

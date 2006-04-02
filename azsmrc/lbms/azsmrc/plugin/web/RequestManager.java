@@ -20,6 +20,7 @@ import lbms.azsmrc.shared.EncodingUtil;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.azsmrc.shared.UserNotFoundException;
 
+import org.gudy.azureus2.core3.config.COConfigurationManager;
 import org.gudy.azureus2.plugins.PluginConfig;
 import org.gudy.azureus2.plugins.PluginInterface;
 import org.gudy.azureus2.plugins.disk.DiskManagerFileInfo;
@@ -35,6 +36,7 @@ import org.gudy.azureus2.plugins.torrent.TorrentAttribute;
 import org.gudy.azureus2.plugins.torrent.TorrentException;
 import org.gudy.azureus2.plugins.torrent.TorrentManager;
 import org.gudy.azureus2.plugins.tracker.web.TrackerWebPageResponse;
+import org.gudy.azureus2.plugins.update.UpdateException;
 import org.jdom.*;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -983,6 +985,86 @@ public class RequestManager {
 					}
 				}
 				return true;
+			}
+		});
+		addHandler("setCoreParameter", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {
+				if (user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+					try {
+						int type = xmlRequest.getAttribute("type").getIntValue();
+						switch (type) {
+						case RemoteConstants.PARAMETER_BOOLEAN:
+							COConfigurationManager.setParameter(xmlRequest.getAttributeValue("key"), xmlRequest.getAttribute("value").getBooleanValue());
+							break;
+						case RemoteConstants.PARAMETER_STRING:
+							COConfigurationManager.setParameter(xmlRequest.getAttributeValue("key"), xmlRequest.getAttributeValue("value"));
+							break;
+						case RemoteConstants.PARAMETER_FLOAT:
+							COConfigurationManager.setParameter(xmlRequest.getAttributeValue("key"), xmlRequest.getAttribute("value").getFloatValue());
+							break;
+						case RemoteConstants.PARAMETER_INT:
+							COConfigurationManager.setParameter(xmlRequest.getAttributeValue("key"), xmlRequest.getAttribute("value").getIntValue());
+							break;
+						}
+					} catch (DataConversionException e) {
+						e.printStackTrace();
+					}
+				}
+				response.setAttribute("switch", "getCoreParameter");
+				return handlerList.get("getCoreParameter").handleRequest(xmlRequest, response, user); //TODO Hack
+
+			}
+		});
+		addHandler("getCoreParameter", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {
+				if (user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+					try {
+						int type = xmlRequest.getAttribute("type").getIntValue();
+						response.setAttribute("type",xmlRequest.getAttributeValue("type"));
+						response.setAttribute("key", xmlRequest.getAttributeValue("key"));
+						switch (type) {
+						case RemoteConstants.PARAMETER_BOOLEAN:
+							response.setAttribute("value",Boolean.toString(
+							COConfigurationManager.getBooleanParameter(xmlRequest.getAttributeValue("key"))));
+							break;
+						case RemoteConstants.PARAMETER_STRING:
+							response.setAttribute("value",
+							COConfigurationManager.getStringParameter(xmlRequest.getAttributeValue("key")));
+							break;
+						case RemoteConstants.PARAMETER_FLOAT:
+							response.setAttribute("value",Float.toString(
+							COConfigurationManager.getFloatParameter(xmlRequest.getAttributeValue("key"))));
+							break;
+						case RemoteConstants.PARAMETER_INT:
+							response.setAttribute("value",Integer.toString(
+							COConfigurationManager.getIntParameter(xmlRequest.getAttributeValue("key"))));
+							break;
+						}
+					} catch (DataConversionException e) {
+						e.printStackTrace();
+						response.setAttribute("type",Integer.toString(RemoteConstants.PARAMETER_NOT_FOUND));
+					}
+				}
+				return true;
+			}
+		});
+		addHandler("restartAzureus", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, final User user) throws IOException {
+				if (user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+					Thread t = new Thread(new Runnable() {
+						public void run() {
+							try {
+								Plugin.getPluginInterface().getUpdateManager().applyUpdates(true);
+							} catch (UpdateException e) {
+								user.eventException(e);
+								e.printStackTrace();
+							}
+						}
+					});
+					t.setDaemon(true);
+					t.start();
+				}
+				return false;
 			}
 		});
 	}
