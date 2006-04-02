@@ -209,6 +209,13 @@ public class DownloadManagerShell {
 		Menu fileSubmenu = new Menu (DOWNLOAD_MANAGER_SHELL, SWT.DROP_DOWN);
 		fileItem.setMenu (fileSubmenu);
 
+        MenuItem remoteItem = new MenuItem(menuBar,SWT.CASCADE);
+        remoteItem.setText("&Remote");
+
+        Menu remoteSubmenu = new Menu (DOWNLOAD_MANAGER_SHELL, SWT.DROP_DOWN);
+        remoteItem.setMenu (remoteSubmenu);
+
+
 		MenuItem toolItem = new MenuItem(menuBar,SWT.CASCADE);
 		toolItem.setText("&Tools");
 
@@ -299,6 +306,26 @@ public class DownloadManagerShell {
 			}
 		});
 
+        //-----Remote
+        menuRestartAzureus = new MenuItem(remoteSubmenu,SWT.PUSH);
+        menuRestartAzureus.setText("&Restart Server");
+        menuRestartAzureus.addListener(SWT.Selection, new Listener(){
+            public void handleEvent(Event e){
+                MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
+                messageBox.setText("Restart Azureus");
+                messageBox.setMessage("Are you sure you wish to restart the Azureus Server itself?");
+                int response = messageBox.open();
+                switch (response){
+                case SWT.OK:
+                    RCMain.getRCMain().getClient().sendRestartAzureus();
+                    break;
+                case SWT.CANCEL:
+                    break;
+                }
+            }
+        });
+
+
 		//-----Tools Submenu
 
 		MenuItem menuConsole = new MenuItem(toolSubmenu,SWT.PUSH);
@@ -334,23 +361,6 @@ public class DownloadManagerShell {
 			}
 		});
 
-        menuRestartAzureus = new MenuItem(toolSubmenu,SWT.PUSH);
-        menuRestartAzureus.setText("&Restart Server");
-        menuRestartAzureus.addListener(SWT.Selection, new Listener(){
-            public void handleEvent(Event e){
-                MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
-                messageBox.setText("Restart Azureus");
-                messageBox.setMessage("Are you sure you wish to restart the Azureus Server itself?");
-                int response = messageBox.open();
-                switch (response){
-                case SWT.OK:
-                    RCMain.getRCMain().getClient().sendRestartAzureus();
-                    break;
-                case SWT.CANCEL:
-                    break;
-                }
-            }
-        });
 
         new MenuItem(toolSubmenu,SWT.SEPARATOR);
 
@@ -1806,6 +1816,7 @@ public class DownloadManagerShell {
 
 						login.setEnabled(false);
 						menuLogin.setEnabled(false);
+                        menuRestartAzureus.setEnabled(true);
 						menuLogout.setEnabled(true);
 						logout.setEnabled(true);
 						quickconnect.setEnabled(false);
@@ -1831,6 +1842,7 @@ public class DownloadManagerShell {
 						login.setEnabled(true);
 						menuLogin.setEnabled(true);
 						menuLogout.setEnabled(false);
+                        menuRestartAzureus.setEnabled(false);
 						logout.setEnabled(false);
 						quickconnect.setEnabled(true);
 						menuQuickconnect.setEnabled(true);
