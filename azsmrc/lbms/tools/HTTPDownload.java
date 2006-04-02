@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.Callable;
+import java.util.zip.GZIPInputStream;
 
 public class HTTPDownload extends Download  {
 
@@ -38,7 +39,16 @@ public class HTTPDownload extends Download  {
 		try {
 			HttpURLConnection conn = (HttpURLConnection)source.openConnection();
 			conn.setDoInput(true);
+			conn.addRequestProperty("Accept-Encoding","gzip");
+			conn.connect();
 			is =  conn.getInputStream();
+			String encoding = conn.getHeaderField( "content-encoding");
+
+		  	boolean	gzip = encoding != null && encoding.equalsIgnoreCase("gzip");		
+
+		  	if ( gzip ){		  		
+		  		is = new GZIPInputStream( is );
+		  	}
 			if (target != null) {
 				target.createNewFile();
 				FileOutputStream os = null;
