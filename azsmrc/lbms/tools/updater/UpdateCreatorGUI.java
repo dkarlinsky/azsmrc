@@ -12,6 +12,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -46,6 +47,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
@@ -160,6 +162,9 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
     private DefaultMutableTreeNode rootNode;
     private DefaultTreeModel treeModel;
     private DefaultTreeModel fileTreeModel;
+
+    HashMap<String,File> map = new HashMap<String,File>();
+    HashMap<String,File> totalMap = new HashMap<String,File>();
 
     /**
      * Auto-generated main method to display this JFrame
@@ -971,6 +976,33 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                         unpackFile.addActionListener(new ActionListener(){
                             public void actionPerformed(ActionEvent arg0) {
                                 currentUF.setArchive(unpackFile.isSelected());
+                                File archiveFile = (File)map.get(currentUF.getName());
+                                if(unpackFile.isSelected()){
+                                    try{
+                                        updateCreator.setZipArchivFiles(archiveFile, currentUF);
+                                        if(currentUF.getArchivFiles().size() > 0){
+                                            DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) fileTree.getSelectionPath().getLastPathComponent();
+                                            List<UpdateFile> archList = currentUF.getArchivFiles();
+                                            Iterator it = archList.iterator();
+                                            while(it.hasNext()){
+                                                UpdateFile nextUF = (UpdateFile)it.next();
+                                                DefaultMutableTreeNode archNodeToAdd = new DefaultMutableTreeNode(nextUF.getName());
+                                                fileTreeModel.insertNodeInto(archNodeToAdd, parentNode, parentNode.getChildCount());
+                                                fileTree.scrollPathToVisible(new TreePath(archNodeToAdd.getPath()));
+                                            }
+                                        }
+                                    }catch(Exception e){
+                                        e.printStackTrace();
+                                    }
+
+                                }else{
+                                    currentUF.clearArcive();
+                                    DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) fileTree.getSelectionPath().getLastPathComponent();
+                                    while(parentNode.getChildCount() > 0){
+                                        DefaultMutableTreeNode subNode = (DefaultMutableTreeNode)parentNode.getLastChild();
+                                        fileTreeModel.removeNodeFromParent(subNode);
+                                    }
+                                }
                             }
                         });
                         //END <<  unpackFile
@@ -993,6 +1025,11 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 
                                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                                     currentDirFile = fc.getSelectedFile();
+                                    if(totalMap.containsKey(currentDirFile.getName())){
+                                        JOptionPane.showMessageDialog(jPanel2, "A file by that name is already in an upadate package.  No duplicate file names allowed.");
+                                        return;
+                                    }else
+                                        totalMap.put(currentDirFile.getName(),currentDirFile);
                                     currentDir = new File(currentDirFile.getParent());
                                     try {
                                         UpdateFile uf = updateCreator.addFile(
@@ -1007,21 +1044,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                                         fileTree.scrollPathToVisible(new TreePath(nodeToAdd.getPath()));
                                         String ufName = uf.getName();
                                         if(ufName.endsWith(".gz") || ufName.endsWith(".zip")){
-                                            updateCreator.setZipArchivFiles(currentDirFile, uf);
-                                            if(uf.getArchivFiles().size() > 0){
-                                                List<UpdateFile> archList = uf.getArchivFiles();
-                                                Iterator it = archList.iterator();
-                                                while(it.hasNext()){
-                                                    UpdateFile nextUF = (UpdateFile)it.next();
-                                                    DefaultMutableTreeNode archNodeToAdd = new DefaultMutableTreeNode(nextUF.getName());
-                                                    fileTreeModel.insertNodeInto(archNodeToAdd, nodeToAdd, nodeToAdd.getChildCount());
-                                                    fileTree.scrollPathToVisible(new TreePath(archNodeToAdd.getPath()));
-                                                }
-                                            }
-
-//TODO
-
-                                        }
+                                            map.put(ufName, currentDirFile);                                        }
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
@@ -1185,6 +1208,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
                             }
                         }
                     });
+                    fileTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
                     //END <<  fileTree
                     //END <<  TreeScrollPane
