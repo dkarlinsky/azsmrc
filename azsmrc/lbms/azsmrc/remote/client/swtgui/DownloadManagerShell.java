@@ -1038,6 +1038,11 @@ public class DownloadManagerShell {
 				}
 
 			}
+
+            public void coreParameter(String key, String value, int type) {
+                // TODO Auto-generated method stub
+
+            }
 		};
 
 		RCMain.getRCMain().getClient().addParameterListener(pl);
