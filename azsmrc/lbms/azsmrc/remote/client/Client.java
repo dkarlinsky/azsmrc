@@ -544,6 +544,23 @@ public class Client {
 		enqueue(sendElement);
 	}
 
+	public void sendSetCoreParameter(String key, String value, int type) {
+		Element sendElement = getSendElement();
+		sendElement.setAttribute("switch", "setCoreParameter");
+		sendElement.setAttribute("key", key);
+		sendElement.setAttribute("value", value);
+		sendElement.setAttribute("type", Integer.toString(type));
+		enqueue(sendElement);
+	}
+
+	public void sendGetCoreParameter(String key,int type) {
+		Element sendElement = getSendElement();
+		sendElement.setAttribute("switch", "getCoreParameter");
+		sendElement.setAttribute("key", key);
+		sendElement.setAttribute("type", Integer.toString(type));
+		enqueue(sendElement);
+	}
+
 	public void sendRestartAzureus() {
 		Element sendElement = getSendElement();
 		sendElement.setAttribute("switch", "restartAzureus");
@@ -657,6 +674,12 @@ public class Client {
 	protected void callPluginParameterListener(String key, String value, int type) {
 		for (ParameterListener l:parameterListeners) {
 			l.pluginParameter(key, value, type);
+		}
+	}
+
+	protected void callCoreParameterListener(String key, String value, int type) {
+		for (ParameterListener l:parameterListeners) {
+			l.coreParameter(key, value, type);
 		}
 	}
 

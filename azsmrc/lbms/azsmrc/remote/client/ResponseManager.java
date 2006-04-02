@@ -317,5 +317,16 @@ public class ResponseManager {
 				return 0;
 			}
 		});
+		addHandler("getCoreParameter", new ResponseHandler() {
+			public long handleRequest(Element xmlResponse) throws IOException {
+				try {
+					client.callCoreParameterListener(xmlResponse.getAttributeValue("key"),xmlResponse.getAttributeValue("value"),xmlResponse.getAttribute("type").getIntValue());
+				} catch (DataConversionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return 0;
+			}
+		});
 	}
 }
