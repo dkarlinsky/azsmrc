@@ -8,6 +8,7 @@ import lbms.azsmrc.shared.BDecoder;
 import lbms.azsmrc.shared.RemoteConstants;
 
 public class ScrapeResult {
+	private String scrapeUrl;
 	private long seeds, leechers, downloaded;
 
 	private boolean failure = false;
@@ -44,6 +45,11 @@ public class ScrapeResult {
 		}
 	}
 
+	public ScrapeResult (String scrapeURL, byte[] scrapeData) {
+		this(scrapeData);
+		this.scrapeUrl = scrapeURL;
+	}
+
 	/**
 	 * @return Returns the downloaded.
 	 */
@@ -78,4 +84,13 @@ public class ScrapeResult {
 	public String getFailureReason() {
 		return failureReason;
 	}
+
+	/**
+	 * @return Returns the scrapeUrl.
+	 */
+	public String getScrapeUrl() {
+		return scrapeUrl;
+	}
+
+
 }
