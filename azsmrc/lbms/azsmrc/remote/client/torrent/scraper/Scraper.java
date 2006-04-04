@@ -50,8 +50,8 @@ public class Scraper implements Runnable {
 			HTTPDownload dl = new HTTPDownload(realScrapeURL);
 			dl.run();
 //			System.out.println(dl.getBuffer().toString());
-			if (dl.isFailed()) {
-				callScrapeFailedListener("Couldn't connect to Server.");
+			if (dl.hasFailed()) {
+				callScrapeFailedListener("Couldn't connect to Server: "+dl.getFailureReason());
 			} else {
 				byte[] scrapeRes = dl.getBuffer().toString().getBytes(RemoteConstants.BYTE_ENCODING);
 				scrapeResult = new ScrapeResult(scrapeURL,scrapeRes);
