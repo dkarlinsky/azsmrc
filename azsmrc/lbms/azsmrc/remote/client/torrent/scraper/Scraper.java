@@ -58,6 +58,7 @@ public class Scraper implements Runnable {
 				callListener(scrapeResult);
 			}
 		} catch (Exception e) {
+			callScrapeFailedListener(e.getMessage());
 			e.printStackTrace();
 		}
 		return true;

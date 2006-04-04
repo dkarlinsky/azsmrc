@@ -41,6 +41,8 @@ public class ScrapeResult {
 						+ leechers + "\nDownloaded = " + downloaded);
 			}
 		} catch (IOException e) {
+			failure = true;
+			failureReason = e.getMessage();
 			e.printStackTrace();
 		}
 	}
