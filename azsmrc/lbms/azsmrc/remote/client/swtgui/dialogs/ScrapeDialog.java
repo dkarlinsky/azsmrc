@@ -15,6 +15,7 @@ import lbms.azsmrc.remote.client.torrent.scraper.ScrapeListener;
 import lbms.azsmrc.remote.client.torrent.scraper.ScrapeResult;
 import lbms.azsmrc.remote.client.torrent.scraper.Scraper;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
+import lbms.azsmrc.shared.EncodingUtil;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -110,6 +111,17 @@ public class ScrapeDialog {
 
 						//put the torrent in the container and add to the map
 						AddTorrentContainer atc = new AddTorrentContainer(test);
+						if(map.containsKey(atc.getName())){
+							CTabItem[] items = tabFolder.getItems();
+							for(CTabItem item:items){
+								if(item.getText().equalsIgnoreCase(atc.getName())){
+									tabFolder.setSelection(item);
+									return;
+								}
+							}
+							torrentTabOpen(tabFolder,map.get(atc.getName()));
+							return;
+						}
 						map.put(atc.getName(), atc);
 
 						//Add it to the table
@@ -162,6 +174,13 @@ public class ScrapeDialog {
 			public void handleEvent(Event arg0) {		
 				TableItem[] items = torrentTable.getSelection();
 				if(items.length > 1) return;
+				CTabItem[] tabs = tabFolder.getItems();
+				for(CTabItem item:tabs){
+					if(item.getText().equalsIgnoreCase(items[0].getText(0))){
+						tabFolder.setSelection(item);
+						return;
+					}
+				}
 				torrentTabOpen(tabFolder,map.get(items[0].getText(0)));
 			}
 
@@ -276,7 +295,7 @@ public class ScrapeDialog {
 		//----STATS
 		final Group gStats = new Group(parent,SWT.NULL);
 		gStats.setText("Scrape Results");
-		gStats.setLayout(new GridLayout(4,false));
+		gStats.setLayout(new GridLayout(2,false));
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.grabExcessHorizontalSpace= true;
 		gd.horizontalSpan = 2;
@@ -296,23 +315,128 @@ public class ScrapeDialog {
 		leechers.setText("Not Scraped");
 
 		Label downloadedL = new Label(gStats,SWT.NULL);
-		downloadedL.setText("Number Downloaded: ");
-		
-		
+		downloadedL.setText("Downloadeds: ");
+				
 		final Label downloaded = new Label(gStats,SWT.NULL);
 		downloaded.setText("Not Scraped");
 
+				
+		Label srURLL = new Label(gStats,SWT.NULL);
+		srURLL.setText("Scrape URL: ");
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
+		srURLL.setLayoutData(gd);
+		
+		final Label srURL = new Label(gStats,SWT.NULL);
+		srURL.setText("Not Scraped");
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
+		srURL.setLayoutData(gd);
+		
+		
 		
 		//----FILES
 		
 		Group gFiles = new Group(parent,SWT.NULL);
-		gFiles.setText("Files in the Torrent");
-		gFiles.setLayout(new GridLayout(4,false));
+		gFiles.setText("Torrent Details");
+		gFiles.setLayout(new GridLayout(2,false));
 		gd = new GridData(GridData.FILL_BOTH);
 		gd.grabExcessHorizontalSpace= true;		
 		gd.horizontalSpan = 2;
 		gFiles.setLayoutData(gd);
 
+		Composite cLeft = new Composite(gFiles,SWT.NULL);
+		cLeft.setLayout(new GridLayout(2,false));
+		gd = new GridData(GridData.FILL_HORIZONTAL);			
+		gd.horizontalSpan = 1;
+		cLeft.setLayoutData(gd);
+		
+		//Size
+		Label sizeL = new Label(cLeft,SWT.NULL);
+		sizeL.setText("Size: ");
+		
+		Label size = new Label(cLeft,SWT.NULL);
+		size.setText(DisplayFormatters.formatByteCountToBase10KBEtc(atc.getTorrent().getSize()));
+		
+		//Number of Pieces
+		Label numPiecesL = new Label(cLeft,SWT.NULL);
+		numPiecesL.setText("Pieces: ");
+		
+		Label numPieces = new Label(cLeft,SWT.NULL);
+		numPieces.setText(String.valueOf(atc.getTorrent().getNumberOfPieces()));
+		
+		//Piece Size
+		Label pieceSizeL = new Label(cLeft,SWT.NULL);
+		pieceSizeL.setText("Piece Size: ");
+		
+		Label pieceSize = new Label(cLeft,SWT.NULL);
+		pieceSize.setText(DisplayFormatters.formatByteCountToBase10KBEtc(atc.getTorrent().getPieceLength()));
+		
+		
+		
+		Composite cRight = new Composite(gFiles,SWT.NULL);
+		cRight.setLayout(new GridLayout(2,false));
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.grabExcessHorizontalSpace= true;		
+		gd.horizontalSpan = 1;
+		cRight.setLayoutData(gd);
+		
+		
+		//Created on
+		Label dateL = new Label(cRight,SWT.NULL);
+		dateL.setText("Created On: ");
+		
+		Label date = new Label(cRight,SWT.NULL);
+		date.setText(DisplayFormatters.formatDate(atc.getTorrent().getCreationDate()));
+		
+		//Created by
+		Label byL = new Label(cRight,SWT.NULL);
+		byL.setText("Created By: ");
+		
+		Label by = new Label(cRight,SWT.NULL);
+		by.setText(EncodingUtil.nicePrint(atc.getTorrent().getCreatedBy(),true));
+		
+		//Is Private
+		Label privL = new Label(cRight,SWT.NULL);
+		privL.setText("Private: ");
+		
+		Label priv = new Label(cRight,SWT.NULL);
+		if(atc.getTorrent().getPrivate())
+			priv.setText("Yes");
+		else
+			priv.setText("No");
+		
+		Composite cBottom = new Composite(gFiles,SWT.NULL);
+		cBottom.setLayout(new GridLayout(1,false));
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.grabExcessHorizontalSpace= true;		
+		gd.horizontalSpan = 2;
+		cBottom.setLayoutData(gd);
+		
+		//URL
+		Label tURL = new Label(cBottom,SWT.NULL);
+		tURL.setText("Announce URL: " + atc.getTorrent().getAnnounceURL());
+		
+		//Hash
+		Label hash = new Label(cBottom,SWT.NULL);		
+		hash.setLayoutData(gd);
+		try {			
+			hash.setText("Hash: " + EncodingUtil.nicePrint(atc.getTorrent().getHash(),false));
+		} catch (TOTorrentException e) {
+			hash.setText("Hash: Unable to properly decode hash");			
+		}
+        
+		//Comments
+		Label commentsL = new Label(cBottom,SWT.NULL);
+		commentsL.setText("Comments: ");
+		
+		Label comments = new Label(cBottom,SWT.NULL);
+		try{
+			comments.setText(new String(atc.getTorrent().getComment()));
+		}catch(Exception e){
+			
+		}
+		
 		
 		
 		//Table for files
@@ -380,6 +504,8 @@ public class ScrapeDialog {
 								seeds.setText(String.valueOf(sr.getSeeds()));
 								leechers.setText(String.valueOf(sr.getLeechers()));
 								downloaded.setText(String.valueOf(sr.getDownloaded()));
+								srURL.setText(sr.getScrapeUrl());
+								srURL.setToolTipText(sr.getScrapeUrl());
 							}
 							
 						});
