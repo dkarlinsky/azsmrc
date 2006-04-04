@@ -175,6 +175,29 @@ public class Updater {
 								e.printStackTrace();
 								callListenerException(e);
 							}
+						} else if (u.isArchive()) { //if the file doesn't exist check if it is an archive, when all files inside the archive exist
+													//we don't need to download it
+							List<UpdateFile> archiveFiles = u.getArchivFiles();
+							boolean exist = true;
+							for (UpdateFile a:archiveFiles) {
+								File aLoc = new File(dir,a.getPath()+a.getName());
+								if (aLoc.exists()) {
+									try {
+										String localHash = CryptoTools.formatByte(CryptoTools.messageDigestFile(aLoc.getAbsolutePath(), "SHA-1"));
+										if (localHash.equalsIgnoreCase(a.getHash())) {
+											System.out.println("Updater: file exists: "+aLoc);
+											continue;
+										}
+									} catch (Exception e) {
+										e.printStackTrace();
+										callListenerException(e);
+									}
+								} else {
+									exist = false;
+									break;
+								}
+							}
+							if (exist) continue; // all Files inside the archive exist so we don't need to download it.
 						}
 						Download dl;
 						switch (u.getType()) {
