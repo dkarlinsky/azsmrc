@@ -435,6 +435,14 @@ public class Client {
 		enqueue(sendElement);
 	}
 
+	public void sendMoveDataFiles (String hash,String target) {
+		Element sendElement = getSendElement();
+		sendElement.setAttribute("switch", "moveDataFiles");
+		sendElement.setAttribute("hash", hash);
+		sendElement.setAttribute("target", target);
+		enqueue(sendElement);
+	}
+
 	public void sendMaximumDownloadKBPerSecond (String hash, int limit) {
 		Element sendElement = getSendElement();
 		sendElement.setAttribute("switch", "setMaximumDownload");

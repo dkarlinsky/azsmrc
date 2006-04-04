@@ -638,6 +638,27 @@ public class RequestManager {
 				return false;
 			}
 		});
+		addHandler("moveDataFiles", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {
+
+				String hash = xmlRequest.getAttributeValue("hash");
+				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
+				if (singleUser || user.hasDownload(hash)) {
+					try {
+						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+						File target = new File (xmlRequest.getAttributeValue("target"));
+						if (target.exists() || target.isDirectory())
+							dl.moveDataFiles(target);
+						else
+							user.eventException(new Exception("Error Moving Data Files: Directory not found"));
+					} catch (DownloadException e) {
+						user.eventDownloadException(e);
+						e.printStackTrace();
+					}
+				}
+				return false;
+			}
+		});
 		addHandler("getDownloadStats", new RequestHandler() {
 			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {
 

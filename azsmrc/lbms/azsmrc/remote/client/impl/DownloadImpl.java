@@ -114,6 +114,10 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 		return stats;
 	}
 
+	public void moveDataFiles(String target) {
+		client.sendMoveDataFiles(hash, target);
+	}
+
 	public DownloadAdvancedStats getAdvancedStats() {
 		if (advStats == null) advStats = new DownloadAdvancedStatsImpl(hash, client);
 		return advStats;

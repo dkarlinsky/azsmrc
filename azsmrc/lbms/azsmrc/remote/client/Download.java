@@ -264,6 +264,9 @@ Download
 	 * @param kb
 	 */
 
+	public void moveDataFiles
+	(String target);
+
 	public DownloadAdvancedStats
 	getAdvancedStats();
 
