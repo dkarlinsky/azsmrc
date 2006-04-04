@@ -41,6 +41,7 @@ import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ConnectionDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByFileDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByURLDialog;
+import lbms.azsmrc.remote.client.swtgui.dialogs.ScrapeDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.TableColumnEditorDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.UpdateDialog;
 import lbms.azsmrc.remote.client.swtgui.tabs.ConsoleTab;
@@ -327,6 +328,15 @@ public class DownloadManagerShell {
 
 
 		//-----Tools Submenu
+		
+		MenuItem menuScraper = new MenuItem(toolSubmenu,SWT.PUSH);
+		menuScraper.setText("&Scrape a torrent file");
+		menuScraper.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event e){
+				new ScrapeDialog(RCMain.getRCMain().getDisplay()); 
+			}
+		});
+		
 
 		MenuItem menuConsole = new MenuItem(toolSubmenu,SWT.PUSH);
 		menuConsole.setText("&Console\tCtrl+C");
@@ -509,8 +519,6 @@ public class DownloadManagerShell {
 			public void handleEvent (Event e){
 				if(RCMain.getRCMain().connected())
 					RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
-
-				//new UpdateDialog(DOWNLOAD_MANAGER_SHELL,SWT.NULL).open();
 			}
 		});
 

@@ -57,6 +57,15 @@ public class AddTorrentContainer {
     }
 
     /**
+     * Return the TOTorrent Itself
+     * @return
+     */
+    public TOTorrent getTorrent(){
+    	return torrent;
+    }
+    
+    
+    /**
      * Obtain the torrent File
      * @return
      */
