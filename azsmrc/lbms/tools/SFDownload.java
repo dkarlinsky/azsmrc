@@ -13,8 +13,6 @@ public class SFDownload extends Download {
 
 	private static Pattern mirrorPattern = Pattern.compile("<td><a href=\"[\\w/:.]+?\\?use_mirror=(\\w+)\"><b>Download</b></a></td>");
 	private List<URL> mirrors = new ArrayList<URL>();
-	private boolean finished = false;
-	private boolean failed = false;
 
 	public SFDownload(URL source, File target) {
 		super(source, target);
@@ -40,11 +38,15 @@ public class SFDownload extends Download {
 			sfContent.call();
 		} catch (Exception e1) {
 			e1.printStackTrace();
+			failureReason = e1.getMessage();
+			failed = true;
 			throw e1;
 		}
-		if (sfContent.isFailed() || !sfContent.isFinished()) {
-			System.out.println("Couldn't load mirrors");
-			throw new Exception ("Error occured: Couldn't load mirrors");
+		if (sfContent.hasFailed() || !sfContent.hasFinished()) {
+			failureReason = "Couldn't load mirrors";
+			failed = true;
+			System.out.println(failureReason);
+			throw new Exception ("Error occured:"+failureReason);
 		}
 		Matcher sfMirror = mirrorPattern.matcher(sfContent.getBuffer());
 		String fileLocation = source.getPath();
@@ -64,29 +66,17 @@ public class SFDownload extends Download {
 				//System.out.println("Trying: "+x.toExternalForm());
 				HTTPDownload file = new HTTPDownload(x,target);
 				file.call();
-				if (file.isFailed() || !file.isFinished()) continue;
+				if (file.hasFailed() || !file.hasFinished()) continue;
 				else return this;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 		//I hope we are not getting here
-		System.out.println("Couldn't Download file");
-		throw new Exception ("Couldn't Download file");
-	}
 
-
-	/**
-	 * @return Returns the failed.
-	 */
-	public boolean isFailed() {
-		return failed;
-	}
-
-	/**
-	 * @return Returns the finished.
-	 */
-	public boolean isFinished() {
-		return finished;
+		failureReason = "Couldn't Download file";
+		failed = true;
+		System.out.println(failureReason);
+		throw new Exception (failureReason);
 	}
 }

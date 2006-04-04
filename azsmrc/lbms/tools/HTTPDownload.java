@@ -13,8 +13,6 @@ import java.util.zip.GZIPInputStream;
 public class HTTPDownload extends Download  {
 
 	private StringBuffer buffer;
-	private boolean finished = false;
-	private boolean failed = false;
 
 	public HTTPDownload(URL source, File target) {
 		super(source, target);
@@ -38,6 +36,7 @@ public class HTTPDownload extends Download  {
 		InputStream is = null;
 		try {
 			HttpURLConnection conn = (HttpURLConnection)source.openConnection();
+			conn.setConnectTimeout(Download.TIMEOUT);
 			conn.setDoInput(true);
 			conn.addRequestProperty("Accept-Encoding","gzip");
 			conn.connect();
@@ -74,6 +73,7 @@ public class HTTPDownload extends Download  {
 			finished = true;
 		} catch (IOException e) {
 			failed = true;
+			failureReason = e.getMessage();
 			e.printStackTrace();
 			throw e;
 		} finally {
@@ -90,19 +90,5 @@ public class HTTPDownload extends Download  {
 	 */
 	public StringBuffer getBuffer() {
 		return buffer;
-	}
-
-	/**
-	 * @return Returns the failed.
-	 */
-	public boolean isFailed() {
-		return failed;
-	}
-
-	/**
-	 * @return Returns the finished.
-	 */
-	public boolean isFinished() {
-		return finished;
 	}
 }
