@@ -50,9 +50,13 @@ public class Scraper implements Runnable {
 			HTTPDownload dl = new HTTPDownload(realScrapeURL);
 			dl.run();
 //			System.out.println(dl.getBuffer().toString());
-			byte[] scrapeRes = dl.getBuffer().toString().getBytes(RemoteConstants.BYTE_ENCODING);
-			scrapeResult = new ScrapeResult(scrapeURL,scrapeRes);
-			callListener(scrapeResult);
+			if (dl.isFailed()) {
+				callScrapeFailedListener("Couldn't connect to Server.");
+			} else {
+				byte[] scrapeRes = dl.getBuffer().toString().getBytes(RemoteConstants.BYTE_ENCODING);
+				scrapeResult = new ScrapeResult(scrapeURL,scrapeRes);
+				callListener(scrapeResult);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -97,6 +101,11 @@ public class Scraper implements Runnable {
 				l.scrapeFailed(sr.getFailureReason());
 			else
 				l.scrapeFinished(sr);
+		}
+	}
+	public void callScrapeFailedListener (String reason) {
+		for (ScrapeListener l:listeners) {
+			l.scrapeFailed(reason);
 		}
 	}
 }
