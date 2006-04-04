@@ -6,7 +6,7 @@ import java.util.concurrent.Callable;
 
 public abstract class Download implements Runnable, Callable<Download> {
 
-	public static int TIMEOUT = 15000;
+	public static int TIMEOUT = 30000;
 
 	protected URL source;
 	protected File target;
