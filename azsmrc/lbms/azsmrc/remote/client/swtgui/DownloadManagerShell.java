@@ -209,11 +209,11 @@ public class DownloadManagerShell {
 		Menu fileSubmenu = new Menu (DOWNLOAD_MANAGER_SHELL, SWT.DROP_DOWN);
 		fileItem.setMenu (fileSubmenu);
 
-        MenuItem remoteItem = new MenuItem(menuBar,SWT.CASCADE);
-        remoteItem.setText("&Remote");
+		MenuItem remoteItem = new MenuItem(menuBar,SWT.CASCADE);
+		remoteItem.setText("&Remote");
 
-        Menu remoteSubmenu = new Menu (DOWNLOAD_MANAGER_SHELL, SWT.DROP_DOWN);
-        remoteItem.setMenu (remoteSubmenu);
+		Menu remoteSubmenu = new Menu (DOWNLOAD_MANAGER_SHELL, SWT.DROP_DOWN);
+		remoteItem.setMenu (remoteSubmenu);
 
 
 		MenuItem toolItem = new MenuItem(menuBar,SWT.CASCADE);
@@ -288,42 +288,42 @@ public class DownloadManagerShell {
 		exitItem.addListener (SWT.Selection, new Listener () {
 			public void handleEvent (Event e) {
 				if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("confirm.exit","true"))){
-                    MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
-                    messageBox.setText("Confirm Exit");
-                    messageBox.setMessage("Are you sure you wish to exit AzSMRC entirely?");
-                    int response = messageBox.open();
-                    switch (response){
-                    case SWT.OK:
-                        RCMain.getRCMain().close();
-                        break;
-                    case SWT.CANCEL:
-                        break;
-                    }
-                }else{
-                    RCMain.getRCMain().close();
-                }
+					MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
+					messageBox.setText("Confirm Exit");
+					messageBox.setMessage("Are you sure you wish to exit AzSMRC entirely?");
+					int response = messageBox.open();
+					switch (response){
+					case SWT.OK:
+						RCMain.getRCMain().close();
+						break;
+					case SWT.CANCEL:
+						break;
+					}
+				}else{
+					RCMain.getRCMain().close();
+				}
 
 			}
 		});
 
-        //-----Remote
-        menuRestartAzureus = new MenuItem(remoteSubmenu,SWT.PUSH);
-        menuRestartAzureus.setText("&Restart Server");
-        menuRestartAzureus.addListener(SWT.Selection, new Listener(){
-            public void handleEvent(Event e){
-                MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
-                messageBox.setText("Restart Azureus");
-                messageBox.setMessage("Are you sure you wish to restart the Azureus Server itself?");
-                int response = messageBox.open();
-                switch (response){
-                case SWT.OK:
-                    RCMain.getRCMain().getClient().sendRestartAzureus();
-                    break;
-                case SWT.CANCEL:
-                    break;
-                }
-            }
-        });
+		//-----Remote
+		menuRestartAzureus = new MenuItem(remoteSubmenu,SWT.PUSH);
+		menuRestartAzureus.setText("&Restart Server");
+		menuRestartAzureus.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event e){
+				MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
+				messageBox.setText("Restart Azureus");
+				messageBox.setMessage("Are you sure you wish to restart the Azureus Server itself?");
+				int response = messageBox.open();
+				switch (response){
+				case SWT.OK:
+					RCMain.getRCMain().getClient().sendRestartAzureus();
+					break;
+				case SWT.CANCEL:
+					break;
+				}
+			}
+		});
 
 
 		//-----Tools Submenu
@@ -362,65 +362,65 @@ public class DownloadManagerShell {
 		});
 
 
-        new MenuItem(toolSubmenu,SWT.SEPARATOR);
+		new MenuItem(toolSubmenu,SWT.SEPARATOR);
 
-        MenuItem menuUpdate = new MenuItem(toolSubmenu,SWT.PUSH);
-        menuUpdate.setText("Check for &Updates");
-        menuUpdate.addListener(SWT.Selection, new Listener(){
-            public void handleEvent(Event e) {
-                final Updater updater;
-                try {
-                    final Properties properties = RCMain.getRCMain().getProperties();
-                    updater = new Updater(new URL(RemoteConstants.UPDATE_URL),new File("update.xml.gz"),new File(System.getProperty("user.dir")));
-                    updater.addListener(new UpdateListener() {
-                        public void exception(Exception e) {
-                            System.out.println(e);
+		MenuItem menuUpdate = new MenuItem(toolSubmenu,SWT.PUSH);
+		menuUpdate.setText("Check for &Updates");
+		menuUpdate.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event e) {
+				final Updater updater;
+				try {
+					final Properties properties = RCMain.getRCMain().getProperties();
+					updater = new Updater(new URL(RemoteConstants.UPDATE_URL),new File("update.xml.gz"),new File(System.getProperty("user.dir")));
+					updater.addListener(new UpdateListener() {
+						public void exception(Exception e) {
+							System.out.println(e);
 
-                        }
-                        public void noUpdate() {
-                            if (RCMain.getRCMain().getMainWindow() != null) {
-                                RCMain.getRCMain().getMainWindow().setStatusBarText("No Update Available");
-                            }
-                            RCMain.getRCMain().getNormalLogger().info("No Update Available");
-                        }
-                        public void updateAvailable(Update update) {
-                            if (RCMain.getRCMain().getMainWindow() != null) {
-                                RCMain.getRCMain().getMainWindow().setStatusBarText("Update Available: Version "+update.getVersion());
-                            }
-                            RCMain.getRCMain().getNormalLogger().info("Update Available: Version "+update.getVersion());
-                            if (Boolean.parseBoolean(properties.getProperty("update.autoupdate", "false"))) {
-                                updater.doUpdate();
-                            }else{
-                                new UpdateDialog(RCMain.getRCMain().getDisplay(),update,updater);
-                            }
-                        }
-                        public void updateFailed(String reason) {
-                            if (RCMain.getRCMain().getMainWindow() != null) {
-                                RCMain.getRCMain().getMainWindow().setStatusBarText("Update Failed",SWT.COLOR_RED);
-                            }
-                            RCMain.getRCMain().getNormalLogger().info("Update Failed");
-                        }
-                        public void updateFinished() {
-                            if (RCMain.getRCMain().getMainWindow() != null) {
-                                RCMain.getRCMain().getMainWindow().setStatusBarText("Update Finished");
-                            }
-                            RCMain.getRCMain().getNormalLogger().info("Update Finished");
-                        }
-                        public void updateError(String error) {
-                            if (RCMain.getRCMain().getMainWindow() != null) {
-                                RCMain.getRCMain().getMainWindow().setStatusBarText("Update Error");
-                            }
-                            RCMain.getRCMain().getNormalLogger().info(error);
-                        }
-                    });
+						}
+						public void noUpdate() {
+							if (RCMain.getRCMain().getMainWindow() != null) {
+								RCMain.getRCMain().getMainWindow().setStatusBarText("No Update Available");
+							}
+							RCMain.getRCMain().getNormalLogger().info("No Update Available");
+						}
+						public void updateAvailable(Update update) {
+							if (RCMain.getRCMain().getMainWindow() != null) {
+								RCMain.getRCMain().getMainWindow().setStatusBarText("Update Available: Version "+update.getVersion());
+							}
+							RCMain.getRCMain().getNormalLogger().info("Update Available: Version "+update.getVersion());
+							if (Boolean.parseBoolean(properties.getProperty("update.autoupdate", "false"))) {
+								updater.doUpdate();
+							}else{
+								new UpdateDialog(RCMain.getRCMain().getDisplay(),update,updater);
+							}
+						}
+						public void updateFailed(String reason) {
+							if (RCMain.getRCMain().getMainWindow() != null) {
+								RCMain.getRCMain().getMainWindow().setStatusBarText("Update Failed",SWT.COLOR_RED);
+							}
+							RCMain.getRCMain().getNormalLogger().info("Update Failed");
+						}
+						public void updateFinished() {
+							if (RCMain.getRCMain().getMainWindow() != null) {
+								RCMain.getRCMain().getMainWindow().setStatusBarText("Update Finished");
+							}
+							RCMain.getRCMain().getNormalLogger().info("Update Finished");
+						}
+						public void updateError(String error) {
+							if (RCMain.getRCMain().getMainWindow() != null) {
+								RCMain.getRCMain().getMainWindow().setStatusBarText("Update Error");
+							}
+							RCMain.getRCMain().getNormalLogger().info(error);
+						}
+					});
 
-                    updater.checkForUpdates(Boolean.parseBoolean(properties.getProperty("update.beta", "false")));
-                    properties.setProperty("update.lastcheck",Long.toString(System.currentTimeMillis()));
-                    RCMain.getRCMain().saveConfig();
-                } catch (MalformedURLException e2) {
-                }
-            }
-        });
+					updater.checkForUpdates(Boolean.parseBoolean(properties.getProperty("update.beta", "false")));
+					properties.setProperty("update.lastcheck",Long.toString(System.currentTimeMillis()));
+					RCMain.getRCMain().saveConfig();
+				} catch (MalformedURLException e2) {
+				}
+			}
+		});
 
 
 		//-----Help Submenu
@@ -1049,10 +1049,10 @@ public class DownloadManagerShell {
 
 			}
 
-            public void coreParameter(String key, String value, int type) {
-                // TODO Auto-generated method stub
+			public void coreParameter(String key, String value, int type) {
+				// TODO Auto-generated method stub
 
-            }
+			}
 		};
 
 		RCMain.getRCMain().getClient().addParameterListener(pl);
@@ -1606,25 +1606,25 @@ public class DownloadManagerShell {
 				RCMain.getRCMain().saveConfig();
 
 				if(!Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("tray.exit","true"))){
-                    if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("confirm.exit","true"))){
-                        MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
-                        messageBox.setText("Confirm Exit");
-                        messageBox.setMessage("Are you sure you wish to exit AzSMRC entirely?");
-                        int response = messageBox.open();
-                        switch (response){
-                        case SWT.OK:
-                            RCMain.getRCMain().close();
-                            break;
-                        case SWT.CANCEL:
-                            DOWNLOAD_MANAGER_SHELL = null;
-                            RCMain.getRCMain().openMainWindow();
-                            break;
-                        }
-                    }else{
-                        RCMain.getRCMain().close();
-                    }
+					if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("confirm.exit","true"))){
+						MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
+						messageBox.setText("Confirm Exit");
+						messageBox.setMessage("Are you sure you wish to exit AzSMRC entirely?");
+						int response = messageBox.open();
+						switch (response){
+						case SWT.OK:
+							RCMain.getRCMain().close();
+							break;
+						case SWT.CANCEL:
+							DOWNLOAD_MANAGER_SHELL = null;
+							RCMain.getRCMain().openMainWindow();
+							break;
+						}
+					}else{
+						RCMain.getRCMain().close();
+					}
 				}
-                DOWNLOAD_MANAGER_SHELL = null;
+				DOWNLOAD_MANAGER_SHELL = null;
 			}
 
 			public void shellDeactivated(ShellEvent arg0) {
@@ -1678,7 +1678,7 @@ public class DownloadManagerShell {
 		RCMain.getRCMain().updateTimer(true);
 
 
-        RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
+		RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
 	}
 
 	public void close_shell () {
@@ -1816,7 +1816,7 @@ public class DownloadManagerShell {
 
 						login.setEnabled(false);
 						menuLogin.setEnabled(false);
-                        menuRestartAzureus.setEnabled(true);
+						menuRestartAzureus.setEnabled(true);
 						menuLogout.setEnabled(true);
 						logout.setEnabled(true);
 						quickconnect.setEnabled(false);
@@ -1842,7 +1842,7 @@ public class DownloadManagerShell {
 						login.setEnabled(true);
 						menuLogin.setEnabled(true);
 						menuLogout.setEnabled(false);
-                        menuRestartAzureus.setEnabled(false);
+						menuRestartAzureus.setEnabled(false);
 						logout.setEnabled(false);
 						quickconnect.setEnabled(true);
 						menuQuickconnect.setEnabled(true);
@@ -3041,8 +3041,8 @@ public class DownloadManagerShell {
 						return false;
 					}
 				}
-				return true;
 			}
+			return true;
 		} catch (Throwable e) {
 			return false;
 		}
