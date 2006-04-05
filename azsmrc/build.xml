@@ -5,11 +5,6 @@
 	<property file="build.properties" />
 	<property name="root.dir" value="." />
 	<!-- REMINDER: this needs to be "." for public source -->
-	<property name="source.dir" value="lbms" />
-	<property name="build.dir" value="build" />
-	<property name="quick.dir" value="bin" />
-	<property name="libs.dir" value="lbms/azsmrc/libs" />
-	<property name="dist.dir" value="dist" />
 
 	<property name="generic.excludes" value="**/*.jar **/*.txt **/*.jardesc **/.classpath **/.project **/aereg.lib **/aereg.dll **/.svn" />
 	<property name="dist.jar.excludes" value="${generic.excludes} **/*.java " />
