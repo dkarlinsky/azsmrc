@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 import lbms.azsmrc.remote.client.swtgui.ColorUtilities;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
+import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.container.AddTorrentContainer;
 import lbms.azsmrc.remote.client.torrent.TOTorrentAnnounceURLGroup;
 import lbms.azsmrc.remote.client.torrent.TOTorrentAnnounceURLSet;
@@ -73,7 +74,7 @@ public class ScrapeDialog {
 		tabFolder.setSimple(false);
 
 
-		CTabItem mainTab = new CTabItem(tabFolder, SWT.NULL);
+		final CTabItem mainTab = new CTabItem(tabFolder, SWT.NULL);
 		mainTab.setText("Main");
 
 		//Main Composite on shell
@@ -200,12 +201,18 @@ public class ScrapeDialog {
 
 		//Clear Table
 		Button clearTable = new Button(utButtonComp,SWT.PUSH);
-		clearTable.setText("Clear Table");		
+		clearTable.setText("Clear Loaded Torrents");		
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		clearTable.setLayoutData(gd);
 		clearTable.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
-				map.clear();
+				CTabItem[] items = tabFolder.getItems();
+				for(CTabItem item:items){
+					if(!item.equals(mainTab)){
+						item.dispose();
+					}
+				}
+				map.clear();				
 				torrentTable.removeAll();
 			}			
 		});
@@ -262,8 +269,17 @@ public class ScrapeDialog {
 		gl.numColumns = 2;
 		parent.setLayout(gl);
 
-
-		final Combo combo = new Combo(parent,SWT.DROP_DOWN | SWT.READ_ONLY);
+		Composite comboComp = new Composite(parent,SWT.NULL);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.grabExcessHorizontalSpace = true;
+		comboComp.setLayoutData(gd);
+		
+		gl = new GridLayout();
+		gl.marginWidth = 0;
+		gl.numColumns = 2;
+		comboComp.setLayout(gl);
+		
+		final Combo combo = new Combo(comboComp,SWT.DROP_DOWN | SWT.READ_ONLY);
 
 
 		//Pull the URL from the torrent and put it in the combo
@@ -288,11 +304,39 @@ public class ScrapeDialog {
 		}
 
 
-		//button for Scrape
-		Button scrape = new Button(parent,SWT.PUSH);
+		//button for Scrape -- still in comboComp
+		Button scrape = new Button(comboComp,SWT.PUSH);
 		scrape.setText("Scrape");
 
-
+		//button for Add Torrent
+		final Button add = new Button(parent, SWT.PUSH);
+		add.setText("Send Torrent to Server");
+		add.setToolTipText("Choose files from the torrent in the table below that you want to add, then click here to send torrent to the server");
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
+		add.setLayoutData(gd);
+		add.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				if(RCMain.getRCMain().connected()){
+					if(atc.isWholeFileSent()){
+                    	RCMain.getRCMain().getClient().sendAddDownload(atc.getTorrentFile());
+                    }else{
+                    	int[] props = atc.getFileProperties();
+                        //Main add to Azureus
+                        RCMain.getRCMain().getClient().sendAddDownload(atc.getTorrentFile(), props);	
+                    }					
+				}else{
+					//we are not connected .. so alert the user
+					MessageBox messageBox = new MessageBox(add.getShell(),SWT.ICON_INFORMATION | SWT.OK);
+					messageBox.setText("Not Connected");
+					messageBox.setMessage("You are not currently connected to a server, please connect and try again.");
+					messageBox.open();
+					return;
+				}
+				
+			}
+			
+		});
+		
 		//Label for status
 		final Label status = new Label(parent,SWT.NULL);
 		if(sr != null)
@@ -474,7 +518,7 @@ public class ScrapeDialog {
 		
 		
 		//Table for files
-		Table filesTable = new Table(gFiles,SWT.CHECK | SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+		final Table filesTable = new Table(gFiles,SWT.CHECK | SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		gd = new GridData(GridData.FILL_BOTH);
 		gd.grabExcessHorizontalSpace= true;
 		gd.grabExcessVerticalSpace = true;
@@ -509,13 +553,29 @@ public class ScrapeDialog {
             detailItem.setText(1, name);
             detailItem.setText(2, DisplayFormatters
                     .formatByteCountToBase10KBEtc(files[i].getLength()));
-            detailItem.setChecked(true);
+            
             
             //Shade every other one
             if(filesTable.indexOf(detailItem)%2!=0){
             	detailItem.setBackground(ColorUtilities.getBackgroundColor());
             }
         }
+
+        //Listener for table DND selection
+        filesTable.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event event) {
+                if (event.detail == SWT.CHECK) {
+                    TableItem item = (TableItem) event.item;
+                    int place = filesTable.indexOf(item);
+                    
+                    if (item.getChecked()) {
+                        atc.setFileProperty(place, 1);
+                    } else
+                        atc.setFileProperty(place, 0);
+                }
+
+            }
+        });
 
 
 		//Listener for the Scrape button
