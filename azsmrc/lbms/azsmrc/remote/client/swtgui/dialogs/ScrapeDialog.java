@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 import lbms.azsmrc.remote.client.swtgui.ColorUtilities;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
+import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.container.AddTorrentContainer;
 import lbms.azsmrc.remote.client.torrent.TOTorrentAnnounceURLGroup;
@@ -20,6 +21,7 @@ import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.shared.EncodingUtil;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.layout.GridData;
@@ -82,16 +84,37 @@ public class ScrapeDialog {
 		gd = new GridData(GridData.FILL_BOTH);
 		gd.grabExcessHorizontalSpace= true;
 		gd.grabExcessVerticalSpace = true;
+		//gd.verticalSpan = 125;
 		parent.setLayoutData(gd);
 
 		GridLayout gl = new GridLayout();
 		gl.numColumns = 2;
+		gl.verticalSpacing = 20;
+		gl.marginHeight = 20;
 		parent.setLayout(gl);
 
+		CLabel infoLabel = new CLabel(parent,SWT.CENTER | SWT.SHADOW_IN);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.grabExcessHorizontalSpace= true;
+		gd.verticalSpan = 2;
+		gd.horizontalSpan = 2;
+		infoLabel.setLayoutData(gd);
+		
+		infoLabel.setImage(ImageRepository.getImage("information"));
+		infoLabel.setBackground(display.getSystemColor(SWT.COLOR_GRAY));
+		infoLabel.setText("Load a local torrent file by choosing the 'Load Torrent' button." +
+				"\nA tab will be created for that torrent which will allow you to scrape the " +
+				"\ntracker and see details about the torrent.  From the details tab, you can " +
+				"\nalso send the torrent to the server (if connected).");
 
 		//Load Torrent button
 		Button loadTorrent = new Button(parent,SWT.PUSH);
 		loadTorrent.setText("Load Torrent");
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		gd.grabExcessHorizontalSpace = true;
+		gd.horizontalSpan = 2;
+		loadTorrent.setLayoutData(gd);
+		
 		loadTorrent.addListener(SWT.Selection, new Listener(){
 
 			public void handleEvent(Event arg0) {
@@ -160,7 +183,7 @@ public class ScrapeDialog {
 		gd.horizontalSpan = 2;
 		gd.grabExcessHorizontalSpace = true;
 		gd.grabExcessVerticalSpace = true;
-		gd.verticalSpan = 100;
+		gd.verticalSpan = 20;
 		ttGroup.setLayoutData(gd);
 
 		//urlTable		
