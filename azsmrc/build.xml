@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+
+<project name="AzSMRC" default="quickjar" basedir=".">
+
+	<property file="build.properties" />
+	<property name="root.dir" value="." />
+	<!-- REMINDER: this needs to be "." for public source -->
+	<property name="source.dir" value="lbms" />
+	<property name="build.dir" value="build" />
+	<property name="quick.dir" value="bin" />
+	<property name="libs.dir" value="lbms/azsmrc/libs" />
+	<property name="dist.dir" value="dist" />
+
+	<property name="generic.excludes" value="**/*.jar **/*.txt **/*.jardesc **/.classpath **/.project **/aereg.lib **/aereg.dll **/.svn" />
+	<property name="dist.jar.excludes" value="${generic.excludes} **/*.java " />
+	<!-- <property name="dist.source.excludes" value="${generic.excludes} **/*.class" /> -->
+
+
+	<target name="init">
+		<echo message="Preparing to build AzSMRC..." />
+
+		<tstamp />
+		<mkdir dir="${root.dir}/${dist.dir}" />
+		<mkdir dir="${root.dir}/${build.dir}" />
+	</target>
+
+
+	<target name="compile" depends="init">
+		<echo message="Compiling Source..." />
+		<path id="libs.classpath">
+			<fileset dir="${root.dir}/${libs.dir}" includes="**/*.jar" />
+			<fileset dir="${swt.jar}" includes="swt.jar" />
+			<fileset dir="${azureus.jar}" includes="Azureus2.jar" />
+			<fileset dir="${azureus.dir}" includes="**/*.class"/>
+		</path>
+
+		<javac srcdir="${root.dir}/${source.dir}" destdir="${root.dir}/${build.dir}" excludes="${generic.excludes}" nowarn="yes" includeAntRuntime="no" debug="true" debuglevel="lines,vars,source" verbose="yes">
+			<classpath refid="libs.classpath" />
+		</javac>
+	</target>
+
+
+	<target name="jar" depends="compile">
+		<echo message="Creating azsmrcPlugin_${version}.jar..." />
+		<jar destfile="${root.dir}/${dist.dir}/azsmrcPlugin_${version}.jar" excludes="${dist.jar.excludes}">
+			<fileset dir="${root.dir}/${build.dir}/lbms/azsmrc/plugin" />
+			<fileset dir="${root.dir}/${build.dir}/lbms/azsmrc/shared" />
+		</jar>
+		<echo message="Creating AzSMRC_${version}.jar..." />
+		<jar destfile="${root.dir}/${dist.dir}/AzSMRC_${version}.jar" basedir="${root.dir}/${build.dir}" excludes="${dist.jar.excludes}">
+			<fileset dir="${root.dir}/${build.dir}/lbms/azsmrc/remote" />
+			<fileset dir="${root.dir}/${build.dir}/lbms/azsmrc/shared" />
+			<fileset dir="${root.dir}/${build.dir}/lbms/tools">
+				<include name="launcher/Launchable.class" />
+				<include name="updater/*" />
+				<include name="./*" />
+				<exclude name="stats/" />
+			</fileset>
+		</jar>
+		<echo message="Creating launcher.jar..." />
+		<jar destfile="${root.dir}/${dist.dir}/launcher.jar" basedir="${root.dir}/${build.dir}" excludes="${dist.jar.excludes}">
+			<fileset dir="${root.dir}/${build.dir}/lbms/tools/launcher" />
+			<manifest>
+				<attribute name="Main-Class" value="lbms.tools.launcher.Launcher" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="quickjar" depends="init">
+			<echo message="Creating azsmrcPlugin_${version}.jar..." />
+			<jar destfile="${root.dir}/${dist.dir}/azsmrcPlugin_${version}.jar" basedir="${root.dir}/${quick.dir}" excludes="${dist.jar.excludes}">
+				<include name="lbms/azsmrc/plugin/**/*" />
+				<include name="lbms/azsmrc/shared/**/*" />
+				<include name="../plugin.properties" />
+			</jar>
+			<echo message="Creating AzSMRC_${version}.jar..." />
+			<jar destfile="${root.dir}/${dist.dir}/AzSMRC_${version}.jar" basedir="${root.dir}/${quick.dir}" excludes="${dist.jar.excludes}">
+				<include name="lbms/azsmrc/remote/**/*" />
+				<include name="lbms/azsmrc/shared/**/*" />
+				<include name="lbms/tools/launcher/Launchable.class" />
+				<include name="lbms/tools/updater/*" />
+				<include name="lbms/tools/*" />
+				<exclude name="lbms/tools/stats"/>
+			</jar>
+			<echo message="Creating launcher.jar..." />
+			<jar destfile="${root.dir}/${dist.dir}/launcher.jar" basedir="${root.dir}/${quick.dir}" excludes="${dist.jar.excludes}">
+				<include name="lbms/tools/launcher/*" />
+				<manifest>
+					<attribute name="Main-Class" value="lbms.tools.launcher.Launcher" />
+				</manifest>
+			</jar>
+		</target>
+
+
+	<target name="clean">
+		<delete quiet="true">
+			<fileset dir="${root.dir}/${build.dir}" includes="**/*.class" />
+		</delete>
+
+		<delete dir="${root.dir}/${dist.dir}" />
+	</target>
+
+</project>
