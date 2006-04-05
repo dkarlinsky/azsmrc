@@ -63,7 +63,10 @@ public class OpenByFileDialog {
     private int drag_drop_line_start = -1;
 
     public OpenByFileDialog(Display display, final String[] filenames) {
-        // Shell
+        //pull last dir if available
+    	lastDir =  RCMain.getRCMain().getProperties().getProperty("Last.Directory");
+    	    	
+    	// Shell
         final Shell shell = new Shell(display);
         shell.setLayout(new GridLayout(1, false));
         shell.setText("Send Torrent File to Server");
@@ -117,6 +120,8 @@ public class OpenByFileDialog {
                             item.setData(container);
                             generateDetails(container.getName());
                             lastDir = container.getFilePath();
+                            RCMain.getRCMain().getProperties().setProperty("Last.Directory", lastDir);
+    						RCMain.getRCMain().saveConfig();
                         }
                     } catch (UnsupportedEncodingException e1) {
                         e1.printStackTrace();

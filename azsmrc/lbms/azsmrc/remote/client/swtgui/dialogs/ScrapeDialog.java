@@ -60,6 +60,9 @@ public class ScrapeDialog {
 		//set the display
 		display = mainDisplay;
 		
+		//pull in the properties for the lastDir if available
+		lastDir = RCMain.getRCMain().getProperties().getProperty("Last.Directory");
+		
 		//Shell
 		final Shell shell = new Shell(display);
 		shell.setLayout(new GridLayout(1,false));
@@ -131,7 +134,8 @@ public class ScrapeDialog {
 						//Make the file
 						File test = new File(choosen_file);
 						lastDir = test.getParent();
-
+						RCMain.getRCMain().getProperties().setProperty("Last.Directory", lastDir);
+						RCMain.getRCMain().saveConfig();
 
 						//put the torrent in the container and add to the map
 						AddTorrentContainer atc = new AddTorrentContainer(test);
