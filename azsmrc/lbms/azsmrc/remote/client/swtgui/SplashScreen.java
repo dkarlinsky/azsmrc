@@ -6,7 +6,6 @@
 package lbms.azsmrc.remote.client.swtgui;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -45,7 +44,7 @@ public class SplashScreen {
 
         GUI_Utilities.centerShellandOpen(splash);
 
-        display.asyncExec(new Runnable() {
+        display.syncExec(new Runnable() {
             public void run() {
                 for (int i = 0; i < tenths_secondsOpen; i++) {
                     //bar.setSelection(i + 1);
