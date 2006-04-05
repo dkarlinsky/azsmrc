@@ -12,13 +12,15 @@ import lbms.azsmrc.remote.client.torrent.TOTorrent;
 import lbms.azsmrc.remote.client.torrent.TOTorrentException;
 import lbms.azsmrc.remote.client.torrent.TOTorrentFactory;
 import lbms.azsmrc.remote.client.torrent.TOTorrentFile;
+import lbms.azsmrc.remote.client.torrent.scraper.ScrapeResult;
 import lbms.azsmrc.shared.RemoteConstants;
 
 public class AddTorrentContainer {
 
     private TOTorrent torrent;
     private int[] fileProperties;
-    private File fTorrentFile;    
+    private File fTorrentFile;
+    private ScrapeResult sr;
 
     public AddTorrentContainer(File torrentFile) throws TOTorrentException{        
     	torrent = TOTorrentFactory.deserialiseFromBEncodedFile(torrentFile);
@@ -98,6 +100,22 @@ public class AddTorrentContainer {
      */
     public String getFilePath(){
         return fTorrentFile.getParent();
+    }
+    
+    /**
+     * If this container is used in the scrape dialog and has been scraped, we return the SR here
+     * @return
+     */
+    public ScrapeResult getScrapeResults(){
+    	return sr;
+    }
+    
+    /**
+     * If this container is used in the scrape dialog and has been sraped, we store the SR here
+     * @param scrapeResults
+     */
+    public void setScrapeResults(ScrapeResult scrapeResults){
+    	sr = scrapeResults;
     }
 
 

@@ -194,32 +194,32 @@ public class ScrapeDialog {
 
 		//buttons under the urlTable
 		Composite utButtonComp = new Composite(ttGroup,SWT.NULL);
-		utButtonComp.setLayout(new GridLayout(3,false));
+		utButtonComp.setLayout(new GridLayout(2,false));
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		utButtonComp.setLayoutData(gd);
 
 		//Clear Table
 		Button clearTable = new Button(utButtonComp,SWT.PUSH);
-		clearTable.setText("Clear Table");
-		clearTable.setEnabled(false);
+		clearTable.setText("Clear Table");		
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		clearTable.setLayoutData(gd);
 		clearTable.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
-
-
+				map.clear();
+				torrentTable.removeAll();
 			}			
 		});
 
 
 		//Close Dialog
 		Button close = new Button(utButtonComp,SWT.PUSH);
-		close.setText("Scrape All");
-		close.setEnabled(false);
-		gd = new GridData(GridData.END);
+		close.setText("Close");		
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
+		gd.grabExcessHorizontalSpace = true;
 		close.setLayoutData(gd);
 		close.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
-
-
+				shell.dispose();
 			}			
 		});		
 
@@ -230,8 +230,19 @@ public class ScrapeDialog {
 	}
 
 
-	private void torrentTabOpen(CTabFolder tabFolder, AddTorrentContainer atc){
-
+	
+	
+	
+	/**
+	 * The main torrent details tab
+	 * @param tabFolder
+	 * @param atc
+	 */
+	private void torrentTabOpen(CTabFolder tabFolder, final AddTorrentContainer atc){
+		//pull previous SR if available
+		ScrapeResult sr = atc.getScrapeResults();
+		
+		
 		CTabItem tab = new CTabItem(tabFolder,SWT.CLOSE);
 		final Scraper scraper = new Scraper(atc.getTorrent());
 
@@ -270,7 +281,8 @@ public class ScrapeDialog {
 			for(TOTorrentAnnounceURLSet urlSet:urlSets){
 				URL[] urls = urlSet.getAnnounceURLs();
 				for(URL url:urls){
-					combo.add(url.toString());                           		
+					if(!url.toString().equalsIgnoreCase(atc.getTorrent().getAnnounceURL().toString()))
+						combo.add(url.toString());                           		
 				}                        		
 			}
 		}
@@ -283,7 +295,10 @@ public class ScrapeDialog {
 
 		//Label for status
 		final Label status = new Label(parent,SWT.NULL);
-		status.setText("Status:  Not Scraped Yet");
+		if(sr != null)
+			status.setText("Status:  Using previous scrape data");
+		else
+			status.setText("Status:  Not Scraped Yet");
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 2;
 		status.setLayoutData(gd);
@@ -307,23 +322,33 @@ public class ScrapeDialog {
 		gStats.setLayoutData(gd);
 
 		
+		
 		Label seedsL = new Label(gStats,SWT.NULL);
 		seedsL.setText("Seeds: ");
 		
 		final Label seeds = new Label(gStats,SWT.NULL);
-		seeds.setText("Not Scraped");
+		if(sr != null)
+			seeds.setText(String.valueOf(sr.getSeeds()));
+		else
+			seeds.setText("Not Scraped");
 
 		Label leechersL = new Label(gStats,SWT.NULL);
 		leechersL.setText("Leechers: ");
 		
 		final Label leechers = new Label(gStats, SWT.NULL);
-		leechers.setText("Not Scraped");
+		if(sr != null)
+			leechers.setText(String.valueOf(sr.getLeechers()));
+		else
+			leechers.setText("Not Scraped");
 
 		Label downloadedL = new Label(gStats,SWT.NULL);
-		downloadedL.setText("Downloadeds: ");
+		downloadedL.setText("Downloads: ");
 				
 		final Label downloaded = new Label(gStats,SWT.NULL);
-		downloaded.setText("Not Scraped");
+		if(sr != null)
+			downloaded.setText(String.valueOf(sr.getDownloaded()));
+		else
+			downloaded.setText("Not Scraped");
 
 				
 		Label srURLL = new Label(gStats,SWT.NULL);
@@ -333,7 +358,11 @@ public class ScrapeDialog {
 		srURLL.setLayoutData(gd);
 		
 		final Label srURL = new Label(gStats,SWT.NULL);
-		srURL.setText("Not Scraped");
+		if(sr != null){
+			srURL.setText(sr.getScrapeUrl());
+			srURL.setToolTipText(sr.getScrapeUrl());			
+		}else
+			srURL.setText("Not Scraped");
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 2;
 		srURL.setLayoutData(gd);
@@ -518,6 +547,7 @@ public class ScrapeDialog {
 								downloaded.setText(String.valueOf(sr.getDownloaded()));
 								srURL.setText(sr.getScrapeUrl());
 								srURL.setToolTipText(sr.getScrapeUrl());
+								atc.setScrapeResults(sr);
 							}
 							
 						});
