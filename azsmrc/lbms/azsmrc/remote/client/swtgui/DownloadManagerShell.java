@@ -328,15 +328,15 @@ public class DownloadManagerShell {
 
 
 		//-----Tools Submenu
-		
+
 		MenuItem menuScraper = new MenuItem(toolSubmenu,SWT.PUSH);
 		menuScraper.setText("&Scrape a torrent file");
 		menuScraper.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e){
-				new ScrapeDialog(RCMain.getRCMain().getDisplay()); 
+				new ScrapeDialog(RCMain.getRCMain().getDisplay());
 			}
 		});
-		
+
 
 		MenuItem menuConsole = new MenuItem(toolSubmenu,SWT.PUSH);
 		menuConsole.setText("&Console\tCtrl+C");
@@ -1683,10 +1683,8 @@ public class DownloadManagerShell {
 			e.printStackTrace();
 		}
 
-		RCMain.getRCMain().updateTimer(true);
-
-
-		RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
+		if (RCMain.getRCMain().connected())
+			RCMain.getRCMain().updateTimer(true);
 	}
 
 	public void close_shell () {
