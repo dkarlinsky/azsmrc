@@ -131,9 +131,9 @@ public class RCMain implements Launchable {
 		connect = (Boolean.parseBoolean(properties.getProperty("auto_connect","false")));
 		createContents();
 		if (connect) {
-			if (properties.getProperty("connection_password") == null
-					|| properties.getProperty("connection_username") == null
-					|| properties.getProperty("connection_lastURL") == null) {
+			if (properties.getProperty("connection_password", "").equals("")
+					|| properties.getProperty("connection_username", "").equals("")
+					|| properties.getProperty("connection_lastURL", "").equals("")) {
 				connect = false;
 			} else if (Boolean.parseBoolean(properties.getProperty("auto_open", "true"))) {
 				updateTimer(true);
@@ -157,10 +157,10 @@ public class RCMain implements Launchable {
 		shell = new Shell();
 		ImageRepository.loadImages(display);
 
-        //Show Splash
-        if(Boolean.parseBoolean(properties.getProperty("show_splash","true"))){
-            new SplashScreen(RCMain.getRCMain().getDisplay(),30);
-        }
+		//Show Splash
+		if(Boolean.parseBoolean(properties.getProperty("show_splash","true"))){
+			new SplashScreen(RCMain.getRCMain().getDisplay(),30);
+		}
 
 		final Tray systray = display.getSystemTray ();
 		systrayItem = new TrayItem (systray, SWT.NONE);

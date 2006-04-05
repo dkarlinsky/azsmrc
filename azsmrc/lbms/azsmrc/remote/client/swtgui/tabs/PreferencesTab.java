@@ -44,17 +44,17 @@ import org.eclipse.swt.widgets.TreeItem;
 
 public class PreferencesTab {
 
-    private Label pluginLabel;
+	private Label pluginLabel;
 	private Text updateIntervalOpen_Text, updateIntervalClosed_Text;
 	private Button autoOpen, autoConnect, autoUpdateCheck, autoUpdate;
 	private Button trayMinimize, trayExit, showSplash, popupsEnabled;
-    private Button autoClipboard, autoConsole, exitConfirm;
+	private Button autoClipboard, autoConsole, exitConfirm;
 	private Button updateBeta, singleUser;
 
 	private Composite cOptions;
 	private Properties properties;
 
-    private ParameterListener pl;
+	private ParameterListener pl;
 
 	private boolean bModified = false;
 
@@ -88,7 +88,7 @@ public class PreferencesTab {
 							"closed the tab before you saved.  All changes have been discarded");
 					box.open();
 				}
-                if(pl != null) RCMain.getRCMain().getClient().removeParameterListener(pl);
+				if(pl != null) RCMain.getRCMain().getClient().removeParameterListener(pl);
 			}
 
 		});
@@ -148,10 +148,10 @@ public class PreferencesTab {
 		final TreeItem tiUpdate = new TreeItem(tree,SWT.NULL);
 		tiUpdate.setText("Update");
 
-        final TreeItem tiPlugin = new TreeItem(tree,SWT.NULL);
-        tiPlugin.setText("Plugin Settings");
+		final TreeItem tiPlugin = new TreeItem(tree,SWT.NULL);
+		tiPlugin.setText("Plugin Settings");
 
-        tree.addListener(SWT.Selection, new Listener(){
+		tree.addListener(SWT.Selection, new Listener(){
 
 			public void handleEvent(Event event) {
 				if(bModified){
@@ -185,8 +185,8 @@ public class PreferencesTab {
 				}else if(event.item.equals(tiUpdate)){
 					makeUpdatePreferences(cOptions);
 				}else if(event.item.equals(tiPlugin)){
-                    makePlugPreferences(cOptions);
-                }
+					makePlugPreferences(cOptions);
+				}
 
 			}
 
@@ -231,7 +231,7 @@ public class PreferencesTab {
 			public void handleEvent(Event e) {
 				save(parent);
 				if(pl != null) RCMain.getRCMain().getClient().removeParameterListener(pl);
-                prefsTab.dispose();
+				prefsTab.dispose();
 			}
 		});
 
@@ -240,8 +240,8 @@ public class PreferencesTab {
 		cancel.setText("Cancel");
 		cancel.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
-                if(pl != null) RCMain.getRCMain().getClient().removeParameterListener(pl);
-                prefsTab.dispose();
+				if(pl != null) RCMain.getRCMain().getClient().removeParameterListener(pl);
+				prefsTab.dispose();
 			}
 		});
 
@@ -265,7 +265,7 @@ public class PreferencesTab {
 		autoConnect.setLayoutData(gridData);
 		autoConnect.setText("AutoConnect: If connection data and password are saved, attempt last connection on startup");
 
-		if (Boolean.parseBoolean(properties.getProperty("auto_connect","true"))) {
+		if (Boolean.parseBoolean(properties.getProperty("auto_connect","false"))) {
 			autoConnect.setSelection(true);
 		}
 		addModListener(autoConnect,SWT.Selection);
@@ -362,14 +362,14 @@ public class PreferencesTab {
 		trayExit.setSelection(Boolean.parseBoolean(properties.getProperty("tray.exit","true"))?true:false);
 		addModListener(trayExit,SWT.Selection);
 
-        //Exit Confirmation
-        exitConfirm = new Button(composite,SWT.CHECK);
-        gridData = new GridData(GridData.GRAB_HORIZONTAL);
-        gridData.horizontalSpan = 2;
-        exitConfirm.setLayoutData(gridData);
-        exitConfirm.setText("Show confirmation dialog on exit");
-        exitConfirm.setSelection(Boolean.parseBoolean(properties.getProperty("confirm.exit","true"))?true:false);
-        addModListener(exitConfirm,SWT.Selection);
+		//Exit Confirmation
+		exitConfirm = new Button(composite,SWT.CHECK);
+		gridData = new GridData(GridData.GRAB_HORIZONTAL);
+		gridData.horizontalSpan = 2;
+		exitConfirm.setLayoutData(gridData);
+		exitConfirm.setText("Show confirmation dialog on exit");
+		exitConfirm.setSelection(Boolean.parseBoolean(properties.getProperty("confirm.exit","true"))?true:false);
+		addModListener(exitConfirm,SWT.Selection);
 
 		//auto console open
 		autoConsole = new Button(composite,SWT.CHECK);
@@ -405,19 +405,19 @@ public class PreferencesTab {
 		addModListener(popupsEnabled,SWT.Selection);
 
 
-        //show splash screen
-        showSplash = new Button(composite,SWT.CHECK);
-        gridData = new GridData(GridData.GRAB_HORIZONTAL);
-        gridData.horizontalSpan = 2;
-        showSplash.setLayoutData(gridData);
-        showSplash.setText("Show splash screen on startup");
+		//show splash screen
+		showSplash = new Button(composite,SWT.CHECK);
+		gridData = new GridData(GridData.GRAB_HORIZONTAL);
+		gridData.horizontalSpan = 2;
+		showSplash.setLayoutData(gridData);
+		showSplash.setText("Show splash screen on startup");
 
-        if(Boolean.parseBoolean(properties.getProperty("show_splash","true"))){
-            showSplash.setSelection(true);
-        }else
-            showSplash.setSelection(false);
+		if(Boolean.parseBoolean(properties.getProperty("show_splash","true"))){
+			showSplash.setSelection(true);
+		}else
+			showSplash.setSelection(false);
 
-        addModListener(showSplash,SWT.Selection);
+		addModListener(showSplash,SWT.Selection);
 
 
 		//AutoClipboard
@@ -443,19 +443,19 @@ public class PreferencesTab {
 			control.dispose();
 		}
 
-        //Update betas
-        updateBeta = new Button(composite,SWT.CHECK);
-        updateBeta.setText("Use Beta Builds:  Allow updates to include potentially non-stable, beta builds of AzSMRC" );
-        GridData gridData = new GridData(GridData.GRAB_HORIZONTAL);
-        gridData.horizontalSpan = 2;
-        updateBeta.setLayoutData(gridData);
+		//Update betas
+		updateBeta = new Button(composite,SWT.CHECK);
+		updateBeta.setText("Use Beta Builds:  Allow updates to include potentially non-stable, beta builds of AzSMRC" );
+		GridData gridData = new GridData(GridData.GRAB_HORIZONTAL);
+		gridData.horizontalSpan = 2;
+		updateBeta.setLayoutData(gridData);
 
-        if(Boolean.parseBoolean(properties.getProperty("update.beta", "false"))){
-            updateBeta.setSelection(true);
-        }else
-            updateBeta.setSelection(false);
+		if(Boolean.parseBoolean(properties.getProperty("update.beta", "false"))){
+			updateBeta.setSelection(true);
+		}else
+			updateBeta.setSelection(false);
 
-        addModListener(updateBeta,SWT.Selection);
+		addModListener(updateBeta,SWT.Selection);
 
 
 		//Auto Update Check
@@ -539,8 +539,8 @@ public class PreferencesTab {
 					});
 
 					updater.checkForUpdates(Boolean.parseBoolean(properties.getProperty("update.beta", "false")));
-                    properties.setProperty("update.lastcheck",Long.toString(System.currentTimeMillis()));
-                    RCMain.getRCMain().saveConfig();
+					properties.setProperty("update.lastcheck",Long.toString(System.currentTimeMillis()));
+					RCMain.getRCMain().saveConfig();
 				} catch (MalformedURLException e2) {
 				}
 
@@ -553,85 +553,85 @@ public class PreferencesTab {
 	}
 
 
-    public void makePlugPreferences(final Composite composite){
-        Control[] controls = composite.getChildren();
-        for(Control control:controls){
-            control.dispose();
-        }
-        pluginLabel = new Label(composite,SWT.NULL);
-        if(!RCMain.getRCMain().connected()){
-            pluginLabel.setText("You are not currently connected to the server, therefore no settings are available under this option");
-        }else{
-            Client client = RCMain.getRCMain().getClient();
-            client.transactionStart();
+	public void makePlugPreferences(final Composite composite){
+		Control[] controls = composite.getChildren();
+		for(Control control:controls){
+			control.dispose();
+		}
+		pluginLabel = new Label(composite,SWT.NULL);
+		if(!RCMain.getRCMain().connected()){
+			pluginLabel.setText("You are not currently connected to the server, therefore no settings are available under this option");
+		}else{
+			Client client = RCMain.getRCMain().getClient();
+			client.transactionStart();
 
-            client.sendGetPluginParameter("singleUserMode", RemoteConstants.PARAMETER_BOOLEAN);
+			client.sendGetPluginParameter("singleUserMode", RemoteConstants.PARAMETER_BOOLEAN);
 
-            client.transactionCommit();
-
-
-            //Add listener for the preferences
-            pl = new ParameterListener(){
-
-                public void azParameter(String key, String value, int type) {
-
-                }
-
-                public void pluginParameter(String key, final String value, int type) {
-                    if(key.equalsIgnoreCase("singleUserMode")){
-                        Display display = RCMain.getRCMain().getDisplay();
-                        if(display != null && !display.isDisposed()){
-                            display.asyncExec(new Runnable(){
-
-                                public void run() {
-                                    if(pluginLabel != null && !pluginLabel.isDisposed())
-                                        pluginLabel.setText("Properties received from server");
-                                    singleUser.setEnabled(true);
-                                    if (Boolean.parseBoolean(value)) {
-                                        singleUser.setSelection(true);
-                                    }else
-                                        singleUser.setSelection(false);
-                                }
-
-                            });
-                        }
+			client.transactionCommit();
 
 
-                    }
+			//Add listener for the preferences
+			pl = new ParameterListener(){
 
-                }
+				public void azParameter(String key, String value, int type) {
 
-                public void coreParameter(String key, String value, int type) {
-                    // TODO Auto-generated method stub
+				}
 
-                }
-            };
+				public void pluginParameter(String key, final String value, int type) {
+					if(key.equalsIgnoreCase("singleUserMode")){
+						Display display = RCMain.getRCMain().getDisplay();
+						if(display != null && !display.isDisposed()){
+							display.asyncExec(new Runnable(){
 
-            RCMain.getRCMain().getClient().addParameterListener(pl);
+								public void run() {
+									if(pluginLabel != null && !pluginLabel.isDisposed())
+										pluginLabel.setText("Properties received from server");
+									singleUser.setEnabled(true);
+									if (Boolean.parseBoolean(value)) {
+										singleUser.setSelection(true);
+									}else
+										singleUser.setSelection(false);
+								}
+
+							});
+						}
 
 
-            pluginLabel.setText("Sending request to server for settings.. Please wait");
+					}
 
-            //Single User
-            singleUser = new Button(composite,SWT.CHECK);
-            GridData gridData = new GridData(GridData.GRAB_HORIZONTAL);
-            gridData.horizontalSpan = 2;
-            singleUser.setLayoutData(gridData);
-            singleUser.setText("Enable Single User Mode");
-            singleUser.setEnabled(false);
+				}
+
+				public void coreParameter(String key, String value, int type) {
+					// TODO Auto-generated method stub
+
+				}
+			};
+
+			RCMain.getRCMain().getClient().addParameterListener(pl);
 
 
-            addModListener(singleUser,SWT.Selection);
+			pluginLabel.setText("Sending request to server for settings.. Please wait");
+
+			//Single User
+			singleUser = new Button(composite,SWT.CHECK);
+			GridData gridData = new GridData(GridData.GRAB_HORIZONTAL);
+			gridData.horizontalSpan = 2;
+			singleUser.setLayoutData(gridData);
+			singleUser.setText("Enable Single User Mode");
+			singleUser.setEnabled(false);
 
 
+			addModListener(singleUser,SWT.Selection);
 
 
 
-        }
 
-        RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
-        composite.layout();
-    }
+
+		}
+
+		RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
+		composite.layout();
+	}
 
 
 	public void addModListener(Control control, int selectionType){
@@ -690,13 +690,13 @@ public class PreferencesTab {
 				properties.setProperty("auto_connect", "false");
 		}
 
-        //update Beta
-        if(updateBeta != null && !updateBeta.isDisposed()){
-            if(updateBeta.getSelection())
-                properties.setProperty("update.beta", "true");
-            else
-                properties.setProperty("update.beta", "false");
-        }
+		//update Beta
+		if(updateBeta != null && !updateBeta.isDisposed()){
+			if(updateBeta.getSelection())
+				properties.setProperty("update.beta", "true");
+			else
+				properties.setProperty("update.beta", "false");
+		}
 
 
 
@@ -736,13 +736,13 @@ public class PreferencesTab {
 		}
 
 
-        //Store Confirm exit
-        if(exitConfirm != null && !exitConfirm.isDisposed()){
-            if(exitConfirm.getSelection())
-                properties.setProperty("confirm.exit", "true");
-            else
-                properties.setProperty("confirm.exit", "false");
-        }
+		//Store Confirm exit
+		if(exitConfirm != null && !exitConfirm.isDisposed()){
+			if(exitConfirm.getSelection())
+				properties.setProperty("confirm.exit", "true");
+			else
+				properties.setProperty("confirm.exit", "false");
+		}
 
 		//Store popupsEnabled
 		if(popupsEnabled != null && !popupsEnabled.isDisposed()){
@@ -753,13 +753,13 @@ public class PreferencesTab {
 		}
 
 
-        //Store Splash Screen Setting
-        if(showSplash != null && !showSplash.isDisposed()){
-            if(showSplash.getSelection())
-                properties.setProperty("show_splash","true");
-            else
-                properties.setProperty("show_splash","false");
-        }
+		//Store Splash Screen Setting
+		if(showSplash != null && !showSplash.isDisposed()){
+			if(showSplash.getSelection())
+				properties.setProperty("show_splash","true");
+			else
+				properties.setProperty("show_splash","false");
+		}
 
 		//Store the autoClipboard setting
 		if(autoClipboard != null && !autoClipboard.isDisposed()){
@@ -777,21 +777,21 @@ public class PreferencesTab {
 				properties.setProperty("auto_console", "false");
 		}
 
-        //Plugin Setting to core
-        if(singleUser != null && !singleUser.isDisposed()){
-            Client client = RCMain.getRCMain().getClient();
-            client.transactionStart();
+		//Plugin Setting to core
+		if(singleUser != null && !singleUser.isDisposed()){
+			Client client = RCMain.getRCMain().getClient();
+			client.transactionStart();
 
-            if(singleUser.getSelection())
-                client.sendSetPluginParameter("singleUserMode", "true", RemoteConstants.PARAMETER_BOOLEAN);
-            else{
-                client.sendSetPluginParameter("singleUserMode", "false", RemoteConstants.PARAMETER_BOOLEAN);
-                RCMain.getRCMain().getMainWindow().setStatusBarText("Connected in Multi User Mode", SWT.COLOR_DARK_GREEN);
-            }
+			if(singleUser.getSelection())
+				client.sendSetPluginParameter("singleUserMode", "true", RemoteConstants.PARAMETER_BOOLEAN);
+			else{
+				client.sendSetPluginParameter("singleUserMode", "false", RemoteConstants.PARAMETER_BOOLEAN);
+				RCMain.getRCMain().getMainWindow().setStatusBarText("Connected in Multi User Mode", SWT.COLOR_DARK_GREEN);
+			}
 
-            client.transactionCommit();
+			client.transactionCommit();
 
-        }
+		}
 
 
 
