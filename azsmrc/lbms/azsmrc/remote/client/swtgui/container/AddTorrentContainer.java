@@ -18,11 +18,10 @@ public class AddTorrentContainer {
 
     private TOTorrent torrent;
     private int[] fileProperties;
-    private File fTorrentFile;
+    private File fTorrentFile;    
 
-
-    public AddTorrentContainer(File torrentFile) throws TOTorrentException{
-        torrent = TOTorrentFactory.deserialiseFromBEncodedFile(torrentFile);
+    public AddTorrentContainer(File torrentFile) throws TOTorrentException{        
+    	torrent = TOTorrentFactory.deserialiseFromBEncodedFile(torrentFile);
         fTorrentFile = torrentFile;
         fileProperties = new int[torrent.getFiles().length];
         for(int i = 0; i < fileProperties.length; i++){
@@ -73,6 +72,18 @@ public class AddTorrentContainer {
         return fTorrentFile;
     }
 
+    /**
+     * Searches through the properties and returns false if any file property is not == 1
+     * @return
+     */
+    public boolean isWholeFileSent(){    	
+    	for(int i = 0; i < fileProperties.length; i++){
+            if(fileProperties[i] != 1) return false;
+        }    	
+    	return true;
+    }
+    
+    
     /**
      * obtain all of the files from the torrent
      * @return

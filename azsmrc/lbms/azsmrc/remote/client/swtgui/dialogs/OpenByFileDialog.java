@@ -286,9 +286,18 @@ public class OpenByFileDialog {
                     Iterator iterator = tMap.keySet().iterator();
                     while (iterator.hasNext()) {
                         AddTorrentContainer container = tMap.get(iterator.next());
-                        int[] props = container.getFileProperties();
-                        //Main add to Azureus
-                        RCMain.getRCMain().getClient().sendAddDownload(container.getTorrentFile(), props);
+                        
+                        //Check to see if the whole file is sent and if so, just add it normally
+                        //else send it with the properties int[]
+                        if(container.isWholeFileSent()){
+                        	RCMain.getRCMain().getClient().sendAddDownload(container.getTorrentFile());
+                        }else{
+                        	int[] props = container.getFileProperties();
+                            //Main add to Azureus
+                            RCMain.getRCMain().getClient().sendAddDownload(container.getTorrentFile(), props);	
+                        }
+                        
+                        
                     }
                 }
                 shell.close();
