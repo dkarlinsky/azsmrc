@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import lbms.azsmrc.remote.client.swtgui.ColorUtilities;
 import lbms.azsmrc.remote.client.swtgui.DownloadManagerShell;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
@@ -542,6 +543,10 @@ public class OpenByFileDialog {
                 detailItem.setText(2, DisplayFormatters
                         .formatByteCountToBase10KBEtc(files[i].getLength()));
 
+                //Shade every other one
+                if(filesTable.indexOf(detailItem)%2!=0){
+                	detailItem.setBackground(ColorUtilities.getBackgroundColor());
+                }
             }
 
         }
