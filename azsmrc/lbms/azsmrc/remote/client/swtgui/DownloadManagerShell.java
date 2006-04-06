@@ -80,6 +80,7 @@ import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellEvent;
@@ -1097,7 +1098,22 @@ public class DownloadManagerShell {
 		//add in the non closable My torrents ctabitem
 		myTorrents = new CTabItem(tabFolder, SWT.NONE);
 
+		tabFolder.addMouseListener(new MouseListener(){
 
+			public void mouseDoubleClick(MouseEvent arg0) {
+				CTabItem tab = tabFolder.getSelection();
+				if(tab.equals(myTorrents)){
+					sortTable(downloadsTable);
+					sortTable(seedsTable);					
+				}
+
+			}
+
+			public void mouseDown(MouseEvent arg0) {}
+
+			public void mouseUp(MouseEvent arg0) {}
+
+		});
 
 
 		//----------------------  Sash------------------------\\
@@ -2136,8 +2152,8 @@ public class DownloadManagerShell {
 			}
 		});
 
-		
-		
+
+
 		if(table.equals(seedsTable)){
 			moveData = new MenuItem(menu, SWT.PUSH);
 			moveData.setText("Move Data");
@@ -2146,7 +2162,7 @@ public class DownloadManagerShell {
 				public void handleEvent(Event arg0) {
 					TableItem[] items = table.getSelection();
 					if(items.length > 1) return;
-					
+
 					for(TableItem item : items){
 						Container container = (Container)item.getData();
 						new MoveDataDialog(container);
@@ -2156,8 +2172,8 @@ public class DownloadManagerShell {
 
 			});
 		}
-		
-		
+
+
 
 		new MenuItem(menu,SWT.SEPARATOR);
 
