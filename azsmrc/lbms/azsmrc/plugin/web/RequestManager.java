@@ -654,6 +654,7 @@ public class RequestManager {
 										if (!dl.isPaused())
 											dl.stop();
 										dl.moveDataFiles(target);
+										dl.restart();
 									} catch (DownloadException e) {
 										user.eventDownloadException(e);
 										e.printStackTrace();
@@ -805,7 +806,11 @@ public class RequestManager {
 						as.setAttribute("createdOn", Plugin.getPluginInterface().getUtilities().getFormatters().formatDate(tor.getCreationDate()*1000));
 						as.setAttribute("pieceCount", Long.toString(tor.getPieceCount()));
 						as.setAttribute("pieceSize",Long.toString(tor.getPieceSize()));
-						as.setAttribute("saveDir", dl.getSavePath());
+						File saveDir = new File(dl.getSavePath());
+						if (saveDir.isDirectory())
+							as.setAttribute("saveDir", saveDir.getAbsolutePath());
+						else
+							as.setAttribute("saveDir", saveDir.getParent());
 						response.addContent(as);
 
 					} catch (DownloadException e) {
