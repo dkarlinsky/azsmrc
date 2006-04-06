@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
@@ -57,8 +58,10 @@ public class OpenByFileDialog {
     private Table filesTable, detailsTable;
 
     private String lastDir;
+        
+    private Label totalS;
 
-    private Map<String, AddTorrentContainer> tMap = new HashMap<String, AddTorrentContainer>();
+    private HashMap<String, AddTorrentContainer> tMap = new HashMap<String, AddTorrentContainer>();
 
     private int drag_drop_line_start = -1;
 
@@ -85,7 +88,7 @@ public class OpenByFileDialog {
         Button open_file_button = new Button(comp, SWT.PUSH);
         open_file_button.setToolTipText("Choose a file to upload");
         open_file_button.setText("Choose a file to upload");
-        open_file_button.setImage(ImageRepository.getImage("openfile"));
+        open_file_button.setImage(ImageRepository.getImage("open_by_file"));
         open_file_button.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event e) {
                 FileDialog dialog = new FileDialog(shell, SWT.OPEN);
@@ -116,6 +119,7 @@ public class OpenByFileDialog {
                             item.setText(1, container.getFilePath());
 
                             tMap.put(container.getName(), container);
+                            setTotalSize();
                             filesTable.setSelection(item);
                             item.setData(container);
                             generateDetails(container.getName());
@@ -145,12 +149,14 @@ public class OpenByFileDialog {
                         messageBox
                                 .setMessage("File not valid, please check permissions and try again.");
                         messageBox.open();
+                        e1.printStackTrace();
                     }
             }
         });
 
         Button remove = new Button(comp, SWT.PUSH);
         remove.setText("Remove selected from list");
+        remove.setImage(ImageRepository.getImage("toolbar_remove"));
         remove.addSelectionListener(new SelectionListener() {
 
             public void widgetSelected(SelectionEvent arg0) {
@@ -166,6 +172,7 @@ public class OpenByFileDialog {
                 filesTable.remove(items);
                 filesTable.deselectAll();
                 detailsTable.removeAll();
+                setTotalSize();
             }
 
             public void widgetDefaultSelected(SelectionEvent arg0) {
@@ -173,6 +180,14 @@ public class OpenByFileDialog {
 
         });
 
+        totalS = new Label(comp,SWT.NULL);
+        gridData = new GridData(GridData.FILL_HORIZONTAL);
+        gridData.horizontalSpan = 2;
+        totalS.setLayoutData(gridData);
+        
+        setTotalSize();
+        
+        
         SashForm sash = new SashForm(comp, SWT.VERTICAL);
         gridLayout = new GridLayout();
         gridLayout.numColumns = 1;
@@ -262,6 +277,7 @@ public class OpenByFileDialog {
                         container.setFileProperty(place, 1);
                     } else
                         container.setFileProperty(place, 0);
+                    setTotalSize();
                 }
 
             }
@@ -497,6 +513,7 @@ public class OpenByFileDialog {
                                     filesTable.setSelection(item);
                                     generateDetails(container.getName());
                                     lastDir = container.getFilePath();
+                                    setTotalSize();
                                 }
 
                             } catch (Exception e) {
@@ -557,4 +574,18 @@ public class OpenByFileDialog {
         }
     }
 
+    
+    public void setTotalSize(){
+    	long totalSize = 0;
+    	Iterator it = tMap.keySet().iterator();
+    	while (it.hasNext()){
+    		AddTorrentContainer atc = tMap.get(it.next());    		
+    		if(atc != null)
+    			totalSize += atc.getTotalSizeOfDownloads();
+    	}
+    	
+    	totalS.setText("Total size of selected downloads to send to server: " +
+    			DisplayFormatters.formatByteCountToBase10KBEtc(totalSize));
+    }
+    
 }// EOF

@@ -85,6 +85,23 @@ public class AddTorrentContainer {
     	return true;
     }
     
+    /**
+     * Any file in the torrent that has a property of 1 will be counted and sized
+     * @return
+     */
+    public long getTotalSizeOfDownloads(){    	
+    	if(fileProperties == null)
+    		return torrent.getSize();
+    	else{
+    		long size = 0;
+        	for(int i = 0; i < fileProperties.length; i++){
+                if(fileProperties[i] == 1){
+                	size += torrent.getFiles()[i].getLength();
+                }
+            }    	
+        	return size;	
+    	}    	
+    }
     
     /**
      * obtain all of the files from the torrent
