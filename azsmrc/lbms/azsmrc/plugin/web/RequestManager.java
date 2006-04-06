@@ -647,7 +647,7 @@ public class RequestManager {
 					try {
 						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
 						File target = new File (xmlRequest.getAttributeValue("target"));
-						if (target.exists() || target.isDirectory())
+						if (target.exists() && target.isDirectory())
 							dl.moveDataFiles(target);
 						else
 							user.eventException(new Exception("Error Moving Data Files: Directory not found"));
