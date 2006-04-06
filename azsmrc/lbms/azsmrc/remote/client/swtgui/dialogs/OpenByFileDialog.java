@@ -61,7 +61,7 @@ public class OpenByFileDialog {
         
     private Label totalS;
 
-    private HashMap<String, AddTorrentContainer> tMap = new HashMap<String, AddTorrentContainer>();
+    private Map<String, AddTorrentContainer> tMap = new HashMap<String, AddTorrentContainer>();
 
     private int drag_drop_line_start = -1;
 
