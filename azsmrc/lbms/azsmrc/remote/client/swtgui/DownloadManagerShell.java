@@ -39,6 +39,7 @@ import lbms.azsmrc.remote.client.swtgui.container.Container;
 import lbms.azsmrc.remote.client.swtgui.container.DownloadContainer;
 import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ConnectionDialog;
+import lbms.azsmrc.remote.client.swtgui.dialogs.MoveDataDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByFileDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByURLDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ScrapeDialog;
@@ -110,6 +111,7 @@ public class DownloadManagerShell {
 	private SashForm sash;
 	private CTabFolder tabFolder;
 	private CTabItem myTorrents;
+	private MenuItem moveData;
 
 	private DownloadListener dlL = new DownloadListener(){
 
@@ -2134,6 +2136,28 @@ public class DownloadManagerShell {
 			}
 		});
 
+		
+		
+		if(table.equals(seedsTable)){
+			moveData = new MenuItem(menu, SWT.PUSH);
+			moveData.setText("Move Data");
+			moveData.addListener(SWT.Selection, new Listener(){
+
+				public void handleEvent(Event arg0) {
+					TableItem[] items = table.getSelection();
+					if(items.length > 1) return;
+					
+					for(TableItem item : items){
+						Container container = (Container)item.getData();
+						new MoveDataDialog(container);
+					}
+
+				}
+
+			});
+		}
+		
+		
 
 		new MenuItem(menu,SWT.SEPARATOR);
 
@@ -2166,11 +2190,17 @@ public class DownloadManagerShell {
 					forceStart.setSelection(false);
 					removeAnd.setEnabled(false);
 					forceRecheck.setEnabled(false);
+					try{
+						moveData.setEnabled(false);	
+					}catch(Exception e){}					
 				}else if(items.length == 1){
 					stop.setEnabled(true);
 					queue.setEnabled(true);
 					remove.setEnabled(true);
 					forceStart.setEnabled(true);
+					try{
+						moveData.setEnabled(true);
+					}catch(Exception e){}
 					//Check to see if download is already in ForceStart
 					Container container = (Container)items[0].getData();
 					if(container.getDownload().isForceStart()){
@@ -2196,6 +2226,9 @@ public class DownloadManagerShell {
 					forceStart.setEnabled(false);
 					forceStart.setSelection(false);
 					forceRecheck.setEnabled(false);
+					try{
+						moveData.setEnabled(false);
+					}catch(Exception e){}
 					removeAnd.setEnabled(true);
 				}
 
