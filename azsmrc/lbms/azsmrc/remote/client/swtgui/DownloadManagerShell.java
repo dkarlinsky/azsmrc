@@ -934,7 +934,7 @@ public class DownloadManagerShell {
 
 			public void downloadAdded(final Download download) {
 				try {
-					if (DOWNLOAD_MANAGER_SHELL.isDisposed()) {
+					if (DOWNLOAD_MANAGER_SHELL == null || DOWNLOAD_MANAGER_SHELL.isDisposed()) {
 						RCMain.getRCMain().getClient().getDownloadManager().removeListener(this);
 						return;
 					}
