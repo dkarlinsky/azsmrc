@@ -651,7 +651,8 @@ public class RequestManager {
 							new Thread(new Runnable() {
 								public void run() {
 									try {
-										dl.stop();
+										if (!dl.isPaused())
+											dl.stop();
 										dl.moveDataFiles(target);
 									} catch (DownloadException e) {
 										user.eventDownloadException(e);
