@@ -333,6 +333,13 @@ public class DownloadManagerShell {
 		menuScraper.setText("&Scrape a torrent file");
 		menuScraper.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e){
+				Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
+				for(Shell shell:shells){
+					if(shell.getText().equalsIgnoreCase("Scrape a Torrent File")){
+						shell.setFocus();
+						return;
+					}
+				}
 				new ScrapeDialog(RCMain.getRCMain().getDisplay());
 			}
 		});
