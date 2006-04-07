@@ -3,7 +3,7 @@
 	<Update url="http://azsmrc.sourceforge.net" version="1.0" type="2" importance="50">
 		<Changelog>
 			<BugFix>UserManager Bug: Users were not read correctly</BugFix>
-			<BugFix>QuickConnect did not requested userinfo</BugFix>
+			<BugFix>QuickConnect did not request userinfo</BugFix>
 			<BugFix>Download move and reordering fixed</BugFix>
 			<Feature>Serverless Torrent Scraper with ability to select files and send torrent to server</Feature>
 			<Feature>Remote Azureus restart</Feature>
