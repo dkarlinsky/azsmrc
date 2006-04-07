@@ -91,7 +91,7 @@ public class RemoteConstants {
 
 
 	//Update URL
-	public static final String UPDATE_URL = "http://azcvsupdater.sourceforge.net/azsmrc/AzSMRCupdate.xml.gz";
+	public static final String UPDATE_URL = "http://azsmrc.sourceforge.net/AzSMRCupdate.xml.gz";
 
 	//Encoder stuff
 	public static final String DEFAULT_ENCODING 	= "UTF8";
