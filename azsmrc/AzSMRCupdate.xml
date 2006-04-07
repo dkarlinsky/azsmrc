@@ -1,39 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Updates>
-  <Update url="http://azsmrc.sourceforge.net" version="1.0" type="2" importance="50">
-    <Changelog>
-      <BugFix>UserManager Bug: Users were not read correctly</BugFix>
-      <BugFix>QuickConnect didn't requested userinfo</BugFix>
-      <BugFix>Download move and reordering fixed</BugFix>
-      <Feature>Torrent Scraper</Feature>
-      <Feature>Remote Azureus Restart</Feature>
-      <Feature>move Data Files of a seeding torrent</Feature>
-      <Feature>File Selection for a torrent</Feature>
-      <Change>Improved the Updater</Change>
-    </Changelog>
-    <Files>
-      <File name="Libraries.zip" version="1.0" url="http://prdownloads.sourceforge.net/azsmrc/Libraries.zip" hash="be2950f730f825b5a5d98f26cc9cecda7f71e4" isArchive="true" type="2" size="186472">
-        <File name="commons-codec_1.3.jar" version="1.3" hash="fd32786786e2adb664d5ecc965da47629dca14ba" isInArchive="true" type="0" size="46725" />
-        <File name="jdom_1.0.jar" version="1.0" hash="a2ac1cd690ab4c80defe7f9bce14d35934c35cec" isInArchive="true" type="0" size="153253" />
-      </File>
-    </Files>
-  </Update>
-  <Update url="http://azsmrc.sourceforge.net" version="0.9.3" type="1" importance="50">
-    <Changelog>
-      <BugFix>column share ratio can now be selected</BugFix>
-      <Feature>File Selection on addDownload</Feature>
-      <Feature>Builtin - Updater</Feature>
-      <Feature>SingleUserMode for all those who don't want to use the multiuser part</Feature>
-      <Feature>Clipboardmonitor for Torrent URLs</Feature>
-      <Change>Totally improved preferences Tab</Change>
-      <Change>You can disable AutoImport now</Change>
-      <Change>Added some more buttons to the Toolsbar, like start, stop and remove</Change>
-      <Change>Added MenuBar</Change>
-      <Change>You can disable minimize to tray on close, this will close the program if you close the shell</Change>
-    </Changelog>
-    <Files>
-      <File name="AzSMRC_0.9.3.jar" version="0.9.3" url="http://prdownloads.sourceforge.net/azsmrc/AzSMRC_0.9.3.jar" hash="974b8e3055e1cb6a93bbfdbaad2d169582d274f" type="2" size="664494" />
-    </Files>
-  </Update>
+	<Update url="http://azsmrc.sourceforge.net" version="1.0" type="2" importance="50">
+		<Changelog>
+			<BugFix>UserManager Bug: Users were not read correctly</BugFix>
+			<BugFix>QuickConnect did not requested userinfo</BugFix>
+			<BugFix>Download move and reordering fixed</BugFix>
+			<Feature>Serverless Torrent Scraper with ability to select files and send torrent to server</Feature>
+			<Feature>Remote Azureus restart</Feature>
+			<Feature>Ability to move Data Files of a seeding torrent</Feature>
+			<Feature>File Selection for a torrent</Feature>
+			<Feature>Added splash screen with ability to disable it in the Preferences</Feature>
+			<Feature>Added ability to enable/disable Single User Mode through the remote control via Preferences</Feature>
+			<Change>Improved the Updater</Change>
+			<Change>Preferences were expanded to allow more control over exiting and tray behavior</Change>
+			<Change>Enhanced top menu with more quick access to many features</Change>
+		</Changelog>
+		<Files>
+			<File name="Libraries.zip" version="1.0" url="http://prdownloads.sourceforge.net/azsmrc/Libraries.zip" hash="be2950f730f825b5a5d98f26cc9cecda7f71e4" isArchive="true" type="2" size="186472">
+				<File name="commons-codec_1.3.jar" version="1.3" hash="fd32786786e2adb664d5ecc965da47629dca14ba" isInArchive="true" type="0" size="46725" />
+				<File name="jdom_1.0.jar" version="1.0" hash="a2ac1cd690ab4c80defe7f9bce14d35934c35cec" isInArchive="true" type="0" size="153253" />
+			</File>
+		</Files>
+	</Update>
+	<Update url="http://azsmrc.sourceforge.net" version="0.9.3" type="1" importance="50">
+		<Changelog>
+			<BugFix>column share ratio can now be selected</BugFix>
+			<Feature>File Selection on addDownload</Feature>
+			<Feature>Builtin - Updater</Feature>
+			<Feature>SingleUserMode for all those who don't want to use the multiuser part</Feature>
+			<Feature>Clipboardmonitor for Torrent URLs</Feature>
+			<Change>Totally improved preferences Tab</Change>
+			<Change>You can disable AutoImport now</Change>
+			<Change>Added some more buttons to the Toolsbar, like start, stop and remove</Change>
+			<Change>Added MenuBar</Change>
+			<Change>You can disable minimize to tray on close, this will close the program if you close the shell</Change>
+		</Changelog>
+		<Files>
+			<File name="AzSMRC_0.9.3.jar" version="0.9.3" url="http://prdownloads.sourceforge.net/azsmrc/AzSMRC_0.9.3.jar" hash="974b8e3055e1cb6a93bbfdbaad2d169582d274f" type="2" size="664494" />
+		</Files>
+	</Update>
 </Updates>
 
