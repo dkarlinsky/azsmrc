@@ -30,9 +30,12 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -449,6 +452,7 @@ public class ConsoleTab {
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
 		layout.verticalSpacing = 1;
+		layout.numColumns = 2;
 		cEnd.setLayout(layout);
 		gd = new GridData(SWT.TOP, SWT.LEAD, false, false);
 		cEnd.setLayoutData(gd);
@@ -456,7 +460,11 @@ public class ConsoleTab {
 
 		Label debuglabel = new Label(cEnd,SWT.NULL);
         debuglabel.setText("Debug Log Level:");
-
+        gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.horizontalSpan = 2;
+        debuglabel.setLayoutData(gd);
+        
+        
         final Combo debugCombo = new Combo(cEnd, SWT.DROP_DOWN | SWT.READ_ONLY);
         debugCombo.add("7 - Show Finest and above (shows most)");
         debugCombo.add("6 - Show Finer and above");
@@ -476,9 +484,53 @@ public class ConsoleTab {
             }
 
         });
+        
+        final Label debugColor = new Label(cEnd, SWT.BORDER);
+        gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
+        gd.horizontalSpan = 1;
+        gd.widthHint = 20;
+        debugColor.setLayoutData(gd);
+        debugColor.setToolTipText("Double click to choose color");
+        debugColor.setCursor(RCMain.getRCMain().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+        debugColor.setBackground(
+        		new Color(RCMain.getRCMain().getDisplay(),
+        				GUI_Utilities.getRGB(
+        						RCMain.getRCMain().getProperties().getProperty("debug.color", "r192g192b192")
+        				)
+        		)
+        );
+
+        debugColor.addMouseListener(new MouseListener(){
+
+			public void mouseDoubleClick(MouseEvent arg0) {
+				RCMain.getRCMain().getProperties().setProperty("debug.color", 
+						GUI_Utilities.colorChooserDialog(
+								GUI_Utilities.getRGB(
+		        						RCMain.getRCMain().getProperties().getProperty("debug.color", "r192g192b192")
+								)
+						)
+				);
+				RCMain.getRCMain().saveConfig();
+				debugColor.setBackground(
+		        		new Color(RCMain.getRCMain().getDisplay(),
+		        				GUI_Utilities.getRGB(
+		        						RCMain.getRCMain().getProperties().getProperty("debug.color", "r192g192b192")
+		        				)
+		        		)
+		        );
+				
+			}
+			public void mouseDown(MouseEvent arg0) {}
+			public void mouseUp(MouseEvent arg0) {}        	
+        });
+        
 
         Label normallabel = new Label(cEnd,SWT.NULL);
         normallabel.setText("Normal Log Level:");
+        gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.horizontalSpan = 2;
+        normallabel.setLayoutData(gd);
+        
         final Combo normalCombo = new Combo(cEnd, SWT.DROP_DOWN | SWT.READ_ONLY);
         normalCombo.add("7 - Show Finest and above (shows most)");
         normalCombo.add("6 - Show Finer and above");
@@ -500,6 +552,48 @@ public class ConsoleTab {
         });
 
 
+        final Label normalColor = new Label(cEnd, SWT.BORDER);
+        gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
+        gd.horizontalSpan = 1;
+        gd.widthHint = 20;
+        normalColor.setLayoutData(gd);
+        normalColor.setToolTipText("Double click to choose color");
+        normalColor.setCursor(RCMain.getRCMain().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+        normalColor.setBackground(
+        		new Color(RCMain.getRCMain().getDisplay(),
+        				GUI_Utilities.getRGB(
+        						RCMain.getRCMain().getProperties().getProperty("normal.color", "r000g255b000")
+        				)
+        		)
+        );
+
+        normalColor.addMouseListener(new MouseListener(){
+
+			public void mouseDoubleClick(MouseEvent arg0) {
+				RCMain.getRCMain().getProperties().setProperty("normal.color", 
+						GUI_Utilities.colorChooserDialog(
+								GUI_Utilities.getRGB(
+		        						RCMain.getRCMain().getProperties().getProperty("normal.color", "r000g255b000")
+								)
+						)
+				);
+				RCMain.getRCMain().saveConfig();
+				normalColor.setBackground(
+		        		new Color(RCMain.getRCMain().getDisplay(),
+		        				GUI_Utilities.getRGB(
+		        						RCMain.getRCMain().getProperties().getProperty("normal.color", "r000g255b000")
+		        				)
+		        		)
+		        );
+				
+			}
+			public void mouseDown(MouseEvent arg0) {}
+			public void mouseUp(MouseEvent arg0) {}        	
+        });
+        
+
+        
+        
 
 		detailsTab.addDisposeListener(new DisposeListener (){
 
@@ -543,11 +637,42 @@ public class ConsoleTab {
 						consoleText.append(buf.toString());
 
 						int nbLinesNow = consoleText.getLineCount();
-						int colorIdx = -1;
+						//int colorIdx = -1;
 						//Color Based On Log
-                        if (record.getLoggerName().equalsIgnoreCase("lbms.azsmrc.debug"))
+                        
+						if(levelToInteger(record.getLevel()) == 5)
+							consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
+									- nbLinesBefore, display.getSystemColor(SWT.COLOR_YELLOW));
+                        else if(levelToInteger(record.getLevel()) == 6)
+                        	consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
+									- nbLinesBefore, display.getSystemColor(SWT.COLOR_RED));
+                        else if(record.getLoggerName().equalsIgnoreCase("lbms.azsmrc.debug"))
+                        	consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
+									- nbLinesBefore, new Color(RCMain.getRCMain().getDisplay(),
+					        				GUI_Utilities.getRGB(
+					        						RCMain.getRCMain().getProperties().getProperty("debug.color", "r192g192b192")
+					        				)
+					        		)
+                        	);
+                        else if(record.getLoggerName().equalsIgnoreCase("lbms.azsmrc.normal"))
+                        	consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
+									- nbLinesBefore, new Color(RCMain.getRCMain().getDisplay(),
+					        				GUI_Utilities.getRGB(
+					        						RCMain.getRCMain().getProperties().getProperty("normal.color", "r000g255b000")
+					        				)
+					        		)
+                        	);
+						
+						/*Color debugColor = null;
+						if (record.getLoggerName().equalsIgnoreCase("lbms.azsmrc.debug")){
 							colorIdx = SWT.COLOR_GRAY;
-						else
+							debugColor = new Color(RCMain.getRCMain().getDisplay(),
+					        				GUI_Utilities.getRGB(
+					        						RCMain.getRCMain().getProperties().getProperty("debug.color", "r192g192b192")
+					        				)
+					        		);
+					        
+                        }else
 							colorIdx = SWT.COLOR_GREEN;
 
                         //Change the color if severe or warning
@@ -557,9 +682,13 @@ public class ConsoleTab {
                             colorIdx = SWT.COLOR_RED;
 
 						if (colorIdx >= 0)
-							consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
+							if(debugColor != null){
+								consoleText.setLineBackground(nbLinesBefore -1, nbLinesNow - nbLinesBefore, debugColor);
+								
+							}else								
+								consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
 									- nbLinesBefore, display.getSystemColor(colorIdx));
-
+*/
 						if (bAutoScroll)
 							consoleText.setSelection(consoleText.getText().length());
 

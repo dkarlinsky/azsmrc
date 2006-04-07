@@ -7,7 +7,9 @@ package lbms.azsmrc.remote.client.swtgui;
 
 
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Monitor;
@@ -104,4 +106,43 @@ public class GUI_Utilities {
         mb.setText(title);
         return mb.open();
     }
+    
+    /**
+     * Returns a string holding the rgb format of the color from the properties
+     * @param color in r000g000b000 format
+     * @return RGB
+     */
+    public static RGB getRGB(String color){
+        RGB rgb;
+        try{
+            int red = color.indexOf("r") + 1;
+            int green = color.indexOf("g") + 1 ;
+            int blue = color.indexOf("b") + 1;
+
+            rgb = new RGB(new Integer(color.substring(red,green-1)).intValue(),
+            new Integer(color.substring(green, blue-1)).intValue(),
+            new Integer(color.substring(blue,color.length())).intValue());
+            return rgb;
+        }catch(Exception e){
+            e.printStackTrace();
+            return new RGB(0,0,0);
+        }
+    }
+    
+    
+    
+    public static String colorChooserDialog(RGB originalColor){
+        //Choose color
+        ColorDialog colorDialog = new ColorDialog(RCMain.getRCMain().getMainWindow().getShell());
+        colorDialog.setText("Choose Color");
+        colorDialog.setRGB(originalColor);
+        RGB selectedColor = colorDialog.open();
+        //Return String of color
+        if(selectedColor != null){
+        	return ("r"+selectedColor.red + "g" + selectedColor.green + "b" + selectedColor.blue);
+        }else return ("r"+originalColor.red + "g" + originalColor.green + "b" + originalColor.blue);
+        
+    }
+    
+    
 }
