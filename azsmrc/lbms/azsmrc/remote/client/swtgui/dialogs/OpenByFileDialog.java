@@ -119,8 +119,7 @@ public class OpenByFileDialog {
                             item.setText(1, container.getFilePath());
 
                             tMap.put(container.getName(), container);
-                            setTotalSize();
-                            filesTable.setSelection(item);
+                            setTotalSize();                            
                             item.setData(container);
                             generateDetails(container.getName());
                             lastDir = container.getFilePath();
