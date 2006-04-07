@@ -311,7 +311,7 @@ public class DownloadManagerShell {
 		});
 
 		//-----Remote
-		
+
 		//Add by file
 		menuAddByFile = new MenuItem(remoteSubmenu,SWT.PUSH);
 		menuAddByFile.setText("Send Torrent &File to Server");
@@ -328,11 +328,11 @@ public class DownloadManagerShell {
 				new OpenByFileDialog(RCMain.getRCMain().getDisplay());
 			}
 		});
-		
-		
+
+
 		//Add by URL
 		menuAddbyURL = new MenuItem(remoteSubmenu,SWT.PUSH);
-		menuAddbyURL.setText("Send Torrent &URL to Server");		
+		menuAddbyURL.setText("Send Torrent &URL to Server");
 		menuAddbyURL.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e){
 				Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
@@ -346,13 +346,13 @@ public class DownloadManagerShell {
 				new OpenByURLDialog(RCMain.getRCMain().getDisplay());
 			}
 		});
-		
-		
-		
+
+
+
 		//Separator
 		new MenuItem(remoteSubmenu,SWT.SEPARATOR);
-		
-		
+
+
 		//Restart Server
 		menuRestartAzureus = new MenuItem(remoteSubmenu,SWT.PUSH);
 		menuRestartAzureus.setText("&Restart Server");
@@ -708,7 +708,7 @@ public class DownloadManagerShell {
 					Container container = (Container)items[0].getData();
 					int current_position = container.getDownload().getPosition();
 					if(current_position != downloadsMap.size()){
-						container.getDownload().setPosition(downloadsMap.size());
+						container.getDownload().moveTo(downloadsMap.size());
 					}
 				}else{
 					TableItem[] items = seedsTable.getSelection();
@@ -716,7 +716,7 @@ public class DownloadManagerShell {
 					Container container = (Container)items[0].getData();
 					int current_position = container.getDownload().getPosition();
 					if(current_position != seedsMap.size()){
-						container.getDownload().setPosition(seedsMap.size());
+						container.getDownload().moveTo(seedsMap.size());
 					}
 				}
 			}
@@ -2988,7 +2988,7 @@ public class DownloadManagerShell {
 								Container container = downloadsMap.get(iter.next());
 								if(container.getDownload().getPosition() == drag_drop_line_start+1){
 									System.out.println("Moving " + container.getDownload().getName()+ " From position " + (drag_drop_line_start +1) + " to " + (drag_drop_line_end+1));
-									container.getDownload().setPosition(drag_drop_line_end+1);
+									container.getDownload().moveTo(drag_drop_line_end+1);
 									if(RCMain.getRCMain().connected())
 										RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
 								}
@@ -2999,7 +2999,7 @@ public class DownloadManagerShell {
 								Container container = seedsMap.get(iter.next());
 								if(container.getDownload().getPosition() == drag_drop_line_start){
 									System.out.println("Moving " + container.getDownload().getName()+ " From position " + (drag_drop_line_start +1) + " to " + (drag_drop_line_end+1));
-									container.getDownload().setPosition(drag_drop_line_end+1);
+									container.getDownload().moveTo(drag_drop_line_end+1);
 									if(RCMain.getRCMain().connected())
 										RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
 								}
