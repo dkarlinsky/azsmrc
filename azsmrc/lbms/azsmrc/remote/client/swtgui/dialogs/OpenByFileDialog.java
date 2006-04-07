@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import lbms.azsmrc.remote.client.Utilities;
 import lbms.azsmrc.remote.client.swtgui.ColorUtilities;
 import lbms.azsmrc.remote.client.swtgui.DownloadManagerShell;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
@@ -88,7 +89,8 @@ public class OpenByFileDialog {
         Button open_file_button = new Button(comp, SWT.PUSH);
         open_file_button.setToolTipText("Choose a file to upload");
         open_file_button.setText("Choose a file to upload");
-        open_file_button.setImage(ImageRepository.getImage("open_by_file"));
+        if(Utilities.isLinux())
+        	open_file_button.setImage(ImageRepository.getImage("open_by_file"));
         open_file_button.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event e) {
                 FileDialog dialog = new FileDialog(shell, SWT.OPEN);
@@ -155,7 +157,8 @@ public class OpenByFileDialog {
 
         Button remove = new Button(comp, SWT.PUSH);
         remove.setText("Remove selected from list");
-        remove.setImage(ImageRepository.getImage("toolbar_remove"));
+        if(Utilities.isLinux())
+        	remove.setImage(ImageRepository.getImage("toolbar_remove"));
         remove.addSelectionListener(new SelectionListener() {
 
             public void widgetSelected(SelectionEvent arg0) {
