@@ -493,7 +493,7 @@ public class DownloadManagerShell {
 						properties.getProperty("connection_username",null) != null &&
 						properties.getProperty("connection_password",null) != null) {
 					RCMain.getRCMain().connect(true);
-					RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
+					initializeConnection();
 				} else
 					new ConnectionDialog(RCMain.getRCMain().getDisplay());
 			}
@@ -1104,7 +1104,7 @@ public class DownloadManagerShell {
 				CTabItem tab = tabFolder.getSelection();
 				if(tab.equals(myTorrents)){
 					sortTable(downloadsTable);
-					sortTable(seedsTable);					
+					sortTable(seedsTable);
 				}
 
 			}
@@ -2207,8 +2207,8 @@ public class DownloadManagerShell {
 					removeAnd.setEnabled(false);
 					forceRecheck.setEnabled(false);
 					try{
-						moveData.setEnabled(false);	
-					}catch(Exception e){}					
+						moveData.setEnabled(false);
+					}catch(Exception e){}
 				}else if(items.length == 1){
 					stop.setEnabled(true);
 					queue.setEnabled(true);
