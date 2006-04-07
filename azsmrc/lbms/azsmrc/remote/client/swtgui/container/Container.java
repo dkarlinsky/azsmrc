@@ -363,14 +363,14 @@ public abstract class Container implements Comparable<Container> {
 					if (tableColumns.contains(RemoteConstants.ST_SHARE)) {
 						float ratio = (ds.getShareRatio()/1000f);
 						if(oldShareRatio != ratio || bForce){
-						/*	if(ratio < 0.5)
-								item.setForeground(tableColumns.indexOf(RemoteConstants.ST_SHARE), FireFrogMain.getFFM().getDisplay().getSystemColor(SWT.COLOR_DARK_RED));
+							int shareIndex = tableColumns.indexOf(RemoteConstants.ST_SHARE); 
+							item.setText(shareIndex,df.format(ratio));							
+							if(ratio < 0.5)
+								item.setForeground(shareIndex, RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_DARK_RED));
 							else if(ratio > 0.05 && ratio < 0.9)
-								item.setForeground(tableColumns.indexOf(RemoteConstants.ST_SHARE), FireFrogMain.getFFM().getDisplay().getSystemColor(SWT.COLOR_DARK_YELLOW));
+								item.setForeground(shareIndex, RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_DARK_YELLOW));
 							else
-								item.setForeground(tableColumns.indexOf(RemoteConstants.ST_SHARE), FireFrogMain.getFFM().getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
-*/
-							item.setText(tableColumns.indexOf(RemoteConstants.ST_SHARE),df.format(ratio));
+								item.setForeground(shareIndex, RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));							
 						}
 						oldShareRatio = ratio;
 					}
