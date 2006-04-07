@@ -259,9 +259,9 @@ public class ResponseManager {
 				List<Element> userList = xmlResponse.getChild("Users").getChildren("User");
 				List<String> userNames = new ArrayList<String>();
 				for (Element u:userList) {
+					userNames.add(u.getAttributeValue("username"));
 					try {
 						User user = um.getUser(u.getAttributeValue("username"));
-						userNames.add(u.getAttributeValue("username"));
 						user.updateUser(u);
 					} catch (UserNotFoundException e) {
 						try {

@@ -1,8 +1,11 @@
 package lbms.azsmrc.remote.client.impl;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.jdom.Element;
@@ -16,7 +19,7 @@ import lbms.azsmrc.shared.UserNotFoundException;
 
 public class UserManagerImpl implements UserManager {
 
-	private HashMap<String,User> userList = new HashMap<String,User>();
+	private Map<String,User> userList = Collections.synchronizedMap(new HashMap<String,User>());
 	private Client client;
 
 	public UserManagerImpl (Client client) {
@@ -92,8 +95,8 @@ public class UserManagerImpl implements UserManager {
 	}
 
 	public void keepUsers(List<String> userNames) {
-		Set<String> users = userList.keySet();
-		users.retainAll(userNames);
+		Set<String> users = new HashSet<String>(userList.keySet());
+		users.removeAll(userNames);
 		for (String user:users) {
 			userList.remove(user);
 		}
