@@ -159,7 +159,7 @@ public class RCMain implements Launchable {
 
 		//Show Splash
 		if(Boolean.parseBoolean(properties.getProperty("show_splash","true"))){
-			new SplashScreen(RCMain.getRCMain().getDisplay(),30);
+			new SplashScreen(RCMain.getRCMain().getDisplay(),20);
 		}
 
 		final Tray systray = display.getSystemTray ();
