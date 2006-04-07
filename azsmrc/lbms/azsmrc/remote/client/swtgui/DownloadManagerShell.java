@@ -157,7 +157,7 @@ public class DownloadManagerShell {
 	private ToolItem refresh,manage_users, preferences, console;
 	private ToolItem addTorrent_by_file,addTorrent_by_url, pauseAll, resumeAll ;
 	private ToolItem stopTorrent, queueTorrent, removeTorrent;
-	private MenuItem menuLogin,menuLogout,menuQuickconnect, menuRestartAzureus;
+	private MenuItem menuLogin,menuLogout,menuQuickconnect, menuRestartAzureus, menuAddByFile, menuAddbyURL;
 	public ConsoleTab consoleTab;
 
 	//status bar labels
@@ -208,7 +208,7 @@ public class DownloadManagerShell {
 		DOWNLOAD_MANAGER_SHELL.setMenuBar (menuBar);
 
 		MenuItem fileItem = new MenuItem(menuBar,SWT.CASCADE);
-		fileItem.setText("&File");
+		fileItem.setText("&Main");
 
 		Menu fileSubmenu = new Menu (DOWNLOAD_MANAGER_SHELL, SWT.DROP_DOWN);
 		fileItem.setMenu (fileSubmenu);
@@ -234,7 +234,7 @@ public class DownloadManagerShell {
 		helpItem.setMenu (helpSubmenu);
 
 
-		//----File submenu
+		//----Main submenu
 
 		//Login
 		menuLogin = new MenuItem(fileSubmenu,SWT.PUSH);
@@ -311,6 +311,49 @@ public class DownloadManagerShell {
 		});
 
 		//-----Remote
+		
+		//Add by file
+		menuAddByFile = new MenuItem(remoteSubmenu,SWT.PUSH);
+		menuAddByFile.setText("Send Torrent &File to Server");
+		menuAddByFile.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event e){
+				Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
+				for(int i = 0; i < shells.length; i++){
+					if(shells[i].getText().equalsIgnoreCase("Send Torrent File to Server")){
+						shells[i].setActive();
+						shells[i].setFocus();
+						return;
+					}
+				}
+				new OpenByFileDialog(RCMain.getRCMain().getDisplay());
+			}
+		});
+		
+		
+		//Add by URL
+		menuAddbyURL = new MenuItem(remoteSubmenu,SWT.PUSH);
+		menuAddbyURL.setText("Send Torrent &URL to Server");		
+		menuAddbyURL.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event e){
+				Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
+				for(int i = 0; i < shells.length; i++){
+					if(shells[i].getText().equalsIgnoreCase("Add a Torrent by URL")){
+						shells[i].setActive();
+						shells[i].setFocus();
+						return;
+					}
+				}
+				new OpenByURLDialog(RCMain.getRCMain().getDisplay());
+			}
+		});
+		
+		
+		
+		//Separator
+		new MenuItem(remoteSubmenu,SWT.SEPARATOR);
+		
+		
+		//Restart Server
 		menuRestartAzureus = new MenuItem(remoteSubmenu,SWT.PUSH);
 		menuRestartAzureus.setText("&Restart Server");
 		menuRestartAzureus.addListener(SWT.Selection, new Listener(){
@@ -1848,6 +1891,8 @@ public class DownloadManagerShell {
 						login.setEnabled(false);
 						menuLogin.setEnabled(false);
 						menuRestartAzureus.setEnabled(true);
+						menuAddByFile.setEnabled(true);
+						menuAddbyURL.setEnabled(true);
 						menuLogout.setEnabled(true);
 						logout.setEnabled(true);
 						quickconnect.setEnabled(false);
@@ -1874,6 +1919,8 @@ public class DownloadManagerShell {
 						menuLogin.setEnabled(true);
 						menuLogout.setEnabled(false);
 						menuRestartAzureus.setEnabled(false);
+						menuAddByFile.setEnabled(false);
+						menuAddbyURL.setEnabled(false);
 						logout.setEnabled(false);
 						quickconnect.setEnabled(true);
 						menuQuickconnect.setEnabled(true);
