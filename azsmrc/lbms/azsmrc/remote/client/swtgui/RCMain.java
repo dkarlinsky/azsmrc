@@ -506,7 +506,7 @@ public class RCMain implements Launchable {
 
 		System.out.println("Creating Updater.");
 		try {
-			updater = new Updater(new URL(RemoteConstants.UPDATE_URL),new File("update.xml.gz"),new File(USER_DIR));
+			updater = new Updater(new URL(RemoteConstants.UPDATE_URL),new File("AzSMRCupdate.xml.gz"),new File(USER_DIR));
 		} catch (MalformedURLException e2) {
 		}
 		updater.addListener(new UpdateListener() {
@@ -692,6 +692,15 @@ public class RCMain implements Launchable {
 	public Properties getProperties() {
 		return properties;
 	}
+
+
+	/**
+	 * @return Returns the updater.
+	 */
+	public Updater getUpdater() {
+		return updater;
+	}
+
 	/**
 	 *
 	 * @param connection -- int -- 0 for no connection, 1 for connecting, 2 for connected
