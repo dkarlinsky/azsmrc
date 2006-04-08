@@ -342,7 +342,12 @@ public class RCMain implements Launchable {
 		debugLogger.setLevel(Level.FINEST);
 
 		Handler consoleHandler = new Handler() {
-			private SimpleFormatter sF = new SimpleFormatter();
+			private Formatter sF = new Formatter() {
+				@Override
+				public String format(LogRecord record) {
+					return record.getMessage();
+				}
+			};
 			@Override
 			public void close() throws SecurityException {}
 			@Override
@@ -350,13 +355,6 @@ public class RCMain implements Launchable {
 			@Override
 			public void publish(LogRecord record) {
 				System.out.println(sF.format(record));
-			}
-		};
-
-		Formatter consoleFormatter = new Formatter() {
-			@Override
-			public String format(LogRecord record) {
-				return TimeFormatter.consoleFormat(record.getMillis())+" "+record.getMessage();
 			}
 		};
 
