@@ -7,6 +7,7 @@ Index
 4.  Setup
 5.  Manually starting the remote
 6.	Website
+7.  Donating
 ------------------
 
 1.  What is AzSMRC?
@@ -140,3 +141,23 @@ Our ProjectPage is: http://sourceforge.net/projects/azsmrc
 
 Please use the tools there, like the BugTracker or the Feature Requests.
 You can find the forum there too.
+
+7.  Donations
+
+Donations are always welcome!  We have several methods for donating availble.
+
+These can be viewed directly in the AzSMRC program
+(Help-> User Guide or the blue toolbar icon with a 'i')
+
+Also these options are described on our homepage:
+
+http://azsmrc.sourceforge.net/index.php?action=supportUs
+
+
+a.  PayPal -- Directly give a donation to us through PayPal
+b.  Amazon referral system --
+		This does not require any actual donation from you, but rather, Amazon
+		will donate to us a percentage of your total shopping if you use the
+		provided referral links.  The direct link system provides the most
+		money back for us from Amazon, so if you plan to do some shopping at
+		Amazon, then please do it through this system and support us!
