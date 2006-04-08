@@ -734,7 +734,7 @@ public class ConsoleTab {
 						buf.append('\n');
 
 						if(buf.length() <=0 || buf.length() > 1000) return;
-						System.out.println("To Console: "+buf);
+						//System.out.println("To Console: "+buf);
 						consoleText.append(buf.toString());
 
 						int nbLinesNow = consoleText.getLineCount();
