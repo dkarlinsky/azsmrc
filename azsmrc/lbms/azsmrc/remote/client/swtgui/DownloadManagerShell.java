@@ -730,22 +730,36 @@ public class DownloadManagerShell {
 
 		queueTorrent = new ToolItem(bar, SWT.PUSH);
 		queueTorrent.setImage(ImageRepository.getImage("toolbar_queue"));
-		queueTorrent.setToolTipText("Queue Torrent");
+		queueTorrent.setToolTipText("Queue Torrent(s)");
 		queueTorrent.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				if(downloadsTable.isFocusControl()){
 					TableItem[] items = downloadsTable.getSelection();
-					if(items.length == 0 || items.length > 1) return;
-					Container container = (Container)items[0].getData();
-					container.getDownload().stopAndQueue();
+					if(items.length == 0) return;
+					
+					RCMain.getRCMain().getClient().transactionStart();
+					
+					for(TableItem item : items){
+						Container container = (Container)item.getData();
+						container.getDownload().stopAndQueue();
+					}				
+					
 					RCMain.getRCMain().getClient().transactionCommit();
+					//Reset Buttons
 					setToolBarTorrentIcons(false,true,true);
 				}else{
 					TableItem[] items = seedsTable.getSelection();
-					if(items.length == 0 || items.length > 1) return;
-					Container container = (Container)items[0].getData();
-					container.getDownload().stopAndQueue();
+					if(items.length == 0) return;
+					
+					RCMain.getRCMain().getClient().transactionStart();
+					
+					for(TableItem item : items){
+						Container container = (Container)item.getData();
+						container.getDownload().stopAndQueue();
+					}				
+					
 					RCMain.getRCMain().getClient().transactionCommit();
+					//Reset Buttons
 					setToolBarTorrentIcons(false,true,true);
 				}
 			}
@@ -754,22 +768,36 @@ public class DownloadManagerShell {
 
 		stopTorrent = new ToolItem(bar, SWT.PUSH);
 		stopTorrent.setImage(ImageRepository.getImage("toolbar_stop"));
-		stopTorrent.setToolTipText("Stop Torrent");
+		stopTorrent.setToolTipText("Stop Torrent(s)");
 		stopTorrent.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				if(downloadsTable.isFocusControl()){
 					TableItem[] items = downloadsTable.getSelection();
-					if(items.length == 0 || items.length > 1) return;
-					Container container = (Container)items[0].getData();
-					container.getDownload().stop();
-					RCMain.getRCMain().getClient().transactionCommit();
+					if(items.length == 0) return;					
+					
+					RCMain.getRCMain().getClient().transactionStart();
+					
+					for(TableItem item : items){
+						Container container = (Container)item.getData();
+						container.getDownload().stop();
+					}
+					
+					RCMain.getRCMain().getClient().transactionCommit();				
+					//Reset the Toobar Buttons
 					setToolBarTorrentIcons(true,false,true);
 				}else{
 					TableItem[] items = seedsTable.getSelection();
-					if(items.length == 0 || items.length > 1) return;
-					Container container = (Container)items[0].getData();
-					container.getDownload().stop();
-					RCMain.getRCMain().getClient().transactionCommit();
+					if(items.length == 0) return;
+					
+					RCMain.getRCMain().getClient().transactionStart();
+					
+					for(TableItem item : items){
+						Container container = (Container)item.getData();
+						container.getDownload().stop();
+					}
+					
+					RCMain.getRCMain().getClient().transactionCommit();				
+					//Reset the Toobar buttons
 					setToolBarTorrentIcons(true,false,true);
 				}
 			}
@@ -782,35 +810,43 @@ public class DownloadManagerShell {
 
 		removeTorrent = new ToolItem(bar, SWT.PUSH);
 		removeTorrent.setImage(ImageRepository.getImage("toolbar_remove"));
-		removeTorrent.setToolTipText("Remove Torrents");
+		removeTorrent.setToolTipText("Remove Torrent(s)");
 		removeTorrent.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				if(downloadsTable.isFocusControl()){
 					TableItem[] items = downloadsTable.getSelection();
-					if(items.length == 0 || items.length > 1) return;
-					Container container = (Container)items[0].getData();
-					container.getDownload().remove();
-					container.removeFromTable();
-					if(seedsMap.containsKey(container.getDownload().getHash())){
-						seedsMap.remove(container.getDownload().getHash());
-					}else if(downloadsMap.containsKey(container.getDownload().getHash())){
-						downloadsMap.remove(container.getDownload().getHash());
-					}
+					if(items.length == 0) return;					
+					
+					RCMain.getRCMain().getClient().transactionStart();
+					
+					for(TableItem item : items){
+						Container container = (Container)item.getData();
+						container.getDownload().remove();
+						container.removeFromTable();
+						if(seedsMap.containsKey(container.getDownload().getHash())){
+							seedsMap.remove(container.getDownload().getHash());
+						}else if(downloadsMap.containsKey(container.getDownload().getHash())){
+							downloadsMap.remove(container.getDownload().getHash());
+						}
+					}					
 					RCMain.getRCMain().getClient().transactionCommit();
+					
 				}else{
 					TableItem[] items = seedsTable.getSelection();
-					if(items.length == 0 || items.length > 1) return;
-					Container container = (Container)items[0].getData();
-					container.getDownload().remove();
-					container.removeFromTable();
-					if(seedsMap.containsKey(container.getDownload().getHash())){
-						seedsMap.remove(container.getDownload().getHash());
-					}else if(downloadsMap.containsKey(container.getDownload().getHash())){
-						downloadsMap.remove(container.getDownload().getHash());
-					}
+					if(items.length == 0) return;
+					RCMain.getRCMain().getClient().transactionStart();
+
+					for(TableItem item : items){
+						Container container = (Container)item.getData();
+						container.getDownload().remove();
+						container.removeFromTable();
+						if(seedsMap.containsKey(container.getDownload().getHash())){
+							seedsMap.remove(container.getDownload().getHash());
+						}else if(downloadsMap.containsKey(container.getDownload().getHash())){
+							downloadsMap.remove(container.getDownload().getHash());
+						}
+					}					
 					RCMain.getRCMain().getClient().transactionCommit();
-
-
 				}
 			}
 		});
