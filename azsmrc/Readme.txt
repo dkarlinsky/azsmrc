@@ -6,7 +6,7 @@ Index
 3.  Installation
 4.  Setup
 5.  Manually starting the remote
-6.	Website
+6.  Website
 7.  Donating
 ------------------
 
