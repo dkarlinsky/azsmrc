@@ -12,6 +12,8 @@ import java.io.FileReader;
 
 
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
+import lbms.azsmrc.remote.client.swtgui.RCMain;
+import lbms.azsmrc.remote.client.swtgui.dialogs.AmazonDialog;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -33,14 +35,16 @@ public class ReadmeTab {
     private String sourceFile = "Readme.txt";
     private String sourceDir = System.getProperty("user.dir")+System.getProperty("file.separator");
     private String paypalURL = "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=omschaub%40users%2esourceforge%2enet&item_name=AzMultiUser%20Donation&no_shipping=0&no_note=1&tax=0&currency_code=USD&bn=PP%2dDonationsBF&charset=UTF%2d8";
-
+    private String amazonComURL = "http://www.amazon.com/exec/obidos/redirect?tag=azsmrc-20&amp;creative=374005&amp;camp=211041&amp;link_code=qs1&amp;adid=0TY7KZ926FVJDA9X0AQ9&amp;path=subst/home/home.html";
+    private String amazonDeURL = "http://www.amazon.de/exec/obidos/redirect-home?tag=azsmrc-21&site=home";
+    
     public ReadmeTab(CTabFolder parentTab){
         final CTabItem detailsTab = new CTabItem(parentTab, SWT.CLOSE);
         detailsTab.setText("Information");
 
 
         final Composite parent = new Composite(parentTab, SWT.NONE);
-        parent.setLayout(new GridLayout(1,false));
+        parent.setLayout(new GridLayout(3,false));
         GridData gridData = new GridData(GridData.GRAB_HORIZONTAL);
         gridData.grabExcessHorizontalSpace = true;
         gridData.horizontalSpan = 1;
@@ -55,7 +59,27 @@ public class ReadmeTab {
             }
         });
 
+        
+        Button amazonDonate = new Button(parent,SWT.PUSH);
+        amazonDonate.setImage(ImageRepository.getImage("amazon.com"));
+        amazonDonate.setToolTipText("By making your Amazon.com purchases through our referral link, they pay us a donation! So, start your Amazon shopping from here");
+        amazonDonate.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
+                Program.launch(amazonComURL);
+                new AmazonDialog(RCMain.getRCMain().getDisplay());
+            }
+        });
 
+        
+        Button amazonDeDonate = new Button(parent,SWT.PUSH);
+        amazonDeDonate.setImage(ImageRepository.getImage("amazon.de"));
+        amazonDeDonate.setToolTipText("Wenn du bei Amazon.de einkaufst und dabei unseren Link benutzt, zahlt Amazon uns eine Provision! Also starte deinen Amazon Einkauf bei uns.");
+        amazonDeDonate.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
+                Program.launch(amazonDeURL);
+            }
+        });
+        
         Group info = new Group(parent,SWT.NONE);
         info.setText("AzMultiUser Information (Readme.txt)");
         GridLayout gridLayout = new GridLayout();
@@ -64,6 +88,7 @@ public class ReadmeTab {
         gridData = new GridData(GridData.FILL_BOTH);
         gridData.grabExcessHorizontalSpace = true;
         gridData.grabExcessVerticalSpace = true;
+        gridData.horizontalSpan = 3;
         info.setLayoutData(gridData);
 
 

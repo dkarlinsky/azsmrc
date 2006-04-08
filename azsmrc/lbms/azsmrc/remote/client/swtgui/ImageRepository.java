@@ -97,9 +97,10 @@ public class ImageRepository {
         loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/toolbar/remove_large.png","toolbar_remove",255);
         loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/toolbar/stop_large.png","toolbar_stop",255);
 
-        //paypal
+        //paypal and amazon
         loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/paypal.gif","paypal",255);
-
+        loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/amazon-com.png","amazon.com",255);
+        loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/amazon-de.png","amazon.de",255);
 		//if needed
 		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/tool_delete.png","trashcan",255);
 
