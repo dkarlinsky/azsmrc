@@ -1527,10 +1527,7 @@ public class DownloadManagerShell {
 					}
 
 
-					public void widgetDefaultSelected(SelectionEvent arg0) {
-						// TODO Auto-generated method stub
-
-					}
+					public void widgetDefaultSelected(SelectionEvent arg0) {}
 				};
 
 				int iRel = 0;
@@ -1607,10 +1604,7 @@ public class DownloadManagerShell {
 
 					}
 
-					public void widgetDefaultSelected(SelectionEvent arg0) {
-						// TODO Auto-generated method stub
-
-					}
+					public void widgetDefaultSelected(SelectionEvent arg0) {}
 				};
 
 				int iRel = 0;
@@ -1821,7 +1815,6 @@ public class DownloadManagerShell {
 		try {
 			if(connectionStatusIcon.getDisplay() == null) return;
 		} catch (SWTException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
@@ -1841,8 +1834,7 @@ public class DownloadManagerShell {
 						connectionStatusIcon.setImage(ImageRepository.getImage("connect_established"));
 						connectionStatusIcon.setToolTipText("Connected to server");
 					}
-				} catch (SWTException e) {
-					// TODO Auto-generated catch block
+				} catch (SWTException e) {					
 					e.printStackTrace();
 				}
 			}});
@@ -1859,8 +1851,7 @@ public class DownloadManagerShell {
 							sslStatusIcon.setEnabled(true);
 							sslStatusIcon.setImage(ImageRepository.getImage("ssl_enabled"));
 							sslStatusIcon.setToolTipText("SSL Enabled");
-						} catch (SWTException e) {
-							// TODO Auto-generated catch block
+						} catch (SWTException e) {							
 							e.printStackTrace();
 						}
 					}
@@ -1873,8 +1864,7 @@ public class DownloadManagerShell {
 							sslStatusIcon.setEnabled(true);
 							sslStatusIcon.setImage(ImageRepository.getImage("ssl_disabled"));
 							sslStatusIcon.setToolTipText("SSL Disabled");
-						} catch (SWTException e) {
-							// TODO Auto-generated catch block
+						} catch (SWTException e) {							
 							e.printStackTrace();
 						}
 					}
@@ -1887,8 +1877,7 @@ public class DownloadManagerShell {
 					try {
 						sslStatusIcon.setImage(ImageRepository.getImage("ssl_disabled"));
 						sslStatusIcon.setEnabled(false);
-					} catch (SWTException e) {
-						// TODO Auto-generated catch block
+					} catch (SWTException e) {						
 						e.printStackTrace();
 					}
 				}
@@ -1908,7 +1897,6 @@ public class DownloadManagerShell {
 					down.setEnabled(bDown);
 					bottom.setEnabled(bBottom);
 				} catch (SWTException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -2357,8 +2345,7 @@ public class DownloadManagerShell {
 					statusBarText.setForeground(display.getSystemColor(color));
 					statusBarText.setText(text);
 					statusBarText.getParent().layout();
-				} catch (SWTException e) {
-					// TODO Auto-generated catch block
+				} catch (SWTException e) {					
 					e.printStackTrace();
 				}
 			}
@@ -2817,7 +2804,7 @@ public class DownloadManagerShell {
 						} else {
 							System.out.println("This is not a valid File: "+source);
 							// Probably a URL.. let torrentwindow handle it
-							//TODO: openTorrentWindow(null, new String[] { sourceNames[i] },
+							// openTorrentWindow(null, new String[] { sourceNames[i] },
 							//		bOverrideToStopped);
 						}
 					}
@@ -2826,7 +2813,7 @@ public class DownloadManagerShell {
 
 			System.out.println(((URLTransfer.URLType)event.data).toString());
 			System.out.println(((URLTransfer.URLType) event.data).linkURL);
-//          TODO:openTorrentWindow(null,
+//          openTorrentWindow(null,
 			//			new String[] { ((URLTransfer.URLType) event.data).linkURL },
 			//			bOverrideToStopped);
 		} else
