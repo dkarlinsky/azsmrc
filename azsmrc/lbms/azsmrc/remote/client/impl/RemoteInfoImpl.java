@@ -6,7 +6,7 @@ import lbms.azsmrc.remote.client.RemoteInfo;
 public class RemoteInfoImpl implements RemoteInfo {
 
 	private Client client;
-	private boolean loaded;
+	private boolean loaded, loading;
 	private String azureusVersion = "";
 	private String pluginVersion = "";
 
@@ -26,6 +26,7 @@ public class RemoteInfoImpl implements RemoteInfo {
 	 * @param azureusVersion The azureusVersion to set.
 	 */
 	public void setAzureusVersion(String azureusVersion) {
+		load();
 		this.azureusVersion = azureusVersion;
 	}
 
@@ -33,6 +34,7 @@ public class RemoteInfoImpl implements RemoteInfo {
 	 * @param pluginVersion The pluginVersion to set.
 	 */
 	public void setPluginVersion(String pluginVersion) {
+		load();
 		this.pluginVersion = pluginVersion;
 	}
 
@@ -41,11 +43,15 @@ public class RemoteInfoImpl implements RemoteInfo {
 	 */
 	public void setLoaded(boolean loaded) {
 		this.loaded = loaded;
+		loading = false;
 	}
 
 	public boolean load() {
 		if (loaded) return true;
-
+		if (!loading) {
+			loading = true;
+			client.sendGetRemoteInfo();
+		}
 		return false;
 	}
 }
