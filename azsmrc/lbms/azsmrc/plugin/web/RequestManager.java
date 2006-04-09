@@ -45,6 +45,8 @@ public class RequestManager {
 	private static RequestManager instance = new RequestManager();
 	private Map<String, Integer[]> downloadControlList = new HashMap<String, Integer[]>();
 
+	private boolean restart = false;
+
 	/**
 	 * @return Returns the instance.
 	 */
@@ -165,6 +167,21 @@ public class RequestManager {
 		}
 		System.out.println("\nResponse:");
 		new XMLOutputter(Format.getPrettyFormat()).output(xmlResponse, System.out);		//Response
+
+		if (restart) {
+			System.out.println("Restarting Azureus");
+			Thread t = new Thread(new Runnable() {
+				public void run() {
+					try {
+						Plugin.getPluginInterface().getUpdateManager().applyUpdates(true);
+					} catch (UpdateException e) {
+						e.printStackTrace();
+					}
+				}
+			});
+			t.setDaemon(true);
+			t.start();
+		}
 	}
 
 	private Element sendEvents(User user) {
@@ -1087,20 +1104,19 @@ public class RequestManager {
 		addHandler("restartAzureus", new RequestHandler() {
 			public boolean handleRequest(Element xmlRequest, Element response, final User user) throws IOException {
 				if (user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
-					Thread t = new Thread(new Runnable() {
-						public void run() {
-							try {
-								Plugin.getPluginInterface().getUpdateManager().applyUpdates(true);
-							} catch (UpdateException e) {
-								user.eventException(e);
-								e.printStackTrace();
-							}
-						}
-					});
-					t.setDaemon(true);
-					t.start();
+					restart = true;
 				}
 				return false;
+			}
+		});
+		addHandler("getRemoteInfo", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, final User user) throws IOException {
+
+				PluginInterface pi = Plugin.getPluginInterface();
+				response.setAttribute("azureusVersion", pi.getAzureusVersion());
+				response.setAttribute("pluginVersion", pi.getPluginVersion());
+
+				return true;
 			}
 		});
 	}

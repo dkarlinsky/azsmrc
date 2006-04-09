@@ -5,4 +5,5 @@ public class Constants {
 	public static final long UPDATE_ADVANCED_STATS 	= 1<<1;
 	public static final long UPDATE_DOWNLOAD_FILES 	= 1<<2;
 	public static final long UPDATE_USERS 			= 1<<3;
+	public static final long UPDATE_REMOTE_INFO		= 1<<4;
 }

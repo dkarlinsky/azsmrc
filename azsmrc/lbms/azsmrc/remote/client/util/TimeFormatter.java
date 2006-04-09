@@ -67,10 +67,6 @@ public class TimeFormatter {
 	  return result;
 	}
 
-	public static String consoleFormat(long time) {
-		return "[XX:XX]";
-	}
-
 	private static String twoDigits(int i) {
 	  return (i < 10) ? "0" + i : String.valueOf(i);
 	}

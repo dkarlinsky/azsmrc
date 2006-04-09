@@ -12,6 +12,7 @@ import lbms.azsmrc.remote.client.impl.DownloadFileManagerImpl;
 import lbms.azsmrc.remote.client.impl.DownloadImpl;
 import lbms.azsmrc.remote.client.impl.DownloadManagerImpl;
 import lbms.azsmrc.remote.client.impl.DownloadStatsImpl;
+import lbms.azsmrc.remote.client.impl.RemoteInfoImpl;
 import lbms.azsmrc.remote.client.impl.UserManagerImpl;
 import lbms.azsmrc.shared.DuplicatedUserException;
 import lbms.azsmrc.shared.RemoteConstants;
@@ -326,6 +327,15 @@ public class ResponseManager {
 					e.printStackTrace();
 				}
 				return 0;
+			}
+		});
+		addHandler("getRemoteInfo", new ResponseHandler() {
+			public long handleRequest(Element xmlResponse) throws IOException{
+				RemoteInfoImpl ri = client.getRemoteInfoImpl();
+				ri.setAzureusVersion(xmlResponse.getAttributeValue("azureusVersion"));
+				ri.setPluginVersion(xmlResponse.getAttributeValue("pluginVersion"));
+				ri.setLoaded(true);
+				return Constants.UPDATE_REMOTE_INFO;
 			}
 		});
 	}

@@ -42,6 +42,7 @@ import lbms.azsmrc.remote.client.events.HTTPErrorListener;
 import lbms.azsmrc.remote.client.events.ParameterListener;
 import lbms.azsmrc.remote.client.events.SpeedUpdateListener;
 import lbms.azsmrc.remote.client.impl.DownloadManagerImpl;
+import lbms.azsmrc.remote.client.impl.RemoteInfoImpl;
 import lbms.azsmrc.remote.client.impl.UserManagerImpl;
 import lbms.azsmrc.remote.client.util.Timer;
 import lbms.azsmrc.remote.client.util.TimerEvent;
@@ -67,6 +68,7 @@ public class Client {
 	private DownloadManagerImpl downloadManager;
 	private UserManagerImpl userManager;
 	private ResponseManager responseManager;
+	private RemoteInfoImpl remoteInfo;
 
 	private List<ClientUpdateListener> 	clientUpdateListeners	= new ArrayList<ClientUpdateListener>();
 	private List<SpeedUpdateListener> 	speedUpdateListners		= new ArrayList<SpeedUpdateListener>();
@@ -90,6 +92,7 @@ public class Client {
 		downloadManager = new DownloadManagerImpl();
 		responseManager = new ResponseManager(this);
 		userManager 	= new UserManagerImpl(this);
+		remoteInfo		= new RemoteInfoImpl(this);
 		failedConnections 	= 0;
 		timer 	= new Timer("Client Timer",1);
 		ssl 	= false;
@@ -105,6 +108,12 @@ public class Client {
 				System.out.println(sF.format(record));
 			}
 		});
+	}
+
+	private void reset() {
+		userManager 	= new UserManagerImpl(this);
+		remoteInfo		= new RemoteInfoImpl(this);
+		failedConnections 	= 0;
 	}
 
 	public void transactionStart() {
@@ -575,6 +584,12 @@ public class Client {
 		enqueue(sendElement);
 	}
 
+	public void sendGetRemoteInfo() {
+		Element sendElement = getSendElement();
+		sendElement.setAttribute("switch", "getRemoteInfo");
+		enqueue(sendElement);
+	}
+
 	public void sendGetGlobalStats() {
 		send(); //globalStats are allways requested so just send here
 	}
@@ -731,6 +746,20 @@ public class Client {
 		return userManager;
 	}
 
+	/**
+	 * @return Returns the remoteInfo.
+	 */
+	public RemoteInfo getRemoteInfo() {
+		return remoteInfo;
+	}
+
+
+	/**
+	 * @return Returns the remoteInfo.
+	 */
+	protected RemoteInfoImpl getRemoteInfoImpl() {
+		return remoteInfo;
+	}
 
 	/**
 	 * @param password The password to set.
@@ -759,6 +788,7 @@ public class Client {
 	}
 
 	public void setServer(String server) {
+		reset();
 		if (server == null) this.server = null;
 		else
 		try {
