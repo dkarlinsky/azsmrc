@@ -294,7 +294,7 @@ public class DownloadManagerShell {
 				if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("confirm.exit","true"))){
 					MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
 					messageBox.setText("Confirm Exit");
-					messageBox.setMessage("Are you sure you wish to exit AzSMRC entirely?");
+					messageBox.setMessage("Are you sure?");
 					int response = messageBox.open();
 					switch (response){
 					case SWT.OK:
@@ -360,7 +360,7 @@ public class DownloadManagerShell {
 			public void handleEvent(Event e){
 				MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
 				messageBox.setText("Restart Azureus");
-				messageBox.setMessage("Are you sure you wish to restart the Azureus Server itself?");
+				messageBox.setMessage("Are you sure?");
 				int response = messageBox.open();
 				switch (response){
 				case SWT.OK:
