@@ -53,6 +53,7 @@ import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -167,10 +168,18 @@ public class RCMain implements Launchable {
 		setTrayIcon(0);
 
 		//Listener for the system tray
-		systrayItem.addListener(SWT.DefaultSelection, new Listener()
+
+		
+		systrayItem.addSelectionListener(new SelectionListener()
 				{
-					public void handleEvent(Event e)
-					{
+					public void widgetDefaultSelected(SelectionEvent arg0) {
+						// this is a double click .. if we ever want to do something with this
+						// do it here
+						
+					}
+
+					public void widgetSelected(SelectionEvent arg0) {
+						//normal selection is a single click
 						try{
 							Shell dms_shell = getMainWindow().getShell();
 							if(dms_shell.getMinimized()){
@@ -188,6 +197,7 @@ public class RCMain implements Launchable {
 							mainWindow.open();
 							return;
 						}
+						
 					}
 				});
 
