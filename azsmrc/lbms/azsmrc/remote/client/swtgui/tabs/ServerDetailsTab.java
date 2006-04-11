@@ -9,6 +9,9 @@ package lbms.azsmrc.remote.client.swtgui.tabs;
 import lbms.azsmrc.remote.client.RemoteInfo;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
+import lbms.azsmrc.remote.client.util.TimerEvent;
+import lbms.azsmrc.remote.client.util.TimerEventPerformer;
+import lbms.azsmrc.remote.client.util.TimerEventPeriodic;
 import lbms.tools.stats.StatsStreamGlobalManager;
 
 import org.eclipse.swt.SWT;
@@ -21,25 +24,29 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MessageBox;
 
 
 public class ServerDetailsTab {
 
 	private Label azVer;
 	private Label plVer;
-	private Label kbpsDown, kbpsUp;
+	
 	private Label totalDown, totalUp;
 
-
+	private Group details2;
+	private Composite parent;
+	
 	public ServerDetailsTab(CTabFolder parentTab, final RemoteInfo remoteInfo){
 		final CTabItem detailsTab = new CTabItem(parentTab, SWT.CLOSE);
 		detailsTab.setText("Server Details");
 		
 		
-		final Composite parent = new Composite(parentTab, SWT.NONE);
+		parent = new Composite(parentTab, SWT.NONE);
 		parent.setLayout(new GridLayout(2,false));
 		GridData gridData = new GridData(GridData.FILL_BOTH);
 		gridData.grabExcessHorizontalSpace = true;
@@ -109,7 +116,7 @@ public class ServerDetailsTab {
 		
 		
 
-		Group details2 = new Group(parent,SWT.NULL);
+		details2 = new Group(parent,SWT.NULL);
 		details2.setText("Connection Details");
 		gridLayout = new GridLayout();
 		gridLayout.numColumns = 2;
@@ -119,20 +126,6 @@ public class ServerDetailsTab {
 		details2.setLayoutData(gridData);
 		
 		
-		//Speed Down
-		Label kbpsDownL = new Label(details2,SWT.NULL);
-		kbpsDownL.setText("Speed Receiving:");
-		
-		kbpsDown = new Label(details2, SWT.NULL);
-		kbpsDown.setText(DisplayFormatters.formatByteCountToBase10KBEtcPerSec(StatsStreamGlobalManager.getKbpsDownload()));
-		
-		//Speed Up
-		Label kbpsUpL = new Label(details2,SWT.NULL);
-		kbpsUpL.setText("Speed Sending:");
-		
-		kbpsUp = new Label(details2, SWT.NULL);
-		kbpsUp.setText(DisplayFormatters.formatByteCountToBase10KBEtcPerSec(StatsStreamGlobalManager.getKbpsUpload()));
-				
 		
 		//Total download
 		Label totalDownL = new Label(details2,SWT.NULL);
@@ -149,8 +142,52 @@ public class ServerDetailsTab {
 		totalUp.setText(DisplayFormatters.formatByteCountToBase10KBEtc(StatsStreamGlobalManager.getTotalUpload()));
 		
 		
+		//Button to restart server
+		
+		Button restartB = new Button(parent, SWT.PUSH);
+		restartB.setText("Restart Server");
+		restartB.addListener(SWT.Selection, new Listener(){
+
+			public void handleEvent(Event arg0) {
+				MessageBox messageBox = new MessageBox(RCMain.getRCMain().getDisplay().getActiveShell(), SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
+				messageBox.setText("Restart Azureus");
+				messageBox.setMessage("Are you sure?");
+				int response = messageBox.open();
+				switch (response){
+				case SWT.OK:
+					RCMain.getRCMain().getClient().sendRestartAzureus();
+					break;
+				case SWT.CANCEL:
+					break;
+				}
+				
+			}
+			
+		});
+		
+		
+		
 		//Update Listener
 		
+
+		final TimerEventPeriodic updateTimerEvent =  RCMain.getRCMain().getMainTimer().addPeriodicEvent(1000,
+				new TimerEventPerformer() {
+			public void perform(TimerEvent event) {
+				RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
+					public void run() {
+						try{							
+							totalDown.setText(DisplayFormatters.formatByteCountToBase10KBEtc(StatsStreamGlobalManager.getTotalDownload()));
+							totalUp.setText(DisplayFormatters.formatByteCountToBase10KBEtc(StatsStreamGlobalManager.getTotalUpload()));
+							details2.layout();
+							parent.layout();
+						}catch(SWTException e){
+							//do nothing.. if it cannot update, then who cares... don't throw an error
+						}							
+					}					
+				});
+			}
+		});
+
 		
 		
 		
@@ -158,7 +195,7 @@ public class ServerDetailsTab {
 		detailsTab.addDisposeListener(new DisposeListener (){
 
 			public void widgetDisposed(DisposeEvent arg0) {
-				
+				updateTimerEvent.cancel();
 			}
 
 		});
