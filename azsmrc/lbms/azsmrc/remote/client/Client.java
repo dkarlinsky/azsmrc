@@ -49,6 +49,8 @@ import lbms.azsmrc.remote.client.util.TimerEvent;
 import lbms.azsmrc.remote.client.util.TimerEventPerformer;
 import lbms.azsmrc.shared.EncodingUtil;
 import lbms.azsmrc.shared.RemoteConstants;
+import lbms.tools.stats.StatsInputStream;
+import lbms.tools.stats.StatsOutputStream;
 
 public class Client {
 
@@ -188,16 +190,15 @@ public class Client {
 					connection.setRequestProperty("Content-type", "text/xml");
 					connection.setRequestProperty("Authorization", "Basic: "+(EncodingUtil.encode((username+":"+password).getBytes("8859_1"))));
 					connection.setRequestProperty("Accept-encoding", "gzip");
-					OutputStream os = connection.getOutputStream();
-					gos = new GZIPOutputStream(os);
+					gos = new GZIPOutputStream(new StatsOutputStream(connection.getOutputStream()));
 					new XMLOutputter().output(req, gos);
 					gos.close();
 					connection.connect();
 					String gzip = connection.getHeaderField("Content-encoding");
 					if (gzip != null && gzip.toLowerCase().indexOf("gzip") != -1) {
-						is = new GZIPInputStream (connection.getInputStream());
+						is = new GZIPInputStream (new StatsInputStream(connection.getInputStream()));
 					} else {
-						is = connection.getInputStream();
+						is = new StatsInputStream(connection.getInputStream());
 					}
 					try {
 						System.out.println("\nRequest:");
