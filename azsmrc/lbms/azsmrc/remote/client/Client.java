@@ -44,6 +44,7 @@ import lbms.azsmrc.remote.client.events.SpeedUpdateListener;
 import lbms.azsmrc.remote.client.impl.DownloadManagerImpl;
 import lbms.azsmrc.remote.client.impl.RemoteInfoImpl;
 import lbms.azsmrc.remote.client.impl.UserManagerImpl;
+import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.remote.client.util.Timer;
 import lbms.azsmrc.remote.client.util.TimerEvent;
 import lbms.azsmrc.remote.client.util.TimerEventPerformer;
@@ -190,22 +191,24 @@ public class Client {
 					connection.setRequestProperty("Content-type", "text/xml");
 					connection.setRequestProperty("Authorization", "Basic: "+(EncodingUtil.encode((username+":"+password).getBytes("8859_1"))));
 					connection.setRequestProperty("Accept-encoding", "gzip");
-					gos = new GZIPOutputStream(new StatsOutputStream(connection.getOutputStream()));
+					StatsOutputStream sos = new StatsOutputStream(connection.getOutputStream());
+					gos = new GZIPOutputStream(sos);
 					new XMLOutputter().output(req, gos);
 					gos.close();
 					connection.connect();
 					String gzip = connection.getHeaderField("Content-encoding");
+					StatsInputStream sis = new StatsInputStream(connection.getInputStream());
 					if (gzip != null && gzip.toLowerCase().indexOf("gzip") != -1) {
-						is = new GZIPInputStream (new StatsInputStream(connection.getInputStream()));
+						is = new GZIPInputStream (sis);
 					} else {
-						is = new StatsInputStream(connection.getInputStream());
+						is = sis;
 					}
 					try {
-						System.out.println("\nRequest:");
+						System.out.println("\nRequest ("+DisplayFormatters.formatByteCountToBase10KBEtc(sos.getBytesWritten())+"):");
 						new XMLOutputter(Format.getPrettyFormat()).output(req, System.out);		//Request
 						SAXBuilder builder = new SAXBuilder();
 						Document xmlDom = builder.build(is);
-						System.out.println("\nResponse:");
+						System.out.println("\nResponse ("+DisplayFormatters.formatByteCountToBase10KBEtc(sis.getBytesRead())+"):");
 						new XMLOutputter(Format.getPrettyFormat()).output(xmlDom, System.out);	//Response
 						System.out.println();
 						responseManager.handleResponse(xmlDom);
