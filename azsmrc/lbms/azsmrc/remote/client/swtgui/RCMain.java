@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -75,7 +76,7 @@ public class RCMain implements Launchable {
 	protected Display display;
 	private static RCMain rcMain;
 	private Client client;
-	private Properties properties;
+	private Properties properties, azsmrcProperties;
 	private File confFile;
 	private Timer timer;
 	private TimerEventPeriodic updateTimer;
@@ -169,13 +170,13 @@ public class RCMain implements Launchable {
 
 		//Listener for the system tray
 
-		
+
 		systrayItem.addSelectionListener(new SelectionListener()
 				{
 					public void widgetDefaultSelected(SelectionEvent arg0) {
 						// this is a double click .. if we ever want to do something with this
 						// do it here
-						
+
 					}
 
 					public void widgetSelected(SelectionEvent arg0) {
@@ -197,7 +198,7 @@ public class RCMain implements Launchable {
 							mainWindow.open();
 							return;
 						}
-						
+
 					}
 				});
 
@@ -343,6 +344,20 @@ public class RCMain implements Launchable {
 				e.printStackTrace();
 			}  finally {
 				if (fin!=null) try { fin.close(); } catch (IOException e) {}
+			}
+		}
+		azsmrcProperties = new Properties();
+		{
+			InputStream is = null;
+			try {
+				is = RCMain.class.getClassLoader().getResourceAsStream("azsmrc.properties");
+				azsmrcProperties.load(is);
+				is.close();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} finally {
+				if (is!=null) try { is.close(); } catch (IOException e) {}
 			}
 		}
 		System.out.println("Creating Logger.");
@@ -703,6 +718,14 @@ public class RCMain implements Launchable {
 
 
 	/**
+	 * @return Returns the azsmrcProperties.
+	 */
+	public Properties getAzsmrcProperties() {
+		return azsmrcProperties;
+	}
+
+
+	/**
 	 * @return Returns the updater.
 	 */
 	public Updater getUpdater() {
@@ -800,6 +823,4 @@ public class RCMain implements Launchable {
 
 		});
 	}
-
-
 }//EOF
