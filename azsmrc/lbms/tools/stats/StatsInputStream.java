@@ -23,6 +23,15 @@ public class StatsInputStream extends InputStream {
 		super();
 		this.is = is;
 		lastTime = System.currentTimeMillis();
+		StatsStreamGlobalManager.registerIS(this);
+	}
+
+	public StatsInputStream(InputStream is, boolean local) {
+		super();
+		this.is = is;
+		lastTime = System.currentTimeMillis();
+		if (!local)
+			StatsStreamGlobalManager.registerIS(this);
 	}
 
 	@Override
@@ -45,6 +54,7 @@ public class StatsInputStream extends InputStream {
 
 	@Override
 	public void close() throws IOException {
+		StatsStreamGlobalManager.removeIS(this);
 		is.close();
 		super.close();
 	}

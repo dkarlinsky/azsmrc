@@ -22,6 +22,16 @@ public class StatsOutputStream extends OutputStream {
 	public StatsOutputStream(OutputStream os) {
 		super();
 		this.os = os;
+		lastTime=System.currentTimeMillis();
+		StatsStreamGlobalManager.registerOS(this);
+	}
+
+	public StatsOutputStream(OutputStream os, boolean local) {
+		super();
+		this.os = os;
+		lastTime=System.currentTimeMillis();
+		if (!local)
+			StatsStreamGlobalManager.registerOS(this);
 	}
 
 	@Override
@@ -45,6 +55,7 @@ public class StatsOutputStream extends OutputStream {
 
 	@Override
 	public void close() throws IOException {
+		StatsStreamGlobalManager.removeOS(this);
 		os.close();
 		super.close();
 	}
