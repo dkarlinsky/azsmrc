@@ -24,7 +24,7 @@ public class I18N {
 		localized = true;
 	}
 
-	private static void load (BufferedReader ir, Map<String,String> map) throws IOException {
+	protected static void load (BufferedReader ir, Map<String,String> map) throws IOException {
 		try {
 			do {
 				String line = ir.readLine();
@@ -67,6 +67,4 @@ public class I18N {
 	public static boolean isLocalized() {
 		return localized;
 	}
-
-
 }
