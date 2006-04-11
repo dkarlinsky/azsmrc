@@ -2163,7 +2163,7 @@ public class DownloadManagerShell {
 			public void handleEvent(Event arg0) {
 				if(table != null || !table.isDisposed()){
 					TableItem[] items = table.getSelection();
-					MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_ERROR | SWT.OK | SWT.CANCEL);
+					MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
 					messageBox.setText("Confirm Delete");
 					messageBox.setMessage("Are you sure you wish to remove the data associated with these torrents?");
 					int response = messageBox.open();
@@ -2198,7 +2198,7 @@ public class DownloadManagerShell {
 			public void handleEvent(Event arg0) {
 				if(table != null || !table.isDisposed()){
 					TableItem[] items = table.getSelection();
-					MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_ERROR | SWT.OK | SWT.CANCEL);
+					MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
 					messageBox.setText("Confirm Delete");
 					messageBox.setMessage("Are you sure you wish to remove both the data associated with these torrents and the torrents themselves?");
 					int response = messageBox.open();
