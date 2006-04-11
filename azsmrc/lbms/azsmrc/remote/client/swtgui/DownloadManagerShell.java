@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 import lbms.azsmrc.remote.client.Client;
 import lbms.azsmrc.remote.client.Constants;
 import lbms.azsmrc.remote.client.Download;
+import lbms.azsmrc.remote.client.RemoteInfo;
 import lbms.azsmrc.remote.client.User;
 import lbms.azsmrc.remote.client.Utilities;
 import lbms.azsmrc.remote.client.events.ClientUpdateListener;
@@ -49,6 +50,7 @@ import lbms.azsmrc.remote.client.swtgui.tabs.ConsoleTab;
 import lbms.azsmrc.remote.client.swtgui.tabs.ManageUsersTab;
 import lbms.azsmrc.remote.client.swtgui.tabs.PreferencesTab;
 import lbms.azsmrc.remote.client.swtgui.tabs.ReadmeTab;
+import lbms.azsmrc.remote.client.swtgui.tabs.ServerDetailsTab;
 import lbms.azsmrc.remote.client.swtgui.tabs.TorrentDetailsTab;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.shared.EncodingUtil;
@@ -113,6 +115,7 @@ public class DownloadManagerShell {
 	private CTabFolder tabFolder;
 	private CTabItem myTorrents;
 	private MenuItem moveData;
+	private RemoteInfo remoteInfo;
 
 	private DownloadListener dlL = new DownloadListener(){
 
@@ -157,7 +160,8 @@ public class DownloadManagerShell {
 	private ToolItem refresh,manage_users, preferences, console;
 	private ToolItem addTorrent_by_file,addTorrent_by_url, pauseAll, resumeAll ;
 	private ToolItem stopTorrent, queueTorrent, removeTorrent;
-	private MenuItem menuLogin,menuLogout,menuQuickconnect, menuRestartAzureus, menuAddByFile, menuAddbyURL;
+	private MenuItem menuLogin,menuLogout,menuQuickconnect, menuRestartAzureus;
+	private MenuItem menuServerDetails, menuAddByFile, menuAddbyURL;
 	public ConsoleTab consoleTab;
 
 	//status bar labels
@@ -347,6 +351,25 @@ public class DownloadManagerShell {
 			}
 		});
 
+		//Separator
+		new MenuItem(remoteSubmenu,SWT.SEPARATOR);
+		
+		//Server Details
+		menuServerDetails = new MenuItem(remoteSubmenu, SWT.PUSH);
+		menuServerDetails.setText("&Server Details");
+		menuServerDetails.addListener(SWT.Selection,new Listener(){
+			public void handleEvent(Event e){
+				CTabItem[] tabs = tabFolder.getItems();
+				for(CTabItem tab:tabs){
+					if(tab.getText().equalsIgnoreCase("Server Details")){
+						tabFolder.setSelection(tab);
+						return;
+					}
+				}
+				new ServerDetailsTab(tabFolder,remoteInfo);
+			}
+		});
+		
 
 
 		//Separator
@@ -1114,6 +1137,10 @@ public class DownloadManagerShell {
 					setLogInOutButtons(true);
 				}
 
+				if((updateSwitches & Constants.UPDATE_REMOTE_INFO) != 0){
+					remoteInfo = RCMain.getRCMain().getClient().getRemoteInfo();
+				}
+				
 			}
 		};
 
@@ -1915,6 +1942,7 @@ public class DownloadManagerShell {
 						login.setEnabled(false);
 						menuLogin.setEnabled(false);
 						menuRestartAzureus.setEnabled(true);
+						menuServerDetails.setEnabled(true);
 						menuAddByFile.setEnabled(true);
 						menuAddbyURL.setEnabled(true);
 						menuLogout.setEnabled(true);
@@ -1943,6 +1971,7 @@ public class DownloadManagerShell {
 						menuLogin.setEnabled(true);
 						menuLogout.setEnabled(false);
 						menuRestartAzureus.setEnabled(false);
+						menuServerDetails.setEnabled(false);
 						menuAddByFile.setEnabled(false);
 						menuAddbyURL.setEnabled(false);
 						logout.setEnabled(false);
@@ -2914,6 +2943,9 @@ public class DownloadManagerShell {
 			client.transactionStart();
 			client.sendListTransfers(RemoteConstants.ST_ALL);
 			client.getUserManager().update();
+			
+			//Pull the remote info
+			client.getRemoteInfo().load();
 
 			//pull the upload download settings
 			client.sendGetAzParameter(
