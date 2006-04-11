@@ -158,6 +158,7 @@ a.  PayPal -- Directly give a donation to us through PayPal
 b.  Amazon referral system --
 		This does not require any actual donation from you, but rather, Amazon
 		will donate to us a percentage of your total shopping if you use the
-		provided referral links.  The direct link system provides the most
-		money back for us from Amazon, so if you plan to do some shopping at
-		Amazon, then please do it through this system and support us!
+		provided referral links.
+		If you are from Germany please use the direct link system as it provides
+		the most money back for us from Amazon, so if you plan to do some shopping
+		at Amazon, then please do it through this system and support us!
