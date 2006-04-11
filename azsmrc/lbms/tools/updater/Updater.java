@@ -252,6 +252,7 @@ public class Updater {
 									failed = true;
 									lastError = "File "+u.getName()+" failed Hash check";
 									callListenerUpdateError(lastError);
+									localLoc.delete();
 									continue;
 								}
 								if (u.isArchive()) {
