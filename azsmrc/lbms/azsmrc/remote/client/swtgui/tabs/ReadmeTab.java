@@ -66,7 +66,7 @@ public class ReadmeTab {
         amazonDonate.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 Program.launch(amazonComURL);
-                new AmazonDialog(RCMain.getRCMain().getDisplay());
+                //new AmazonDialog(RCMain.getRCMain().getDisplay());
             }
         });
 
