@@ -2163,9 +2163,15 @@ public class DownloadManagerShell {
 			public void handleEvent(Event arg0) {
 				if(table != null || !table.isDisposed()){
 					TableItem[] items = table.getSelection();
+					String names = "";
+					//Pull the names for the dialog
+					for(TableItem item : items){
+						names += ((Container)item.getData()).getDownload().getName() + "\n";
+					}					
+					
 					MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
 					messageBox.setText("Confirm Delete");
-					messageBox.setMessage("Are you sure you wish to remove the data associated with these torrents?");
+					messageBox.setMessage("Remove the data associated with the following:\n\n" + names);
 					int response = messageBox.open();
 					switch (response){
 					case SWT.OK:
@@ -2198,9 +2204,14 @@ public class DownloadManagerShell {
 			public void handleEvent(Event arg0) {
 				if(table != null || !table.isDisposed()){
 					TableItem[] items = table.getSelection();
+					String names = "";
+					//Pull the names for the dialog
+					for(TableItem item : items){
+						names += ((Container)item.getData()).getDownload().getName() + "\n";
+					}
 					MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
 					messageBox.setText("Confirm Delete");
-					messageBox.setMessage("Are you sure you wish to remove both the data associated with these torrents and the torrents themselves?");
+					messageBox.setMessage("Remove both the data and the torrents for the following:\n\n" + names);
 					int response = messageBox.open();
 					switch (response){
 					case SWT.OK:
