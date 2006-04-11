@@ -60,8 +60,8 @@ public class AmazonDialog {
         		"Visit Amazon and find a product you want to buy.  Here is an example URL:\n\n" +
         		"http://www.amazon.com/gp/product/B0000643Q8/qid=1144059482/sr=1-3/ \n\n" +
         		"Simply find the number after the /product/ -- here it is B0000643Q8 \n" +
-        		"Put this into the box below and then click to view the product page from either\n" +
-        		"Amazon.com or Amazon.de and Amazon will donate back to us the money just for\n" +
+        		"Put this into the box below and then click to view the product page \n" +
+        		"from Amazon.de and Amazon will donate back to us the money just for\n" +
         		"your buying through this link. It is that easy!");
         
 
@@ -98,7 +98,7 @@ public class AmazonDialog {
         gridLayout.marginWidth = 0;
         button_comp.setLayout(gridLayout);
 
-        Button amazonCom = new Button(button_comp,SWT.PUSH);
+/*        Button amazonCom = new Button(button_comp,SWT.PUSH);
         amazonCom.setText("Amazon.com");
         gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
         amazonCom.setLayoutData(gd);
@@ -109,11 +109,12 @@ public class AmazonDialog {
         				"&tag=azsmrc-20&camp=1789&creative=9325");
         		shell.close();
             }
-         });
+         });*/
 
         Button amazonDe = new Button(button_comp,SWT.PUSH);
-        amazonDe.setText("Amazon.de");
+        amazonDe.setText("Open Amazon.de");
         gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+        
         amazonDe.setLayoutData(gd);
         amazonDe.addListener(SWT.Selection, new Listener(){
         	public void handleEvent(Event e) {
@@ -131,6 +132,7 @@ public class AmazonDialog {
         cancel.setText("Cancel");
         gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
         gd.grabExcessHorizontalSpace = true;
+        gd.horizontalSpan = 2;
         cancel.setLayoutData(gd);
         cancel.addListener(SWT.Selection, new Listener(){
             public void handleEvent(Event e) {
