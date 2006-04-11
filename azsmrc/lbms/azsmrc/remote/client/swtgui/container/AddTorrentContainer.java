@@ -22,7 +22,7 @@ public class AddTorrentContainer {
     private File fTorrentFile;
     private ScrapeResult sr;
 
-    public AddTorrentContainer(File torrentFile) throws TOTorrentException{        
+    public AddTorrentContainer(File torrentFile) throws TOTorrentException{
     	torrent = TOTorrentFactory.deserialiseFromBEncodedFile(torrentFile);
         fTorrentFile = torrentFile;
         fileProperties = new int[torrent.getFiles().length];
@@ -64,8 +64,8 @@ public class AddTorrentContainer {
     public TOTorrent getTorrent(){
     	return torrent;
     }
-    
-    
+
+
     /**
      * Obtain the torrent File
      * @return
@@ -75,21 +75,30 @@ public class AddTorrentContainer {
     }
 
     /**
+     * Deletes the file associated with this container
+     * @return
+     */
+    public boolean deleteFile(){
+    	return fTorrentFile.delete();
+    }
+
+
+    /**
      * Searches through the properties and returns false if any file property is not == 1
      * @return
      */
-    public boolean isWholeFileSent(){    	
+    public boolean isWholeFileSent(){
     	for(int i = 0; i < fileProperties.length; i++){
             if(fileProperties[i] != 1) return false;
-        }    	
+        }
     	return true;
     }
-    
+
     /**
      * Any file in the torrent that has a property of 1 will be counted and sized
      * @return
      */
-    public long getTotalSizeOfDownloads(){    	
+    public long getTotalSizeOfDownloads(){
     	if(fileProperties == null)
     		return torrent.getSize();
     	else{
@@ -98,11 +107,11 @@ public class AddTorrentContainer {
                 if(fileProperties[i] == 1){
                 	size += torrent.getFiles()[i].getLength();
                 }
-            }    	
-        	return size;	
-    	}    	
+            }
+        	return size;
+    	}
     }
-    
+
     /**
      * obtain all of the files from the torrent
      * @return
@@ -118,7 +127,7 @@ public class AddTorrentContainer {
     public String getFilePath(){
         return fTorrentFile.getParent();
     }
-    
+
     /**
      * If this container is used in the scrape dialog and has been scraped, we return the SR here
      * @return
@@ -126,7 +135,7 @@ public class AddTorrentContainer {
     public ScrapeResult getScrapeResults(){
     	return sr;
     }
-    
+
     /**
      * If this container is used in the scrape dialog and has been sraped, we store the SR here
      * @param scrapeResults

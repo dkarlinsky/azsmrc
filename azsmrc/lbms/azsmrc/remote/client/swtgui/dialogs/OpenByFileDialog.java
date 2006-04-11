@@ -58,8 +58,10 @@ public class OpenByFileDialog {
 
     private Table filesTable, detailsTable;
 
+    Button deleteOnSend;
+
     private String lastDir;
-        
+
     private Label totalS;
 
     private Map<String, AddTorrentContainer> tMap = new HashMap<String, AddTorrentContainer>();
@@ -69,7 +71,7 @@ public class OpenByFileDialog {
     public OpenByFileDialog(Display display, final String[] filenames) {
         //pull last dir if available
     	lastDir =  RCMain.getRCMain().getProperties().getProperty("Last.Directory");
-    	    	
+
     	// Shell
         final Shell shell = new Shell(display);
         shell.setLayout(new GridLayout(1, false));
@@ -121,7 +123,7 @@ public class OpenByFileDialog {
                             item.setText(1, container.getFilePath());
 
                             tMap.put(container.getName(), container);
-                            setTotalSize();                            
+                            setTotalSize();
                             item.setData(container);
                             generateDetails(container.getName());
                             lastDir = container.getFilePath();
@@ -186,10 +188,10 @@ public class OpenByFileDialog {
         gridData = new GridData(GridData.FILL_HORIZONTAL);
         gridData.horizontalSpan = 2;
         totalS.setLayoutData(gridData);
-        
+
         setTotalSize();
-        
-        
+
+
         SashForm sash = new SashForm(comp, SWT.VERTICAL);
         gridLayout = new GridLayout();
         gridLayout.numColumns = 1;
@@ -295,6 +297,26 @@ public class OpenByFileDialog {
         gridLayout.marginWidth = 0;
         button_comp.setLayout(gridLayout);
 
+        deleteOnSend = new Button(button_comp,SWT.CHECK);
+        deleteOnSend.setText("Delete local copy of torrent after sending");
+        gridData = new GridData(GridData.FILL_HORIZONTAL);
+        gridData.horizontalSpan = 2;
+        deleteOnSend.setLayoutData(gridData);
+        deleteOnSend.setSelection(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("delete.on.send", "false")));
+        deleteOnSend.addListener(SWT.Selection, new Listener(){
+
+			public void handleEvent(Event arg0) {
+				if(deleteOnSend.getSelection())
+					RCMain.getRCMain().getProperties().setProperty("delete.on.send", "true");
+				else
+					RCMain.getRCMain().getProperties().setProperty("delete.on.send", "false");
+				//Store the new setting
+				RCMain.getRCMain().saveConfig();
+			}
+
+        });
+
+
         Button connect = new Button(button_comp, SWT.PUSH);
         connect.setText("Send File(s) to Server");
         connect.addListener(SWT.Selection, new Listener() {
@@ -310,7 +332,7 @@ public class OpenByFileDialog {
                     Iterator iterator = tMap.keySet().iterator();
                     while (iterator.hasNext()) {
                         AddTorrentContainer container = tMap.get(iterator.next());
-                        
+
                         //Check to see if the whole file is sent and if so, just add it normally
                         //else send it with the properties int[]
                         if(container.isWholeFileSent()){
@@ -318,10 +340,18 @@ public class OpenByFileDialog {
                         }else{
                         	int[] props = container.getFileProperties();
                             //Main add to Azureus
-                            RCMain.getRCMain().getClient().sendAddDownload(container.getTorrentFile(), props);	
+                            RCMain.getRCMain().getClient().sendAddDownload(container.getTorrentFile(), props);
                         }
-                        
-                        
+
+                        if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("delete.on.send", "false"))){
+                        	if(!container.deleteFile()){
+                                MessageBox messageBox = new MessageBox(shell,
+                                        SWT.ICON_ERROR | SWT.OK);
+                                messageBox.setText("Error");
+                                messageBox.setMessage("Error deleting " + container.getTorrentFile().getName());
+                                messageBox.open();
+                        	}
+                        }
                     }
                 }
                 shell.close();
@@ -576,18 +606,18 @@ public class OpenByFileDialog {
         }
     }
 
-    
+
     public void setTotalSize(){
     	long totalSize = 0;
     	Iterator it = tMap.keySet().iterator();
     	while (it.hasNext()){
-    		AddTorrentContainer atc = tMap.get(it.next());    		
+    		AddTorrentContainer atc = tMap.get(it.next());
     		if(atc != null)
     			totalSize += atc.getTotalSizeOfDownloads();
     	}
-    	
+
     	totalS.setText("Total size of selected downloads to send to server: " +
     			DisplayFormatters.formatByteCountToBase10KBEtc(totalSize));
     }
-    
+
 }// EOF
