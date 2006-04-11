@@ -3,6 +3,7 @@
 <project name="AzSMRC" default="quickjar" basedir=".">
 
 	<property file="build.properties" />
+	<property file="azsmrc.properties" />
 	<property name="root.dir" value="." />
 	<!-- REMINDER: this needs to be "." for public source -->
 
@@ -78,6 +79,9 @@
 				<include name="lbms/tools/updater/*" />
 				<include name="lbms/tools/*" />
 				<include name="lbms/tools/stats/*"/>
+				<fileset dir="${root.dir}" >
+					<filename name="azsmrc.properties"/>
+				</fileset>
 			</jar>
 			<echo message="Creating launcher.jar..." />
 			<jar destfile="${root.dir}/${dist.dir}/launcher.jar" basedir="${root.dir}/${quick.dir}" excludes="${dist.jar.excludes}">
