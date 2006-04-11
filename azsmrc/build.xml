@@ -77,7 +77,7 @@
 				<include name="lbms/tools/launcher/Launchable.class" />
 				<include name="lbms/tools/updater/*" />
 				<include name="lbms/tools/*" />
-				<exclude name="lbms/tools/stats"/>
+				<include name="lbms/tools/stats/*"/>
 			</jar>
 			<echo message="Creating launcher.jar..." />
 			<jar destfile="${root.dir}/${dist.dir}/launcher.jar" basedir="${root.dir}/${quick.dir}" excludes="${dist.jar.excludes}">
