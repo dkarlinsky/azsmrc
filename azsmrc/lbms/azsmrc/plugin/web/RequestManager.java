@@ -34,6 +34,9 @@ import org.gudy.azureus2.plugins.torrent.TorrentAttribute;
 import org.gudy.azureus2.plugins.torrent.TorrentException;
 import org.gudy.azureus2.plugins.torrent.TorrentManager;
 import org.gudy.azureus2.plugins.tracker.web.TrackerWebPageResponse;
+import org.gudy.azureus2.plugins.update.Update;
+import org.gudy.azureus2.plugins.update.UpdateCheckInstance;
+import org.gudy.azureus2.plugins.update.UpdateChecker;
 import org.gudy.azureus2.plugins.update.UpdateException;
 import org.jdom.*;
 import org.jdom.output.Format;
@@ -1116,6 +1119,25 @@ public class RequestManager {
 				response.setAttribute("azureusVersion", pi.getAzureusVersion());
 				response.setAttribute("pluginVersion", pi.getPluginVersion());
 
+				return true;
+			}
+		});
+		addHandler("getUpdateInfo", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, final User user) throws IOException {
+
+				UpdateCheckInstance uci = Plugin.getLatestUpdate();
+				if (uci == null) {
+					response.setAttribute("updateAvailable", Boolean.toString(false));
+				} else {
+					response.setAttribute("updateAvailable", Boolean.toString(true));
+					Update[] updates = uci.getUpdates();
+					for (Update update:updates) {
+						Element uElement = new Element ("Update");
+						uElement.setAttribute("name", update.getName());
+						uElement.setAttribute("newVersion", update.getNewVersion());
+						uElement.setAttribute("isMandatory",Boolean.toString(update.isMandatory()));
+					}
+				}
 				return true;
 			}
 		});

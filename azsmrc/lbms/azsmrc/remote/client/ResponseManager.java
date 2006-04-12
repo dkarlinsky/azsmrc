@@ -13,6 +13,8 @@ import lbms.azsmrc.remote.client.impl.DownloadImpl;
 import lbms.azsmrc.remote.client.impl.DownloadManagerImpl;
 import lbms.azsmrc.remote.client.impl.DownloadStatsImpl;
 import lbms.azsmrc.remote.client.impl.RemoteInfoImpl;
+import lbms.azsmrc.remote.client.impl.RemoteUpdateImpl;
+import lbms.azsmrc.remote.client.impl.RemoteUpdateManagerImpl;
 import lbms.azsmrc.remote.client.impl.UserManagerImpl;
 import lbms.azsmrc.shared.DuplicatedUserException;
 import lbms.azsmrc.shared.RemoteConstants;
@@ -335,6 +337,23 @@ public class ResponseManager {
 				ri.setAzureusVersion(xmlResponse.getAttributeValue("azureusVersion"));
 				ri.setPluginVersion(xmlResponse.getAttributeValue("pluginVersion"));
 				ri.setLoaded(true);
+				return Constants.UPDATE_REMOTE_INFO;
+			}
+		});
+		addHandler("getUpdateInfo", new ResponseHandler() {
+			public long handleRequest(Element xmlResponse) throws IOException{
+				RemoteUpdateManagerImpl rum = client.getRemoteUpdateManagerImpl();
+				boolean avail = Boolean.parseBoolean(xmlResponse.getAttributeValue("updateAvailable"));
+				if (avail) {
+					rum.clear();
+					rum.setUpdatesAvailable(avail);
+					List<Element> updates = xmlResponse.getChildren("Update");
+					for (Element u:updates) {
+						rum.addUpdate(new RemoteUpdateImpl(u));
+					}
+				} else {
+					rum.setUpdatesAvailable(avail);
+				}
 				return Constants.UPDATE_REMOTE_INFO;
 			}
 		});

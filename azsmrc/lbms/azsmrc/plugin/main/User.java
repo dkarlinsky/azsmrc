@@ -215,4 +215,10 @@ public class User extends lbms.azsmrc.shared.User {
 		event.setAttribute("message", e.getMessage());
 		eventQueue.offer(event);
 	}
+
+	public void eventUpdateAvailable () {
+		Element event = getEventElement();
+		event.setAttribute("type", Integer.toString(RemoteConstants.EV_UPDATE_AVAILABLE));
+		eventQueue.offer(event);
+	}
 }

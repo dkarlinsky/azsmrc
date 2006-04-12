@@ -43,6 +43,7 @@ import lbms.azsmrc.remote.client.events.ParameterListener;
 import lbms.azsmrc.remote.client.events.SpeedUpdateListener;
 import lbms.azsmrc.remote.client.impl.DownloadManagerImpl;
 import lbms.azsmrc.remote.client.impl.RemoteInfoImpl;
+import lbms.azsmrc.remote.client.impl.RemoteUpdateManagerImpl;
 import lbms.azsmrc.remote.client.impl.UserManagerImpl;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.remote.client.util.Timer;
@@ -72,6 +73,7 @@ public class Client {
 	private UserManagerImpl userManager;
 	private ResponseManager responseManager;
 	private RemoteInfoImpl remoteInfo;
+	private RemoteUpdateManagerImpl remoteUpdateManager;
 
 	private List<ClientUpdateListener> 	clientUpdateListeners	= new ArrayList<ClientUpdateListener>();
 	private List<SpeedUpdateListener> 	speedUpdateListners		= new ArrayList<SpeedUpdateListener>();
@@ -96,6 +98,7 @@ public class Client {
 		responseManager = new ResponseManager(this);
 		userManager 	= new UserManagerImpl(this);
 		remoteInfo		= new RemoteInfoImpl(this);
+		remoteUpdateManager = new RemoteUpdateManagerImpl (this);
 		failedConnections 	= 0;
 		timer 	= new Timer("Client Timer",1);
 		ssl 	= false;
@@ -764,6 +767,21 @@ public class Client {
 	protected RemoteInfoImpl getRemoteInfoImpl() {
 		return remoteInfo;
 	}
+
+	/**
+	 * @return Returns the remoteUpdateManager.
+	 */
+	public RemoteUpdateManager getRemoteUpdateManager() {
+		return remoteUpdateManager;
+	}
+
+	/**
+	 * @return Returns the remoteUpdateManager.
+	 */
+	protected RemoteUpdateManagerImpl getRemoteUpdateManagerImpl() {
+		return remoteUpdateManager;
+	}
+
 
 	/**
 	 * @param password The password to set.

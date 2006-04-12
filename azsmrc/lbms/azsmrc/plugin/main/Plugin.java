@@ -9,6 +9,7 @@ import java.security.KeyStore;
 import lbms.azsmrc.plugin.gui.View;
 import lbms.azsmrc.plugin.web.RequestManager;
 import lbms.azsmrc.plugin.web.WebRequestHandler;
+import lbms.azsmrc.shared.RemoteConstants;
 import lbms.azsmrc.shared.UserNotFoundException;
 
 import org.eclipse.swt.widgets.Display;
@@ -29,6 +30,10 @@ import org.gudy.azureus2.plugins.ui.UIInstance;
 import org.gudy.azureus2.plugins.ui.UIManager;
 import org.gudy.azureus2.plugins.ui.UIManagerListener;
 import org.gudy.azureus2.plugins.ui.model.BasicPluginConfigModel;
+import org.gudy.azureus2.plugins.update.UpdateCheckInstance;
+import org.gudy.azureus2.plugins.update.UpdateCheckInstanceListener;
+import org.gudy.azureus2.plugins.update.UpdateManager;
+import org.gudy.azureus2.plugins.update.UpdateManagerListener;
 import org.gudy.azureus2.plugins.utils.LocaleUtilities;
 import org.gudy.azureus2.ui.swt.plugins.UISWTInstance;
 import org.gudy.azureus2.ui.swt.plugins.UISWTViewEventListener;
@@ -51,6 +56,8 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 	//The logger from Azureus
 	private static LoggerChannel logger;
+
+	private static UpdateCheckInstance latestUpdate;
 
 	//new API startup code
 	UISWTInstance swtInstance = null;
@@ -80,6 +87,32 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 		//initialize the logger
 		logger = pluginInterface.getLogger().getTimeStampedChannel("AzSMRC");
+		UpdateManager um = pluginInterface.getUpdateManager();
+		um.addListener(
+				new UpdateManagerListener()
+				{
+					public void
+					checkInstanceCreated(
+						UpdateCheckInstance instance )
+					{
+
+						instance.addListener( new UpdateCheckInstanceListener() {
+							public void cancelled(UpdateCheckInstance instance) {
+								if (latestUpdate != null && latestUpdate == instance)
+									latestUpdate = null;
+							}
+
+							public void complete(UpdateCheckInstance instance) {
+								latestUpdate = instance;
+								User[] users = config.getUsers();
+								for (User user:users) {
+									if (user.checkAccess(RemoteConstants.RIGHTS_ADMIN))
+										user.eventUpdateAvailable();
+								}
+							}
+						});
+					}
+				});
 
 		//initialize the timer
 		Timers.initTimer();
@@ -328,6 +361,14 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 	 */
 	public static LocaleUtilities getLocaleUtilities(){
 		return locale_utils;
+	}
+
+
+	/**
+	 * @return Returns the latestUpdate.
+	 */
+	public static UpdateCheckInstance getLatestUpdate() {
+		return latestUpdate;
 	}
 
 //EOF

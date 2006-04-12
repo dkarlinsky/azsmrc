@@ -58,6 +58,7 @@ public class RemoteConstants {
 	public static final int EV_DL_REMOVED	= 2;
 	public static final int EV_DL_EXCEPTION	= 3;
 	public static final int EV_EXCEPTION	= 4;
+	public static final int EV_UPDATE_AVAILABLE	= 5;
 
 	//Parameter types
 	public static final int PARAMETER_NOT_FOUND = -1;
