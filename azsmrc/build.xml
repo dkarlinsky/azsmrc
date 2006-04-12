@@ -68,6 +68,7 @@
 	</target>
 
 	<target name="quickjar" depends="init">
+		<antcall target="modPluginProps" />
 		<echo message="Creating azsmrcPlugin_${version}.jar..." />
 		<jar destfile="${root.dir}/${dist.dir}/azsmrcPlugin_${version}.jar" basedir="${root.dir}/${quick.dir}" excludes="${dist.jar.excludes}">
 			<include name="lbms/azsmrc/plugin/**/*" />
@@ -96,6 +97,16 @@
 				<attribute name="Class-Path" value="launcher.jar" />
 			</manifest>
 		</jar>
+	</target>
+
+	<target name="modPluginProps">
+		<propertyfile file="${root.dir}/plugin.properties">
+			<entry key="plugin.class" value="lbms.azsmrc.plugin.main.Plugin"/>
+			<entry key="plugin.name" value="AzSMRC"/>
+			<entry key="plugin.langfile" value="lbms.azsmrc.plugin.internat.Messages"/>
+			<entry key="plugin.version" value="${version}"/>
+			<entry key="plugin.id" value="azsmrc"/>
+		</propertyfile>
 	</target>
 
 
