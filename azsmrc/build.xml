@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-
-<project name="AzSMRC" default="quickjar" basedir=".">
+<project name="AzSMRC" default="jar" basedir=".">
 
 	<property file="build.properties" />
 	<property file="azsmrc.properties" />
@@ -35,10 +34,15 @@
 		</javac>
 	</target>
 
+	<target name="cleanBuild">
+		<antcall target="compile" />
+		<antcall target="jar" />
+	</target>
 
-	<target name="jar" depends="compile">
+	<target name="jar" depends="init">
+		<antcall target="modPluginProps" />
 		<echo message="Creating azsmrcPlugin_${version}.jar..." />
-		<jar destfile="${root.dir}/${dist.dir}/azsmrcPlugin_${version}.jar" excludes="${dist.jar.excludes}">
+		<jar destfile="${root.dir}/${dist.dir}/azsmrcPlugin_${version}.jar" basedir="${root.dir}/${build.dir}" excludes="${dist.jar.excludes}">
 			<include name="lbms/azsmrc/plugin/**/*" />
 			<include name="lbms/azsmrc/shared/**/*" />
 			<fileset dir="${root.dir}">
@@ -67,54 +71,42 @@
 		</jar>
 	</target>
 
-	<target name="quickjar" depends="init">
-		<antcall target="modPluginProps" />
-		<echo message="Creating azsmrcPlugin_${version}.jar..." />
-		<jar destfile="${root.dir}/${dist.dir}/azsmrcPlugin_${version}.jar" basedir="${root.dir}/${quick.dir}" excludes="${dist.jar.excludes}">
-			<include name="lbms/azsmrc/plugin/**/*" />
-			<include name="lbms/azsmrc/shared/**/*" />
+	<target name="distribute" depends="jar">
+		<zip destfile="${root.dir}/${dist.dir}/AzSMRC_${version}.zip">
 			<fileset dir="${root.dir}">
-				<filename name="plugin.properties" />
+				<filename name="Readme.txt" />
+				<filename name="javaw.exe.manifest" />
+				<filename name="AzSMRCupdate.xml.gz" />
+				<filename name="changelog.txt" />
+				<filename name="${dist.dir}/AzSMRC_${version}.jar" />
 			</fileset>
-		</jar>
-		<echo message="Creating AzSMRC_${version}.jar..." />
-		<jar destfile="${root.dir}/${dist.dir}/AzSMRC_${version}.jar" basedir="${root.dir}/${quick.dir}" excludes="${dist.jar.excludes}">
-			<include name="lbms/azsmrc/remote/**/*" />
-			<include name="lbms/azsmrc/shared/**/*" />
-			<include name="lbms/tools/launcher/Launchable.class" />
-			<include name="lbms/tools/updater/*" />
-			<include name="lbms/tools/*" />
-			<include name="lbms/tools/stats/*" />
-			<fileset dir="${root.dir}">
-				<filename name="azsmrc.properties" />
-			</fileset>
-		</jar>
-		<echo message="Creating launcher.jar..." />
-		<jar destfile="${root.dir}/${dist.dir}/launcher.jar" basedir="${root.dir}/${quick.dir}" excludes="${dist.jar.excludes}">
-			<include name="lbms/tools/launcher/*" />
-			<manifest>
-				<attribute name="Main-Class" value="lbms.tools.launcher.Launcher" />
-				<attribute name="Class-Path" value="launcher.jar" />
-			</manifest>
-		</jar>
+		</zip>
 	</target>
 
 	<target name="modPluginProps">
 		<propertyfile file="${root.dir}/plugin.properties">
-			<entry key="plugin.class" value="lbms.azsmrc.plugin.main.Plugin"/>
-			<entry key="plugin.name" value="AzSMRC"/>
-			<entry key="plugin.langfile" value="lbms.azsmrc.plugin.internat.Messages"/>
-			<entry key="plugin.version" value="${version}"/>
-			<entry key="plugin.id" value="azsmrc"/>
+			<entry key="plugin.class" value="lbms.azsmrc.plugin.main.Plugin" />
+			<entry key="plugin.name" value="AzSMRC" />
+			<entry key="plugin.langfile" value="lbms.azsmrc.plugin.internat.Messages" />
+			<entry key="plugin.version" value="${version}" />
+			<entry key="plugin.id" value="azsmrc" />
 		</propertyfile>
 	</target>
 
+	<target name="source" depends="init">
+		<zip destfile="${dist.dir}/AzSMRC_src_${version}.zip" basedir="${source.dir}">
+			<include name="**/*.java" />
+			<exclude name="**/resources" />
+		</zip>
+	</target>
 
-	<target name="clean">
+	<target name="clean" depends="cleanDist">
 		<delete quiet="true">
 			<fileset dir="${root.dir}/${build.dir}" includes="**/*.class" />
 		</delete>
+	</target>
 
+	<target name="cleanDist">
 		<delete dir="${root.dir}/${dist.dir}" />
 	</target>
 
