@@ -86,6 +86,7 @@ public class RCMain implements Launchable {
 
 	private TrayItem systrayItem;
 	private DownloadManagerShell mainWindow;
+	private long runTime;
 
 	protected boolean terminated, failedConnection;
 
@@ -104,6 +105,7 @@ public class RCMain implements Launchable {
 				new RCMain();
 			}
 			rcMain.open();
+			rcMain.runTime = System.currentTimeMillis();
 		} catch (Throwable e) {
 			e.printStackTrace();
 			File error = new File(System.getProperty("user.dir")+System.getProperty("file.separator")+"error.log");
@@ -607,7 +609,16 @@ public class RCMain implements Launchable {
 		timer.destroy();
 		DownloadContainer.saveColumns();
 		SeedContainer.saveColumns();
+		getRunTime();
 		saveConfig();
+	}
+
+	public long getRunTime() {
+		long rTime = (System.currentTimeMillis()-runTime)
+			+Long.parseLong(properties.getProperty("runTime", "0"));
+		runTime = System.currentTimeMillis();
+		properties.setProperty("runTime", Long.toString(rTime));
+		return rTime;
 	}
 
 	public void close() {
