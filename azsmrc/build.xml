@@ -27,7 +27,7 @@
 			<fileset dir="${root.dir}/${libs.dir}" includes="**/*.jar" />
 			<fileset dir="${swt.jar}" includes="swt.jar" />
 			<fileset dir="${azureus.jar}" includes="Azureus2.jar" />
-			<fileset dir="${azureus.dir}" includes="**/*.class"/>
+			<fileset dir="${azureus.dir}" includes="**/*.class" />
 		</path>
 
 		<javac srcdir="${root.dir}/${source.dir}" destdir="${root.dir}/${build.dir}" excludes="${generic.excludes}" nowarn="yes" includeAntRuntime="no" debug="true" debuglevel="lines,vars,source" verbose="yes">
@@ -39,58 +39,64 @@
 	<target name="jar" depends="compile">
 		<echo message="Creating azsmrcPlugin_${version}.jar..." />
 		<jar destfile="${root.dir}/${dist.dir}/azsmrcPlugin_${version}.jar" excludes="${dist.jar.excludes}">
-			<fileset dir="${root.dir}/${build.dir}/lbms/azsmrc/plugin" />
-			<fileset dir="${root.dir}/${build.dir}/lbms/azsmrc/shared" />
+			<include name="lbms/azsmrc/plugin/**/*" />
+			<include name="lbms/azsmrc/shared/**/*" />
+			<fileset dir="${root.dir}">
+				<filename name="plugin.properties" />
+			</fileset>
 		</jar>
 		<echo message="Creating AzSMRC_${version}.jar..." />
 		<jar destfile="${root.dir}/${dist.dir}/AzSMRC_${version}.jar" basedir="${root.dir}/${build.dir}" excludes="${dist.jar.excludes}">
-			<fileset dir="${root.dir}/${build.dir}/lbms/azsmrc/remote" />
-			<fileset dir="${root.dir}/${build.dir}/lbms/azsmrc/shared" />
-			<fileset dir="${root.dir}/${build.dir}/lbms/tools">
-				<include name="launcher/Launchable.class" />
-				<include name="updater/*" />
-				<include name="./*" />
-				<exclude name="stats/" />
+			<include name="lbms/azsmrc/remote/**/*" />
+			<include name="lbms/azsmrc/shared/**/*" />
+			<include name="lbms/tools/launcher/Launchable.class" />
+			<include name="lbms/tools/updater/*" />
+			<include name="lbms/tools/*" />
+			<include name="lbms/tools/stats/*" />
+			<fileset dir="${root.dir}">
+				<filename name="azsmrc.properties" />
 			</fileset>
 		</jar>
 		<echo message="Creating launcher.jar..." />
 		<jar destfile="${root.dir}/${dist.dir}/launcher.jar" basedir="${root.dir}/${build.dir}" excludes="${dist.jar.excludes}">
-			<fileset dir="${root.dir}/${build.dir}/lbms/tools/launcher" />
+			<include name="lbms/tools/launcher/*" />
 			<manifest>
 				<attribute name="Main-Class" value="lbms.tools.launcher.Launcher" />
+				<attribute name="Class-Path" value="launcher.jar" />
 			</manifest>
 		</jar>
 	</target>
 
 	<target name="quickjar" depends="init">
-			<echo message="Creating azsmrcPlugin_${version}.jar..." />
-			<jar destfile="${root.dir}/${dist.dir}/azsmrcPlugin_${version}.jar" basedir="${root.dir}/${quick.dir}" excludes="${dist.jar.excludes}">
-				<include name="lbms/azsmrc/plugin/**/*" />
-				<include name="lbms/azsmrc/shared/**/*" />
-				<fileset dir="${root.dir}" >
-					<filename name="plugin.properties"/>
-				</fileset>
-			</jar>
-			<echo message="Creating AzSMRC_${version}.jar..." />
-			<jar destfile="${root.dir}/${dist.dir}/AzSMRC_${version}.jar" basedir="${root.dir}/${quick.dir}" excludes="${dist.jar.excludes}">
-				<include name="lbms/azsmrc/remote/**/*" />
-				<include name="lbms/azsmrc/shared/**/*" />
-				<include name="lbms/tools/launcher/Launchable.class" />
-				<include name="lbms/tools/updater/*" />
-				<include name="lbms/tools/*" />
-				<include name="lbms/tools/stats/*"/>
-				<fileset dir="${root.dir}" >
-					<filename name="azsmrc.properties"/>
-				</fileset>
-			</jar>
-			<echo message="Creating launcher.jar..." />
-			<jar destfile="${root.dir}/${dist.dir}/launcher.jar" basedir="${root.dir}/${quick.dir}" excludes="${dist.jar.excludes}">
-				<include name="lbms/tools/launcher/*" />
-				<manifest>
-					<attribute name="Main-Class" value="lbms.tools.launcher.Launcher" />
-				</manifest>
-			</jar>
-		</target>
+		<echo message="Creating azsmrcPlugin_${version}.jar..." />
+		<jar destfile="${root.dir}/${dist.dir}/azsmrcPlugin_${version}.jar" basedir="${root.dir}/${quick.dir}" excludes="${dist.jar.excludes}">
+			<include name="lbms/azsmrc/plugin/**/*" />
+			<include name="lbms/azsmrc/shared/**/*" />
+			<fileset dir="${root.dir}">
+				<filename name="plugin.properties" />
+			</fileset>
+		</jar>
+		<echo message="Creating AzSMRC_${version}.jar..." />
+		<jar destfile="${root.dir}/${dist.dir}/AzSMRC_${version}.jar" basedir="${root.dir}/${quick.dir}" excludes="${dist.jar.excludes}">
+			<include name="lbms/azsmrc/remote/**/*" />
+			<include name="lbms/azsmrc/shared/**/*" />
+			<include name="lbms/tools/launcher/Launchable.class" />
+			<include name="lbms/tools/updater/*" />
+			<include name="lbms/tools/*" />
+			<include name="lbms/tools/stats/*" />
+			<fileset dir="${root.dir}">
+				<filename name="azsmrc.properties" />
+			</fileset>
+		</jar>
+		<echo message="Creating launcher.jar..." />
+		<jar destfile="${root.dir}/${dist.dir}/launcher.jar" basedir="${root.dir}/${quick.dir}" excludes="${dist.jar.excludes}">
+			<include name="lbms/tools/launcher/*" />
+			<manifest>
+				<attribute name="Main-Class" value="lbms.tools.launcher.Launcher" />
+				<attribute name="Class-Path" value="launcher.jar" />
+			</manifest>
+		</jar>
+	</target>
 
 
 	<target name="clean">

@@ -325,6 +325,8 @@ public class RCMain implements Launchable {
 
 	public RCMain () {
 		System.out.println("Starting up RCMain.");
+		System.out.println("Checking javaw.exe.manifest");
+		javawExeManifest();
 		confFile = new File(USER_DIR+FSEP+"config.cfg");
 		properties = new Properties();
 		System.out.println("Loading Properties.");
@@ -746,6 +748,15 @@ public class RCMain implements Launchable {
 		}else if(connection == 2){
 			//systrayItem.setToolTipText("AzMultiUser RC");  //Let the listener do this!
 			systrayItem.setImage(ImageRepository.getImage("TrayIcon_Blue"));
+		}
+	}
+
+	public void javawExeManifest() {
+		File fDest = new File(System.getProperty("java.home")
+				+ "\\bin\\javaw.exe.manifest");
+		File fOrigin = new File("javaw.exe.manifest");
+		if (!fDest.exists() && fOrigin.exists()) {
+			FileUtil.copyFile(fOrigin, fDest);
 		}
 	}
 
