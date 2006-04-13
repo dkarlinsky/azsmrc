@@ -497,7 +497,6 @@ public class RCMain implements Launchable {
 			public void handleEvent(int type, long time, Element event) {
 				switch (type) {
 				case RemoteConstants.EV_DL_FINISHED:
-					normalLogger.fine("Download Finished: "+event.getAttributeValue("name"));
 					if (mainWindow != null) {
 						mainWindow.setStatusBarText("Download Finished: "+event.getAttributeValue("name"), SWT.COLOR_DARK_GREEN);
 					}
@@ -763,6 +762,7 @@ public class RCMain implements Launchable {
 	}
 
 	public void javawExeManifest() {
+		if (!RemoteConstants.isWindows) return;
 		File fDest = new File(System.getProperty("java.home")
 				+ "\\bin\\javaw.exe.manifest");
 		File fOrigin = new File("javaw.exe.manifest");
