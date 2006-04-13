@@ -163,6 +163,7 @@ public abstract class Container implements Comparable<Container> {
 					DecimalFormat df = new DecimalFormat();
 					df.applyPattern("##0.00");
 
+					//ProgressBar
 					if (tableColumns.contains(RemoteConstants.ST_COMPLETITION)) {
 						int newPercentage = dl.getStats().getCompleted();
 						if(progBar == null) progBar = new CustomProgressBar();
@@ -203,14 +204,14 @@ public abstract class Container implements Comparable<Container> {
 								else
 									item.setImage(tableColumns.indexOf(RemoteConstants.ST_HEALTH),resizedHealthImages[5]);
 							}
-								
+
 							else{
 								if(RCMain.getRCMain().isManifestInUse())
 									item.setImage(tableColumns.indexOf(RemoteConstants.ST_HEALTH),nonResizedHealthImages[newHealth-1]);
 								else
 									item.setImage(tableColumns.indexOf(RemoteConstants.ST_HEALTH),resizedHealthImages[newHealth-1]);
 							}
-								
+
 						}
 					}
 
@@ -373,14 +374,14 @@ public abstract class Container implements Comparable<Container> {
 					if (tableColumns.contains(RemoteConstants.ST_SHARE)) {
 						float ratio = (ds.getShareRatio()/1000f);
 						if(oldShareRatio != ratio || bForce){
-							int shareIndex = tableColumns.indexOf(RemoteConstants.ST_SHARE); 
-							item.setText(shareIndex,df.format(ratio));							
+							int shareIndex = tableColumns.indexOf(RemoteConstants.ST_SHARE);
+							item.setText(shareIndex,df.format(ratio));
 							if(ratio < 0.5)
 								item.setForeground(shareIndex, RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_DARK_RED));
 							else if(ratio > 0.05 && ratio < 0.9)
 								item.setForeground(shareIndex, RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_DARK_YELLOW));
 							else
-								item.setForeground(shareIndex, RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));							
+								item.setForeground(shareIndex, RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
 						}
 						oldShareRatio = ratio;
 					}
@@ -478,6 +479,10 @@ public abstract class Container implements Comparable<Container> {
 		if (resizedHealthImages == null || bforced) {
 			if (resizedHealthImages == null) {
 				resizedHealthImages = new Image[6];
+			}
+
+			if(nonResizedHealthImages == null){
+				nonResizedHealthImages = new Image[6];
 			}
 			for (int i = 0; i<resizedHealthImages.length; i++) {
 				if (resizedHealthImages[i] != null) resizedHealthImages[i].dispose();
