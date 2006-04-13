@@ -87,6 +87,7 @@ public class RCMain implements Launchable {
 	private TrayItem systrayItem;
 	private DownloadManagerShell mainWindow;
 	private long runTime;
+	private boolean manifestInUse;
 
 	protected boolean terminated, failedConnection;
 
@@ -762,13 +763,26 @@ public class RCMain implements Launchable {
 	}
 
 	public void javawExeManifest() {
-		if (!RemoteConstants.isWindows) return;
+		if (!RemoteConstants.isWindowsXP) {
+			manifestInUse = false;
+			return;
+		}
 		File fDest = new File(System.getProperty("java.home")
 				+ "\\bin\\javaw.exe.manifest");
 		File fOrigin = new File("javaw.exe.manifest");
 		if (!fDest.exists() && fOrigin.exists()) {
 			FileUtil.copyFile(fOrigin, fDest);
+			manifestInUse = false;
+		} else {
+			manifestInUse = true;
 		}
+	}
+
+	/**
+	 * @return Returns the manifestInUse.
+	 */
+	public boolean isManifestInUse() {
+		return manifestInUse;
 	}
 
 	public void saveConfig() {
