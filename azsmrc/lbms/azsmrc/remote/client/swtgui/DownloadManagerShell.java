@@ -512,7 +512,7 @@ public class DownloadManagerShell {
 		//-----Help Submenu
 
 		MenuItem menuAbout = new MenuItem(helpSubmenu,SWT.PUSH);
-		menuAbout.setText("&User Guide");
+		menuAbout.setText("&Information");
 		menuAbout.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				//open readme shell here

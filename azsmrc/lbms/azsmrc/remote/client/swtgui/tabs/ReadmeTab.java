@@ -26,6 +26,7 @@ import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 
 
@@ -52,7 +53,7 @@ public class ReadmeTab {
 
         Button donate = new Button(parent,SWT.PUSH);
         donate.setImage(ImageRepository.getImage("paypal"));
-        donate.setToolTipText("If you like AzMultiUser, please consider donating. Thanks!");
+        donate.setToolTipText("If you like AzSMRC, please consider donating. Thanks!");
         donate.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 Program.launch(paypalURL);
@@ -82,7 +83,7 @@ public class ReadmeTab {
         });
         
         Group info = new Group(parent,SWT.NONE);
-        info.setText("AzMultiUser Information (Readme.txt)");
+        info.setText("AzSMRC Information (Readme.txt)");
         GridLayout gridLayout = new GridLayout();
         gridLayout.numColumns = 3;
         info.setLayout(gridLayout);
@@ -93,6 +94,10 @@ public class ReadmeTab {
         info.setLayoutData(gridData);
 
 
+        Label version = new Label(info,SWT.NULL);
+        version.setText("Running AzSMRC Version: " + RCMain.getRCMain().getAzsmrcProperties().getProperty("version", "Error Reading Properties"));
+        
+        
         List readme = new List(info, SWT.BORDER | SWT.V_SCROLL );
         gridData = new GridData(GridData.FILL_BOTH);
         gridData.horizontalSpan  = 3;
