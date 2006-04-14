@@ -8,6 +8,7 @@ package lbms.azsmrc.remote.client.swtgui;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -48,13 +49,16 @@ public class CustomProgressBar {
     }
 
     private void initDefaultRGBs() {
-        /*this.defaultBackgroundRGB = new RGB(139, 159, 160);
-        this.defaultProgressRGB = new RGB(87, 118, 123);
-        this.defaultTextRGB = new RGB(36, 111, 134);
-        this.defaultBorderRGB = this.defaultTextRGB; */
-        this.defaultBackgroundRGB = new RGB(214, 235, 255); //210, 16, 100 (hsv)
-        this.defaultProgressRGB = new RGB(128, 191, 255);//210, 50, 500 (hsv)
-        this.defaultTextRGB = new RGB(0, 64, 128); //210, 100, 50 (hsv)
+        //this.defaultBackgroundRGB = new RGB(214, 235, 255); //210, 16, 100 (hsv)
+        //this.defaultProgressRGB = new RGB(128, 191, 255);//210, 50, 500 (hsv)
+        //this.defaultTextRGB = new RGB(0, 64, 128); //210, 100, 50 (hsv)
+        //this.defaultBorderRGB = this.defaultTextRGB;
+        
+    	//new colors based on system colors to accomodate manifest
+        this.defaultBackgroundRGB = new RGB(214, 235, 255);
+        this.defaultProgressRGB = new RGB(128, 191, 255);
+        
+        this.defaultTextRGB = display.getSystemColor(SWT.COLOR_DARK_BLUE).getRGB();
         this.defaultBorderRGB = this.defaultTextRGB;
     }
 
