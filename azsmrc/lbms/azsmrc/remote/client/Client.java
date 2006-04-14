@@ -15,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
+import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -102,9 +103,14 @@ public class Client {
 		failedConnections 	= 0;
 		timer 	= new Timer("Client Timer",1);
 		ssl 	= false;
-		debug = Logger.getAnonymousLogger();
+		debug = Logger.getLogger("lbms.azsmrc.client");
 		debug.addHandler(new Handler() {
-			private SimpleFormatter sF = new SimpleFormatter();
+			private Formatter sF = new Formatter() {
+				@Override
+				public String format(LogRecord record) {
+					return record.getMessage();
+				}
+			};
 			@Override
 			public void close() throws SecurityException {}
 			@Override
@@ -125,8 +131,10 @@ public class Client {
 
 	public void transactionStart() {
 		transaction = true;
+		debug.fine("Transaction Started");
 		transactionTimeout = timer.addEvent(TRANSACTION_TIMEOUT, new TimerEventPerformer() {
 			public void perform(TimerEvent event) {
+				debug.warning("Transaction Committed by Timeout.");
 				transactionCommit();
 			}
 		});
@@ -135,6 +143,7 @@ public class Client {
 	public void transactionCommit() {
 		if (transactionTimeout != null) transactionTimeout.cancel();
 		transaction = false;
+		debug.fine("Transaction Committed");
 		send();
 	}
 
