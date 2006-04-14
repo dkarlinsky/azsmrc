@@ -53,7 +53,7 @@ public abstract class Container implements Comparable<Container> {
 	private String oldElapsedTime = "";
 	private long oldTotalAverage = -1;
 	private float oldShareRatio = -1;
-	protected static Image[] resizedHealthImages, nonResizedHealthImages;
+	protected static Image[] resizedHealthImages;
 	protected CustomProgressBar progBar;
 	protected Image progBarImage;
 
@@ -75,7 +75,7 @@ public abstract class Container implements Comparable<Container> {
 		totalTableColumns.add(RemoteConstants.ST_STATUS);
 		totalTableColumns.add(RemoteConstants.ST_TRACKER);
 		totalTableColumns.add(RemoteConstants.ST_DISCARDED);
-        totalTableColumns.add(RemoteConstants.ST_SHARE);
+		totalTableColumns.add(RemoteConstants.ST_SHARE);
 		totalTableColumns.add(RemoteConstants.ST_SIZE);
 		totalTableColumns.add(RemoteConstants.ST_ELAPSED_TIME);
 		totalTableColumns.add(RemoteConstants.ST_TOTAL_AVG);
@@ -156,7 +156,7 @@ public abstract class Container implements Comparable<Container> {
 
 	public void updateData(final List<Integer> tableColumns, final boolean bForce) {
 		final Display display = RCMain.getRCMain().getDisplay();
-        if(display == null || display.isDisposed()) return;
+		if(display == null || display.isDisposed()) return;
 		display.syncExec(new Runnable(){
 			public void run() {
 				try {
@@ -199,17 +199,11 @@ public abstract class Container implements Comparable<Container> {
 						if(oldHealth != newHealth || bForce){
 							//Set the Health image
 							if (newHealth==0){
-								if(RCMain.getRCMain().isManifestInUse())
-									item.setImage(tableColumns.indexOf(RemoteConstants.ST_HEALTH),nonResizedHealthImages[5]);
-								else
-									item.setImage(tableColumns.indexOf(RemoteConstants.ST_HEALTH),resizedHealthImages[5]);
+								item.setImage(tableColumns.indexOf(RemoteConstants.ST_HEALTH),resizedHealthImages[5]);
 							}
 
 							else{
-								if(RCMain.getRCMain().isManifestInUse())
-									item.setImage(tableColumns.indexOf(RemoteConstants.ST_HEALTH),nonResizedHealthImages[newHealth-1]);
-								else
-									item.setImage(tableColumns.indexOf(RemoteConstants.ST_HEALTH),resizedHealthImages[newHealth-1]);
+								item.setImage(tableColumns.indexOf(RemoteConstants.ST_HEALTH),resizedHealthImages[newHealth-1]);
 							}
 
 						}
@@ -461,6 +455,7 @@ public abstract class Container implements Comparable<Container> {
 
 
 	private Image resizeHealthIcon(Image oldHealthIcon,int iconColWidth, int newPBWidth){
+		if (RCMain.getRCMain().isManifestInUse()) return oldHealthIcon;
 		Image newImage = new Image(RCMain.getRCMain().getDisplay(),newPBWidth,rowHeight);
 		GC gc = new GC(newImage);
 		int x = (iconColWidth /2) - (oldHealthIcon.getImageData().width / 2);
@@ -480,50 +475,40 @@ public abstract class Container implements Comparable<Container> {
 			if (resizedHealthImages == null) {
 				resizedHealthImages = new Image[6];
 			}
-
-			if(nonResizedHealthImages == null){
-				nonResizedHealthImages = new Image[6];
-			}
 			for (int i = 0; i<resizedHealthImages.length; i++) {
 				if (resizedHealthImages[i] != null) resizedHealthImages[i].dispose();
 				switch(i+1) {
 				case DownloadStats.HEALTH_OK:
-					nonResizedHealthImages[i] = ImageRepository.getImage("health_green");
 					resizedHealthImages[i] = resizeHealthIcon(ImageRepository.getImage("health_green")
 							,18 /* static health column widht */
 							,120 /*static pb column width*/ -4);
 
 					break;
 				case DownloadStats.HEALTH_ERROR:
-					nonResizedHealthImages[i] = ImageRepository.getImage("health_red");
 					resizedHealthImages[i] = resizeHealthIcon(ImageRepository.getImage("health_red")
 							,18 /* static health column widht */
 							,120 /*static pb column width*/ -4);
 
 					break;
 				case DownloadStats.HEALTH_NO_TRACKER:
-					nonResizedHealthImages[i] = ImageRepository.getImage("health_blue");
 					resizedHealthImages[i] = resizeHealthIcon(ImageRepository.getImage("health_blue")
 							,18 /* static health column widht */
 							,120 /*static pb column width*/ -4);
 
 					break;
 				case DownloadStats.HEALTH_NO_REMOTE:
-					nonResizedHealthImages[i] = ImageRepository.getImage("health_yellow");
 					resizedHealthImages[i] = resizeHealthIcon(ImageRepository.getImage("health_yellow")
 							,18 /* static health column widht */
 							,120 /*static pb column width*/ -4);
 
 					break;
 				case DownloadStats.HEALTH_KO:
-					nonResizedHealthImages[i] = ImageRepository.getImage("health_red");
 					resizedHealthImages[i] = resizeHealthIcon(ImageRepository.getImage("health_red")
 							,18 /* static health column widht */
 							,120 /*static pb column width*/ -4);
 
 					break;
 				default:
-					nonResizedHealthImages[i] = ImageRepository.getImage("health_gray");
 					resizedHealthImages[i] = resizeHealthIcon(ImageRepository.getImage("health_gray")
 							,18 /* static health column widht */
 							,120 /*static pb column width*/ -4);
