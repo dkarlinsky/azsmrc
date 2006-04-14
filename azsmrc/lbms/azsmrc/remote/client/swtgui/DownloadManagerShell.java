@@ -114,7 +114,7 @@ public class DownloadManagerShell {
 	private CTabFolder tabFolder;
 	private CTabItem myTorrents;
 	private MenuItem moveData;
-	
+
 
 	private DownloadListener dlL = new DownloadListener(){
 
@@ -259,7 +259,7 @@ public class DownloadManagerShell {
 						properties.getProperty("connection_username",null) != null &&
 						properties.getProperty("connection_password",null) != null) {
 					RCMain.getRCMain().connect(true);
-					RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
+					initializeConnection();
 				} else
 					new ConnectionDialog(RCMain.getRCMain().getDisplay());
 			}
@@ -352,7 +352,7 @@ public class DownloadManagerShell {
 
 		//Separator
 		new MenuItem(remoteSubmenu,SWT.SEPARATOR);
-		
+
 		//Server Details
 		menuServerDetails = new MenuItem(remoteSubmenu, SWT.PUSH);
 		menuServerDetails.setText("&Server Details");
@@ -368,7 +368,7 @@ public class DownloadManagerShell {
 				new ServerDetailsTab(tabFolder);
 			}
 		});
-		
+
 
 
 		//Separator
@@ -758,28 +758,28 @@ public class DownloadManagerShell {
 				if(downloadsTable.isFocusControl()){
 					TableItem[] items = downloadsTable.getSelection();
 					if(items.length == 0) return;
-					
+
 					RCMain.getRCMain().getClient().transactionStart();
-					
+
 					for(TableItem item : items){
 						Container container = (Container)item.getData();
 						container.getDownload().stopAndQueue();
-					}				
-					
+					}
+
 					RCMain.getRCMain().getClient().transactionCommit();
 					//Reset Buttons
 					setToolBarTorrentIcons(false,true,true);
 				}else{
 					TableItem[] items = seedsTable.getSelection();
 					if(items.length == 0) return;
-					
+
 					RCMain.getRCMain().getClient().transactionStart();
-					
+
 					for(TableItem item : items){
 						Container container = (Container)item.getData();
 						container.getDownload().stopAndQueue();
-					}				
-					
+					}
+
 					RCMain.getRCMain().getClient().transactionCommit();
 					//Reset Buttons
 					setToolBarTorrentIcons(false,true,true);
@@ -795,30 +795,30 @@ public class DownloadManagerShell {
 			public void handleEvent (Event e){
 				if(downloadsTable.isFocusControl()){
 					TableItem[] items = downloadsTable.getSelection();
-					if(items.length == 0) return;					
-					
+					if(items.length == 0) return;
+
 					RCMain.getRCMain().getClient().transactionStart();
-					
+
 					for(TableItem item : items){
 						Container container = (Container)item.getData();
 						container.getDownload().stop();
 					}
-					
-					RCMain.getRCMain().getClient().transactionCommit();				
+
+					RCMain.getRCMain().getClient().transactionCommit();
 					//Reset the Toobar Buttons
 					setToolBarTorrentIcons(true,false,true);
 				}else{
 					TableItem[] items = seedsTable.getSelection();
 					if(items.length == 0) return;
-					
+
 					RCMain.getRCMain().getClient().transactionStart();
-					
+
 					for(TableItem item : items){
 						Container container = (Container)item.getData();
 						container.getDownload().stop();
 					}
-					
-					RCMain.getRCMain().getClient().transactionCommit();				
+
+					RCMain.getRCMain().getClient().transactionCommit();
 					//Reset the Toobar buttons
 					setToolBarTorrentIcons(true,false,true);
 				}
@@ -837,10 +837,10 @@ public class DownloadManagerShell {
 			public void handleEvent (Event e){
 				if(downloadsTable.isFocusControl()){
 					TableItem[] items = downloadsTable.getSelection();
-					if(items.length == 0) return;					
-					
+					if(items.length == 0) return;
+
 					RCMain.getRCMain().getClient().transactionStart();
-					
+
 					for(TableItem item : items){
 						Container container = (Container)item.getData();
 						container.getDownload().remove();
@@ -850,9 +850,9 @@ public class DownloadManagerShell {
 						}else if(downloadsMap.containsKey(container.getDownload().getHash())){
 							downloadsMap.remove(container.getDownload().getHash());
 						}
-					}					
+					}
 					RCMain.getRCMain().getClient().transactionCommit();
-					
+
 				}else{
 					TableItem[] items = seedsTable.getSelection();
 					if(items.length == 0) return;
@@ -867,7 +867,7 @@ public class DownloadManagerShell {
 						}else if(downloadsMap.containsKey(container.getDownload().getHash())){
 							downloadsMap.remove(container.getDownload().getHash());
 						}
-					}					
+					}
 					RCMain.getRCMain().getClient().transactionCommit();
 				}
 			}
@@ -1135,7 +1135,7 @@ public class DownloadManagerShell {
 				if ((updateSwitches & Constants.UPDATE_USERS) != 0){
 					setLogInOutButtons(true);
 				}
-			
+
 			}
 		};
 
@@ -1255,7 +1255,7 @@ public class DownloadManagerShell {
 						setTorrentMoveButtons(false,true,true,false);
 					else if(index == 0)
 						setTorrentMoveButtons(false,true,true,true);
-					else if(index == downloadsTable.getItemCount())
+					else if(index == downloadsTable.getItemCount()-1)
 						setTorrentMoveButtons(true,true,true,false);
 					else
 						setTorrentMoveButtons(true,true,true,true);
@@ -1351,7 +1351,7 @@ public class DownloadManagerShell {
 						setTorrentMoveButtons(false,true,true,false);
 					else if(index == 0)
 						setTorrentMoveButtons(false,true,true,true);
-					else if(index == seedsTable.getItemCount())
+					else if(index == seedsTable.getItemCount()-1)
 						setTorrentMoveButtons(true,true,true,false);
 					else
 						setTorrentMoveButtons(true,true,true,true);
@@ -1856,7 +1856,7 @@ public class DownloadManagerShell {
 						connectionStatusIcon.setImage(ImageRepository.getImage("connect_established"));
 						connectionStatusIcon.setToolTipText("Connected to server");
 					}
-				} catch (SWTException e) {					
+				} catch (SWTException e) {
 					e.printStackTrace();
 				}
 			}});
@@ -1873,7 +1873,7 @@ public class DownloadManagerShell {
 							sslStatusIcon.setEnabled(true);
 							sslStatusIcon.setImage(ImageRepository.getImage("ssl_enabled"));
 							sslStatusIcon.setToolTipText("SSL Enabled");
-						} catch (SWTException e) {							
+						} catch (SWTException e) {
 							e.printStackTrace();
 						}
 					}
@@ -1886,7 +1886,7 @@ public class DownloadManagerShell {
 							sslStatusIcon.setEnabled(true);
 							sslStatusIcon.setImage(ImageRepository.getImage("ssl_disabled"));
 							sslStatusIcon.setToolTipText("SSL Disabled");
-						} catch (SWTException e) {							
+						} catch (SWTException e) {
 							e.printStackTrace();
 						}
 					}
@@ -1899,7 +1899,7 @@ public class DownloadManagerShell {
 					try {
 						sslStatusIcon.setImage(ImageRepository.getImage("ssl_disabled"));
 						sslStatusIcon.setEnabled(false);
-					} catch (SWTException e) {						
+					} catch (SWTException e) {
 						e.printStackTrace();
 					}
 				}
@@ -1914,10 +1914,14 @@ public class DownloadManagerShell {
 		display.asyncExec(new Runnable() {
 			public void run() {
 				try {
-					top.setEnabled(bTop);
-					up.setEnabled(bUp);
-					down.setEnabled(bDown);
-					bottom.setEnabled(bBottom);
+					if (top.isEnabled() != bTop)
+						top.setEnabled(bTop);
+					if (up.isEnabled() != bUp)
+						up.setEnabled(bUp);
+					if (down.isEnabled() != bDown)
+						down.setEnabled(bDown);
+					if (bottom.isEnabled() != bBottom)
+						bottom.setEnabled(bBottom);
 				} catch (SWTException e) {
 					e.printStackTrace();
 				}
@@ -2162,8 +2166,8 @@ public class DownloadManagerShell {
 					//Pull the names for the dialog
 					for(TableItem item : items){
 						names += ((Container)item.getData()).getDownload().getName() + "\n";
-					}					
-					
+					}
+
 					MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
 					messageBox.setText("Confirm Delete");
 					messageBox.setMessage("Remove the data associated with the following:\n\n" + names);
@@ -2380,7 +2384,7 @@ public class DownloadManagerShell {
 					statusBarText.setForeground(display.getSystemColor(color));
 					statusBarText.setText(text);
 					statusBarText.getParent().layout();
-				} catch (SWTException e) {					
+				} catch (SWTException e) {
 					e.printStackTrace();
 				}
 			}
@@ -2944,12 +2948,13 @@ public class DownloadManagerShell {
 	 *
 	 */
 	public void initializeConnection(){
+		setRequestedItems();
 		if (RCMain.getRCMain().connected()) {
 			Client client = RCMain.getRCMain().getClient();
 			client.transactionStart();
 			client.sendListTransfers(RemoteConstants.ST_ALL);
 			client.getUserManager().update();
-			
+
 			//Pull the remote info
 			client.getRemoteInfo().load();
 
