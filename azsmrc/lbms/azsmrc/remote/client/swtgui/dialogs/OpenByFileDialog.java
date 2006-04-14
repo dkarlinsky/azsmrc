@@ -11,7 +11,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import lbms.azsmrc.remote.client.Constants;
 import lbms.azsmrc.remote.client.Utilities;
+import lbms.azsmrc.remote.client.events.ClientUpdateListener;
 import lbms.azsmrc.remote.client.swtgui.ColorUtilities;
 import lbms.azsmrc.remote.client.swtgui.DownloadManagerShell;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
@@ -24,6 +26,7 @@ import lbms.azsmrc.remote.client.torrent.TOTorrentFile;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSource;
@@ -38,6 +41,8 @@ import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -63,6 +68,8 @@ public class OpenByFileDialog {
     private String lastDir;
 
     private Label totalS;
+    
+    private Label saveDir, saveDirSize, destDir, destDirSize;
 
     private Map<String, AddTorrentContainer> tMap = new HashMap<String, AddTorrentContainer>();
 
@@ -78,7 +85,7 @@ public class OpenByFileDialog {
         shell.setText("Send Torrent File to Server");
 
         // Comp on shell
-        Group comp = new Group(shell, SWT.NULL);
+        final Group comp = new Group(shell, SWT.NULL);
         GridData gridData = new GridData(GridData.FILL_BOTH);
         comp.setLayoutData(gridData);
 
@@ -184,13 +191,109 @@ public class OpenByFileDialog {
 
         });
 
+
+
+        //      -------Server Free Disk stuff -----------\\
+		final Group details3 = new Group(comp,SWT.NULL);
+		details3.setText("Server Drive Information");
+		gridLayout = new GridLayout();
+		gridLayout.numColumns = 3;
+		gridLayout.horizontalSpacing = 30;
+		details3.setLayout(gridLayout);
+		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		gridData.horizontalSpan = 3;
+		details3.setLayoutData(gridData);
+		
+		
+		
+		//save.dir is the default save dir
+		Label saveDirL = new Label(details3,SWT.NULL);
+		saveDirL.setText("Default Save Directory:");
+		
+		saveDir = new Label(details3,SWT.NULL);
+		saveDir.setText("Not Received Yet");
+		
+		saveDirSize = new Label(details3, SWT.NULL);
+		saveDirSize.setText("Not Received Yet");
+		
+		//destination.dir is the user dir
+		Label destDirL = new Label(details3,SWT.NULL);
+		destDirL.setText("User Directory:");
+		
+		destDir = new Label(details3,SWT.NULL);
+		destDir.setText("Not Received Yet");
+		
+		destDirSize = new Label(details3, SWT.NULL);
+		destDirSize.setText("Not Received Yet");
+        
+//		CUL
+		final ClientUpdateListener serverDetails = new ClientUpdateListener(){
+
+			public void update(long updateSwitches) {
+				if((updateSwitches & Constants.UPDATE_DRIVE_INFO) != 0){
+					RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
+						public void run() {
+							try{			
+								RCMain.getRCMain().getClient().getRemoteInfo().refreshDriveInfo();
+								Map<String,String> driveMap = RCMain.getRCMain().getClient().getRemoteInfo().getDriveInfo();
+								
+								if(driveMap.containsKey("save.dir") && driveMap.containsKey("save.dir.path")){
+									saveDir.setText(driveMap.get("save.dir.path"));
+									saveDirSize.setText(DisplayFormatters.formatKBCountToBase10KBEtc(Long.parseLong(driveMap.get("save.dir"))) + " Free");
+								}		
+								
+								if(driveMap.containsKey("destination.dir") && driveMap.containsKey("destination.dir.path")){
+									destDir.setText(driveMap.get("destination.dir.path"));
+									destDirSize.setText(DisplayFormatters.formatKBCountToBase10KBEtc(Long.parseLong(driveMap.get("destination.dir"))) + " Free");
+								}
+								
+								//redraw the group
+								details3.layout();
+								comp.layout();
+							}catch(SWTException e){
+								//do nothing as the tab was probably disposed
+							}catch(Exception e){
+								e.printStackTrace();
+							}
+						}
+					});
+
+				}
+				
+			}
+		};
+
+		RCMain.getRCMain().getClient().addClientUpdateListener(serverDetails);
+
+		RCMain.getRCMain().getClient().getRemoteInfo().refreshDriveInfo();
+		
+		//list to shell for close so that we can remove cul
+		shell.addShellListener(new ShellListener(){
+
+			public void shellActivated(ShellEvent arg0) {}
+
+			public void shellClosed(ShellEvent arg0) {
+				RCMain.getRCMain().getClient().removeClientUpdateListener(serverDetails);				
+			}
+
+			public void shellDeactivated(ShellEvent arg0) {}
+
+			public void shellDeiconified(ShellEvent arg0) {}
+
+			public void shellIconified(ShellEvent arg0) {}			
+		});
+		
+		
+		//--------------------------Total Size ------------------------\\
+		
         totalS = new Label(comp,SWT.NULL);
         gridData = new GridData(GridData.FILL_HORIZONTAL);
         gridData.horizontalSpan = 2;
         totalS.setLayoutData(gridData);
 
         setTotalSize();
-
+		
+		// -------------------------- SASH------------------------------\\
 
         SashForm sash = new SashForm(comp, SWT.VERTICAL);
         gridLayout = new GridLayout();
@@ -201,14 +304,14 @@ public class OpenByFileDialog {
 
         gridData = new GridData(GridData.FILL_BOTH);
         gridData.horizontalSpan = 3;
-        gridData.verticalSpan = 100;
+        gridData.verticalSpan = 70;
         gridData.grabExcessVerticalSpace = true;
         sash.setLayoutData(gridData);
 
         filesTable = new Table(sash, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
         gridData = new GridData(GridData.FILL_BOTH);
         gridData.horizontalSpan = 3;
-        gridData.verticalSpan = 50;
+        gridData.verticalSpan = 30;
         gridData.grabExcessVerticalSpace = true;
         filesTable.setLayoutData(gridData);
         filesTable.setHeaderVisible(true);
@@ -361,7 +464,7 @@ public class OpenByFileDialog {
         Button cancel = new Button(button_comp, SWT.PUSH);
         cancel.setText("Cancel");
         cancel.addListener(SWT.Selection, new Listener() {
-            public void handleEvent(Event e) {
+            public void handleEvent(Event e) {            
                 shell.close();
             }
         });
