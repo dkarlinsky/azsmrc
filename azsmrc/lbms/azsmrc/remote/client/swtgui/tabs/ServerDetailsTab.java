@@ -6,7 +6,10 @@
 package lbms.azsmrc.remote.client.swtgui.tabs;
 
 
-import lbms.azsmrc.remote.client.RemoteInfo;
+import java.util.Map;
+
+import lbms.azsmrc.remote.client.Constants;
+import lbms.azsmrc.remote.client.events.ClientUpdateListener;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.remote.client.util.TimerEvent;
@@ -36,12 +39,18 @@ public class ServerDetailsTab {
 	private Label azVer;
 	private Label plVer;
 	
+	private Label saveDirSize, saveDir;
+	private Label destDirSize, destDir;
+	
 	private Label totalDown, totalUp;
 
-	private Group details2;
+	private Group details1, details2, details3;
 	private Composite parent;
 	
-	public ServerDetailsTab(CTabFolder parentTab, final RemoteInfo remoteInfo){
+	
+	
+	public ServerDetailsTab(CTabFolder parentTab){
+		
 		final CTabItem detailsTab = new CTabItem(parentTab, SWT.CLOSE);
 		detailsTab.setText("Server Details");
 		
@@ -54,7 +63,7 @@ public class ServerDetailsTab {
 		gridData.horizontalSpan = 1;
 		parent.setLayoutData(gridData);
 
-		Group details1 = new Group(parent,SWT.NULL);
+		details1 = new Group(parent,SWT.NULL);
 		details1.setText("Server Details");
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = 2;
@@ -98,20 +107,14 @@ public class ServerDetailsTab {
 		azVerL.setText("Azureus Version:");
 		
 		azVer = new Label(details1,SWT.NULL);
-		if(remoteInfo == null)
-			azVer.setText("Not Received Yet");
-		else
-			azVer.setText(remoteInfo.getAzureusVersion());
+		azVer.setText("Not Received Yet");
 		
 		//Plugin Version
 		Label plVerL = new Label(details1, SWT.NULL);
 		plVerL.setText("AzSMRC Plugin Version:");
 		
-		plVer = new Label(details1, SWT.NULL);
-		if(remoteInfo == null)
-			plVer.setText("Not Received Yet");
-		else
-			plVer.setText(remoteInfo.getPluginVersion());
+		plVer = new Label(details1, SWT.NULL);		
+		plVer.setText("Not Received Yet");
 		
 		
 		
@@ -140,6 +143,54 @@ public class ServerDetailsTab {
 		
 		totalUp = new Label(details2, SWT.NULL);
 		totalUp.setText(DisplayFormatters.formatByteCountToBase10KBEtc(StatsStreamGlobalManager.getTotalUpload()));
+		
+		//-------Details 3
+		details3 = new Group(parent,SWT.NULL);
+		details3.setText("Server Drive Information");
+		gridLayout = new GridLayout();
+		gridLayout.numColumns = 3;
+		gridLayout.horizontalSpacing = 30;
+		details3.setLayout(gridLayout);
+		gridData = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+		gridData.horizontalSpan = 2;
+		details3.setLayoutData(gridData);
+		
+		
+		
+		//save.dir is the default save dir
+		Label saveDirL = new Label(details3,SWT.NULL);
+		saveDirL.setText("Default Save Directory:");
+		
+		saveDir = new Label(details3,SWT.NULL);
+		saveDir.setText("Not Received Yet");
+		
+		saveDirSize = new Label(details3, SWT.NULL);
+		saveDirSize.setText("Not Received Yet");
+		
+		//destination.dir is the user dir
+		Label destDirL = new Label(details3,SWT.NULL);
+		destDirL.setText("User Directory:");
+		
+		destDir = new Label(details3,SWT.NULL);
+		destDir.setText("Not Received Yet");
+		
+		destDirSize = new Label(details3, SWT.NULL);
+		destDirSize.setText("Not Received Yet");
+		
+		Button updateDriveInfo = new Button(details3,SWT.PUSH);
+		updateDriveInfo.setText("Update Drive Information");
+		updateDriveInfo.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				RCMain.getRCMain().getClient().transactionStart();
+				RCMain.getRCMain().getClient().sendGetRemoteInfo();
+				RCMain.getRCMain().getClient().sendGetDriveInfo();
+				RCMain.getRCMain().getClient().transactionCommit();
+				RCMain.getRCMain().getClient().getRemoteInfo().refreshDriveInfo();				
+			}			
+		});
+		
+		//call a drive refresh now that the labels are there
+		//remoteInfo.refreshDriveInfo();
 		
 		
 		//Button to restart server
@@ -188,14 +239,75 @@ public class ServerDetailsTab {
 			}
 		});
 
-		
-		
+		//CUL
+		final ClientUpdateListener serverDetails = new ClientUpdateListener(){
+
+			public void update(long updateSwitches) {
+				//if((updateSwitches & Constants.UPDATE_REMOTE_INFO) != 0){
+					RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
+						public void run() {
+							try{
+								azVer.setText(RCMain.getRCMain().getClient().getRemoteInfo().getAzureusVersion());
+								plVer.setText(RCMain.getRCMain().getClient().getRemoteInfo().getPluginVersion());								//redraw the group
+								details1.layout();
+								parent.layout();
+							}catch(SWTException e){
+								//do nothing as the tab was probably disposed
+							}catch(Exception e){
+								e.printStackTrace();
+							}
+						}
+					});
+
+					
+				//}
+				
+				//if((updateSwitches & Constants.UPDATE_DRIVE_INFO) != 0){
+					RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
+						public void run() {
+							try{			
+								RCMain.getRCMain().getClient().getRemoteInfo().refreshDriveInfo();
+								Map<String,String> driveMap = RCMain.getRCMain().getClient().getRemoteInfo().getDriveInfo();
+								
+								if(driveMap.containsKey("save.dir") && driveMap.containsKey("save.dir.path")){
+									saveDir.setText(driveMap.get("save.dir.path"));
+									saveDirSize.setText(DisplayFormatters.formatByteCountToBase10KBEtc(Long.parseLong(driveMap.get("save.dir"))));
+								}		
+								
+								if(driveMap.containsKey("destination.dir") && driveMap.containsKey("destination.dir.path")){
+									destDir.setText(driveMap.get("destination.dir.path"));
+									destDirSize.setText(DisplayFormatters.formatByteCountToBase10KBEtc(Long.parseLong(driveMap.get("destination.dir"))));
+								}
+								
+								//redraw the group
+								details3.layout();
+								parent.layout();
+							}catch(SWTException e){
+								//do nothing as the tab was probably disposed
+							}catch(Exception e){
+								e.printStackTrace();
+							}
+						}
+					});
+
+				//}
+				
+			}
+		};
+
+		RCMain.getRCMain().getClient().addClientUpdateListener(serverDetails);
+
+		RCMain.getRCMain().getClient().transactionStart();
+		RCMain.getRCMain().getClient().sendGetRemoteInfo();
+		RCMain.getRCMain().getClient().sendGetDriveInfo();
+		RCMain.getRCMain().getClient().transactionCommit();
 		
 		//Dispose Listener for tab
 		detailsTab.addDisposeListener(new DisposeListener (){
 
 			public void widgetDisposed(DisposeEvent arg0) {
 				updateTimerEvent.cancel();
+				RCMain.getRCMain().getClient().removeClientUpdateListener(serverDetails);
 			}
 
 		});

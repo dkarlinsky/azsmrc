@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
 import lbms.azsmrc.remote.client.Client;
 import lbms.azsmrc.remote.client.Constants;
 import lbms.azsmrc.remote.client.Download;
-import lbms.azsmrc.remote.client.RemoteInfo;
 import lbms.azsmrc.remote.client.User;
 import lbms.azsmrc.remote.client.Utilities;
 import lbms.azsmrc.remote.client.events.ClientUpdateListener;
@@ -115,7 +114,7 @@ public class DownloadManagerShell {
 	private CTabFolder tabFolder;
 	private CTabItem myTorrents;
 	private MenuItem moveData;
-	private RemoteInfo remoteInfo;
+	
 
 	private DownloadListener dlL = new DownloadListener(){
 
@@ -366,7 +365,7 @@ public class DownloadManagerShell {
 						return;
 					}
 				}
-				new ServerDetailsTab(tabFolder,remoteInfo);
+				new ServerDetailsTab(tabFolder);
 			}
 		});
 		
@@ -1136,11 +1135,7 @@ public class DownloadManagerShell {
 				if ((updateSwitches & Constants.UPDATE_USERS) != 0){
 					setLogInOutButtons(true);
 				}
-
-				if((updateSwitches & Constants.UPDATE_REMOTE_INFO) != 0){
-					remoteInfo = RCMain.getRCMain().getClient().getRemoteInfo();
-				}
-				
+			
 			}
 		};
 
