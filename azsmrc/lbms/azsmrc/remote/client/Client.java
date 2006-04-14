@@ -152,7 +152,10 @@ public class Client {
 
 		new Thread(new Runnable() {
 			public void run() {
-				if (!semaphore.tryAcquire()) return;
+				if (!semaphore.tryAcquire()) {
+					debug.finer("Client connection already established, postponed transfer.");
+					return;
+				}
 				Document reqDoc = new Document();
 
 				Element request = new Element("Request");
