@@ -347,6 +347,7 @@ public class ResponseManager {
 				List<Element> eList = xmlResponse.getChildren("Directory");
 				for (Element e:eList) {
 					map.put(e.getAttributeValue("name"), e.getAttributeValue("free"));
+					map.put(e.getAttributeValue("name")+".path", e.getAttributeValue("path"));
 				}
 				ri.setDriveInfo(map);
 				ri.setLoading(false);

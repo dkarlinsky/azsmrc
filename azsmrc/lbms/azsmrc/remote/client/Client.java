@@ -119,6 +119,7 @@ public class Client {
 	private void reset() {
 		userManager 	= new UserManagerImpl(this);
 		remoteInfo		= new RemoteInfoImpl(this);
+		downloadManager.clear();
 		failedConnections 	= 0;
 	}
 

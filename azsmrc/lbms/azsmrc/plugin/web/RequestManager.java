@@ -1139,6 +1139,7 @@ public class RequestManager {
 					if (!user.getOutputDir().equals("") && new File(user.getOutputDir()).exists()) {
 						dir = new Element ("Directory");
 						dir.setAttribute("name", "destination.dir");
+						dir.setAttribute("path", user.getOutputDir());
 						dir.setAttribute("free", Long.toString(FileSystemUtils.freeSpaceKb(user.getOutputDir())));
 						response.addContent(dir);
 					}
@@ -1146,6 +1147,7 @@ public class RequestManager {
 					if(new File(defSDir).exists()) {
 						dir = new Element ("Directory");
 						dir.setAttribute("name", "save.dir");
+						dir.setAttribute("path", defSDir);
 						dir.setAttribute("free", Long.toString(FileSystemUtils.freeSpaceKb(defSDir)));
 						response.addContent(dir);
 					}
