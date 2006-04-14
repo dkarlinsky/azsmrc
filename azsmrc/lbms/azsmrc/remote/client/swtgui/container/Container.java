@@ -174,7 +174,8 @@ public abstract class Container implements Comparable<Container> {
 									rowHeight,
 									newPercentage,
 									display,
-									RCMain.getRCMain().isManifestInUse()?false:true);
+									//RCMain.getRCMain().isManifestInUse()?false:
+									true);
 							item.setImage(tableColumns.indexOf(RemoteConstants.ST_COMPLETITION),progBarImage);
 						}
 

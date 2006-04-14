@@ -20,9 +20,9 @@ import org.eclipse.swt.widgets.TableItem;
 
 public class CustomProgressBar {
 	private NumberFormat longPercentFormat;
-	private RGB backgroundRGB, backgroundShadowRGB, backgroundHighlightRGB, progressRGB, progressShadowRGB, progressHighlightRGB, textRGB, borderRGB;
+	private static RGB backgroundRGB, backgroundShadowRGB, backgroundHighlightRGB, progressRGB, progressShadowRGB, progressHighlightRGB, textRGB, borderRGB;
 	private Display display;
-	private Color backgoundColor, backgroundShadowColor, backgroundHighlightColor, progressColor, progressShadowColor, progressHighlightColor, textColor, borderColor;
+	private static Color backgoundColor, backgroundShadowColor, backgroundHighlightColor, progressColor, progressShadowColor, progressHighlightColor, textColor, borderColor;
 
 	public Image paintProgressBar(TableItem cell, int column_of_cell, int width, int height, Integer completed, Display sentDisplay, boolean isRelief) {
 		display = sentDisplay;
@@ -49,111 +49,111 @@ public class CustomProgressBar {
 		//this.defaultBorderRGB = this.defaultTextRGB;
 
 		//new colors based on system colors to accomodate manifest
-		this.backgroundRGB = new RGB(214, 235, 255);
-		this.backgroundShadowRGB = new RGB(0, 255, 0);
-		this.backgroundHighlightRGB = new RGB(255, 0, 0);
-		this.progressRGB = new RGB(128, 191, 255);
-		this.progressShadowRGB = new RGB(0, 0, 0);
-		this.progressHighlightRGB = new RGB(0, 0, 255);
+		backgroundRGB = new RGB(214, 235, 255);
+		backgroundShadowRGB = new RGB(0, 255, 0);
+		backgroundHighlightRGB = new RGB(255, 0, 0);
+		progressRGB = new RGB(128, 191, 255);
+		progressShadowRGB = new RGB(0, 0, 0);
+		progressHighlightRGB = new RGB(0, 0, 255);
 
-		this.textRGB = display.getSystemColor(SWT.COLOR_DARK_BLUE).getRGB();
-		this.borderRGB = this.textRGB;
+		textRGB = display.getSystemColor(SWT.COLOR_DARK_BLUE).getRGB();
+		borderRGB = textRGB;
 	}
 
 	private RGB getBackgroundRGB() {
 
-		return this.backgroundRGB;
+		return backgroundRGB;
 	}
 
 	private RGB getBackgroundShadowRGB() {
 
-		return this.backgroundShadowRGB;
+		return backgroundShadowRGB;
 	}
 
 	private RGB getBackgroundHighlightRGB() {
 
-		return this.backgroundHighlightRGB;
+		return backgroundHighlightRGB;
 	}
 
 
 	private RGB getProgressRGB() {
 
-		return this.progressRGB;
+		return progressRGB;
 	}
 
 	private RGB getProgressShadowRGB() {
 
-		return this.progressShadowRGB;
+		return progressShadowRGB;
 	}
 
 	private RGB getProgressHighlightRGB() {
 
-		return this.progressHighlightRGB;
+		return progressHighlightRGB;
 	}
 
 	private RGB getTextRGB() {
 
-		return this.textRGB;
+		return textRGB;
 	}
 
 	private RGB getBorderRGB() {
 
-		return this.borderRGB;
+		return borderRGB;
 	}
 	public Color getBackgroundColor() {
-		if (this.backgoundColor == null) {
-			this.backgoundColor = new Color(display, this.getBackgroundRGB());
+		if (backgoundColor == null) {
+			backgoundColor = new Color(display, this.getBackgroundRGB());
 		}
-		return this.backgoundColor;
+		return backgoundColor;
 	}
 
 	public Color getBackgroundShadowColor() {
-		if (this.backgroundShadowColor == null) {
-			this.backgroundShadowColor = new Color(display, this.getBackgroundShadowRGB());
+		if (backgroundShadowColor == null) {
+			backgroundShadowColor = new Color(display, this.getBackgroundShadowRGB());
 		}
-		return this.backgroundShadowColor;
+		return backgroundShadowColor;
 	}
 
 	public Color getBackgroundHighlightColor() {
-		if (this.backgroundHighlightColor == null) {
-			this.backgroundHighlightColor = new Color(display, this.getBackgroundHighlightRGB());
+		if (backgroundHighlightColor == null) {
+			backgroundHighlightColor = new Color(display, this.getBackgroundHighlightRGB());
 		}
-		return this.backgroundHighlightColor;
+		return backgroundHighlightColor;
 	}
 
 	public Color getProgressColor() {
-		if (this.progressColor == null) {
-			this.progressColor = new Color(display, this.getProgressRGB());
+		if (progressColor == null) {
+			progressColor = new Color(display, this.getProgressRGB());
 		}
-		return this.progressColor;
+		return progressColor;
 	}
 
 	public Color getProgressHighlightColor() {
-		if (this.progressHighlightColor == null) {
-			this.progressHighlightColor = new Color(display, this.getProgressHighlightRGB());
+		if (progressHighlightColor == null) {
+			progressHighlightColor = new Color(display, this.getProgressHighlightRGB());
 		}
-		return this.progressHighlightColor;
+		return progressHighlightColor;
 	}
 
 	public Color getProgressShadowColor() {
-		if (this.progressShadowColor == null) {
-			this.progressShadowColor = new Color(display, this.getProgressShadowRGB());
+		if (progressShadowColor == null) {
+			progressShadowColor = new Color(display, this.getProgressShadowRGB());
 		}
-		return this.progressShadowColor;
+		return progressShadowColor;
 	}
 
 	public Color getBorderColor() {
-		if (this.borderColor == null) {
-			this.borderColor = new Color(display, this.getBorderRGB());
+		if (borderColor == null) {
+			borderColor = new Color(display, this.getBorderRGB());
 		}
-		return this.borderColor;
+		return borderColor;
 	}
 
 	public Color getTextColor() {
-		if (this.textColor == null) {
-			this.textColor = new Color(display, this.getTextRGB());
+		if (textColor == null) {
+			textColor = new Color(display, this.getTextRGB());
 		}
-		return this.textColor;
+		return textColor;
 	}
 	private void paintBackground(int imageWidth, int imageHeight, GC gc, boolean isRelief) {
 		int heightToPaint = imageHeight - 2;
@@ -256,6 +256,5 @@ public class CustomProgressBar {
 	private Image createImage(int width, int height) {
 		return new Image(display, width, height);
 	}
-
 
 }//EOF
