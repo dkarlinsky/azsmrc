@@ -18,7 +18,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TableItem;
 
 public class CustomProgressBar {
@@ -136,7 +135,7 @@ public class CustomProgressBar {
     }
 
     private void paintPercent(int imageWidth, int imageHeight, Integer completed, GC gc) {
-        gc.setForeground(new Color(display, defaultTextRGB));
+        gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_BLUE)/*new Color(display, defaultTextRGB)*/);
         String percent = this.longPercentFormat.format(completed.intValue() / 10.0f) + " %";
         Point extent = gc.stringExtent(percent);
         if (extent.x <= imageWidth) {
