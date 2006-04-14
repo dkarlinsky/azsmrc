@@ -773,9 +773,8 @@ public class RCMain implements Launchable {
 		if (!fDest.exists() && fOrigin.exists()) {
 			FileUtil.copyFile(fOrigin, fDest);
 			manifestInUse = false;
-		} else {
+		} else if (fDest.exists())
 			manifestInUse = true;
-		}
 	}
 
 	/**
