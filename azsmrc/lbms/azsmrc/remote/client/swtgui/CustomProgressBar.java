@@ -12,8 +12,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
@@ -24,13 +22,10 @@ public class CustomProgressBar {
 	private NumberFormat longPercentFormat;
 	private RGB backgroundRGB, backgroundShadowRGB, backgroundHighlightRGB, progressRGB, progressShadowRGB, progressHighlightRGB, textRGB, borderRGB;
 	private Display display;
-	private Image barImage, backgroundImage, coloredBarImage, coloredBackgroundImage;
 	private Color backgoundColor, backgroundShadowColor, backgroundHighlightColor, progressColor, progressShadowColor, progressHighlightColor, textColor, borderColor;
 
 	public Image paintProgressBar(TableItem cell, int column_of_cell, int width, int height, Integer completed, Display sentDisplay, boolean isRelief) {
 		display = sentDisplay;
-		barImage = ImageRepository.getImage("barImage");
-		backgroundImage = ImageRepository.getImage("backgroundImage");
 
 		this.longPercentFormat = new DecimalFormat("##0.0");
 		initDefaultRGBs();
@@ -233,26 +228,11 @@ public class CustomProgressBar {
 		}
 	}
 
-
-
-
 	private int getWidthToPaint(Integer completed, int imageWidth) {
 		float precentComplete = completed.intValue() / 1000.0f;
 		int widthToPaint = (int) ((imageWidth - 2) * precentComplete);
 		return widthToPaint;
 	}
-
-
-	private void paintSlice(int srcX, int destX, int width, int imageHeight, Image pattern, GC gc) {
-		if (width > 0) {
-			int srcHeight = pattern.getImageData().height;
-			gc.drawImage(pattern, srcX,             1, 1, srcHeight - 2, destX,               2, width, imageHeight - 4); //middle
-			gc.drawImage(pattern, srcX,             0, 1,             1, destX,               1, width,               1); //top
-			gc.drawImage(pattern, srcX, srcHeight - 1, 1,             1, destX, imageHeight - 2, width,               1); //botton
-		}
-	}
-
-
 
 	private void paintBorder(int imageWidth, int imageHeight, GC gc) {
 		gc.setForeground(new Color(display, borderRGB));
@@ -276,102 +256,6 @@ public class CustomProgressBar {
 	private Image createImage(int width, int height) {
 		return new Image(display, width, height);
 	}
-
-	public Image getColoredBar() {
-		if (this.coloredBarImage == null) {
-			ImageData imageData = this.tintImageData(this.barImage.getImageData(), getProgressColor());
-			this.coloredBarImage = new Image(display, imageData);
-		}
-		return this.coloredBarImage;
-	}
-
-	public Image getColoredBackground() {
-		if (this.coloredBackgroundImage == null) {
-			ImageData imageData = this.tintImageData(this.backgroundImage.getImageData(), this.getBackgroundColor());
-			this.coloredBackgroundImage = new Image(display, imageData);
-		}
-		return this.coloredBackgroundImage;
-	}
-
-
-	private ImageData tintImageData(ImageData imageData, Color color) {
-		PaletteData palette = imageData.palette;
-		imageData = (ImageData) imageData.clone();
-
-		if (palette.isDirect) {
-			this.tintDirectImageData(imageData, color, palette);
-		} else {
-			this.tintIndexedImageData(imageData, color, palette);
-		}
-		return imageData;
-	}
-
-	private void tintIndexedImageData(ImageData imageData, Color color, PaletteData palette) {
-		float divisor = 1f / 255f;
-		RGB[] rgbs = imageData.getRGBs();
-		for (int x = 0; x < imageData.width; ++x) {
-			for (int y = 0; y < imageData.height; ++y) {
-				int pixel = imageData.getPixel(x, y);
-				RGB rgb = rgbs[pixel];
-
-				int red = this.multAndRound(rgb.red, color.getRed(), divisor);
-				int green = this.multAndRound(rgb.green, color.getGreen(), divisor);
-				int blue = this.multAndRound(rgb.blue, color.getBlue(), divisor);
-
-				rgb.red = red;
-				rgb.green = green;
-				rgb.blue = blue;
-
-				pixel = palette.getPixel(rgb);
-				imageData.setPixel(x, y, pixel);
-			}
-		}
-	}
-
-	private void tintDirectImageData(ImageData imageData, Color color, PaletteData palette) {
-		float divisor = 1f / 255f;
-		int redMask = palette.redMask;
-		int redShift = palette.redShift;
-		int greenMask = palette.greenMask;
-		int greenShift = palette.greenShift;
-		int blueMask = palette.blueMask;
-		int blueShift = palette.blueShift;
-		for (int x = 0; x < imageData.width; ++x) {
-			for (int y = 0; y < imageData.height; ++y) {
-				int pixel = imageData.getPixel(x, y);
-				int red = this.decodeColor(pixel, redMask, redShift);
-				int green = this.decodeColor(pixel, greenMask, greenShift);
-				int blue = this.decodeColor(pixel, blueMask, blueShift);
-
-				red = this.multAndRound(red, color.getRed(), divisor);
-				green = this.multAndRound(green, color.getGreen(), divisor);
-				blue = this.multAndRound(blue, color.getBlue(), divisor);
-
-				red = this.encodeColor(red, redMask, redShift);
-				green = this.encodeColor(green, greenMask, greenShift);
-				blue = this.encodeColor(blue, blueMask, blueShift);
-				pixel = red | green | blue;
-				imageData.setPixel(x, y, pixel);
-			}
-		}
-	}
-	private int decodeColor(int pixel, int mask, int shift) {
-		int color = pixel & mask;
-		color = (shift < 0) ? color >>> -shift : color << shift;
-		return color;
-	}
-
-	private int encodeColor(int color, int mask, int shift) {
-		int pixel = (shift < 0) ? color << -shift : color >> shift;
-		pixel &= mask;
-		return pixel;
-	}
-
-	private int multAndRound(int color1, int color2, float divisor) {
-		int color = color1 * color2;
-		return Math.round(color * divisor);
-	}
-
 
 
 }//EOF
