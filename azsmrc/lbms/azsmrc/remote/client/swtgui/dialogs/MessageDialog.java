@@ -16,6 +16,7 @@ import lbms.azsmrc.remote.client.util.TimerEvent;
 import lbms.azsmrc.remote.client.util.TimerEventPerformer;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
@@ -197,34 +198,39 @@ public class MessageDialog {
 		messageDiags.remove(this);
 		display.asyncExec(new Runnable() {
 			public void run() {
-				Rectangle splashRect = splash.getBounds();
-				Rectangle displayRect = display.getClientArea();
-				final int start_x = displayRect.width - splashRect.width - 5;
-				final int start_y = displayRect.height;
-				final int end_x = (displayRect.width - splashRect.width - 5);
-				final int end_y = (displayRect.height - splashRect.height);
-				int step = 0;
-				while(step <= steps) {
-					try {
-						final int x = end_x + ((start_x - end_x) * step ) / steps;
-						final int y = end_y + ((start_y - end_y) * step ) / steps;
-						splash.setLocation(x,y);
-						if(!splash.isVisible()) splash.open();
+				try{
+					Rectangle splashRect = splash.getBounds();
+					Rectangle displayRect = display.getClientArea();
+					final int start_x = displayRect.width - splashRect.width - 5;
+					final int start_y = displayRect.height;
+					final int end_x = (displayRect.width - splashRect.width - 5);
+					final int end_y = (displayRect.height - splashRect.height);
+					int step = 0;
+					while(step <= steps) {
 						try {
-							Thread.sleep(thread_Sleep_Steps);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+							final int x = end_x + ((start_x - end_x) * step ) / steps;
+							final int y = end_y + ((start_y - end_y) * step ) / steps;
+							splash.setLocation(x,y);
+							if(!splash.isVisible()) splash.open();
+							try {
+								Thread.sleep(thread_Sleep_Steps);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 
-						step++;
-					} catch(Exception e) {
-						//Stop animating
-						step = steps;
+							step++;
+						} catch(Exception e) {
+							//Stop animating
+							step = steps;
+						}
 					}
+					splash.close();
+					popupImage.dispose();
+				}catch(SWTException swte){
+					
 				}
-				splash.close();
-				popupImage.dispose();
+
 			}
 		});
 	}
