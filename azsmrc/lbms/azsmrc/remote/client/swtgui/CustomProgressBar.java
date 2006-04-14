@@ -136,10 +136,6 @@ public class CustomProgressBar {
 
     private void paintPercent(int imageWidth, int imageHeight, Integer completed, GC gc) {
         gc.setForeground(new Color(display, defaultTextRGB));
-        System.out.println("PB INFO: text r:" 
-        		+ gc.getForeground().getRed() + 
-        		" g: " + gc.getForeground().getGreen() + 
-        		" b: " + gc.getForeground().getBlue());
         String percent = this.longPercentFormat.format(completed.intValue() / 10.0f) + " %";
         Point extent = gc.stringExtent(percent);
         if (extent.x <= imageWidth) {
