@@ -174,7 +174,7 @@ public abstract class Container implements Comparable<Container> {
 									rowHeight,
 									newPercentage,
 									display,
-									true);
+									false);
 							item.setImage(tableColumns.indexOf(RemoteConstants.ST_COMPLETITION),progBarImage);
 						}
 
