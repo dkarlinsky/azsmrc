@@ -31,9 +31,8 @@ public class RemoteUpdateManagerImpl implements RemoteUpdateManager {
 
 	}
 
-	public void applyUpdates() {
-		// TODO Auto-generated method stub
-
+	public void applyUpdates(String[] u) {
+		client.sendApplyUpdates(u);
 	}
 
 	/**

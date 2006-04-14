@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import lbms.azsmrc.remote.client.impl.DownloadAdvancedStatsImpl;
 import lbms.azsmrc.remote.client.impl.DownloadFileImpl;
@@ -28,6 +29,7 @@ public class ResponseManager {
 	private Map<String,ResponseHandler> handlerList = new HashMap<String, ResponseHandler>();
 	private Client client;
 	private DownloadManagerImpl dm;
+	private Logger debug;
 
 	public void addHandler (String request, ResponseHandler handler) {
 		handlerList.put(request, handler);
@@ -162,6 +164,7 @@ public class ResponseManager {
 	public ResponseManager(Client caller) {
 		this.client = caller;
 		this.dm = caller.getDownloadManagerImpl();
+		debug = Logger.getLogger("lbms.azsmrc.client");
 		addHandler("_InvalidProtocolVersion_", new ResponseHandler() {
 			public long handleRequest(Element xmlResponse) throws IOException{
 				return 0;
@@ -169,11 +172,12 @@ public class ResponseManager {
 		});
 		addHandler("_UnhandledRequest_", new ResponseHandler() {
 			public long handleRequest(Element xmlResponse) throws IOException{
-				System.out.println("Unhandled Request:");
 				try {
-					System.out.println(xmlResponse.getChild("Error").getChild("Query").getAttributeValue("switch"));
+					debug.warning("Unhandled Request: "+xmlResponse.getChild("Error").getChild("Query").getAttributeValue("switch"));
 					return 0;
 				} catch (Exception e) {
+
+					debug.warning("Unhandled Request");
 					return 0;
 				}
 			}

@@ -132,7 +132,7 @@ public class Client {
 	public void transactionStart() {
 		transaction = true;
 		debug.fine("Transaction Started");
-		transactionTimeout = timer.addEvent(TRANSACTION_TIMEOUT, new TimerEventPerformer() {
+		transactionTimeout = timer.addEvent(System.currentTimeMillis()+TRANSACTION_TIMEOUT, new TimerEventPerformer() {
 			public void perform(TimerEvent event) {
 				debug.warning("Transaction Committed by Timeout.");
 				transactionCommit();
@@ -613,6 +613,17 @@ public class Client {
 	public void sendGetDriveInfo() {
 		Element sendElement = getSendElement();
 		sendElement.setAttribute("switch", "getDriveInfo");
+		enqueue(sendElement);
+	}
+
+	public void sendApplyUpdates(String[] names) {
+		Element sendElement = getSendElement();
+		sendElement.setAttribute("switch", "applyUpdates");
+		for (String n:names) {
+			Element a = new Element ("Apply");
+			a.setAttribute("name", n);
+			sendElement.addContent(a);
+		}
 		enqueue(sendElement);
 	}
 
