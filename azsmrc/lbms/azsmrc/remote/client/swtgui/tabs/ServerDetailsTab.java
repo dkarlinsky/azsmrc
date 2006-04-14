@@ -181,10 +181,6 @@ public class ServerDetailsTab {
 		updateDriveInfo.setText("Update Drive Information");
 		updateDriveInfo.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
-				RCMain.getRCMain().getClient().transactionStart();
-				RCMain.getRCMain().getClient().sendGetRemoteInfo();
-				RCMain.getRCMain().getClient().sendGetDriveInfo();
-				RCMain.getRCMain().getClient().transactionCommit();
 				RCMain.getRCMain().getClient().getRemoteInfo().refreshDriveInfo();				
 			}			
 		});
@@ -271,12 +267,12 @@ public class ServerDetailsTab {
 								
 								if(driveMap.containsKey("save.dir") && driveMap.containsKey("save.dir.path")){
 									saveDir.setText(driveMap.get("save.dir.path"));
-									saveDirSize.setText(DisplayFormatters.formatKBCountToBase10KBEtc(Long.parseLong(driveMap.get("save.dir"))));
+									saveDirSize.setText(DisplayFormatters.formatKBCountToBase10KBEtc(Long.parseLong(driveMap.get("save.dir"))) + " Free");
 								}		
 								
 								if(driveMap.containsKey("destination.dir") && driveMap.containsKey("destination.dir.path")){
 									destDir.setText(driveMap.get("destination.dir.path"));
-									destDirSize.setText(DisplayFormatters.formatKBCountToBase10KBEtc(Long.parseLong(driveMap.get("destination.dir"))));
+									destDirSize.setText(DisplayFormatters.formatKBCountToBase10KBEtc(Long.parseLong(driveMap.get("destination.dir"))) + " Free");
 								}
 								
 								//redraw the group
@@ -297,10 +293,7 @@ public class ServerDetailsTab {
 
 		RCMain.getRCMain().getClient().addClientUpdateListener(serverDetails);
 
-		RCMain.getRCMain().getClient().transactionStart();
-		RCMain.getRCMain().getClient().sendGetRemoteInfo();
-		RCMain.getRCMain().getClient().sendGetDriveInfo();
-		RCMain.getRCMain().getClient().transactionCommit();
+		RCMain.getRCMain().getClient().getRemoteInfo().load();		
 		
 		//Dispose Listener for tab
 		detailsTab.addDisposeListener(new DisposeListener (){
