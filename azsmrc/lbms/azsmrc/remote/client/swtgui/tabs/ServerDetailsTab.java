@@ -243,7 +243,7 @@ public class ServerDetailsTab {
 		final ClientUpdateListener serverDetails = new ClientUpdateListener(){
 
 			public void update(long updateSwitches) {
-				//if((updateSwitches & Constants.UPDATE_REMOTE_INFO) != 0){
+				if((updateSwitches & Constants.UPDATE_REMOTE_INFO) != 0){
 					RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
 						public void run() {
 							try{
@@ -260,9 +260,9 @@ public class ServerDetailsTab {
 					});
 
 					
-				//}
+				}
 				
-				//if((updateSwitches & Constants.UPDATE_DRIVE_INFO) != 0){
+				if((updateSwitches & Constants.UPDATE_DRIVE_INFO) != 0){
 					RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
 						public void run() {
 							try{			
@@ -271,12 +271,12 @@ public class ServerDetailsTab {
 								
 								if(driveMap.containsKey("save.dir") && driveMap.containsKey("save.dir.path")){
 									saveDir.setText(driveMap.get("save.dir.path"));
-									saveDirSize.setText(DisplayFormatters.formatByteCountToBase10KBEtc(Long.parseLong(driveMap.get("save.dir"))));
+									saveDirSize.setText(DisplayFormatters.formatKBCountToBase10KBEtc(Long.parseLong(driveMap.get("save.dir"))));
 								}		
 								
 								if(driveMap.containsKey("destination.dir") && driveMap.containsKey("destination.dir.path")){
 									destDir.setText(driveMap.get("destination.dir.path"));
-									destDirSize.setText(DisplayFormatters.formatByteCountToBase10KBEtc(Long.parseLong(driveMap.get("destination.dir"))));
+									destDirSize.setText(DisplayFormatters.formatKBCountToBase10KBEtc(Long.parseLong(driveMap.get("destination.dir"))));
 								}
 								
 								//redraw the group
@@ -290,7 +290,7 @@ public class ServerDetailsTab {
 						}
 					});
 
-				//}
+				}
 				
 			}
 		};

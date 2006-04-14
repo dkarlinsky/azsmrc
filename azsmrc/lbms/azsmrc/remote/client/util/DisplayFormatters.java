@@ -260,6 +260,40 @@ DisplayFormatters
 		}
 	}
 
+	
+	public static String
+	formatKBCountToBase10KBEtc(
+			long n)
+	{
+		if (n < 1000){
+
+			return n + units_base10[UNIT_KB];
+
+		}else if (n < 1000 * 1000){
+
+			return 	(n / 1000) + "." +
+					((n % 1000) / 100) +
+					units_base10[UNIT_MB];
+
+		}else if ( n < 1000L * 1000L * 1000L  || not_use_GB_TB ){
+
+			return 	(n / (1000L * 1000L)) + "." +
+					((n % (1000L * 1000L)) / (1000L * 100L)) +
+					units_base10[UNIT_GB];
+
+		}else if (n < 1000L * 1000L * 1000L * 1000L){
+
+			return (n / (1000L * 1000L * 1000L)) + "." +
+					((n % (1000L * 1000L * 1000L)) / (1000L * 1000L * 100L))+
+					units_base10[UNIT_TB];
+
+		}else{
+
+			return Formats_units_alot;
+		}
+	}
+	
+	
 	public static String
 	formatByteCountToBase10KBEtcPerSec(
 			long		n )
