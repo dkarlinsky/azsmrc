@@ -340,7 +340,7 @@ public class ResponseManager {
 				return Constants.UPDATE_REMOTE_INFO;
 			}
 		});
-		addHandler("getRemoteInfo", new ResponseHandler() {
+		addHandler("getDriveInfo", new ResponseHandler() {
 			public long handleRequest(Element xmlResponse) throws IOException{
 				RemoteInfoImpl ri = client.getRemoteInfoImpl();
 				Map<String, String> map = new HashMap<String, String>();
