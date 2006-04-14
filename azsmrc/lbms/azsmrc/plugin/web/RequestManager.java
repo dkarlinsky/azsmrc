@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 
 import lbms.azsmrc.plugin.main.MultiUser;
@@ -19,7 +22,9 @@ import lbms.azsmrc.shared.EncodingUtil;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.azsmrc.shared.UserNotFoundException;
 
+import org.apache.commons.io.FileSystemUtils;
 import org.gudy.azureus2.core3.config.COConfigurationManager;
+import org.gudy.azureus2.core3.util.Constants;
 import org.gudy.azureus2.plugins.PluginConfig;
 import org.gudy.azureus2.plugins.PluginInterface;
 import org.gudy.azureus2.plugins.disk.DiskManagerFileInfo;
@@ -38,6 +43,8 @@ import org.gudy.azureus2.plugins.update.Update;
 import org.gudy.azureus2.plugins.update.UpdateCheckInstance;
 import org.gudy.azureus2.plugins.update.UpdateChecker;
 import org.gudy.azureus2.plugins.update.UpdateException;
+import org.gudy.azureus2.plugins.utils.resourcedownloader.ResourceDownloader;
+import org.gudy.azureus2.plugins.utils.resourcedownloader.ResourceDownloaderException;
 import org.jdom.*;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -1122,6 +1129,30 @@ public class RequestManager {
 				return true;
 			}
 		});
+		addHandler("getDriveInfo", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, final User user) throws IOException {
+
+				PluginInterface pi = Plugin.getPluginInterface();
+				if (Constants.isLinux || Constants.isWindows) {
+					PluginConfig pc = pi.getPluginconfig();
+					Element dir;
+					if (!user.getOutputDir().equals("") && new File(user.getOutputDir()).exists()) {
+						dir = new Element ("Directory");
+						dir.setAttribute("name", "destination.dir");
+						dir.setAttribute("free", Long.toString(FileSystemUtils.freeSpaceKb(user.getOutputDir())));
+						response.addContent(dir);
+					}
+					String defSDir = pc.getStringParameter("Default save path");
+					if(new File(defSDir).exists()) {
+						dir = new Element ("Directory");
+						dir.setAttribute("name", "save.dir");
+						dir.setAttribute("free", Long.toString(FileSystemUtils.freeSpaceKb(defSDir)));
+						response.addContent(dir);
+					}
+				}
+				return true;
+			}
+		});
 		addHandler("getUpdateInfo", new RequestHandler() {
 			public boolean handleRequest(Element xmlRequest, Element response, final User user) throws IOException {
 
@@ -1139,6 +1170,43 @@ public class RequestManager {
 					}
 				}
 				return true;
+			}
+		});
+		addHandler("applyUpdates", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, final User user) throws IOException {
+				if (user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+					final UpdateCheckInstance uci = Plugin.getLatestUpdate();
+					if (uci != null) {
+						final Set<String> apply = new HashSet<String>();
+						List<Element> aElem = xmlRequest.getChildren("Apply");
+						for (Element e:aElem) {
+							apply.add(e.getAttributeValue("name"));
+						}
+						if (apply.size() > 0) {
+							Thread t = new Thread( new Runnable() {
+								public void run() {
+									Update[] updates = uci.getUpdates();
+									for (Update update:updates) {
+										if (!apply.contains(update.getName()))continue;
+										ResourceDownloader[] downloader = update.getDownloaders();
+										for (ResourceDownloader dl:downloader) {
+											try {
+												dl.download();
+											} catch (ResourceDownloaderException e) {
+												user.eventException(e);
+												e.printStackTrace();
+											}
+										}
+									}
+								}
+							});
+							t.setDaemon(true);
+							t.start();
+						}
+					}
+					return false;
+				}
+				return false;
 			}
 		});
 	}
