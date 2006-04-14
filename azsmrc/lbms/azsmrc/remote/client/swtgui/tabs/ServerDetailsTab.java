@@ -106,15 +106,15 @@ public class ServerDetailsTab {
 		Label azVerL = new Label(details1, SWT.NULL);
 		azVerL.setText("Azureus Version:");
 		
-		azVer = new Label(details1,SWT.NULL);
-		azVer.setText("Not Received Yet");
+		azVer = new Label(details1,SWT.NULL);		
+		azVer.setText(RCMain.getRCMain().getClient().getRemoteInfo().getAzureusVersion());
 		
 		//Plugin Version
 		Label plVerL = new Label(details1, SWT.NULL);
 		plVerL.setText("AzSMRC Plugin Version:");
 		
 		plVer = new Label(details1, SWT.NULL);		
-		plVer.setText("Not Received Yet");
+		plVer.setText(RCMain.getRCMain().getClient().getRemoteInfo().getPluginVersion());
 		
 		
 		
@@ -244,7 +244,8 @@ public class ServerDetailsTab {
 						public void run() {
 							try{
 								azVer.setText(RCMain.getRCMain().getClient().getRemoteInfo().getAzureusVersion());
-								plVer.setText(RCMain.getRCMain().getClient().getRemoteInfo().getPluginVersion());								//redraw the group
+								plVer.setText(RCMain.getRCMain().getClient().getRemoteInfo().getPluginVersion());								
+								//redraw the group
 								details1.layout();
 								parent.layout();
 							}catch(SWTException e){
@@ -293,7 +294,7 @@ public class ServerDetailsTab {
 
 		RCMain.getRCMain().getClient().addClientUpdateListener(serverDetails);
 
-		RCMain.getRCMain().getClient().getRemoteInfo().load();		
+		RCMain.getRCMain().getClient().getRemoteInfo().refreshDriveInfo();
 		
 		//Dispose Listener for tab
 		detailsTab.addDisposeListener(new DisposeListener (){
