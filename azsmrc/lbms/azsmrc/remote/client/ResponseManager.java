@@ -340,6 +340,19 @@ public class ResponseManager {
 				return Constants.UPDATE_REMOTE_INFO;
 			}
 		});
+		addHandler("getRemoteInfo", new ResponseHandler() {
+			public long handleRequest(Element xmlResponse) throws IOException{
+				RemoteInfoImpl ri = client.getRemoteInfoImpl();
+				Map<String, String> map = new HashMap<String, String>();
+				List<Element> eList = xmlResponse.getChildren("Directory");
+				for (Element e:eList) {
+					map.put(e.getAttributeValue("name"), e.getAttributeValue("free"));
+				}
+				ri.setDriveInfo(map);
+				ri.setLoading(false);
+				return Constants.UPDATE_DRIVE_INFO;
+			}
+		});
 		addHandler("getUpdateInfo", new ResponseHandler() {
 			public long handleRequest(Element xmlResponse) throws IOException{
 				RemoteUpdateManagerImpl rum = client.getRemoteUpdateManagerImpl();
@@ -354,7 +367,7 @@ public class ResponseManager {
 				} else {
 					rum.setUpdatesAvailable(avail);
 				}
-				return Constants.UPDATE_REMOTE_INFO;
+				return Constants.UPDATE_UPDATE_INFO;
 			}
 		});
 	}

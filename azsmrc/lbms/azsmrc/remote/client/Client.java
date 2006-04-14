@@ -597,6 +597,12 @@ public class Client {
 		enqueue(sendElement);
 	}
 
+	public void sendGetDriveInfo() {
+		Element sendElement = getSendElement();
+		sendElement.setAttribute("switch", "getDriveInfo");
+		enqueue(sendElement);
+	}
+
 	public void sendGetGlobalStats() {
 		send(); //globalStats are allways requested so just send here
 	}

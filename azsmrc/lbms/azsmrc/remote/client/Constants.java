@@ -6,4 +6,7 @@ public class Constants {
 	public static final long UPDATE_DOWNLOAD_FILES 	= 1<<2;
 	public static final long UPDATE_USERS 			= 1<<3;
 	public static final long UPDATE_REMOTE_INFO		= 1<<4;
+	public static final long UPDATE_DRIVE_INFO		= 1<<5;
+	public static final long UPDATE_UPDATE_INFO		= 1<<6;
+
 }
