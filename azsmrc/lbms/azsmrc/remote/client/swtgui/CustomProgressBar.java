@@ -135,7 +135,7 @@ public class CustomProgressBar {
     }
 
     private void paintPercent(int imageWidth, int imageHeight, Integer completed, GC gc) {
-        gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_BLUE)/*new Color(display, defaultTextRGB)*/);
+        gc.setForeground(new Color(display, defaultTextRGB));
         System.out.println("PB INFO: text r:" 
         		+ gc.getForeground().getRed() + 
         		" g: " + gc.getForeground().getGreen() + 
