@@ -35,7 +35,7 @@ public class CustomProgressBar {
 		this.paintBackground(width, height, gc, isRelief);
 		this.paintProgress(width, height, completed, gc, isRelief);
 		this.paintPercent(width, height, completed, gc);
-		this.paintBorder(width, height, gc);
+		if (!isRelief)this.paintBorder(width, height, gc);
 
 		gc.dispose();
 		return image;
@@ -50,11 +50,11 @@ public class CustomProgressBar {
 
 		//new colors based on system colors to accomodate manifest
 		backgroundRGB = new RGB(214, 235, 255);
-		backgroundShadowRGB = new RGB(0, 255, 0);
-		backgroundHighlightRGB = new RGB(255, 0, 0);
+		backgroundShadowRGB = new RGB(241, 248, 255);
+		backgroundHighlightRGB = new RGB(150, 178, 205);
 		progressRGB = new RGB(128, 191, 255);
-		progressShadowRGB = new RGB(0, 0, 0);
-		progressHighlightRGB = new RGB(0, 0, 255);
+		progressShadowRGB = new RGB(83, 134, 186);
+		progressHighlightRGB = new RGB(185, 218, 253);
 
 		textRGB = display.getSystemColor(SWT.COLOR_DARK_BLUE).getRGB();
 		borderRGB = textRGB;
@@ -156,8 +156,8 @@ public class CustomProgressBar {
 		return textColor;
 	}
 	private void paintBackground(int imageWidth, int imageHeight, GC gc, boolean isRelief) {
-		int heightToPaint = imageHeight - 2;
-		int widthToPaint = imageWidth - 2;
+		int heightToPaint = imageHeight - ((isRelief)?1:2);
+		int widthToPaint = imageWidth - ((isRelief)?1:2);
 		if (!isRelief) {
 			gc.setBackground(getBackgroundColor());
 			gc.fillRectangle(1, 1, widthToPaint, heightToPaint);
@@ -192,7 +192,7 @@ public class CustomProgressBar {
 
 	private void paintReliefProgress(int imageWidth, int imageHeight, Integer completed, GC gc) {
 		int widthToPaint = getWidthToPaint(completed, imageWidth);
-		int heightToPaint = imageHeight - 2;
+		int heightToPaint = imageHeight - 1;
 		gc.setBackground(getProgressHighlightColor());
 		gc.fillRectangle(1, 1, widthToPaint, heightToPaint);
 		gc.setBackground(getProgressShadowColor());
