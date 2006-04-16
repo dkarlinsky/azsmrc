@@ -56,9 +56,9 @@ public class ScrapeDialog {
 	private Display display;
 
 
-	public ScrapeDialog(Display mainDisplay){
+	private ScrapeDialog(){
 		//set the display
-		display = mainDisplay;
+		display = RCMain.getRCMain().getDisplay();
 		
 		//pull in the properties for the lastDir if available
 		lastDir = RCMain.getRCMain().getProperties().getProperty("Last.Directory");
@@ -659,4 +659,32 @@ public class ScrapeDialog {
 		tab.setControl(parent);
 		tabFolder.setSelection(tab);
 	}
-}
+	
+	
+	
+	/**
+	 * Check to make sure that there are no other ones open and if not 
+	 * open the ScrapeDialog
+	 */
+	public static void open() {
+		Display display = RCMain.getRCMain().getDisplay();
+		if(display == null) return;
+		display.asyncExec(new Runnable(){
+			public void run() {
+				Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
+				for(int i = 0; i < shells.length; i++){
+					if(shells[i].getText().equalsIgnoreCase("Scrape a Torrent File")){
+						shells[i].setActive();
+						shells[i].setFocus();						
+					}
+				}
+			   new ScrapeDialog();
+				
+			}
+			
+		});
+
+	}
+	
+	
+}//EOF
