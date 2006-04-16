@@ -5,7 +5,10 @@
  */
 package lbms.azsmrc.remote.client.swtgui.dialogs;
 
-import java.util.*;
+
+
+import java.util.ArrayList;
+import java.util.List;
 
 import lbms.azsmrc.remote.client.RemoteUpdate;
 import lbms.azsmrc.remote.client.RemoteUpdateManager;
@@ -17,6 +20,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -147,15 +151,28 @@ public class ServerUpdateDialog {
 		GUI_Utilities.centerShellandOpen(shell);
 	}
 
-	public static ServerUpdateDialog open() {
-		Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
-		for(int i = 0; i < shells.length; i++){
-			if(shells[i].getText().equalsIgnoreCase("Updates Available")){
-				shells[i].setActive();
-				shells[i].setFocus();
-				return null;
+	/**
+	 * Check to make sure that there are no other ones open and if not 
+	 * open the ServerUpdateDialog
+	 */
+	public static void open() {
+		Display display = RCMain.getRCMain().getDisplay();
+		if(display == null) return;
+		display.asyncExec(new Runnable(){
+			public void run() {
+				Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
+				for(int i = 0; i < shells.length; i++){
+					if(shells[i].getText().equalsIgnoreCase("Updates Available")){
+						shells[i].setActive();
+						shells[i].setFocus();						
+					}
+				}
+			   new ServerUpdateDialog();
+				
 			}
-		}
-	   return new ServerUpdateDialog();
+			
+		});
+
 	}
-}
+	
+}//EOF
