@@ -675,7 +675,8 @@ public class ScrapeDialog {
 				for(int i = 0; i < shells.length; i++){
 					if(shells[i].getText().equalsIgnoreCase("Scrape a Torrent File")){
 						shells[i].setActive();
-						shells[i].setFocus();						
+						shells[i].setFocus();
+						return;
 					}
 				}
 			   new ScrapeDialog();
