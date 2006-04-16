@@ -339,15 +339,7 @@ public class DownloadManagerShell {
 		menuAddbyURL.setText("Send Torrent &URL to Server");
 		menuAddbyURL.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e){
-				Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
-				for(int i = 0; i < shells.length; i++){
-					if(shells[i].getText().equalsIgnoreCase("Add a Torrent by URL")){
-						shells[i].setActive();
-						shells[i].setFocus();
-						return;
-					}
-				}
-				new OpenByURLDialog(RCMain.getRCMain().getDisplay());
+				OpenByURLDialog.open();
 			}
 		});
 
@@ -626,15 +618,7 @@ public class DownloadManagerShell {
 		addTorrent_by_url.setToolTipText("Add a torrent from a URL");
 		addTorrent_by_url.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
-				Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
-				for(int i = 0; i < shells.length; i++){
-					if(shells[i].getText().equalsIgnoreCase("Add a Torrent by URL")){
-						shells[i].setActive();
-						shells[i].setFocus();
-						return;
-					}
-				}
-				new OpenByURLDialog(RCMain.getRCMain().getDisplay());
+				OpenByURLDialog.open();
 			}
 		});
 
@@ -3120,7 +3104,7 @@ public class DownloadManagerShell {
 				if (sURL != null || !source.exists()) {
 					//openTorrentWindow(null, new String[] { sURL }, bOverrideToStopped);
 					//System.out.println("Dropped is a URL: " + sURL);
-					new OpenByURLDialog(RCMain.getRCMain().getDisplay(),sURL);
+					OpenByURLDialog.openWithURL(sURL);
 				} else if (source.isFile()) {
 					String filename = source.getAbsolutePath();
 					try {

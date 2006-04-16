@@ -164,7 +164,8 @@ public class ServerUpdateDialog {
 				for(int i = 0; i < shells.length; i++){
 					if(shells[i].getText().equalsIgnoreCase("Updates Available")){
 						shells[i].setActive();
-						shells[i].setFocus();						
+						shells[i].setFocus();
+						return;
 					}
 				}
 			   new ServerUpdateDialog();

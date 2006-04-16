@@ -307,7 +307,7 @@ public class RCMain implements Launchable {
 		addByUrl.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				new OpenByURLDialog(display);
+				OpenByURLDialog.open();
 			}
 		});
 
@@ -850,7 +850,7 @@ public class RCMain implements Launchable {
 							//all looks good.. now make sure DMS is open and open up the Open by URL
 							display.asyncExec(new Runnable(){
 								public void run() {
-									new OpenByURLDialog(display,string);
+									OpenByURLDialog.openWithURL(string);
 								}
 							});
 						} catch(Exception e) {
