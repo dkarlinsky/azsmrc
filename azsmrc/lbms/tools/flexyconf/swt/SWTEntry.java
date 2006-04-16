@@ -36,4 +36,9 @@ public class SWTEntry implements DisplayAdapterEntry {
 	public void setEnabled(boolean e) {
 		control.setEnabled(e);
 	}
+
+	public void updateValue() {
+		// TODO Auto-generated method stub
+
+	}
 }

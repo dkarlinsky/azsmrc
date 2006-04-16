@@ -11,16 +11,25 @@ public class Entry {
 	public static final int TYPE_LONG		= 6;
 
 
-	String label;
+	private String label;
 	String key;
-	String dependsOn;
-	int type;
-	String rule;
-	Validator validator;
+	private String dependsOn;
+	private int type;
+	private String rule;
+	private Validator validator;
 
-	String	value;
-	DisplayAdapterEntry displayAdapter;
-	Section section;
+	private String	value;
+	private DisplayAdapterEntry displayAdapter;
+	private Section section;
+	private FCInterface fci;
+
+	public Entry () {
+
+	}
+
+	public Entry (Section s) {
+
+	}
 
 	public Element toElement() {
 		return null;
@@ -30,9 +39,12 @@ public class Entry {
 
 	}
 
-	public boolean checkDependency () {
-		if (dependsOn == null || dependsOn.equals("")) return true;
-		else return false;
+	public void checkDependency (String key,boolean enabled) {
+		if (dependsOn == null || dependsOn.equals("")) return;
+		else if(dependsOn.equalsIgnoreCase(key)) {
+			if(displayAdapter!=null)
+				displayAdapter.setEnabled(enabled);
+		}
 	}
 
 	/**
@@ -77,6 +89,20 @@ public class Entry {
 		return value;
 	}
 
+	public void setValue(String v) {
+		if (fci!=null)
+			fci.callEntryUpdateListener(getKey(), getValue());
+		setValueQuiet(v);
+	}
+
+	protected void setValueQuiet(String v) {
+		value = v;
+		if(displayAdapter!=null)
+			displayAdapter.updateValue();
+		if (type==TYPE_BOOLEAN && section!=null)
+			section.checkDependency(getKey(), Boolean.parseBoolean(getValue()));
+	}
+
 	/**
 	 * @return the displayAdapter
 	 */
@@ -90,4 +116,27 @@ public class Entry {
 	public void setDisplayAdapter(DisplayAdapterEntry displayAdapter) {
 		this.displayAdapter = displayAdapter;
 	}
+
+	/**
+	 * @return the section
+	 */
+	public Section getSection() {
+		return section;
+	}
+
+	/**
+	 * @return the fci
+	 */
+	public FCInterface getFCInterface() {
+		return fci;
+	}
+
+	/**
+	 * @param fci the FCInterface to set
+	 */
+	public void setFCInterface(FCInterface fci) {
+		this.fci = fci;
+	}
+
+
 }

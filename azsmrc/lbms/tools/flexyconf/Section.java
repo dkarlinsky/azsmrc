@@ -3,6 +3,7 @@ package lbms.tools.flexyconf;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jdom.Element;
 
@@ -44,5 +45,12 @@ public class Section {
 
 	public void setFCInterface (FCInterface fci) {
 		this.fci = fci;
+	}
+
+	protected void checkDependency(String key,boolean enabled) {
+		Set<String> keys = entries.keySet();
+		for (String k:keys) {
+			entries.get(k).checkDependency(key, enabled);
+		}
 	}
 }
