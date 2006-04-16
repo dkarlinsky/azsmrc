@@ -90,6 +90,11 @@ public class Entry {
 	}
 
 	public void setValue(String v) {
+		if (validator!=null)
+			if (!validator.validate(v)) {
+				setValueQuiet(fci.getContentProvider().getDefaultValue(getKey(), getType()));
+				return;
+			}
 		if (fci!=null)
 			fci.callEntryUpdateListener(getKey(), getValue());
 		setValueQuiet(v);
