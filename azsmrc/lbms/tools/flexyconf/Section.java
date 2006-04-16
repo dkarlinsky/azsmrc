@@ -7,10 +7,12 @@ import java.util.Map;
 import org.jdom.Element;
 
 public class Section {
-	Section parent;
-	List<Section> children;
-	Map<String, Entry> entries = new HashMap<String, Entry>();
-	String name;
+	private Section parent;
+	private List<Section> children;
+	private Map<String, Entry> entries = new HashMap<String, Entry>();
+	private String name;
+	private FCInterface fci;
+	private DisplayAdapterSection displayAdapter;
 
 	public Section () {
 
@@ -18,6 +20,10 @@ public class Section {
 
 	public Section (Element e) {
 
+	}
+
+	public Section (Element e, Section parent) {
+		this.parent = parent;
 	}
 
 	public Element toElement() {
@@ -34,5 +40,9 @@ public class Section {
 			}
 			return null;
 		}
+	}
+
+	public void setFCInterface (FCInterface fci) {
+		this.fci = fci;
 	}
 }

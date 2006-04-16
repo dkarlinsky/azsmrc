@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlexyConfiguration>
+	<Section name="root">
+		<Section name="firstMenu">
+			<Entry key="firstMenu.item1" label="Enable Stuff" type="boolean" />
+			<Entry key="firstMenu.item2" label="Level" validate="1..5" type="int" dependsOn="firstMenu.item1" />
+		</Section>
+	</Section>
+</FlexyConfiguration>

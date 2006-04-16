@@ -1,17 +1,13 @@
 package lbms.tools.flexyconf;
 
-import java.util.ArrayList;
-import java.util.List;
+
 
 import org.jdom.Document;
 import org.jdom.Element;
 
 public class FlexyConfiguration {
-	Section rootSection;
-	List<EntryUpdateListener> entryUpdateListenersList = new ArrayList<EntryUpdateListener>();
-	EntryUpdateListener entryUpdateListener = new EntryUpdateListener() {
-		public void updated(String key, String value) {};
-	};
+	private Section rootSection;
+	private FCInterface fci;
 
 	public FlexyConfiguration () {
 
@@ -20,6 +16,7 @@ public class FlexyConfiguration {
 	public FlexyConfiguration (Document doc) {
 		Element root = doc.getRootElement();
 		rootSection = new Section (root.getChild("Section"));
+		fci = new FCInterface (this);
 	}
 
 	public Document toDocument () {
@@ -29,22 +26,11 @@ public class FlexyConfiguration {
 		return doc;
 	}
 
-	public Entry getEntry (String key) {
-		return rootSection.getEntry(key);
+	protected Section getRoot() {
+		return rootSection;
 	}
 
-	/**
-	 * @return Returns the entryUpdateListener.
-	 */
-	public EntryUpdateListener getEntryUpdateListener() {
-		return entryUpdateListener;
-	}
-
-	public void addEntryUpdateListener (EntryUpdateListener l) {
-		entryUpdateListenersList.add(l);
-	}
-
-	public void removeEntryUpdateListener (EntryUpdateListener l) {
-		entryUpdateListenersList.remove(l);
+	public FCInterface getFCInterface() {
+		return fci;
 	}
 }

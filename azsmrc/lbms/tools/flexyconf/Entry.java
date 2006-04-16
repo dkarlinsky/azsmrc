@@ -11,7 +11,7 @@ public class Entry {
 	public static final int TYPE_LONG		= 6;
 
 
-	String lable;
+	String label;
 	String key;
 	String dependsOn;
 	int type;
@@ -20,6 +20,7 @@ public class Entry {
 
 	String	value;
 	DisplayAdapterEntry displayAdapter;
+	Section section;
 
 	public Element toElement() {
 		return null;
@@ -44,8 +45,8 @@ public class Entry {
 	/**
 	 * @return Returns the lable.
 	 */
-	public String getLable() {
-		return lable;
+	public String getLabel() {
+		return label;
 	}
 
 	/**
