@@ -37,7 +37,7 @@ public class ServerUpdateDialog {
 		//Shell
 		final Shell shell = new Shell(RCMain.getRCMain().getDisplay());
 		shell.setLayout(new GridLayout(1,false));
-		shell.setText("Check for Available Updates on Server");
+		shell.setText("Updates Available");
 
 		//Comp on shell
 		Composite comp = new Composite(shell,SWT.NULL);
