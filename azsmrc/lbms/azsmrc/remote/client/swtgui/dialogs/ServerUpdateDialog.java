@@ -5,6 +5,8 @@
  */
 package lbms.azsmrc.remote.client.swtgui.dialogs;
 
+import java.util.*;
+
 import lbms.azsmrc.remote.client.RemoteUpdate;
 import lbms.azsmrc.remote.client.RemoteUpdateManager;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
@@ -26,14 +28,16 @@ import org.eclipse.swt.widgets.TableItem;
 
 public class ServerUpdateDialog {
 
+	
 
-
-	public ServerUpdateDialog(RemoteUpdateManager rum){
-
+	public ServerUpdateDialog(){
+		final RemoteUpdateManager rum = RCMain.getRCMain().getClient().getRemoteUpdateManager();		
+		
+		
 		//Shell
 		final Shell shell = new Shell(RCMain.getRCMain().getDisplay());
 		shell.setLayout(new GridLayout(1,false));
-		shell.setText("Updates Available");
+		shell.setText("Check for Available Updates on Server");
 
 		//Comp on shell
 		Composite comp = new Composite(shell,SWT.NULL);
@@ -48,15 +52,19 @@ public class ServerUpdateDialog {
 
 		//first line
 		Label infoLabel = new Label(comp,SWT.BORDER | SWT.CENTER);
-		infoLabel.setText("Azureus Updates Available\nServer: " + RCMain.getRCMain().getClient().getServer().getHost() + "\nNumber of Updates: "+ rum.getUpdates().length);
+		infoLabel.setText("Azureus Updates Available\nServer: " + 
+				RCMain.getRCMain().getClient().getServer().getHost() + 
+				"\nNumber of Updates: " + rum.getUpdates().length);
 		infoLabel.setBackground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_GRAY));		
 		
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 2;
 		infoLabel.setLayoutData(gd);
 
+		
+		
 		//Table for updates
-		final Table table = new Table(comp,SWT.V_SCROLL | SWT.CHECK | SWT.SINGLE);
+		final Table table = new Table(comp,SWT.BORDER | SWT.V_SCROLL | SWT.CHECK | SWT.SINGLE);
 		gd = new GridData(GridData.FILL_BOTH);
 		gd.horizontalSpan = 2;
 		gd.verticalSpan = 30;
@@ -107,12 +115,14 @@ public class ServerUpdateDialog {
 		commit.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {				
 				TableItem[] items = table.getItems();				
+				List<String> names = new ArrayList<String>();
 				for(TableItem item:items){					
 					if(item.getChecked()){
 						RemoteUpdate ru = (RemoteUpdate)item.getData();
-						//do something with the ru here
+						names.add(ru.getName());					
 					}
-				}
+				}				
+				rum.applyUpdates(names.toArray(new String[]{}));
 			}			
 		});
 		

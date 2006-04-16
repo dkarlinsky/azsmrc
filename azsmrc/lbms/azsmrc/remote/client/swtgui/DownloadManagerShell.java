@@ -43,6 +43,7 @@ import lbms.azsmrc.remote.client.swtgui.dialogs.MoveDataDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByFileDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByURLDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ScrapeDialog;
+import lbms.azsmrc.remote.client.swtgui.dialogs.ServerUpdateDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.TableColumnEditorDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.UpdateDialog;
 import lbms.azsmrc.remote.client.swtgui.tabs.ConsoleTab;
@@ -160,7 +161,7 @@ public class DownloadManagerShell {
 	private ToolItem addTorrent_by_file,addTorrent_by_url, pauseAll, resumeAll ;
 	private ToolItem stopTorrent, queueTorrent, removeTorrent;
 	private MenuItem menuLogin,menuLogout,menuQuickconnect, menuRestartAzureus;
-	private MenuItem menuServerDetails, menuAddByFile, menuAddbyURL;
+	private MenuItem menuServerDetails, menuServerUpdate, menuAddByFile, menuAddbyURL;
 	public ConsoleTab consoleTab;
 
 	//status bar labels
@@ -368,7 +369,21 @@ public class DownloadManagerShell {
 				new ServerDetailsTab(tabFolder);
 			}
 		});
-
+		menuServerUpdate = new MenuItem(remoteSubmenu, SWT.PUSH);
+		menuServerUpdate.setText("&Check for Updates for Server");
+		menuServerUpdate.addListener(SWT.Selection,new Listener(){
+			public void handleEvent(Event e){
+				Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
+				for(int i = 0; i < shells.length; i++){
+					if(shells[i].getText().equalsIgnoreCase("Check for Available Updates on Server")){
+						shells[i].setActive();
+						shells[i].setFocus();
+						return;
+					}
+				}
+				new ServerUpdateDialog();
+			}
+		});
 
 
 		//Separator
@@ -1942,6 +1957,7 @@ public class DownloadManagerShell {
 						menuLogin.setEnabled(false);
 						menuRestartAzureus.setEnabled(true);
 						menuServerDetails.setEnabled(true);
+						menuServerUpdate.setEnabled(true);
 						menuAddByFile.setEnabled(true);
 						menuAddbyURL.setEnabled(true);
 						menuLogout.setEnabled(true);
@@ -1971,6 +1987,7 @@ public class DownloadManagerShell {
 						menuLogout.setEnabled(false);
 						menuRestartAzureus.setEnabled(false);
 						menuServerDetails.setEnabled(false);
+						menuServerUpdate.setEnabled(false);
 						menuAddByFile.setEnabled(false);
 						menuAddbyURL.setEnabled(false);
 						logout.setEnabled(false);
