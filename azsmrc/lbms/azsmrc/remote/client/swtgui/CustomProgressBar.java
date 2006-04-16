@@ -50,8 +50,8 @@ public class CustomProgressBar {
 
 		//new colors based on system colors to accomodate manifest
 		backgroundRGB = new RGB(214, 235, 255);
-		backgroundShadowRGB = new RGB(241, 248, 255);
-		backgroundHighlightRGB = new RGB(150, 178, 205);
+		backgroundShadowRGB = new RGB(150, 178, 205);
+		backgroundHighlightRGB = new RGB(241, 248, 255);
 		progressRGB = new RGB(128, 191, 255);
 		progressShadowRGB = new RGB(83, 134, 186);
 		progressHighlightRGB = new RGB(185, 218, 253);
@@ -162,9 +162,9 @@ public class CustomProgressBar {
 			gc.setBackground(getBackgroundColor());
 			gc.fillRectangle(1, 1, widthToPaint, heightToPaint);
 		} else {
-			gc.setBackground(getBackgroundHighlightColor());
-			gc.fillRectangle(1, 1, widthToPaint, heightToPaint);
 			gc.setBackground(getBackgroundShadowColor());
+			gc.fillRectangle(1, 1, widthToPaint, heightToPaint);
+			gc.setBackground(getBackgroundHighlightColor());
 			gc.fillRectangle(2, 2, widthToPaint-1, heightToPaint-1);
 			gc.setBackground(getBackgroundColor());
 			gc.fillRectangle(2, 2, widthToPaint-2, heightToPaint-2);
@@ -196,9 +196,12 @@ public class CustomProgressBar {
 		gc.setBackground(getProgressHighlightColor());
 		gc.fillRectangle(1, 1, widthToPaint, heightToPaint);
 		gc.setBackground(getProgressShadowColor());
-		gc.fillRectangle(2, 2, widthToPaint-1, heightToPaint-1);
+		gc.fillRectangle(3, 3, widthToPaint-2, heightToPaint-2);
+		gc.setForeground(getProgressShadowColor());
+		gc.drawPoint(2, heightToPaint);
+		gc.drawPoint(widthToPaint, 2);
 		gc.setBackground(getProgressColor());
-		gc.fillRectangle(2, 2, widthToPaint-2, heightToPaint-2);
+		gc.fillRectangle(3, 3, widthToPaint-4, heightToPaint-4);
 	}
 
 	private void paintPercent(int imageWidth, int imageHeight, Integer completed, GC gc) {
