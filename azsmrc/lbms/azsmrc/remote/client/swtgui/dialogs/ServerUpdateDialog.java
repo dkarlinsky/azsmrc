@@ -28,12 +28,12 @@ import org.eclipse.swt.widgets.TableItem;
 
 public class ServerUpdateDialog {
 
-	
 
-	public ServerUpdateDialog(){
-		final RemoteUpdateManager rum = RCMain.getRCMain().getClient().getRemoteUpdateManager();		
-		
-		
+
+	private ServerUpdateDialog(){
+		final RemoteUpdateManager rum = RCMain.getRCMain().getClient().getRemoteUpdateManager();
+
+
 		//Shell
 		final Shell shell = new Shell(RCMain.getRCMain().getDisplay());
 		shell.setLayout(new GridLayout(1,false));
@@ -48,21 +48,21 @@ public class ServerUpdateDialog {
 		gridLayout.numColumns = 2;
 		gridLayout.marginWidth = 2;
 		comp.setLayout(gridLayout);
-		
+
 
 		//first line
 		Label infoLabel = new Label(comp,SWT.BORDER | SWT.CENTER);
-		infoLabel.setText("Azureus Updates Available\nServer: " + 
-				RCMain.getRCMain().getClient().getServer().getHost() + 
+		infoLabel.setText("Azureus Updates Available\nServer: " +
+				RCMain.getRCMain().getClient().getServer().getHost() +
 				"\nNumber of Updates: " + rum.getUpdates().length);
-		infoLabel.setBackground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_GRAY));		
-		
+		infoLabel.setBackground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_GRAY));
+
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 2;
 		infoLabel.setLayoutData(gd);
 
-		
-		
+
+
 		//Table for updates
 		final Table table = new Table(comp,SWT.BORDER | SWT.V_SCROLL | SWT.CHECK | SWT.SINGLE);
 		gd = new GridData(GridData.FILL_BOTH);
@@ -70,18 +70,18 @@ public class ServerUpdateDialog {
 		gd.verticalSpan = 30;
 		table.setLayoutData(gd);
 		table.setHeaderVisible(true);
-		
+
 		TableColumn spacerForCheck = new TableColumn(table,SWT.NULL);
 		spacerForCheck.setWidth(30);
-		
+
 		TableColumn name = new TableColumn(table,SWT.NULL);
 		name.setText("Name");
 		name.setWidth(300);
-		
+
 		TableColumn version = new TableColumn(table,SWT.NULL);
 		version.setText("New Version");
 		version.setWidth(100);
-		
+
 		//populate the table with the updates
 		RemoteUpdate[] rus = rum.getUpdates();
 		for(RemoteUpdate ru:rus){
@@ -91,12 +91,12 @@ public class ServerUpdateDialog {
 			item.setChecked(true);
 			item.setData(ru);
 		}
-		
-		
-		
-		
 
-		//Bottom Buttons		
+
+
+
+
+		//Bottom Buttons
 		Composite button_comp = new Composite(shell, SWT.NULL);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 2;
@@ -113,22 +113,22 @@ public class ServerUpdateDialog {
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		commit.setLayoutData(gd);
 		commit.addListener(SWT.Selection, new Listener(){
-			public void handleEvent(Event arg0) {				
-				TableItem[] items = table.getItems();				
+			public void handleEvent(Event arg0) {
+				TableItem[] items = table.getItems();
 				List<String> names = new ArrayList<String>();
-				for(TableItem item:items){					
+				for(TableItem item:items){
 					if(item.getChecked()){
 						RemoteUpdate ru = (RemoteUpdate)item.getData();
-						names.add(ru.getName());					
+						names.add(ru.getName());
 					}
-				}				
+				}
 				rum.applyUpdates(names.toArray(new String[]{}));
-			}			
+			}
 		});
-		
-		
-		
-		
+
+
+
+
 		Button cancel = new Button(button_comp,SWT.PUSH);
 		cancel.setText("Cancel");
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
@@ -145,5 +145,17 @@ public class ServerUpdateDialog {
 
 		//Center and open shell
 		GUI_Utilities.centerShellandOpen(shell);
+	}
+
+	public static ServerUpdateDialog open() {
+		Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
+		for(int i = 0; i < shells.length; i++){
+			if(shells[i].getText().equalsIgnoreCase("Updates Available")){
+				shells[i].setActive();
+				shells[i].setFocus();
+				return null;
+			}
+		}
+	   return new ServerUpdateDialog();
 	}
 }

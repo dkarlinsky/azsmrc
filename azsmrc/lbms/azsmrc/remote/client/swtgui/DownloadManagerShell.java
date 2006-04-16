@@ -373,15 +373,7 @@ public class DownloadManagerShell {
 		menuServerUpdate.setText("&Check for Updates for Server");
 		menuServerUpdate.addListener(SWT.Selection,new Listener(){
 			public void handleEvent(Event e){
-				Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
-				for(int i = 0; i < shells.length; i++){
-					if(shells[i].getText().equalsIgnoreCase("Check for Available Updates on Server")){
-						shells[i].setActive();
-						shells[i].setFocus();
-						return;
-					}
-				}
-				new ServerUpdateDialog();
+				ServerUpdateDialog.open();
 			}
 		});
 

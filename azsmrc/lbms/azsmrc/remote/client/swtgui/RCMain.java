@@ -26,11 +26,13 @@ import java.util.logging.*;
 import javax.net.ssl.SSLHandshakeException;
 
 import lbms.azsmrc.remote.client.Client;
+import lbms.azsmrc.remote.client.Constants;
 import lbms.azsmrc.remote.client.Download;
 import lbms.azsmrc.remote.client.SESecurityManager;
 import lbms.azsmrc.remote.client.SESecurityManagerListener;
 import lbms.azsmrc.remote.client.Utilities;
 import lbms.azsmrc.remote.client.events.ClientEventListener;
+import lbms.azsmrc.remote.client.events.ClientUpdateListener;
 import lbms.azsmrc.remote.client.events.ConnectionListener;
 import lbms.azsmrc.remote.client.events.DownloadManagerListener;
 import lbms.azsmrc.remote.client.events.ExceptionListener;
@@ -41,6 +43,7 @@ import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
 import lbms.azsmrc.remote.client.swtgui.dialogs.MessageDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByFileDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByURLDialog;
+import lbms.azsmrc.remote.client.swtgui.dialogs.ServerUpdateDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.UpdateDialog;
 import lbms.azsmrc.remote.client.util.*;
 import lbms.azsmrc.shared.RemoteConstants;
@@ -518,6 +521,13 @@ public class RCMain implements Launchable {
 					}
 					normalLogger.severe("Remote Exception: "+event.getAttributeValue("message"));
 					break;
+				case RemoteConstants.EV_UPDATE_AVAILABLE:
+					if (mainWindow != null) {
+						mainWindow.setStatusBarText("Remote Update Available", SWT.COLOR_DARK_GREEN);
+					}
+					normalLogger.severe("Remote Update Available");
+					client.getRemoteUpdateManager().load();
+					break;
 				}
 			}
 		});
@@ -530,6 +540,16 @@ public class RCMain implements Launchable {
 				}
 			}
 		});
+		client.addClientUpdateListener(new ClientUpdateListener() {
+			public void update(long updateSwitches) {
+				if ((updateSwitches & Constants.UPDATE_UPDATE_INFO) != 0) {
+					if (client.getRemoteUpdateManager().updatesAvailable()) {
+						ServerUpdateDialog.open();
+					}
+				}
+			}
+		});
+
 
 		System.out.println("Creating Updater.");
 		try {
