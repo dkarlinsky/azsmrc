@@ -1,11 +1,13 @@
 package lbms.azsmrc.remote.client.swtgui;
 
+import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.FlavorEvent;
 import java.awt.datatransfer.FlavorListener;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -828,10 +830,34 @@ public class RCMain implements Launchable {
 		}
 	}
 
+	public String getAWTClipboardString () {
+		try {
+			Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			Transferable transferData = systemClipboard.getContents( null );
+			for ( DataFlavor dataFlavor : transferData.getTransferDataFlavors() )
+			{
+			  Object content = transferData.getTransferData( dataFlavor );
+			  if ( content instanceof String )
+			  {
+			   return (String)content;
+			  }
+			}
+		} catch (HeadlessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedFlavorException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	public void addAWTClipboardMonitor(){
 		//AWT Listener for the clipboard
-		Toolkit kit = Toolkit.getDefaultToolkit();
-		final Clipboard clipboard = kit.getSystemClipboard();
+		final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 		FlavorListener[] listeners = clipboard.getFlavorListeners();
 		for(FlavorListener listen:listeners){
 			clipboard.removeFlavorListener(listen);
