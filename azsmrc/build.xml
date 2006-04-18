@@ -29,7 +29,8 @@
 			<fileset dir="${azureus.dir}" includes="**/*.class" />
 		</path>
 
-		<javac srcdir="${root.dir}/${source.dir}" destdir="${root.dir}/${build.dir}" excludes="${generic.excludes}" nowarn="yes" includeAntRuntime="no" debug="true" debuglevel="lines,vars,source" verbose="yes">
+		<javac srcdir="${root.dir}" destdir="${root.dir}/${build.dir}" excludes="${generic.excludes}" nowarn="yes" includeAntRuntime="no" debug="true" debuglevel="lines,vars,source" verbose="yes">
+			<include name="${source.dir}/**/*"/>
 			<classpath refid="libs.classpath" />
 		</javac>
 	</target>

@@ -88,6 +88,7 @@ public class RequestManager {
 							 break;
 						 case 0:
 							 dmfi[i].setSkipped(true);
+							 dmfi[i].setDeleted(true);
 							 break;
 						 }
 					}
@@ -776,6 +777,7 @@ public class RequestManager {
 							file.setAttribute("downloaded", Long.toString(dmfi[i].getDownloaded()));
 							file.setAttribute("priority",Boolean.toString(dmfi[i].isPriority()));
 							file.setAttribute("skipped",Boolean.toString(dmfi[i].isSkipped()));
+							file.setAttribute("deleted",Boolean.toString(dmfi[i].isDeleted()));
 							files.addContent(file);
 						}
 						response.addContent(files);
@@ -800,11 +802,14 @@ public class RequestManager {
 							try {
 								boolean priority = Boolean.parseBoolean(xmlRequest.getAttributeValue("priority"));
 								boolean skipped = Boolean.parseBoolean(xmlRequest.getAttributeValue("skipped"));
+								boolean deleted = Boolean.parseBoolean(xmlRequest.getAttributeValue("deleted"));
 								int index = Integer.parseInt(xmlRequest.getAttributeValue("index"));
 								if (dmfi[index].isPriority() != priority)
 									dmfi[index].setPriority(priority);
 								if (dmfi[index].isSkipped() != skipped)
 									dmfi[index].setSkipped(skipped);
+								if (dmfi[index].isDeleted() != deleted)
+									dmfi[index].setDeleted(deleted);
 							} catch(NullPointerException e) {
 							}
 						}

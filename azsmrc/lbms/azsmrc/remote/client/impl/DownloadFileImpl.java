@@ -8,7 +8,7 @@ public class DownloadFileImpl implements DownloadFile {
 	private String name;
 	public int numPieces, index;
 	private long length, downloaded;
-	private boolean priority, skipped;
+	private boolean priority, skipped, deleted;
 	private String hash;
 	private Client client;
 
@@ -108,6 +108,17 @@ public class DownloadFileImpl implements DownloadFile {
 		}
 	}
 
+	public boolean getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		if (this.deleted != deleted) {
+			this.deleted = deleted;
+			updateStatus();
+		}
+	}
+
 	public void setPriorityImpl(boolean priority) {
 		this.priority = priority;
 	}
@@ -120,6 +131,6 @@ public class DownloadFileImpl implements DownloadFile {
 	}
 
 	private void updateStatus() {
-		client.sendSetFileOptions(hash, index, priority, skipped);
+		client.sendSetFileOptions(hash, index, priority, skipped, deleted);
 	}
 }

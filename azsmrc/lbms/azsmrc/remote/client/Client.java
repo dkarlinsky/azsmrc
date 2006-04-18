@@ -537,13 +537,14 @@ public class Client {
 		enqueue(sendElement);
 	}
 
-	public void sendSetFileOptions (String hash, int index, boolean priority, boolean skipped) {
+	public void sendSetFileOptions (String hash, int index, boolean priority, boolean skipped, boolean deleted) {
 		Element sendElement = getSendElement();
 		sendElement.setAttribute("switch", "setFileOptions");
 		sendElement.setAttribute("hash", hash);
 		sendElement.setAttribute("index", Integer.toString(index));
 		sendElement.setAttribute("priority", Boolean.toString(priority));
 		sendElement.setAttribute("skipped", Boolean.toString(skipped));
+		sendElement.setAttribute("deleted", Boolean.toString(deleted));
 		enqueue(sendElement);
 	}
 
