@@ -586,6 +586,8 @@ public class TorrentDetailsTab {
                         priority_status="High";
                     else if(dfm_files[index].getSkipped())
                         priority_status="Do Not Download";
+                    else if(dfm_files[index].getDeleted())
+                    	priority_status="Deleted";
                     else
                         priority_status="Normal";
                     item.setText(5, priority_status);
@@ -654,7 +656,7 @@ public class TorrentDetailsTab {
             }
         });
 
-/*        final MenuItem delete = new MenuItem(submenu, SWT.PUSH);
+        final MenuItem delete = new MenuItem(submenu, SWT.PUSH);
         delete.setText("Delete");
         delete.addListener(SWT.Selection, new Listener(){
             public void handleEvent(Event arg0) {
@@ -662,12 +664,12 @@ public class TorrentDetailsTab {
                 if(indices.length <= 0) return;
                 else{
                     for(int index:indices){
-                        //dfm_files[index].setPriority(true);
-                        //TODO: implement when Leonard gets it on his side
+                        if(!dfm_files[index].getDeleted())
+                        	dfm_files[index].setDeleted(true);
                     }
                 }
             }
-        });*/
+        });
 
         setPriority.setMenu(submenu);
         filesTable.setMenu(menu);
