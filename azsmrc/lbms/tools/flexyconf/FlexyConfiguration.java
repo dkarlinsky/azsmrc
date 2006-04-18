@@ -33,4 +33,13 @@ public class FlexyConfiguration {
 	public FCInterface getFCInterface() {
 		return fci;
 	}
+
+	/**
+	 * @return the rootSection
+	 */
+	public Section getRootSection() {
+		return rootSection;
+	}
+
+
 }

@@ -11,7 +11,7 @@ public class Section {
 	private Section parent;
 	private List<Section> children;
 	private Map<String, Entry> entries = new HashMap<String, Entry>();
-	private String name;
+	private String label;
 	private FCInterface fci;
 	private DisplayAdapterSection displayAdapter;
 
@@ -41,6 +41,27 @@ public class Section {
 			}
 			return null;
 		}
+	}
+
+	/**
+	 * @return the entries
+	 */
+	public Map<String, Entry> getEntries() {
+		return entries;
+	}
+
+	/**
+	 * @return the label
+	 */
+	public String getLabel() {
+		return label;
+	}
+
+	/**
+	 * @return the children
+	 */
+	public List<Section> getChildren() {
+		return children;
 	}
 
 	public void setFCInterface (FCInterface fci) {
