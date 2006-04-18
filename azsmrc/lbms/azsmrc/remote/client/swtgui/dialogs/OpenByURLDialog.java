@@ -59,15 +59,15 @@ public class OpenByURLDialog {
 
 		//pull the clipboard
 		/*final Clipboard cb = new Clipboard(display);
-        TextTransfer transfer = TextTransfer.getInstance();
-        String clipboard = (String)cb.getContents(transfer);*/
+		TextTransfer transfer = TextTransfer.getInstance();
+		String clipboard = (String)cb.getContents(transfer);*/
 
 		if(url != null){
 			if(url.startsWith("http") || url.startsWith("magnet")){
 				url_text.setText(url);
 			}/*else if(clipboard.startsWith("www")){
-                url_text.setText("http://" + clipboard);
-            }*/
+				url_text.setText("http://" + clipboard);
+			}*/
 		}
 
 		//Second Line
@@ -182,7 +182,7 @@ public class OpenByURLDialog {
 
 
 		//Center Shell and open
-		GUI_Utilities.centerShellandOpen(shell);
+		GUI_Utilities.centerShellOpenAndFocus(shell);
 	}
 
 
@@ -203,7 +203,7 @@ public class OpenByURLDialog {
 						return;
 					}
 				}
-				new OpenByURLDialog(URL);				
+				new OpenByURLDialog(URL);
 			}
 
 		});
@@ -227,10 +227,10 @@ public class OpenByURLDialog {
 						return;
 					}
 				}
-				new OpenByURLDialog(null);				
+				new OpenByURLDialog(null);
 			}
 
-		});   
+		});
 	}
 
 }//EOF
