@@ -118,7 +118,7 @@ public class DownloadManagerShell {
 	private CTabFolder tabFolder;
 	private CTabItem myTorrents;
 	private MenuItem moveData;
-	private boolean hasSelection;
+	
 
 
 	private DownloadListener dlL = new DownloadListener(){
@@ -2271,7 +2271,7 @@ public class DownloadManagerShell {
 
 		new MenuItem(menuDownSpeed, SWT.SEPARATOR);
 
-		final MenuItem itemsDownSpeed[] = new MenuItem[2];
+		
 		Listener itemsDownSpeedListener = new Listener() {
 			public void handleEvent(Event e) {
 				if (e.widget != null && e.widget instanceof MenuItem) {
@@ -2289,10 +2289,10 @@ public class DownloadManagerShell {
 			}
 		};
 
-		itemsDownSpeed[1] = new MenuItem(menuDownSpeed, SWT.PUSH);
-		itemsDownSpeed[1].setText("Unlimited");
-		itemsDownSpeed[1].setData("maxdl", new Integer(0));
-		itemsDownSpeed[1].addListener(SWT.Selection, itemsDownSpeedListener);
+		final MenuItem itemsDownSpeed = new MenuItem(menuDownSpeed, SWT.PUSH);
+		itemsDownSpeed.setText("Unlimited");
+		itemsDownSpeed.setData("maxdl", new Integer(0));
+		itemsDownSpeed.addListener(SWT.Selection, itemsDownSpeedListener);
 		
 		// --- Manual set
 		new MenuItem(menuDownSpeed, SWT.SEPARATOR);
@@ -2347,7 +2347,7 @@ public class DownloadManagerShell {
 		// ---
 		new MenuItem(menuUpSpeed, SWT.SEPARATOR);
 
-		final MenuItem itemsUpSpeed[] = new MenuItem[2];
+
 		Listener itemsUpSpeedListener = new Listener() {
 			public void handleEvent(Event e) {
 				if (e.widget != null && e.widget instanceof MenuItem) {
@@ -2365,10 +2365,10 @@ public class DownloadManagerShell {
 			}
 		};
 
-		itemsUpSpeed[1] = new MenuItem(menuUpSpeed, SWT.PUSH);
-		itemsUpSpeed[1].setText("Unlimited");				
-		itemsUpSpeed[1].setData("maxul", new Integer(0));
-		itemsUpSpeed[1].addListener(SWT.Selection, itemsUpSpeedListener);
+		final MenuItem itemsUpSpeed = new MenuItem(menuUpSpeed, SWT.PUSH);
+		itemsUpSpeed.setText("Unlimited");				
+		itemsUpSpeed.setData("maxul", new Integer(0));
+		itemsUpSpeed.addListener(SWT.Selection, itemsUpSpeedListener);
 
 
 		new MenuItem(menuUpSpeed, SWT.SEPARATOR);
