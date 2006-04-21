@@ -39,6 +39,7 @@ import lbms.azsmrc.remote.client.swtgui.container.Container;
 import lbms.azsmrc.remote.client.swtgui.container.DownloadContainer;
 import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ConnectionDialog;
+import lbms.azsmrc.remote.client.swtgui.dialogs.InputShell;
 import lbms.azsmrc.remote.client.swtgui.dialogs.MoveDataDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByFileDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByURLDialog;
@@ -83,6 +84,7 @@ import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellEvent;
@@ -106,6 +108,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
+
 public class DownloadManagerShell {
 
 	private Shell DOWNLOAD_MANAGER_SHELL;
@@ -115,6 +118,7 @@ public class DownloadManagerShell {
 	private CTabFolder tabFolder;
 	private CTabItem myTorrents;
 	private MenuItem moveData;
+	private boolean hasSelection;
 
 
 	private DownloadListener dlL = new DownloadListener(){
@@ -2249,7 +2253,164 @@ public class DownloadManagerShell {
 		});
 
 
+		//--------------------------- Set Custom per Torrent Speeds ---------------\\
+		
+		
+		// advanced > Download Speed Menu //
+		final MenuItem itemDownSpeed = new MenuItem(menu, SWT.CASCADE);
+		itemDownSpeed.setText("Set Down Speed");
+		
+		final Menu menuDownSpeed = new Menu(DOWNLOAD_MANAGER_SHELL,SWT.DROP_DOWN);
+		itemDownSpeed.setMenu(menuDownSpeed);
+		
 
+		final MenuItem itemCurrentDownSpeed = new MenuItem(menuDownSpeed, SWT.PUSH);
+		itemCurrentDownSpeed.setEnabled(false);
+
+		itemCurrentDownSpeed.setText("Current: " + "Not Polled");
+
+		new MenuItem(menuDownSpeed, SWT.SEPARATOR);
+
+		final MenuItem itemsDownSpeed[] = new MenuItem[2];
+		Listener itemsDownSpeedListener = new Listener() {
+			public void handleEvent(Event e) {
+				if (e.widget != null && e.widget instanceof MenuItem) {
+					MenuItem item = (MenuItem) e.widget;
+					int speed = item.getData("maxdl") == null ? 0 : ((Integer) item
+							.getData("maxdl")).intValue();
+
+
+					TableItem[] items = table.getItems();
+					if(items.length == 1){
+						Container container = (Container) items[0].getData();
+						container.getDownload().setMaximumDownloadKBPerSecond(speed);
+					}
+				}
+			}
+		};
+
+		itemsDownSpeed[1] = new MenuItem(menuDownSpeed, SWT.PUSH);
+		itemsDownSpeed[1].setText("Unlimited");
+		itemsDownSpeed[1].setData("maxdl", new Integer(0));
+		itemsDownSpeed[1].addListener(SWT.Selection, itemsDownSpeedListener);
+		
+		// --- Manual set
+		new MenuItem(menuDownSpeed, SWT.SEPARATOR);
+
+		final MenuItem itemDownSpeedManual = new MenuItem(menuDownSpeed, SWT.PUSH);
+		itemDownSpeedManual.setText("Manual");
+		itemDownSpeedManual.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				InputShell is = new InputShell(
+						"Set Download Speed","Enter a number in kb/s to change download to:");
+
+				String sReturn = is.open();
+				if (sReturn == null)
+					return;
+
+				int newSpeed;
+				try {
+					newSpeed = (int) (Double.valueOf(sReturn).doubleValue()/* * 1024*/);
+				} catch (NumberFormatException er) {
+					MessageBox mb = new MessageBox(DOWNLOAD_MANAGER_SHELL,
+							SWT.ICON_ERROR | SWT.OK);
+					mb.setText("Invalid or Unrecognized Number");
+					mb.setMessage("The number you entered is invalid or unrecognized");
+					mb.open();
+					return;
+				}
+				
+				
+				TableItem[] items = table.getItems();
+				if(items.length == 1){
+					Container container = (Container) items[0].getData();
+					container.getDownload().setMaximumDownloadKBPerSecond(newSpeed);
+				}
+			}
+		});
+
+		// advanced >Upload Speed Menu //
+		final MenuItem itemUpSpeed = new MenuItem(menu, SWT.CASCADE);
+		itemUpSpeed.setText("Set Up Speed"); 
+		
+
+		final Menu menuUpSpeed = new Menu(DOWNLOAD_MANAGER_SHELL, SWT.DROP_DOWN);
+		itemUpSpeed.setMenu(menuUpSpeed);
+
+		final MenuItem itemCurrentUpSpeed = new MenuItem(menuUpSpeed, SWT.PUSH);
+		itemCurrentUpSpeed.setEnabled(false);
+		
+		itemCurrentUpSpeed.setText("Current: " + "Not Polled");
+				
+		
+
+		// ---
+		new MenuItem(menuUpSpeed, SWT.SEPARATOR);
+
+		final MenuItem itemsUpSpeed[] = new MenuItem[2];
+		Listener itemsUpSpeedListener = new Listener() {
+			public void handleEvent(Event e) {
+				if (e.widget != null && e.widget instanceof MenuItem) {
+					MenuItem item = (MenuItem) e.widget;
+					int speed = item.getData("maxul") == null ? 0 : ((Integer) item
+							.getData("maxul")).intValue();
+					
+					
+					TableItem[] items = table.getItems();
+					if(items.length == 1){
+						Container container = (Container) items[0].getData();
+						container.getDownload().setUploadRateLimitBytesPerSecond(speed);
+					}
+				}
+			}
+		};
+
+		itemsUpSpeed[1] = new MenuItem(menuUpSpeed, SWT.PUSH);
+		itemsUpSpeed[1].setText("Unlimited");				
+		itemsUpSpeed[1].setData("maxul", new Integer(0));
+		itemsUpSpeed[1].addListener(SWT.Selection, itemsUpSpeedListener);
+
+
+		new MenuItem(menuUpSpeed, SWT.SEPARATOR);
+
+		final MenuItem itemUpSpeedManual = new MenuItem(menuUpSpeed, SWT.PUSH);
+		itemUpSpeedManual.setText("Manual");
+		itemUpSpeedManual.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				InputShell is = new InputShell(
+						"Set Download Speed","Enter a number in kb/s to change download to:");
+
+				String sReturn = is.open();
+				if (sReturn == null)
+					return;
+
+				int newSpeed;
+				try {
+					newSpeed = (int) (Double.valueOf(sReturn).doubleValue() * 1024);
+				} catch (NumberFormatException er) {
+					MessageBox mb = new MessageBox(DOWNLOAD_MANAGER_SHELL,
+							SWT.ICON_ERROR | SWT.OK);
+					mb.setText("Invalid or Unrecognized Number");
+					mb.setMessage("The number you entered is invalid or unrecognized");
+					mb.open();
+					return;
+				}
+				
+				TableItem[] items = table.getItems();
+				if(items.length == 1){
+					Container container = (Container) items[0].getData();
+					container.getDownload().setUploadRateLimitBytesPerSecond(newSpeed);
+				}
+							
+			}
+		});
+
+		
+		
+		
+		
+		
+		//----------------------------Move Data
 		if(table.equals(seedsTable)){
 			moveData = new MenuItem(menu, SWT.PUSH);
 			moveData.setText("Move Data");
@@ -2300,6 +2461,8 @@ public class DownloadManagerShell {
 					remove.setEnabled(false);
 					forceStart.setEnabled(false);
 					forceStart.setSelection(false);
+					itemUpSpeed.setEnabled(false);
+					itemDownSpeed.setEnabled(false);
 					removeAnd.setEnabled(false);
 					forceRecheck.setEnabled(false);
 					try{
@@ -2310,11 +2473,30 @@ public class DownloadManagerShell {
 					queue.setEnabled(true);
 					remove.setEnabled(true);
 					forceStart.setEnabled(true);
+					itemUpSpeed.setEnabled(true);
+					
+					
+					Container container = (Container)items[0].getData();
+					int currentDownSpeed = container.getDownload().getMaximumDownloadKBPerSecond();
+					int currentUpSpeed = container.getDownload().getUploadRateLimitBytesPerSecond();
+					if(currentUpSpeed <= 0)
+						itemCurrentUpSpeed.setText("Current: " + "Unlimited");						
+					else
+						itemCurrentUpSpeed.setText("Current: " + DisplayFormatters.formatByteCountToBase10KBEtcPerSec(currentUpSpeed));						
+
+					if(currentDownSpeed <= 0)
+						itemCurrentDownSpeed.setText("Current: " + "Unlimited");
+					else
+						itemCurrentDownSpeed.setText("Current: " + DisplayFormatters.formatByteCountToBase10KBEtcPerSec(currentDownSpeed));						
+
+					
+					
+					itemDownSpeed.setEnabled(true);
 					try{
 						moveData.setEnabled(true);
 					}catch(Exception e){}
 					//Check to see if download is already in ForceStart
-					Container container = (Container)items[0].getData();
+					
 					if(container.getDownload().isForceStart()){
 						forceStart.setSelection(true);
 					}
@@ -2337,6 +2519,8 @@ public class DownloadManagerShell {
 					remove.setEnabled(true);
 					forceStart.setEnabled(false);
 					forceStart.setSelection(false);
+					itemUpSpeed.setEnabled(false);
+					itemDownSpeed.setEnabled(false);
 					forceRecheck.setEnabled(false);
 					try{
 						moveData.setEnabled(false);
