@@ -44,7 +44,7 @@ public class SplashScreen {
 
         GUI_Utilities.centerShellandOpen(splash);
 
-        display.syncExec(new Runnable() {
+        display.asyncExec(new Runnable() {
             public void run() {
                 for (int i = 0; i < tenths_secondsOpen; i++) {
                     //bar.setSelection(i + 1);
