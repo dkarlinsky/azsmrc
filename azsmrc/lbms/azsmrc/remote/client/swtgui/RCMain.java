@@ -3,9 +3,11 @@ package lbms.azsmrc.remote.client.swtgui;
 import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.FlavorEvent;
 import java.awt.datatransfer.FlavorListener;
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 
@@ -858,10 +860,13 @@ public class RCMain implements Launchable {
 	public void addAWTClipboardMonitor(){
 		//AWT Listener for the clipboard
 		final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-		FlavorListener[] listeners = clipboard.getFlavorListeners();
+/*		FlavorListener[] listeners = clipboard.getFlavorListeners();
 		for(FlavorListener listen:listeners){
 			clipboard.removeFlavorListener(listen);
-		}
+		}*/
+		
+		
+		
 		clipboard.addFlavorListener(new FlavorListener(){
 			public void flavorsChanged(FlavorEvent event) {
 				if(connect && Boolean.parseBoolean(properties.getProperty("auto_clipboard",Utilities.isLinux()? "false" : "true"))){
@@ -869,14 +874,15 @@ public class RCMain implements Launchable {
 					if ( ( contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor) ) {
 						try {
 							final String string = (String) contents.getTransferData(DataFlavor.stringFlavor);
-							if(string.indexOf("torrent") < 0) return;
-							//validate to see if this is a URL
+							if(string.indexOf("torrent") < 0 && string.indexOf("magnet") < 0) return;
+							/*//validate to see if this is a URL
 							new URL(string);
 
-							//all looks good.. now make sure DMS is open and open up the Open by URL
+*/							//all looks good.. now make sure DMS is open and open up the Open by URL
 							display.asyncExec(new Runnable(){
 								public void run() {
 									OpenByURLDialog.openWithURL(string);
+									//clipboard.setContents(new DataFlavor(),null);
 								}
 							});
 						} catch(Exception e) {
