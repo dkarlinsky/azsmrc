@@ -96,6 +96,21 @@ public class RCMain implements Launchable {
 	private long runTime;
 	private boolean manifestInUse;
 
+	private Transferable emptyTransfer = new Transferable() {
+		private DataFlavor[] emptyArray = new DataFlavor[0];
+		public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+			throw new UnsupportedFlavorException(flavor);
+		}
+
+		public DataFlavor[] getTransferDataFlavors() {
+			return emptyArray;
+		}
+
+		public boolean isDataFlavorSupported(DataFlavor flavor) {
+			return false;
+		}
+	};
+
 	protected boolean terminated, failedConnection;
 
 	public static void main(String[] args) {
@@ -864,9 +879,9 @@ public class RCMain implements Launchable {
 		for(FlavorListener listen:listeners){
 			clipboard.removeFlavorListener(listen);
 		}*/
-		
-		
-		
+
+
+
 		clipboard.addFlavorListener(new FlavorListener(){
 			public void flavorsChanged(FlavorEvent event) {
 				if(connect && Boolean.parseBoolean(properties.getProperty("auto_clipboard",Utilities.isLinux()? "false" : "true"))){
