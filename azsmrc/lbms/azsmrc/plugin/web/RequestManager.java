@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -41,11 +40,12 @@ import org.gudy.azureus2.plugins.torrent.TorrentManager;
 import org.gudy.azureus2.plugins.tracker.web.TrackerWebPageResponse;
 import org.gudy.azureus2.plugins.update.Update;
 import org.gudy.azureus2.plugins.update.UpdateCheckInstance;
-import org.gudy.azureus2.plugins.update.UpdateChecker;
 import org.gudy.azureus2.plugins.update.UpdateException;
 import org.gudy.azureus2.plugins.utils.resourcedownloader.ResourceDownloader;
 import org.gudy.azureus2.plugins.utils.resourcedownloader.ResourceDownloaderException;
-import org.jdom.*;
+import org.jdom.DataConversionException;
+import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
@@ -358,10 +358,10 @@ public class RequestManager {
 								user.eventException(e);
 								e.printStackTrace();
 							} catch (TorrentException e) {
-								user.eventException(e);
+								user.eventException(e,url);
 								e.printStackTrace();
 							} catch (DownloadException e) {
-								user.eventDownloadException(e);
+								user.eventException(e);
 							}
 						};
 					}).start();
@@ -414,7 +414,7 @@ public class RequestManager {
 						user.eventException(e);
 						e.printStackTrace();
 					} catch (DownloadException e) {
-						user.eventDownloadException(e);
+						user.eventException(e);
 					}
 				}
 				return false;
@@ -438,7 +438,7 @@ public class RequestManager {
 						else
 							dl.remove();
 					} catch (DownloadException e) {
-						user.eventDownloadException(e);
+						user.eventException(e);
 						e.printStackTrace();
 					} catch (DownloadRemovalVetoException e) {
 						// TODO Auto-generated catch block
@@ -458,7 +458,7 @@ public class RequestManager {
 						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
 						dl.stop();
 					} catch (DownloadException e) {
-						user.eventDownloadException(e);
+						user.eventException(e);
 						e.printStackTrace();
 					}
 				}
@@ -475,7 +475,7 @@ public class RequestManager {
 						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
 						dl.stopAndQueue();
 					} catch (DownloadException e) {
-						user.eventDownloadException(e);
+						user.eventException(e);
 						e.printStackTrace();
 					}
 				}
@@ -492,7 +492,7 @@ public class RequestManager {
 						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
 						dl.restart();
 					} catch (DownloadException e) {
-						user.eventDownloadException(e);
+						user.eventException(e);
 						e.printStackTrace();
 					}
 				}
@@ -509,7 +509,7 @@ public class RequestManager {
 						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
 						dl.recheckData();
 					} catch (DownloadException e) {
-						user.eventDownloadException(e);
+						user.eventException(e);
 						e.printStackTrace();
 					}
 				}
@@ -526,7 +526,7 @@ public class RequestManager {
 						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
 						dl.setMaximumDownloadKBPerSecond(xmlRequest.getAttribute("limit").getIntValue());
 					} catch (DownloadException e) {
-						user.eventDownloadException(e);
+						user.eventException(e);
 						e.printStackTrace();
 					} catch (DataConversionException e) {
 
@@ -545,7 +545,7 @@ public class RequestManager {
 						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
 						dl.setUploadRateLimitBytesPerSecond(xmlRequest.getAttribute("limit").getIntValue());
 					} catch (DownloadException e) {
-						user.eventDownloadException(e);
+						user.eventException(e);
 						e.printStackTrace();
 					} catch (DataConversionException e) {
 
@@ -564,7 +564,7 @@ public class RequestManager {
 						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
 						dl.start();
 					} catch (DownloadException e) {
-						user.eventDownloadException(e);
+						user.eventException(e);
 						e.printStackTrace();
 					}
 				}
@@ -585,7 +585,7 @@ public class RequestManager {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (DownloadException e) {
-						user.eventDownloadException(e);
+						user.eventException(e);
 						e.printStackTrace();
 					}
 				}
@@ -602,7 +602,7 @@ public class RequestManager {
 						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
 						dl.setForceStart(Boolean.parseBoolean(xmlRequest.getAttributeValue("start")));
 					} catch (DownloadException e) {
-						user.eventDownloadException(e);
+						user.eventException(e);
 						e.printStackTrace();
 					}
 				}
@@ -623,7 +623,7 @@ public class RequestManager {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (DownloadException e) {
-						user.eventDownloadException(e);
+						user.eventException(e);
 						e.printStackTrace();
 					}
 				}
@@ -640,7 +640,7 @@ public class RequestManager {
 						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
 						dl.moveUp();
 					} catch (DownloadException e) {
-						user.eventDownloadException(e);
+						user.eventException(e);
 						e.printStackTrace();
 					}
 				}
@@ -657,7 +657,7 @@ public class RequestManager {
 						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
 						dl.moveDown();
 					} catch (DownloadException e) {
-						user.eventDownloadException(e);
+						user.eventException(e);
 						e.printStackTrace();
 					}
 				}
@@ -682,7 +682,7 @@ public class RequestManager {
 										dl.moveDataFiles(target);
 										dl.restart();
 									} catch (DownloadException e) {
-										user.eventDownloadException(e);
+										user.eventException(e);
 										e.printStackTrace();
 									}
 								};
@@ -691,7 +691,7 @@ public class RequestManager {
 						else
 							user.eventException(new Exception("Error Moving Data Files: Directory not found"));
 					} catch (DownloadException e) {
-						user.eventDownloadException(e);
+						user.eventException(e);
 						e.printStackTrace();
 					}
 				}
@@ -717,7 +717,7 @@ public class RequestManager {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (DownloadException e) {
-						user.eventDownloadException(e);
+						user.eventException(e);
 						e.printStackTrace();
 					}
 				}
@@ -733,7 +733,7 @@ public class RequestManager {
 						try {
 							dl.restart();
 						} catch (DownloadException e) {
-							user.eventDownloadException(e);
+							user.eventException(e);
 							e.printStackTrace();
 						}
 					}
@@ -750,7 +750,7 @@ public class RequestManager {
 						try {
 							dl.stop();
 						} catch (DownloadException e) {
-							user.eventDownloadException(e);
+							user.eventException(e);
 							e.printStackTrace();
 						}
 					}
@@ -782,7 +782,7 @@ public class RequestManager {
 						}
 						response.addContent(files);
 					} catch (DownloadException e) {
-						user.eventDownloadException(e);
+						user.eventException(e);
 						e.printStackTrace();
 					}
 				}
@@ -814,7 +814,7 @@ public class RequestManager {
 							}
 						}
 					} catch (DownloadException e) {
-						user.eventDownloadException(e);
+						user.eventException(e);
 						e.printStackTrace();
 					}
 				}
@@ -844,7 +844,7 @@ public class RequestManager {
 						response.addContent(as);
 
 					} catch (DownloadException e) {
-						user.eventDownloadException(e);
+						user.eventException(e);
 						e.printStackTrace();
 					}
 					return true;

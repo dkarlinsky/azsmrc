@@ -202,17 +202,17 @@ public class User extends lbms.azsmrc.shared.User {
 		eventQueue.offer(event);
 	}
 
-	public void eventDownloadException (DownloadException e) {
-		Element event = getEventElement();
-		event.setAttribute("type", Integer.toString(RemoteConstants.EV_DL_EXCEPTION));
-		event.setAttribute("message", e.getMessage());
-		eventQueue.offer(event);
-	}
-
 	public void eventException (Exception e) {
 		Element event = getEventElement();
 		event.setAttribute("type", Integer.toString(RemoteConstants.EV_EXCEPTION));
 		event.setAttribute("message", e.getMessage());
+		eventQueue.offer(event);
+	}
+
+	public void eventException (Exception e, String add) {
+		Element event = getEventElement();
+		event.setAttribute("type", Integer.toString(RemoteConstants.EV_EXCEPTION));
+		event.setAttribute("message", e.getMessage()+"; "+add);
 		eventQueue.offer(event);
 	}
 
