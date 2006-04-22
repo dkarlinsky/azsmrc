@@ -96,6 +96,9 @@ public class ResponseManager {
 			dl.implSetState(dle.getAttribute("state").getIntValue());
 		} catch (Exception e) {}
 		try {
+			dl.implSetDownloadLimit(dle.getAttribute("downloadLimit").getIntValue());
+		} catch (Exception e) {}
+		try {
 			dl.implSetUploadLimit(dle.getAttribute("uploadLimit").getIntValue());
 		} catch (Exception e) {}
 		try {
