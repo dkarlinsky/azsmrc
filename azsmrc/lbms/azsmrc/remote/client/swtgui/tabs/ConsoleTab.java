@@ -738,10 +738,9 @@ public class ConsoleTab {
 						consoleText.append(buf.toString());
 
 						int nbLinesNow = consoleText.getLineCount();
-
-			
+						
                         
-						if(levelToInteger(record.getLevel()) == Level.WARNING.intValue())
+						if(record.getLevel().intValue() == Level.WARNING.intValue())
 							consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
 									- nbLinesBefore, new Color(RCMain.getRCMain().getDisplay(),
 					        				GUI_Utilities.getRGB(
@@ -749,7 +748,7 @@ public class ConsoleTab {
 					        				)
 					        		)
 							);
-                        else if(levelToInteger(record.getLevel()) == Level.SEVERE.intValue())
+                        else if(record.getLevel().intValue() == Level.SEVERE.intValue())
                         	consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
 									- nbLinesBefore, new Color(RCMain.getRCMain().getDisplay(),
 					        				GUI_Utilities.getRGB(
