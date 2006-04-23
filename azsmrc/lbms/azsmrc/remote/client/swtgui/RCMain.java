@@ -894,10 +894,10 @@ public class RCMain implements Launchable {
 							new URL(string);
 
 */							//all looks good.. now make sure DMS is open and open up the Open by URL
+							clipboard.setContents(emptyTransfer,null); //clear Transfer
 							display.asyncExec(new Runnable(){
 								public void run() {
 									OpenByURLDialog.openWithURL(string);
-									//clipboard.setContents(new DataFlavor(),null);
 								}
 							});
 						} catch(Exception e) {
