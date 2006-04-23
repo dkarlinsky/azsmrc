@@ -292,6 +292,7 @@ Download
 
   	public long getSize();
 
+  	public void scrapeNow();
 
 	/**
 	 * Get the max upload rate allowed for this download.

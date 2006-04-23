@@ -664,6 +664,23 @@ public class RequestManager {
 				return false;
 			}
 		});
+		addHandler("scrapeDownload", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {
+
+				String hash = xmlRequest.getAttributeValue("hash");
+				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
+				if (singleUser || user.hasDownload(hash)) {
+					try {
+						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+						dl.getLastScrapeResult().setNextScrapeStartTime(System.currentTimeMillis());
+					} catch (DownloadException e) {
+						user.eventException(e);
+						e.printStackTrace();
+					}
+				}
+				return false;
+			}
+		});
 		addHandler("moveDataFiles", new RequestHandler() {
 			public boolean handleRequest(Element xmlRequest, Element response,final User user) throws IOException {
 
