@@ -50,6 +50,7 @@ public class RemoteConstants {
 	public static final int ST_SIZE			= 1<<21;
 	public static final int ST_ELAPSED_TIME	= 1<<22;
 	public static final int ST_TOTAL_AVG	= 1<<23;
+	public static final int ST_SCRAPE_TIMES	= 1<<24;
 	public static final int ST_ALL_SEEDS	= ST_SEEDS | ST_TOTAL_SEEDS;
 	public static final int ST_ALL_LEECHER	= ST_LEECHER | ST_TOTAL_LEECHER;
 

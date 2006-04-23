@@ -154,6 +154,11 @@ public class ResponseManager {
 			ds.setTrackerStatus(dle.getAttributeValue("tracker"));
 		} catch (Exception e) {}
 
+		try {
+			dl.implSetLastScrapeTime(Long.parseLong(dle.getAttributeValue("last_scrape")));
+			dl.implSetNextScrapeTime(Long.parseLong(dle.getAttributeValue("next_scrape")));
+		} catch (Exception e) {}
+
 		if (dle.getAttribute("eta") != null)
 			ds.setEta(dle.getAttributeValue("eta"));
 		if (dle.getAttribute("elapsedTime") != null)

@@ -294,6 +294,10 @@ Download
 
   	public void scrapeNow();
 
+  	public long getLastScrapeTime();
+
+  	public long getNextScrapeTime();
+
 	/**
 	 * Get the max upload rate allowed for this download.
 	 * @return upload rate in bytes per second, 0 for unlimited, -1 for upload disabled

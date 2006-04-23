@@ -254,6 +254,10 @@ public class RequestManager {
 			dle.setAttribute("total_seeds",Integer.toString(dl.getLastScrapeResult().getSeedCount()));
 		if ((switches & RemoteConstants.ST_TOTAL_LEECHER) != 0)
 			dle.setAttribute("total_leecher",Integer.toString(dl.getLastScrapeResult().getNonSeedCount()));
+		if ((switches & RemoteConstants.ST_SCRAPE_TIMES) != 0) {
+			dle.setAttribute("last_scrape",Long.toString(dl.getLastScrapeResult().getScrapeStartTime()));
+			dle.setAttribute("next_scrape",Long.toString(dl.getLastScrapeResult().getNextScrapeStartTime()));
+		}
 		if ((switches & RemoteConstants.ST_SIZE) != 0)
 			dle.setAttribute("size",Long.toString(dl.getTorrent().getSize()));
 	}

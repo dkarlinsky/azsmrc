@@ -16,7 +16,7 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 	private String hash;
 	private boolean forceStart = false;
 	private int state, position, uploadLimit = -1,downloadLimit = -1, seeds,leecher, totalSeeds,totalLeecher;
-	private long discarded, size;
+	private long discarded, size, lastScrape, nextScrape;
 	private DownloadStatsImpl stats;
 	private List<DownloadListener> listener = new ArrayList<DownloadListener>();
 	private DownloadAdvancedStatsImpl advStats;
@@ -116,6 +116,28 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 
 	public void scrapeNow() {
 		client.sendScrapeDownload(hash);
+	}
+
+	public long getLastScrapeTime() {
+		return lastScrape;
+	}
+
+	public long getNextScrapeTime() {
+		return nextScrape;
+	}
+
+	/**
+	 * @param lastScrape the lastScrape to set
+	 */
+	public void implSetLastScrapeTime(long lastScrape) {
+		this.lastScrape = lastScrape;
+	}
+
+	/**
+	 * @param nextScrape the nextScrape to set
+	 */
+	public void implSetNextScrapeTime(long nextScrape) {
+		this.nextScrape = nextScrape;
 	}
 
 	public void moveDataFiles(String target) {
