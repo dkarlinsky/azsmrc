@@ -118,7 +118,7 @@ public class DownloadManagerShell {
 	private CTabFolder tabFolder;
 	private CTabItem myTorrents;
 	private MenuItem moveData;
-	
+
 
 
 	private DownloadListener dlL = new DownloadListener(){
@@ -947,7 +947,7 @@ public class DownloadManagerShell {
 
 		ToolItem information = new ToolItem(bar,SWT.PUSH);
 		information.setImage(ImageRepository.getImage("information"));
-		information.setToolTipText("View AzMultiUser Guide and Information");
+		information.setToolTipText("View AzSMRC Guide and Information");
 		information.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				//open readme shell here
@@ -2254,15 +2254,15 @@ public class DownloadManagerShell {
 
 
 		//--------------------------- Set Custom per Torrent Speeds ---------------\\
-		
-		
+
+
 		// advanced > Download Speed Menu //
 		final MenuItem itemDownSpeed = new MenuItem(menu, SWT.CASCADE);
 		itemDownSpeed.setText("Set Down Speed");
-		
+
 		final Menu menuDownSpeed = new Menu(DOWNLOAD_MANAGER_SHELL,SWT.DROP_DOWN);
 		itemDownSpeed.setMenu(menuDownSpeed);
-		
+
 
 		final MenuItem itemCurrentDownSpeed = new MenuItem(menuDownSpeed, SWT.PUSH);
 		itemCurrentDownSpeed.setEnabled(false);
@@ -2271,7 +2271,7 @@ public class DownloadManagerShell {
 
 		new MenuItem(menuDownSpeed, SWT.SEPARATOR);
 
-		
+
 		Listener itemsDownSpeedListener = new Listener() {
 			public void handleEvent(Event e) {
 				if (e.widget != null && e.widget instanceof MenuItem) {
@@ -2293,7 +2293,7 @@ public class DownloadManagerShell {
 		itemsDownSpeed.setText("Unlimited");
 		itemsDownSpeed.setData("maxdl", new Integer(0));
 		itemsDownSpeed.addListener(SWT.Selection, itemsDownSpeedListener);
-		
+
 		// --- Manual set
 		new MenuItem(menuDownSpeed, SWT.SEPARATOR);
 
@@ -2319,8 +2319,8 @@ public class DownloadManagerShell {
 					mb.open();
 					return;
 				}
-				
-				
+
+
 				TableItem[] items = table.getItems();
 				if(items.length == 1){
 					Container container = (Container) items[0].getData();
@@ -2331,18 +2331,18 @@ public class DownloadManagerShell {
 
 		// advanced >Upload Speed Menu //
 		final MenuItem itemUpSpeed = new MenuItem(menu, SWT.CASCADE);
-		itemUpSpeed.setText("Set Up Speed"); 
-		
+		itemUpSpeed.setText("Set Up Speed");
+
 
 		final Menu menuUpSpeed = new Menu(DOWNLOAD_MANAGER_SHELL, SWT.DROP_DOWN);
 		itemUpSpeed.setMenu(menuUpSpeed);
 
 		final MenuItem itemCurrentUpSpeed = new MenuItem(menuUpSpeed, SWT.PUSH);
 		itemCurrentUpSpeed.setEnabled(false);
-		
+
 		itemCurrentUpSpeed.setText("Current: " + "Not Polled");
-				
-		
+
+
 
 		// ---
 		new MenuItem(menuUpSpeed, SWT.SEPARATOR);
@@ -2354,8 +2354,8 @@ public class DownloadManagerShell {
 					MenuItem item = (MenuItem) e.widget;
 					int speed = item.getData("maxul") == null ? 0 : ((Integer) item
 							.getData("maxul")).intValue();
-					
-					
+
+
 					TableItem[] items = table.getItems();
 					if(items.length == 1){
 						Container container = (Container) items[0].getData();
@@ -2366,7 +2366,7 @@ public class DownloadManagerShell {
 		};
 
 		final MenuItem itemsUpSpeed = new MenuItem(menuUpSpeed, SWT.PUSH);
-		itemsUpSpeed.setText("Unlimited");				
+		itemsUpSpeed.setText("Unlimited");
 		itemsUpSpeed.setData("maxul", new Integer(0));
 		itemsUpSpeed.addListener(SWT.Selection, itemsUpSpeedListener);
 
@@ -2395,21 +2395,21 @@ public class DownloadManagerShell {
 					mb.open();
 					return;
 				}
-				
+
 				TableItem[] items = table.getItems();
 				if(items.length == 1){
 					Container container = (Container) items[0].getData();
 					container.getDownload().setUploadRateLimitBytesPerSecond(newSpeed);
 				}
-							
+
 			}
 		});
 
-		
-		
-		
-		
-		
+
+
+
+
+
 		//----------------------------Move Data
 		if(table.equals(seedsTable)){
 			moveData = new MenuItem(menu, SWT.PUSH);
@@ -2474,29 +2474,29 @@ public class DownloadManagerShell {
 					remove.setEnabled(true);
 					forceStart.setEnabled(true);
 					itemUpSpeed.setEnabled(true);
-					
-					
+
+
 					Container container = (Container)items[0].getData();
 					int currentDownSpeed = container.getDownload().getMaximumDownloadKBPerSecond();
 					int currentUpSpeed = container.getDownload().getUploadRateLimitBytesPerSecond();
 					if(currentUpSpeed <= 0)
-						itemCurrentUpSpeed.setText("Current: " + "Unlimited");						
+						itemCurrentUpSpeed.setText("Current: " + "Unlimited");
 					else
-						itemCurrentUpSpeed.setText("Current: " + DisplayFormatters.formatByteCountToBase10KBEtcPerSec(currentUpSpeed));						
+						itemCurrentUpSpeed.setText("Current: " + DisplayFormatters.formatByteCountToBase10KBEtcPerSec(currentUpSpeed));
 
 					if(currentDownSpeed <= 0)
 						itemCurrentDownSpeed.setText("Current: " + "Unlimited");
 					else
-						itemCurrentDownSpeed.setText("Current: " + DisplayFormatters.formatByteCountToBase10KBEtcPerSec(currentDownSpeed));						
+						itemCurrentDownSpeed.setText("Current: " + DisplayFormatters.formatByteCountToBase10KBEtcPerSec(currentDownSpeed));
 
-					
-					
+
+
 					itemDownSpeed.setEnabled(true);
 					try{
 						moveData.setEnabled(true);
 					}catch(Exception e){}
 					//Check to see if download is already in ForceStart
-					
+
 					if(container.getDownload().isForceStart()){
 						forceStart.setSelection(true);
 					}
