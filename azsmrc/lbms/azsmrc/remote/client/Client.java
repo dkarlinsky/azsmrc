@@ -464,9 +464,16 @@ public class Client {
 		enqueue(sendElement);
 	}
 
-	public void sendScrapeDownload (String hash) {
+	public void sendRequestDownloadScrape (String hash) {
 		Element sendElement = getSendElement();
-		sendElement.setAttribute("switch", "scrapeDownload");
+		sendElement.setAttribute("switch", "requestDownloadScrape");
+		sendElement.setAttribute("hash", hash);
+		enqueue(sendElement);
+	}
+
+	public void sendRequestDownloadAnnounce (String hash) {
+		Element sendElement = getSendElement();
+		sendElement.setAttribute("switch", "requestDownloadAnnounce");
 		sendElement.setAttribute("hash", hash);
 		enqueue(sendElement);
 	}

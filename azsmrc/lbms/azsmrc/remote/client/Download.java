@@ -292,7 +292,9 @@ Download
 
   	public long getSize();
 
-  	public void scrapeNow();
+  	public void requestScrape();
+
+  	public void requestAnnounce();
 
   	public long getLastScrapeTime();
 

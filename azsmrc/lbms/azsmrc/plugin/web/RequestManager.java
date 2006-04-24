@@ -668,7 +668,7 @@ public class RequestManager {
 				return false;
 			}
 		});
-		addHandler("scrapeDownload", new RequestHandler() {
+		addHandler("requestDownloadScrape", new RequestHandler() {
 			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {
 
 				String hash = xmlRequest.getAttributeValue("hash");
@@ -676,7 +676,24 @@ public class RequestManager {
 				if (singleUser || user.hasDownload(hash)) {
 					try {
 						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
-						dl.getLastScrapeResult().setNextScrapeStartTime(System.currentTimeMillis());
+						dl.requestTrackerScrape(false);
+					} catch (DownloadException e) {
+						user.eventException(e);
+						e.printStackTrace();
+					}
+				}
+				return false;
+			}
+		});
+		addHandler("requestDownloadAnnounce", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {
+
+				String hash = xmlRequest.getAttributeValue("hash");
+				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
+				if (singleUser || user.hasDownload(hash)) {
+					try {
+						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+						dl.requestTrackerAnnounce(false);
 					} catch (DownloadException e) {
 						user.eventException(e);
 						e.printStackTrace();

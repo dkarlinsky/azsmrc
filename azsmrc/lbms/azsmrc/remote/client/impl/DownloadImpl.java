@@ -114,8 +114,12 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 		return stats;
 	}
 
-	public void scrapeNow() {
-		client.sendScrapeDownload(hash);
+	public void requestScrape() {
+		client.sendRequestDownloadScrape(hash);
+	}
+
+	public void requestAnnounce() {
+		client.sendRequestDownloadAnnounce(hash);
 	}
 
 	public long getLastScrapeTime() {
