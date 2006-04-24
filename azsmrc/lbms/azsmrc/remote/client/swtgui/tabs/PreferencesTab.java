@@ -586,11 +586,14 @@ public class PreferencesTab {
 								public void run() {
 									if(pluginLabel != null && !pluginLabel.isDisposed())
 										pluginLabel.setText("Properties received from server");
-									singleUser.setEnabled(true);
-									if (Boolean.parseBoolean(value)) {
-										singleUser.setSelection(true);
-									}else
-										singleUser.setSelection(false);
+									if(singleUser != null && !singleUser.isDisposed()){
+										singleUser.setEnabled(true);
+										if (Boolean.parseBoolean(value)) {
+											singleUser.setSelection(true);
+										}else
+											singleUser.setSelection(false);
+									}
+
 								}
 
 							});
