@@ -17,8 +17,8 @@ import lbms.azsmrc.remote.client.events.DownloadManagerListener;
 
 public class DownloadManagerImpl implements DownloadManager {
 
-	Map<String, DownloadImpl> downloads = Collections.synchronizedMap(new TreeMap<String, DownloadImpl>());
-	List<DownloadManagerListener> listeners = new ArrayList<DownloadManagerListener>();
+	Map<String, DownloadImpl> downloads = Collections.synchronizedMap( new TreeMap<String, DownloadImpl>() );
+	List<DownloadManagerListener> listeners =Collections.synchronizedList( new ArrayList<DownloadManagerListener>() );
 
 	public void addDownload(File torrent_file) {
 		// TODO Auto-generated method stub
