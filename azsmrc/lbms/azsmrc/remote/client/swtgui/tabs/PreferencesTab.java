@@ -14,6 +14,7 @@ import lbms.azsmrc.remote.client.Client;
 import lbms.azsmrc.remote.client.Utilities;
 import lbms.azsmrc.remote.client.events.ParameterListener;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
+import lbms.azsmrc.remote.client.swtgui.dialogs.SSLCertWizard;
 import lbms.azsmrc.remote.client.swtgui.dialogs.UpdateDialog;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.tools.updater.Update;
@@ -627,8 +628,21 @@ public class PreferencesTab {
 			addModListener(singleUser,SWT.Selection);
 
 
+			Button bCertWiz = new Button(composite, SWT.PUSH);
+			bCertWiz.setText("Open SSL Wizard");
+			bCertWiz.setToolTipText("Opens a wizard to help with creating a certificate and " +
+					"enabling secure connection between the remote and server");
+			gridData = new GridData(GridData.GRAB_HORIZONTAL);
+			gridData.horizontalSpan = 2;
+			bCertWiz.setLayoutData(gridData);
+			bCertWiz.addListener(SWT.Selection, new Listener(){
 
-
+				public void handleEvent(Event arg0) {
+					SSLCertWizard.open();
+					
+				}
+				
+			});
 
 		}
 
