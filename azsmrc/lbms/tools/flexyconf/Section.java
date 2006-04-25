@@ -1,10 +1,13 @@
 package lbms.tools.flexyconf;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import lbms.tools.flexyconf.swt.SWTEntry;
 
 import org.jdom.Element;
 
@@ -52,8 +55,23 @@ public class Section {
 	/**
 	 * @return the entries
 	 */
-	public Map<String, Entry> getEntries() {
-		return entries;
+	public Entry[] getEntries() {
+		Set<String> keys = entries.keySet();
+		Entry[] eArray = new Entry[keys.size()];
+		int i = 0;
+		for (String key:keys) {
+			eArray[i++] = entries.get(key);
+		}
+		return eArray;
+	}
+
+	/**
+	 * @return the entries sorted by Index
+	 */
+	public Entry[] getSortedEntries() {
+		Entry[] e = getEntries();
+		Arrays.sort(e);
+		return e;
 	}
 
 	/**

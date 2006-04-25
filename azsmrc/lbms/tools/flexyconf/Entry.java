@@ -2,7 +2,7 @@ package lbms.tools.flexyconf;
 
 import org.jdom.Element;
 
-public class Entry {
+public class Entry implements Comparable<Entry> {
 	public static final int TYPE_STRING 	= 1;
 	public static final int TYPE_INT		= 2;
 	public static final int TYPE_BOOLEAN	= 3;
@@ -17,6 +17,7 @@ public class Entry {
 	private int type;
 	private String rule;
 	private Validator validator;
+	private int index;
 
 	private String	value;
 	private DisplayAdapterEntry displayAdapter;
@@ -35,9 +36,10 @@ public class Entry {
 
 	public Element toElement() {
 		Element e = new Element ("Entry");
+		e.setAttribute("index", Integer.toString(index));
 		e.setAttribute("key", key);
-		e.setAttribute("label", label);
 		e.setAttribute("type", type2String(type));
+		e.setAttribute("label", label);
 		if (dependsOn!=null)
 			e.setAttribute("dependsOn", dependsOn);
 		if (rule!=null)
@@ -49,6 +51,9 @@ public class Entry {
 		key = e.getAttributeValue("key");
 		label = e.getAttributeValue("label");
 		type = string2Type(e.getAttributeValue("type"));
+		String indexString = e.getAttributeValue("index");
+		if (indexString!=null)index = Integer.parseInt(indexString);
+		else index = 0;
 		dependsOn = e.getAttributeValue("dependsOn");
 		rule = e.getAttributeValue("validate");
 		if (rule!=null) {
@@ -105,6 +110,10 @@ public class Entry {
 			if(displayAdapter!=null)
 				displayAdapter.setEnabled(enabled);
 		}
+	}
+
+	public int compareTo(Entry o) {
+		return index-o.index;
 	}
 
 	/**

@@ -62,10 +62,9 @@ public class SWTSection implements DisplayAdapterSection {
 	protected void fillMenu () {
 		clearMenu ();
 		comp.setLayout(new GridLayout(2,false));
-		Map<String, Entry> entries = section.getEntries();
-		Set<String> keys = entries.keySet();
-		for (String key:keys) {
-			new SWTEntry(entries.get(key),comp);
+		Entry[] entries = section.getSortedEntries();
+		for (Entry e:entries) {
+			new SWTEntry(e,comp);
 		}
 		comp.layout();
 	}
