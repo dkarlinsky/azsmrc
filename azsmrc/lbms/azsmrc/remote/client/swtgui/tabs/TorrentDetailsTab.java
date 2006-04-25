@@ -50,7 +50,8 @@ public class TorrentDetailsTab {
 
     private Composite info1, info2;
     //updatable labels for info1
-    private Label trackerURL, trackerStatus, saveIn, numPieces, trackerComment, pieceSize, createdOn;
+    private Label trackerURL, trackerStatus, saveIn, numPieces, trackerComment;
+    private Label pieceSize, createdOn, lastScrape, nextScrape;
 
     private Table filesTable;
 
@@ -447,6 +448,21 @@ public class TorrentDetailsTab {
         createdOn = new Label(info2, SWT.NULL);
         createdOn.setText(das.getCreatedOn());
 
+        
+        // Last Scrape
+        Label lastScrape_label = new Label(info2, SWT.NULL);
+        lastScrape_label.setText("Last Scrape:");
+        
+        lastScrape = new Label(info2, SWT.NULL);
+        lastScrape.setText(DisplayFormatters.formatDate(download.getLastScrapeTime()));
+        
+        //Next Scrape
+        Label nextScrape_label = new Label(info2, SWT.NULL);
+        nextScrape_label.setText("Next Scrape:");
+        
+        nextScrape = new Label(info2, SWT.NULL);
+        nextScrape.setText(DisplayFormatters.formatDate(download.getNextScrapeTime()));
+        
 
         detailsTab.setControl(parent);
     }
@@ -507,6 +523,8 @@ public class TorrentDetailsTab {
                 trackerComment.setText(das.getComment());
                 pieceSize.setText(DisplayFormatters.formatByteCountToBase10KBEtc(das.getPieceSize()));
                 createdOn.setText(das.getCreatedOn());
+                lastScrape.setText(DisplayFormatters.formatDate(download.getLastScrapeTime()));
+                nextScrape.setText(DisplayFormatters.formatDate(download.getNextScrapeTime()));
                 info1.layout();
                 info2.layout();
             }
