@@ -67,23 +67,24 @@ Installation of AzSMRC comes in two parts:
 	For Linux, this is usually:
 	~\.azureus\plugins
 
-	Next, make a new directory in the plugins folder called 'azmultiuser'
+	Next, make a new directory in the plugins folder called 'azsmrc'
 	Go into this directory and copy the following items into there:
 
 		1.  azsmrcPlugin_x.x.x.jar
 		2.  jdom_1.0.jar
 		3.  commons-codec_1.3.jar
+		4.	commons-io_1.2.jar
 
-	jdom and commons-codec are contained in the lib.zip file.  Be sure when
-	uncompressing them, to keep the version number as Azureus will not load
-	them if they do not have them.
+	jdom and commons-codec/io are contained in the Library.zip file.
+	Be sure when uncompressing them, to keep the version number as
+	Azureus will not load them if they do not have them.
 
 	Finally, restart Azureus
 
 3.2  Installing the remote control program
 
 		1.  Create a directory of your choice and extract the
-			contents of the FireFrog.zip as well as lib.zip there
+			contents of the AzSMRC_xxx.zip as well as Library.zip there
 		2.  If you did not download the file with the SWT libraries
 			in it, then you will need to manually obtain those and
 			place them in your chosen folder yourself.
@@ -119,6 +120,14 @@ remote
 Once there, click on the User Managment tools and add / edit users
 from there
 
+4.1	SSL
+
+If you want to use SSL encrypted communication you need to create a
+SSL certificate first. To do that open Azureus and go to
+Tools->Options->Security and create a certificate.
+If you have done that enable SSL in AzSMRC settings and restart Azureus.
+Don't forget to enable SSL in the client too.
+
 5.  Manually starting the remote client
 
 	For Windows:
@@ -141,6 +150,8 @@ Our ProjectPage is: http://sourceforge.net/projects/azsmrc
 
 Please use the tools there, like the BugTracker or the Feature Requests.
 You can find the forum there too.
+
+We have a normal Website too: http://azsmrc.sourceforge.net/
 
 7.  Donations
 
