@@ -16,6 +16,7 @@ import lbms.azsmrc.remote.client.events.ParameterListener;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.dialogs.SSLCertWizard;
 import lbms.azsmrc.remote.client.swtgui.dialogs.UpdateDialog;
+import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.tools.updater.Update;
 import lbms.tools.updater.UpdateListener;
@@ -36,6 +37,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
@@ -86,7 +88,7 @@ public class PreferencesTab {
 					MessageBox box = new MessageBox(parent.getShell(),SWT.OK);
 					box.setText("Usaved Changes");
 					box.setMessage("You have made modifications to the preferences and " +
-							"closed the tab before you saved.  All changes have been discarded");
+					"closed the tab before you saved.  All changes have been discarded");
 					box.open();
 				}
 				if(pl != null) RCMain.getRCMain().getClient().removeParameterListener(pl);
@@ -160,7 +162,7 @@ public class PreferencesTab {
 					box.setText("Usaved Changes");
 					box.setMessage("You have made modifications to these settings\n" +
 							"Click OK to apply these changes and continue\n" +
-							"Click Cancel to discard these changes and continue");
+					"Click Cancel to discard these changes and continue");
 					int answer = box.open();
 					switch(answer){
 
@@ -222,7 +224,7 @@ public class PreferencesTab {
 		apply.setText("Save Changes");
 		apply.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
-			   save(parent);
+				save(parent);
 			}
 		});
 
@@ -545,11 +547,20 @@ public class PreferencesTab {
 				} catch (MalformedURLException e2) {
 				}
 
-
-
 			}
 
 		});
+		
+		
+		Group gTimes = new Group(composite, SWT.NULL);
+		gTimes.setText("Update Times (Reopen Preferences Tab to update)");
+		gTimes.setLayout(new GridLayout(1, false));
+		
+		Label azsmrcUptime = new Label(gTimes, SWT.NULL);
+		azsmrcUptime.setText("AzSMRC Uptime: " + DisplayFormatters.formatDate(RCMain.getRCMain().getRunTime()));
+		
+		
+		
 		composite.layout();
 	}
 
@@ -631,7 +642,7 @@ public class PreferencesTab {
 			Button bCertWiz = new Button(composite, SWT.PUSH);
 			bCertWiz.setText("Open SSL Wizard");
 			bCertWiz.setToolTipText("Opens a wizard to help with creating a certificate and " +
-					"enabling secure connection between the remote and server");
+			"enabling secure connection between the remote and server");
 			gridData = new GridData(GridData.GRAB_HORIZONTAL);
 			gridData.horizontalSpan = 2;
 			bCertWiz.setLayoutData(gridData);
@@ -639,9 +650,9 @@ public class PreferencesTab {
 
 				public void handleEvent(Event arg0) {
 					SSLCertWizard.open();
-					
+
 				}
-				
+
 			});
 
 		}
