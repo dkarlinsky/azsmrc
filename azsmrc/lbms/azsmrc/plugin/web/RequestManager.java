@@ -23,6 +23,7 @@ import lbms.azsmrc.shared.UserNotFoundException;
 
 import org.apache.commons.io.FileSystemUtils;
 import org.gudy.azureus2.core3.config.COConfigurationManager;
+import org.gudy.azureus2.core3.security.SESecurityManager;
 import org.gudy.azureus2.core3.util.Constants;
 import org.gudy.azureus2.plugins.PluginConfig;
 import org.gudy.azureus2.plugins.PluginInterface;
@@ -1250,6 +1251,25 @@ public class RequestManager {
 						}
 					}
 					return false;
+				}
+				return false;
+			}
+		});
+		addHandler("createSSLCertificate", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, final User user) throws IOException {
+				if (user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+					String alias = xmlRequest.getAttributeValue("alias");
+					String dn = xmlRequest.getAttributeValue("dn");
+					int strength =Integer.parseInt(xmlRequest.getAttributeValue("strength"));
+					if (strength < 512) strength = 1024;
+					if (alias == null || dn == null || alias.equals("") || dn.equals("")) {
+						user.eventException("CreateSSLCert: Parameter incorrect");
+					} else
+					try {
+						SESecurityManager.createSelfSignedCertificate( alias, dn, strength );
+					} catch (Exception e) {
+						user.eventException(e,"CreateSSLCert");
+					}
 				}
 				return false;
 			}

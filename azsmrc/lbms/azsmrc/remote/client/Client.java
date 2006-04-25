@@ -642,6 +642,15 @@ public class Client {
 		enqueue(sendElement);
 	}
 
+	public void sendCreateSLLCertificate(String alias, String dn, int strength) {
+		Element sendElement = getSendElement();
+		sendElement.setAttribute("switch", "createSSLCertificate");
+		sendElement.setAttribute("alias", alias);
+		sendElement.setAttribute("dn", dn);
+		sendElement.setAttribute("strength", Integer.toString(strength));
+		enqueue(sendElement);
+	}
+
 	public void sendGetGlobalStats() {
 		send(); //globalStats are allways requested so just send here
 	}

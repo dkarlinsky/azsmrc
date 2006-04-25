@@ -202,6 +202,13 @@ public class User extends lbms.azsmrc.shared.User {
 		eventQueue.offer(event);
 	}
 
+	public void eventException (String e) {
+		Element event = getEventElement();
+		event.setAttribute("type", Integer.toString(RemoteConstants.EV_EXCEPTION));
+		event.setAttribute("message", e);
+		eventQueue.offer(event);
+	}
+
 	public void eventException (Exception e) {
 		Element event = getEventElement();
 		event.setAttribute("type", Integer.toString(RemoteConstants.EV_EXCEPTION));
