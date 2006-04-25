@@ -5,6 +5,7 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.*;
 
 import lbms.tools.flexyconf.*;
@@ -32,6 +33,8 @@ public class SWTEntry implements DisplayAdapterEntry {
 			});
 		} else {
 			control = new Text(comp, SWT.SINGLE | SWT.BORDER);
+			GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+			control.setLayoutData(gd);
 			control.addFocusListener(new FocusListener() {
 				public void focusGained(FocusEvent e) {}
 
