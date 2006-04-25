@@ -12,7 +12,7 @@ public class Entry {
 
 
 	private String label;
-	String key;
+	private String key;
 	private String dependsOn;
 	private int type;
 	private String rule;
@@ -27,16 +27,76 @@ public class Entry {
 
 	}
 
-	public Entry (Section s) {
-
+	public Entry (Element e, FCInterface fci) {
+		this.fci = fci;
+		readFromElement(e);
+		System.out.println("Entry "+label+" created");
 	}
 
 	public Element toElement() {
-		return null;
+		Element e = new Element ("Entry");
+		e.setAttribute("key", key);
+		e.setAttribute("label", label);
+		e.setAttribute("type", type2String(type));
+		if (dependsOn!=null)
+			e.setAttribute("dependsOn", dependsOn);
+		if (rule!=null)
+			e.setAttribute("validate", rule);
+		return e;
 	}
 
 	public void readFromElement(Element e) {
+		key = e.getAttributeValue("key");
+		label = e.getAttributeValue("label");
+		type = string2Type(e.getAttributeValue("type"));
+		dependsOn = e.getAttributeValue("dependsOn");
+		rule = e.getAttributeValue("validate");
+		if (rule!=null) {
+			try {
+				validator = Validator.getValidator(rule, type);
+			} catch (InvalidRuleException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (InvalidTypeException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+	}
 
+	public int string2Type (String s) {
+		if (s.equalsIgnoreCase("string")) {
+			return TYPE_STRING;
+		} else if (s.equalsIgnoreCase("int")) {
+			return TYPE_INT;
+		} else if (s.equalsIgnoreCase("boolean")) {
+			return TYPE_BOOLEAN;
+		} else if (s.equalsIgnoreCase("float")) {
+			return TYPE_FLOAT;
+		} else if (s.equalsIgnoreCase("double")) {
+			return TYPE_DOUBLE;
+		} else if (s.equalsIgnoreCase("long")) {
+			return TYPE_LONG;
+		}
+		return 0;
+	}
+
+	public String type2String (int i) {
+		switch (i) {
+		case TYPE_STRING:
+			return "string";
+		case TYPE_INT:
+			return "int";
+		case TYPE_BOOLEAN:
+			return "boolean";
+		case TYPE_FLOAT:
+			return "float";
+		case TYPE_DOUBLE:
+			return "double";
+		case TYPE_LONG:
+			return "long";
+		}
+		return "";
 	}
 
 	public void checkDependency (String key,boolean enabled) {

@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FlexyConfiguration>
-	<Section name="root">
-		<Section name="firstMenu">
+	<Section label="root">
+		<Section label="firstMenu">
 			<Entry key="firstMenu.item1" label="Enable Stuff" type="boolean" />
 			<Entry key="firstMenu.item2" label="Level" validate="1..5" type="int" dependsOn="firstMenu.item1" />
+		</Section>
+		<Section label="secondMenu">
+			<Entry key="secondMenu.item1" label="blabla" type="boolean" />
+			<Entry key="secondMenu.item2" label="TestRegex" validate=".+@.+\..+" type="string" dependsOn="firstMenu.item1" />
 		</Section>
 	</Section>
 </FlexyConfiguration>

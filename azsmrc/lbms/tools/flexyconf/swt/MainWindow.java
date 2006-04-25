@@ -6,6 +6,11 @@
 
 package lbms.tools.flexyconf.swt;
 
+import java.io.File;
+import java.io.IOException;
+
+import lbms.tools.flexyconf.FlexyConfiguration;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ShellEvent;
@@ -31,11 +36,10 @@ public class MainWindow {
 	private Shell shell;
 	private Tree tree;
 	private Composite mainComp;
+	private FlexyConfiguration fc;
+	private SWTMenu fcMenu;
 
 
-	
-	
-	
 	private MainWindow(){
 
 		shell = new Shell (FlexyConfigMain.getFlexyConfigMain().getDisplay());
@@ -71,7 +75,7 @@ public class MainWindow {
 		fileItem.setMenu (fileSubmenu);
 
 
-		
+
 
 		//Separator
 		new MenuItem(fileSubmenu,SWT.SEPARATOR);
@@ -92,66 +96,65 @@ public class MainWindow {
 		//---------------------Main Composite---------------------------\\
 		Composite parent = new Composite(shell,SWT.NULL);
 		parent.setLayout(new GridLayout(3,false));
-		GridData gd = new GridData(GridData.FILL_BOTH);		
+		GridData gd = new GridData(GridData.FILL_BOTH);
 		parent.setLayoutData(gd);
 
-	
+
 		//First we need a sash
 		SashForm sash = new SashForm(parent,SWT.HORIZONTAL);
 		gd = new GridData(GridData.FILL_BOTH);
-		
+
 		//TODO main application size is here!
-		
+
 		gd.heightHint = 300;
 		gd.widthHint = 600;
-		sash.setLayoutData(gd);		
+		sash.setLayoutData(gd);
 		sash.setLayout(new GridLayout(1,false));
-		
-		
+
+
 		//----Tree on left
-		
+
 		//TODO I made the tree only single select.. change to SWT.MULTI if you want that
 		tree = new Tree(sash,SWT.SINGLE | SWT.BORDER);
 		gd = new GridData(GridData.FILL_BOTH);
-		
+
 		tree.setLayoutData(gd);
-		
-		
-		//Add in any tree items here
+
+
+		/*/Add in any tree items here
 		TreeItem item1 = new TreeItem(tree, SWT.NULL);
 		item1.setText("Tree Item 1 -- Change ME!");
-		
+
 		TreeItem item2 = new TreeItem(tree, SWT.NULL);
 		item2.setText("Tree Item 2 -- Change ME!");
-		
-		
+
+
 		TreeItem item3 = new TreeItem(item2, SWT.NULL);
 		item3.setText("Tree Item 3 -- Change ME!");
-		
-		
-		
-		
+		 */
+
+
 		//Selection Listener for tree
 		tree.addListener (SWT.Selection, new Listener () {
 			public void handleEvent (Event event) {
 				//TODO this is the main selection event
-				//you can pull a treeItem by using event.item			
-				
+				//you can pull a treeItem by using event.item
+
 			}
 		});
-		
-		
+
+
 		//---Composite on right for options
 		mainComp = new Composite(sash,SWT.BORDER);
 		gd = new GridData(GridData.FILL_BOTH);
 		mainComp.setLayoutData(gd);
 		mainComp.setLayout(new GridLayout(1,false));
-		
-		
-		
-		
-		
-		
+
+
+
+
+
+
 		//---------------  Buttons
 		Composite buttonComp = new Composite(parent,SWT.NULL);
 		buttonComp.setLayout(new GridLayout(3,false));
@@ -165,30 +168,39 @@ public class MainWindow {
 		save.addListener(SWT.Selection, new Listener(){
 
 			public void handleEvent(Event arg0) {
-				
+
 				//TODO Listener for Save Button
-				
+
 			}
 
 		});
 
-		
+
 
 
 		//Open the main shell
 
-        shell.pack();
+		shell.pack();
 
-        //Center Shell
-        Monitor primary = FlexyConfigMain.getFlexyConfigMain().getDisplay().getPrimaryMonitor ();
-        Rectangle bounds = primary.getBounds ();
-        Rectangle rect = shell.getBounds ();
-        int x = bounds.x + (bounds.width - rect.width) / 2;
-        int y = bounds.y +(bounds.height - rect.height) / 2;
-        shell.setLocation (x, y);
+		//Center Shell
+		Monitor primary = FlexyConfigMain.getFlexyConfigMain().getDisplay().getPrimaryMonitor ();
+		Rectangle bounds = primary.getBounds ();
+		Rectangle rect = shell.getBounds ();
+		int x = bounds.x + (bounds.width - rect.width) / 2;
+		int y = bounds.y +(bounds.height - rect.height) / 2;
+		shell.setLocation (x, y);
 
-        //open shell
-        shell.open();
+		try {
+			fc = FlexyConfiguration.readFromFile(new File("lbms/tools/flexyconf/sampleConf.xml"));
+			fcMenu = new SWTMenu(fc,tree,mainComp);
+			fcMenu.addAsRoot();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		//open shell
+		shell.open();
 
 
 
@@ -203,5 +215,5 @@ public class MainWindow {
 	}
 
 
-	
+
 }

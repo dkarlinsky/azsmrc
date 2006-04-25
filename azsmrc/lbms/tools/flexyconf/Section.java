@@ -1,5 +1,6 @@
 package lbms.tools.flexyconf;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,8 +9,7 @@ import java.util.Set;
 import org.jdom.Element;
 
 public class Section {
-	private Section parent;
-	private List<Section> children;
+	private List<Section> children = new ArrayList<Section>();
 	private Map<String, Entry> entries = new HashMap<String, Entry>();
 	private String label;
 	private FCInterface fci;
@@ -19,12 +19,18 @@ public class Section {
 
 	}
 
-	public Section (Element e) {
-
-	}
-
-	public Section (Element e, Section parent) {
-		this.parent = parent;
+	public Section (Element e, FCInterface fci) {
+		this.fci = fci;
+		label = e.getAttributeValue("label");
+		List<Element> elems = e.getChildren("Section");
+		for (Element elem:elems) {
+			children.add(new Section(elem,fci));
+		}
+		elems = e.getChildren("Entry");
+		for (Element elem:elems) {
+			Entry en = new Entry(elem,fci);
+			entries.put(en.getKey(), en);
+		}
 	}
 
 	public Element toElement() {

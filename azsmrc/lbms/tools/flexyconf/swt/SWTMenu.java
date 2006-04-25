@@ -1,7 +1,11 @@
 package lbms.tools.flexyconf.swt;
 
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 
 import lbms.tools.flexyconf.*;
 
@@ -15,6 +19,16 @@ public class SWTMenu implements DisplayAdapter {
 		tree = t;
 		this.target = target;
 		fc = c;
+		tree.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {}
+
+			public void widgetSelected(SelectionEvent e) {
+				System.out.println("Tree Selected");
+				TreeItem t =(TreeItem)e.item;
+				SWTSection s = (SWTSection)t.getData("SWTSection");
+				s.fillMenu();
+			}
+		});
 	}
 
 	public void addAsRoot () {

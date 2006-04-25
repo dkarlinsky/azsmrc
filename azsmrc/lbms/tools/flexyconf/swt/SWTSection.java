@@ -19,11 +19,7 @@ public class SWTSection implements DisplayAdapterSection {
 	private Section section;
 
 	private TreeItem treeItem;
-	private Listener selectionListener = new Listener() {
-		public void handleEvent(Event event) {
-			fillMenu();
-		};
-	};
+
 
 	private SWTSection (Section s, Tree t, Composite c, boolean root) {
 		section = s;
@@ -33,7 +29,7 @@ public class SWTSection implements DisplayAdapterSection {
 		if (!root) {
 			treeItem = new TreeItem(t,SWT.None);
 			treeItem.setText(s.getLabel());
-			treeItem.addListener(SWT.Selection, selectionListener);
+			treeItem.setData("SWTSection", this);
 			addSubSections(treeItem, c);
 		} else {
 			addSubSections(t, c);
@@ -44,10 +40,9 @@ public class SWTSection implements DisplayAdapterSection {
 		section = s;
 		parent = t;
 		comp = c;
-		comp.setLayout(new GridLayout(2,false));
 		treeItem = new TreeItem(t,SWT.None);
 		treeItem.setText(s.getLabel());
-		treeItem.addListener(SWT.Selection, selectionListener);
+		treeItem.setData("SWTSection", this);
 	}
 
 	private void addSubSections(Tree t, Composite c) {
@@ -64,11 +59,21 @@ public class SWTSection implements DisplayAdapterSection {
 		}
 	}
 
-	private void fillMenu () {
+	protected void fillMenu () {
+		clearMenu ();
+		comp.setLayout(new GridLayout(2,false));
 		Map<String, Entry> entries = section.getEntries();
 		Set<String> keys = entries.keySet();
 		for (String key:keys) {
 			new SWTEntry(entries.get(key),comp);
+		}
+		comp.layout();
+	}
+
+	private void clearMenu () {
+		Control[] controls = comp.getChildren();
+		for (Control c:controls) {
+			c.dispose();
 		}
 	}
 
