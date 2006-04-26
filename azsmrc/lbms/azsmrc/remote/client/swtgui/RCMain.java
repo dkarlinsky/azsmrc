@@ -135,7 +135,6 @@ public class RCMain implements Launchable {
 				new RCMain();
 			}
 			rcMain.open();
-			rcMain.runTime = System.currentTimeMillis();
 		} catch (Throwable e) {
 			e.printStackTrace();
 			File error = new File(System.getProperty("user.dir")+System.getProperty("file.separator")+"error.log");
@@ -356,6 +355,7 @@ public class RCMain implements Launchable {
 	}
 
 	public RCMain () {
+		runTime = System.currentTimeMillis();
 		System.out.println("Starting up RCMain.");
 		System.out.println("Checking javaw.exe.manifest");
 		javawExeManifest();
@@ -660,9 +660,10 @@ public class RCMain implements Launchable {
 	}
 
 	public long getRunTime() {
-		long rTime = (System.currentTimeMillis()-runTime)
+		long now = System.currentTimeMillis();
+		long rTime = (now-runTime)
 			+Long.parseLong(properties.getProperty("runTime", "0"));
-		runTime = System.currentTimeMillis();
+		runTime = now;
 		properties.setProperty("runTime", Long.toString(rTime));
 		return rTime;
 	}
