@@ -636,7 +636,7 @@ public class RCMain implements Launchable {
 		});
 		if (Boolean.parseBoolean(properties.getProperty("update.autocheck", "true"))) {
 			long lastcheck = Long.parseLong(properties.getProperty("update.lastcheck", "0"));
-			if (lastcheck-System.currentTimeMillis() > 1000*60*60*24) {
+			if (System.currentTimeMillis()-lastcheck > 1000*60*60*24) {
 				if (mainWindow != null) {
 					mainWindow.setStatusBarText("Checking for Updates");
 				}
