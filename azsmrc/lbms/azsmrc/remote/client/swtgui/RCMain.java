@@ -823,7 +823,7 @@ public class RCMain implements Launchable {
 	}
 
 	public void javawExeManifest() {
-		if (!RemoteConstants.isWindowsXP) {
+		if (!(RemoteConstants.isWindowsXP && RemoteConstants.isWindows2003) ) {
 			manifestInUse = false;
 			return;
 		}

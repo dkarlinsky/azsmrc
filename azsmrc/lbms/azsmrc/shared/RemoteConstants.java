@@ -11,6 +11,8 @@ public class RemoteConstants {
 	  public static final boolean isLinux			= OSName.equalsIgnoreCase("Linux");
 	  public static final boolean isSolaris			= OSName.equalsIgnoreCase("SunOS");
 	  public static final boolean isWindowsXP		= OSName.equalsIgnoreCase("Windows XP");
+	  public static final boolean isWindows2000		= OSName.equalsIgnoreCase("Windows 2000");
+	  public static final boolean isWindows2003		= OSName.equalsIgnoreCase("Windows 2003");
 	  public static final boolean isWindows95		= OSName.equalsIgnoreCase("Windows 95");
 	  public static final boolean isWindows98		= OSName.equalsIgnoreCase("Windows 98");
 	  public static final boolean isWindowsME		= OSName.equalsIgnoreCase("Windows ME");
