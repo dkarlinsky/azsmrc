@@ -44,6 +44,48 @@ public class MessageDialog {
 	private static List<MessageDialog> messageDiags = Collections.synchronizedList(new ArrayList<MessageDialog>());
 	TimerEvent timerEvent;
 
+	private final static int STEPS = 30;
+	private final static int TIME_TO_CLOSE = 5000;
+	private final static int TYPE_MESSAGE = 1;
+	private final static int TYPE_WARNING = 2;
+	private final static int TYPE_ERROR   = 3;
+
+	public static MessageDialog message(final Display display, final boolean bautoclose, final int timeToClose, final String title, final String message) {
+		if(!Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("popups_enabled", "true")))
+			return null;
+		return new MessageDialog(display, bautoclose,timeToClose,STEPS,title,message, TYPE_MESSAGE);
+	}
+
+	public static MessageDialog message(final Display display, final String title, final String message) {
+		if(!Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("popups_enabled", "true")))
+			return null;
+		return new MessageDialog(display, true,TIME_TO_CLOSE,STEPS,title,message, TYPE_MESSAGE);
+	}
+
+	public static MessageDialog warning(final Display display, final boolean bautoclose, final int timeToClose, final String title, final String message) {
+		if(!Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("popups_enabled", "true")))
+			return null;
+		return new MessageDialog(display, bautoclose,timeToClose,STEPS,title,message, TYPE_WARNING);
+	}
+
+	public static MessageDialog warning(final Display display, final String title, final String message) {
+		if(!Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("popups_enabled", "true")))
+			return null;
+		return new MessageDialog(display, true,TIME_TO_CLOSE,STEPS,title,message, TYPE_WARNING);
+	}
+
+	public static MessageDialog error(final Display display, final boolean bautoclose, final int timeToClose, final String title, final String message) {
+		if(!Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("popups_enabled", "true")))
+			return null;
+		return new MessageDialog(display, bautoclose,timeToClose,STEPS,title,message, TYPE_ERROR);
+	}
+
+	public static MessageDialog error(final Display display, final String title, final String message) {
+		if(!Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("popups_enabled", "true")))
+			return null;
+		return new MessageDialog(display, true,TIME_TO_CLOSE,STEPS,title,message, TYPE_ERROR);
+	}
+
 	/**
 	 *
 	 * @param display
@@ -54,10 +96,7 @@ public class MessageDialog {
 	 * @param message -- details of the message
 	 */
 
-	public MessageDialog(final Display display, final boolean bautoclose, final int timeToClose, final int steps, final String title, final String message){
-
-		if(!Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("popups_enabled", "true")))
-			return;
+	private MessageDialog(final Display display, final boolean bautoclose, final int timeToClose, final int steps, final String title, final String message, final int type){
 
 		this.display = display;
 		this.steps = steps;
@@ -228,7 +267,7 @@ public class MessageDialog {
 					splash.close();
 					popupImage.dispose();
 				}catch(SWTException swte){
-					
+
 				}
 
 			}

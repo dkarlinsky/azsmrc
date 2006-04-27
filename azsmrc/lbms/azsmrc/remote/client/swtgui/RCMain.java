@@ -463,7 +463,7 @@ public class RCMain implements Launchable {
 						mainWindow.setStatusBarText("Connection failed: "+statusCode+" Bad Username or Password", SWT.COLOR_RED);
 					}
 					normalLogger.warning("Connection failed: "+statusCode+" Bad Username or Password");
-					new MessageDialog(display,true,5000,15,"Connection failed",statusCode+" Bad Username or Password");
+					MessageDialog.error(display,"Connection failed",statusCode+" Bad Username or Password");
 					disconnect();
 				} else {
 					if (mainWindow != null) {
@@ -497,10 +497,7 @@ public class RCMain implements Launchable {
 					}
 					failedConnection = true;
 					 if(client.getFailedConnections() > 0 && client.getFailedConnections()%3 == 0){
-							new MessageDialog(RCMain.getRCMain().getDisplay(),
-									true,
-									10000,
-									20,
+						 MessageDialog.error(RCMain.getRCMain().getDisplay(),
 									"Connection Error", "Failed " + RCMain.getRCMain().getClient().getFailedConnections() + " connection attempts. Please check your settings.");
 							return;
 						}
@@ -525,27 +522,29 @@ public class RCMain implements Launchable {
 		});
 		client.addClientEventListener(new ClientEventListener() {
 			public void handleEvent(int type, long time, Element event) {
+				String msg = event.getAttributeValue("message");
 				switch (type) {
 				case RemoteConstants.EV_DL_FINISHED:
 					if (mainWindow != null) {
 						mainWindow.setStatusBarText("Download Finished: "+event.getAttributeValue("name"), SWT.COLOR_DARK_GREEN);
 					}
-					new MessageDialog(display,true,5000,30,"Download Finished",event.getAttributeValue("name"));
+
+					MessageDialog.message(display,"Download Finished",event.getAttributeValue("name"));
 					normalLogger.info("Download Finished: "+event.getAttributeValue("name"));
 					break;
 
 				case RemoteConstants.EV_DL_EXCEPTION:
 					if (mainWindow != null) {
-						mainWindow.setStatusBarText("Download Exception: "+event.getAttributeValue("message"), SWT.COLOR_RED);
+						mainWindow.setStatusBarText("Download Exception: "+msg, SWT.COLOR_RED);
 					}
-					normalLogger.severe("Download Exception: "+event.getAttributeValue("message"));
+					normalLogger.severe("Download Exception: "+msg);
 					break;
 
 				case RemoteConstants.EV_EXCEPTION:
 					if (mainWindow != null) {
-						mainWindow.setStatusBarText("Remote Exception: "+event.getAttributeValue("message"), SWT.COLOR_RED);
+						mainWindow.setStatusBarText("Remote Exception: "+msg, SWT.COLOR_RED);
 					}
-					normalLogger.severe("Remote Exception: "+event.getAttributeValue("message"));
+					normalLogger.severe("Remote Exception: "+msg);
 					break;
 				case RemoteConstants.EV_UPDATE_AVAILABLE:
 					if (mainWindow != null) {
@@ -554,13 +553,27 @@ public class RCMain implements Launchable {
 					normalLogger.severe("Remote Update Available");
 					client.getRemoteUpdateManager().load();
 					break;
+				case RemoteConstants.EV_MESSAGE:
+					if (mainWindow != null) {
+						mainWindow.setStatusBarText("Server Message: "+msg);
+					}
+					MessageDialog.message(getDisplay(), "Server Message", msg);
+					normalLogger.info("Server Message: "+msg);
+					break;
+				case RemoteConstants.EV_ERROR_MESSAGE:
+					if (mainWindow != null) {
+						mainWindow.setStatusBarText("Server ErrorMessage: "+msg, SWT.COLOR_RED);
+					}
+					normalLogger.severe("Server ErrorMessage: "+msg);
+					MessageDialog.error(getDisplay(), "Server ErrorMessage", msg);
+					break;
 				}
 			}
 		});
 		client.addExceptionListener(new ExceptionListener() {
 			public void exceptionOccured(Exception e, boolean serious) {
 				if (e instanceof SSLHandshakeException) {
-					new MessageDialog(display,true,5000,30,"Connection Error","Server doesn't support SSL.");
+					MessageDialog.message(display,true,5000,"Connection Error","Server doesn't support SSL.");
 					disconnect();
 					normalLogger.severe("Connection Error: Server doesn't support SSL.");
 				}
