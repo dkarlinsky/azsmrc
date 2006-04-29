@@ -18,7 +18,6 @@ import lbms.azsmrc.remote.client.events.ParameterListener;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.dialogs.SSLCertWizard;
 import lbms.azsmrc.remote.client.swtgui.dialogs.UpdateDialog;
-import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.tools.flexyconf.ContentProvider;
 import lbms.tools.flexyconf.Entry;
@@ -368,8 +367,7 @@ public class PreferencesTab {
 			}
 		});
 		addModListener(updateIntervalClosed_Text,SWT.Modify);
-		composite.layout();
-		sc.setContent(composite);
+		composite.layout();		
 	}
 
 
