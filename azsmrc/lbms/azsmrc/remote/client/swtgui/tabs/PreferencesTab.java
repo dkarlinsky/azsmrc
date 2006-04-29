@@ -24,7 +24,9 @@ import lbms.tools.flexyconf.ContentProvider;
 import lbms.tools.flexyconf.Entry;
 import lbms.tools.flexyconf.FCInterface;
 import lbms.tools.flexyconf.FlexyConfiguration;
+import lbms.tools.flexyconf.I18NProvider;
 import lbms.tools.flexyconf.swt.SWTMenu;
+import lbms.tools.i18n.I18NTranslator;
 import lbms.tools.updater.Update;
 import lbms.tools.updater.UpdateListener;
 import lbms.tools.updater.Updater;
@@ -888,11 +890,31 @@ public class PreferencesTab {
 	private void initAzFlexyConf() {
 		System.out.println("Trying to initialize AzRemoteConf");
 		try {
-			InputStream is = this.getClass().getClassLoader().getResourceAsStream("lbms/azsmrc/remote/client/swtgui/flexyconf/AzureusPreferences.xml");
-			fc = FlexyConfiguration.readFromStream(is);
+			final I18NTranslator i18n = new I18NTranslator();
+			InputStream i18nDIs = this.getClass().getClassLoader().getResourceAsStream("lbms/azsmrc/remote/client/swtgui/flexyconf/MessagesBundle.properties");
+			if (i18nDIs!=null) {
+				i18n.initialize(i18nDIs);
+				System.out.println("I18N: initialized");
+				String lang = RCMain.getRCMain().getProperties().getProperty("language");
+				if (lang!=null && !lang.equals("")) {
+					InputStream i18nLIs = this.getClass().getClassLoader().getResourceAsStream("lbms/azsmrc/remote/client/swtgui/flexyconf/MessagesBundle_"+lang+".properties");
+					if (i18nLIs!=null)
+						i18n.load(i18nLIs);
+					System.out.println("I18N: language loaded");
+				}
+			}
+
+			//I18N i18n = I18N.
+			InputStream fcIs = this.getClass().getClassLoader().getResourceAsStream("lbms/azsmrc/remote/client/swtgui/flexyconf/AzureusPreferences.xml");
+			fc = FlexyConfiguration.readFromStream(fcIs);
 			Client client = RCMain.getRCMain().getClient();
 			final FCInterface fci = fc.getFCInterface();
-
+			fci.setI18NProvider(new I18NProvider() {
+				public String translate(String key) {
+					System.out.println("I18N: "+key);
+					return i18n.translate(key);
+				}
+			});
 			fci.setContentProvider(new ContentProvider() {
 
 				Client client = RCMain.getRCMain().getClient();

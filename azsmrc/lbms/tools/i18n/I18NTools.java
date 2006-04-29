@@ -27,7 +27,7 @@ public class I18NTools {
 
 	public static Map<String,String> readFromFile (File file) throws IOException {
 		Map<String, String> map = new TreeMap<String, String>();
-		I18N.load(new BufferedReader(new FileReader(file)), map);
+		I18NTranslator.load(new BufferedReader(new FileReader(file)), map);
 		return map;
 	}
 

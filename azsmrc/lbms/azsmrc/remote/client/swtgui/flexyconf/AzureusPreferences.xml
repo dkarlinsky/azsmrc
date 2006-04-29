@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FlexyConfiguration>
 	<Section label="Azureus Remote">
+		<Entry key="" label="All remote settings will be applied instantly -- no need to save." type="label" index="0" />
 		<Section label="Server">
-			<Entry key="TCP.Listen.Port" label="Incoming TCP Port" type="int" index="0" validate="1..65535"/>
-			<Group label="Peer Sources" index="1">
-				<Entry key="" label="Peer Sources" type="label" index="0" />
-				<Entry key="Peer Source Selection Default.Tracker" label="Tracker" type="boolean" index="1" />
-				<Entry key="Peer Source Selection Default.DHT" label="DHT" type="boolean" index="2" />
-				<Entry key="Peer Source Selection Default.PeerExchange" label="PeerExchange" type="boolean" index="3" />
-				<Entry key="Peer Source Selection Default.Plugin" label="Plugin" type="boolean" index="4" />
+			<Entry key="TCP.Listen.Port" label="ConfigView.label.serverport" type="int" index="0" validate="1..65535"/>
+			<Group label="ConfigView.section.connection.group.peersources" index="1">
+				<Entry key="" label="ConfigView.section.connection.group.peersources.info" type="label" index="0" />
+				<Entry key="Peer Source Selection Default.Tracker" label="ConfigView.section.connection.peersource.Tracker" type="boolean" index="1" />
+				<Entry key="Peer Source Selection Default.DHT" label="ConfigView.section.connection.peersource.DHT" type="boolean" index="2" />
+				<Entry key="Peer Source Selection Default.PeerExchange" label="ConfigView.section.connection.peersource.PeerExchange" type="boolean" index="3" />
+				<Entry key="Peer Source Selection Default.Plugin" label="ConfigView.section.connection.peersource.Plugin" type="boolean" index="4" />
 			</Group>
-			<Group label="Networks" index="2">
-				<Entry key="" label="Networks" type="label" index="0" />
-				<Entry key="Network Selection Default.Public" label="Public" type="boolean" index="1" />
-				<Entry key="Network Selection Default.I2P" label="I2P" type="boolean" index="2" />
-				<Entry key="Network Selection Default.Tor" label="Tor" type="boolean" index="3" />
+			<Group label="ConfigView.section.connection.group.networks" index="2">
+				<Entry key="" label="ConfigView.section.connection.group.networks.info" type="label" index="0" />
+				<Entry key="Network Selection Default.Public" label="ConfigView.section.connection.networks.Public" type="boolean" index="1" />
+				<Entry key="Network Selection Default.I2P" label="ConfigView.section.connection.networks.I2P" type="boolean" index="2" />
+				<Entry key="Network Selection Default.Tor" label="ConfigView.section.connection.networks.Tor" type="boolean" index="3" />
 			</Group>
 		</Section>
 	</Section>
