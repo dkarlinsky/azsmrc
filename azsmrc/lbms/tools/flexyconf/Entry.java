@@ -182,14 +182,12 @@ public class Entry implements Comparable<Entry> {
 	}
 
 	public void setValue(String v) {
-		if (validator!=null)
-			if (!validator.validate(v)) {
-				setValueQuiet(fci.getContentProvider().getDefaultValue(getKey(), getType()));
-				return;
-			} else {
-				fci.getContentProvider().setValue(getKey(), v, getType());
-				fci.callEntryUpdateListener(getKey(), v);
-			}
+		if (validator!=null && !validator.validate(v)) {
+			setValueQuiet(fci.getContentProvider().getDefaultValue(getKey(), getType()));
+			return;
+		}
+		fci.getContentProvider().setValue(getKey(), v, getType());
+		fci.callEntryUpdateListener(getKey(), v);
 		setValueQuiet(v);
 	}
 
