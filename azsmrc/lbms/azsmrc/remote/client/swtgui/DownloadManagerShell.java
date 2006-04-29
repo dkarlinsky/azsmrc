@@ -508,6 +508,7 @@ public class DownloadManagerShell {
 
 		MenuItem menuAbout = new MenuItem(helpSubmenu,SWT.PUSH);
 		menuAbout.setText("&About");
+		
 		menuAbout.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				ReadmeTab.open(tabFolder);

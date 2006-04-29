@@ -106,8 +106,8 @@ public class ReadmeTab {
             }
         });
         
-        Label label = new Label(parent, SWT.WRAP);
-        label.setText("A lot of time and effort went into creating this remote system for Azureus. Please, if you use it, consider donating or at least shopping through these sponser links.  Thank you!");
+        Label label = new Label(parent, SWT.NULL);
+        label.setText("A lot of time and effort went into creating this remote system for Azureus.\nPlease, if you use it, consider donating or at least shopping through these sponser links.\nThank you!");
         gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
         gridData.horizontalSpan = 2;
         label.setLayoutData(gridData);
@@ -256,9 +256,9 @@ public class ReadmeTab {
         gridData.horizontalSpan = 3;
         gthanks.setLayoutData(gridData);
 		
-		Label thanks = new Label(gthanks,SWT.WRAP);
-		thanks.setText("We would like to give special thanks to Paul Gardner and the rest of " +
-				"the Azureus staff for their help and for creating the best Bittorrent client there is.");
+		Label thanks = new Label(gthanks,SWT.NULL);
+		thanks.setText("We would like to give special thanks to Paul Gardner and the rest of\n" +
+				"the Azureus staff for their help and for creating\nthe best Bittorrent client there is.");
 		
 		
         detailsTab.setControl(sc);
