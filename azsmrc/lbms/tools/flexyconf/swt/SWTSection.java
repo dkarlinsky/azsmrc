@@ -7,6 +7,7 @@ import lbms.tools.flexyconf.Entry;
 import lbms.tools.flexyconf.Section;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -20,25 +21,33 @@ public class SWTSection implements DisplayAdapterSection {
 
 
 	private SWTSection (Section s, Tree t, Composite c, boolean root) {
-		section = s;
-		comp = c;
-		comp.setLayout(new GridLayout(2,false));
-		if (!root) {
-			treeItem = new TreeItem(t,SWT.None);
-			treeItem.setText(s.getLabel());
-			treeItem.setData("SWTSection", this);
-			addSubSections(treeItem, c);
-		} else {
-			addSubSections(t, c);
+		try {
+			section = s;
+			comp = c;
+			comp.setLayout(new GridLayout(2,false));
+			if (!root) {
+				treeItem = new TreeItem(t,SWT.None);
+				treeItem.setText(s.getLabel());
+				treeItem.setData("SWTSection", this);
+				addSubSections(treeItem, c);
+			} else {
+				addSubSections(t, c);
+			}
+		} catch (SWTException e) {
+			e.printStackTrace();
 		}
 	}
 
 	private SWTSection (Section s, TreeItem t, Composite c) {
-		section = s;
-		comp = c;
-		treeItem = new TreeItem(t,SWT.None);
-		treeItem.setText(s.getLabel());
-		treeItem.setData("SWTSection", this);
+		try {
+			section = s;
+			comp = c;
+			treeItem = new TreeItem(t,SWT.None);
+			treeItem.setText(s.getLabel());
+			treeItem.setData("SWTSection", this);
+		} catch (SWTException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void addSubSections(Tree t, Composite c) {
@@ -56,20 +65,28 @@ public class SWTSection implements DisplayAdapterSection {
 	}
 
 	protected void fillMenu () {
-		clearMenu ();
-		comp.setLayout(new GridLayout(2,false));
-		Entry[] entries = section.getSortedEntries();
-		for (Entry e:entries) {
-			new SWTEntry(e,comp);
+		try {
+			clearMenu ();
+			comp.setLayout(new GridLayout(2,false));
+			Entry[] entries = section.getSortedEntries();
+			for (Entry e:entries) {
+				new SWTEntry(e,comp);
+			}
+			section.init();
+			comp.layout();
+		} catch (SWTException e) {
+			e.printStackTrace();
 		}
-		section.init();
-		comp.layout();
 	}
 
 	private void clearMenu () {
-		Control[] controls = comp.getChildren();
-		for (Control c:controls) {
-			c.dispose();
+		try {
+			Control[] controls = comp.getChildren();
+			for (Control c:controls) {
+				c.dispose();
+			}
+		} catch (SWTException e) {
+			e.printStackTrace();
 		}
 	}
 
