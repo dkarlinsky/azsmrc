@@ -1267,6 +1267,7 @@ public class RequestManager {
 					} else
 					try {
 						SESecurityManager.createSelfSignedCertificate( alias, dn, strength );
+						user.eventMessage("SSL Certificate successfully created.");
 					} catch (Exception e) {
 						user.eventException(e,"CreateSSLCert");
 					}
