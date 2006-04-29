@@ -507,18 +507,10 @@ public class DownloadManagerShell {
 		//-----Help Submenu
 
 		MenuItem menuAbout = new MenuItem(helpSubmenu,SWT.PUSH);
-		menuAbout.setText("&Information");
+		menuAbout.setText("&About");
 		menuAbout.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
-				//open readme shell here
-				CTabItem[] tabs = tabFolder.getItems();
-				for(CTabItem tab:tabs){
-					if(tab.getText().equalsIgnoreCase("Information")){
-						tabFolder.setSelection(tab);
-						return;
-					}
-				}
-				new ReadmeTab(tabFolder);
+				ReadmeTab.open(tabFolder);
 			}
 		});
 
@@ -947,18 +939,10 @@ public class DownloadManagerShell {
 
 		ToolItem information = new ToolItem(bar,SWT.PUSH);
 		information.setImage(ImageRepository.getImage("information"));
-		information.setToolTipText("View AzSMRC Guide and Information");
+		information.setToolTipText("About AzSMRC");
 		information.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
-				//open readme shell here
-				CTabItem[] tabs = tabFolder.getItems();
-				for(CTabItem tab:tabs){
-					if(tab.getText().equalsIgnoreCase("Information")){
-						tabFolder.setSelection(tab);
-						return;
-					}
-				}
-				new ReadmeTab(tabFolder);
+				ReadmeTab.open(tabFolder);
 			}
 		});
 

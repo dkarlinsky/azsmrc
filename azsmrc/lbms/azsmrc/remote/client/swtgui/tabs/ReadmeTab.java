@@ -13,19 +13,22 @@ import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-
-
 
 
 public class ReadmeTab {
@@ -42,19 +45,29 @@ public class ReadmeTab {
     
     
     
-    public ReadmeTab(CTabFolder parentTab){
+    private ReadmeTab(CTabFolder parentTab){
         final CTabItem detailsTab = new CTabItem(parentTab, SWT.CLOSE);
-        detailsTab.setText("Information");
+        detailsTab.setText("About");
 
-
+        final ScrolledComposite sc = new ScrolledComposite(parentTab, SWT.V_SCROLL);
         
-        final Composite parent = new Composite(parentTab, SWT.NONE);
+        final Composite parent = new Composite(sc, SWT.NONE);
         parent.setLayout(new GridLayout(3,false));
         GridData gridData = new GridData(GridData.GRAB_HORIZONTAL);
         gridData.grabExcessHorizontalSpace = true;
         gridData.horizontalSpan = 1;
         parent.setLayoutData(gridData);
 
+		sc.setContent(parent);
+		sc.setExpandVertical(true);
+		sc.setExpandHorizontal(true);
+		sc.addControlListener(new ControlAdapter() {
+			public void controlResized(ControlEvent e) {
+				Rectangle r = sc.getClientArea();
+				sc.setMinSize(parent.computeSize(r.width, SWT.DEFAULT));
+			}
+		});
+        
         Composite donateC = new Composite(parent, SWT.NONE);
         donateC.setLayout(new GridLayout(3,false));
         gridData = new GridData(GridData.GRAB_HORIZONTAL);
@@ -93,10 +106,10 @@ public class ReadmeTab {
             }
         });
         
-        Label label = new Label(parent, SWT.NULL);
-        label.setText("A lot of time and effort went into creating this remote system for Azureus.\nPlease, if you use it, consider donating or at least shopping through these sponser links.\nThank you!");
+        Label label = new Label(parent, SWT.WRAP);
+        label.setText("A lot of time and effort went into creating this remote system for Azureus. Please, if you use it, consider donating or at least shopping through these sponser links.  Thank you!");
         gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
-        gridData.horizontalSpan = 3;
+        gridData.horizontalSpan = 2;
         label.setLayoutData(gridData);
         
         Composite infoC = new Composite(parent, SWT.NONE);
@@ -112,8 +125,7 @@ public class ReadmeTab {
         Group devs = new Group(infoC,SWT.NULL);
         devs.setText("AzSMRC Developers");
         gridLayout = new GridLayout();
-        gridLayout.numColumns = 2;
-        gridLayout.horizontalSpacing = 75;
+        gridLayout.numColumns = 2;       
         gridLayout.marginHeight = 15;
         devs.setLayout(gridLayout);
         gridData = new GridData(GridData.FILL_HORIZONTAL);        
@@ -123,10 +135,15 @@ public class ReadmeTab {
         
         Label leonard = new Label(devs,SWT.NULL);                
         leonard.setText("Leonard Br\u00FCnings");
+        gridData = new GridData(GridData.HORIZONTAL_ALIGN_CENTER);
+        gridData.grabExcessHorizontalSpace = true;
+        leonard.setLayoutData(gridData);
         
         Label marc = new Label(devs,SWT.NULL);
         marc.setText("Marc Schaubach");
-        
+        gridData = new GridData(GridData.HORIZONTAL_ALIGN_CENTER);
+        gridData.grabExcessHorizontalSpace = true;
+        marc.setLayoutData(gridData);
         
         
         Group info = new Group(infoC,SWT.NONE);
@@ -228,8 +245,44 @@ public class ReadmeTab {
 			}			
 		});
 		
-        detailsTab.setControl(parent);
+        Group gthanks = new Group(infoC,SWT.NONE);
+        gthanks.setText("Thanks");
+        gridLayout = new GridLayout();
+        gridLayout.numColumns = 2;
+        gridLayout.marginHeight = 10;
+        gridLayout.horizontalSpacing = 30;
+        gthanks.setLayout(gridLayout);
+        gridData = new GridData(GridData.FILL_HORIZONTAL);        
+        gridData.horizontalSpan = 3;
+        gthanks.setLayoutData(gridData);
+		
+		Label thanks = new Label(gthanks,SWT.WRAP);
+		thanks.setText("We would like to give special thanks to Paul Gardner and the rest of " +
+				"the Azureus staff for their help and for creating the best Bittorrent client there is.");
+		
+		
+        detailsTab.setControl(sc);
         parentTab.setSelection(detailsTab);
     }
 
-}
+    
+    public static void open(final CTabFolder parentTab){
+    	Display display = RCMain.getRCMain().getDisplay();
+		if(display == null) return;
+		display.asyncExec(new Runnable(){
+			public void run() {
+				CTabItem[] tabs = parentTab.getItems();
+				for(CTabItem tab:tabs){
+					if(tab.getText().equalsIgnoreCase("About")){
+						parentTab.setSelection(tab);
+						return;
+					}
+				}
+				new ReadmeTab(parentTab);
+				
+			}
+
+		});
+    }
+    
+}//EOF
