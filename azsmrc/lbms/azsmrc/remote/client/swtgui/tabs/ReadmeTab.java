@@ -159,14 +159,14 @@ public class ReadmeTab {
 
 
         Label versionL = new Label(info,SWT.NULL);
-        versionL.setText("Running AzSMRC Version:");
+        versionL.setText("AzSMRC Version:");
         
         Label version = new Label(info, SWT.NULL);
         version.setText(RCMain.getRCMain().getAzsmrcProperties().getProperty("version", "Error Reading Properties"));
         
         
         Label azsmrcUptimeL = new Label(info, SWT.NULL);
-        azsmrcUptimeL.setText("AzSMRC Uptime:");
+        azsmrcUptimeL.setText("AzSMRC Total Runtime:");
         
 		Label azsmrcUptime = new Label(info, SWT.NULL);
 		azsmrcUptime.setText(DisplayFormatters.formatTime((RCMain.getRCMain().getRunTime())));
