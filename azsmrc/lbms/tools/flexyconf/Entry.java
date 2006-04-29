@@ -2,7 +2,7 @@ package lbms.tools.flexyconf;
 
 import org.jdom.Element;
 
-public class Entry implements Comparable<Entry> {
+public class Entry implements ConfigEntity {
 	public static final int TYPE_LABEL 		= -1; //special Entry that only displays the label
 	public static final int TYPE_STRING 	= 1;
 	public static final int TYPE_INT		= 2;
@@ -133,6 +133,14 @@ public class Entry implements Comparable<Entry> {
 
 	public int compareTo(Entry o) {
 		return index-o.index;
+	}
+
+	public int compareTo(ConfigEntity o) {
+		return getIndex()-o.getIndex();
+	}
+
+	public int getIndex() {
+		return index;
 	}
 
 	/**

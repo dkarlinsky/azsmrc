@@ -2,8 +2,10 @@ package lbms.tools.flexyconf.swt;
 
 import java.util.List;
 
+import lbms.tools.flexyconf.ConfigEntity;
 import lbms.tools.flexyconf.DisplayAdapterSection;
 import lbms.tools.flexyconf.Entry;
+import lbms.tools.flexyconf.Group;
 import lbms.tools.flexyconf.Section;
 
 import org.eclipse.swt.SWT;
@@ -68,9 +70,17 @@ public class SWTSection implements DisplayAdapterSection {
 		try {
 			clearMenu ();
 			comp.setLayout(new GridLayout(2,false));
-			Entry[] entries = section.getSortedEntries();
-			for (Entry e:entries) {
-				new SWTEntry(e,comp);
+			ConfigEntity[] entities = section.getSortedConfigEntities();
+			for (ConfigEntity e:entities) {
+				if (e instanceof Entry) {
+					System.out.println("Creating SWTEntry");
+					new SWTEntry((Entry)e,comp);
+				} else if (e instanceof Group) {
+					System.out.println("Creating SWTGroup");
+					new SWTGroup((Group)e,comp);
+				} else {
+					System.out.println("Arghh!!");
+				}
 			}
 			section.init();
 			comp.layout();

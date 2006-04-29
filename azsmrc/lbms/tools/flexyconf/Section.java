@@ -11,9 +11,9 @@ import lbms.tools.flexyconf.swt.SWTEntry;
 
 import org.jdom.Element;
 
-public class Section {
+public class Section extends AbstractEntryContainer {
 	private List<Section> children = new ArrayList<Section>();
-	private Map<String, Entry> entries = new HashMap<String, Entry>();
+	private List<Group> groups = new ArrayList<Group>();
 	private String label;
 	private FCInterface fci;
 	private DisplayAdapterSection displayAdapter;
@@ -28,6 +28,10 @@ public class Section {
 		List<Element> elems = e.getChildren("Section");
 		for (Element elem:elems) {
 			children.add(new Section(elem,fci));
+		}
+		elems = e.getChildren("Group");
+		for (Element elem:elems) {
+			groups.add(new Group(elem,this,fci));
 		}
 		elems = e.getChildren("Entry");
 		for (Element elem:elems) {
@@ -46,15 +50,23 @@ public class Section {
 		for (Section child:children) {
 			s.addContent(child.toElement());
 		}
+		for (Group child:groups) {
+			s.addContent(child.toElement());
+		}
 		return s;
 	}
 
+	@Override
 	public Entry getEntry (String key) {
 		if (entries.containsKey(key))
-			return entries.get(key);
+			return super.getEntry(key);
 		else {
 			for (Section child:children) {
 				Entry e = child.getEntry(key);
+				if (e!=null) return e;
+			}
+			for (Group g:groups) {
+				Entry e = g.getEntry(key);
 				if (e!=null) return e;
 			}
 			return null;
@@ -62,23 +74,26 @@ public class Section {
 	}
 
 	/**
-	 * @return the entries
+	 * @return the configEntities
 	 */
-	public Entry[] getEntries() {
+	public ConfigEntity[] getConfigEntities() {
 		Set<String> keys = entries.keySet();
-		Entry[] eArray = new Entry[keys.size()];
+		ConfigEntity[] eArray = new ConfigEntity[keys.size()+groups.size()];
 		int i = 0;
 		for (String key:keys) {
 			eArray[i++] = entries.get(key);
+		}
+		for (Group g:groups) {
+			eArray[i++] = g;
 		}
 		return eArray;
 	}
 
 	/**
-	 * @return the entries sorted by Index
+	 * @return the configEntities sorted by Index
 	 */
-	public Entry[] getSortedEntries() {
-		Entry[] e = getEntries();
+	public ConfigEntity[] getSortedConfigEntities() {
+		ConfigEntity[] e = getConfigEntities();
 		Arrays.sort(e);
 		return e;
 	}
@@ -101,25 +116,16 @@ public class Section {
 		this.fci = fci;
 	}
 
-	protected void checkDependency(String key,boolean enabled) {
-		Set<String> keys = entries.keySet();
-		for (String k:keys) {
-			entries.get(k).checkDependency(key, enabled);
-		}
-	}
-
+	@Override
 	public void init() {
-		Set<String> keys = entries.keySet();
-		for (String k:keys) {
-			entries.get(k).init();
+		super.init();
+		for (Group g:groups) {
+			g.init();
 		}
 	}
 
 	public void initAll() {
-		Set<String> keys = entries.keySet();
-		for (String k:keys) {
-			entries.get(k).init();
-		}
+		init();
 		for (Section child:children) {
 			child.initAll();
 		}
