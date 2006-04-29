@@ -37,7 +37,16 @@ public class Section {
 	}
 
 	public Element toElement() {
-		return null;
+		Element s = new Element ("Secetion");
+		s.setAttribute("label", label);
+		Set<String> keys = entries.keySet();
+		for (String k:keys) {
+			s.addContent(entries.get(k).toElement());
+		}
+		for (Section child:children) {
+			s.addContent(child.toElement());
+		}
+		return s;
 	}
 
 	public Entry getEntry (String key) {
@@ -103,6 +112,16 @@ public class Section {
 		Set<String> keys = entries.keySet();
 		for (String k:keys) {
 			entries.get(k).init();
+		}
+	}
+
+	public void initAll() {
+		Set<String> keys = entries.keySet();
+		for (String k:keys) {
+			entries.get(k).init();
+		}
+		for (Section child:children) {
+			child.initAll();
 		}
 	}
 }

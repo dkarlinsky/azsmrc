@@ -3,6 +3,7 @@ package lbms.tools.flexyconf;
 import org.jdom.Element;
 
 public class Entry implements Comparable<Entry> {
+	public static final int TYPE_LABEL 		= -1; //special Entry that only displays the label
 	public static final int TYPE_STRING 	= 1;
 	public static final int TYPE_INT		= 2;
 	public static final int TYPE_BOOLEAN	= 3;
@@ -87,6 +88,8 @@ public class Entry implements Comparable<Entry> {
 			return TYPE_DOUBLE;
 		} else if (s.equalsIgnoreCase("long")) {
 			return TYPE_LONG;
+		} else if (s.equalsIgnoreCase("label")) {
+			return TYPE_LABEL;
 		}
 		return 0;
 	}
@@ -109,6 +112,8 @@ public class Entry implements Comparable<Entry> {
 			return "double";
 		case TYPE_LONG:
 			return "long";
+		case TYPE_LABEL:
+			return "label";
 		}
 		return "";
 	}
@@ -169,6 +174,7 @@ public class Entry implements Comparable<Entry> {
 	 * @return Returns the value.
 	 */
 	public String getValue() {
+		if (getType() == TYPE_LABEL) return "";
 		if (value == null) {
 			value = fci.getContentProvider().getValue(getKey(), getType());
 		}
@@ -231,6 +237,7 @@ public class Entry implements Comparable<Entry> {
 	}
 
 	public void init() {
+		if (getType() == TYPE_LABEL) return;
 		getValue();
 		if (displayAdapter != null) {
 			displayAdapter.updateValue();

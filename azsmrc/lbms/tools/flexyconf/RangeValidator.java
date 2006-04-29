@@ -53,7 +53,7 @@ class RangeValidator extends Validator {
 	}
 
 	public boolean validate (double value) {
-		if (dmin<value && value<dmax)
+		if (dmin<=value && value<=dmax)
 			return true;
 		else
 			return false;
@@ -64,7 +64,7 @@ class RangeValidator extends Validator {
 	}
 
 	public boolean validate (long value) {
-		if (lmin<value && value<lmax)
+		if (lmin<=value && value<=lmax)
 			return true;
 		else
 			return false;

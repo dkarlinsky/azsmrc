@@ -4,10 +4,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.concurrent.Callable;
 import java.util.zip.GZIPInputStream;
 
 public class HTTPDownload extends Download  {
@@ -70,7 +68,10 @@ public class HTTPDownload extends Download  {
 					r = is.read();
 				}
 			}
-			finished = true;
+			if (conn.getContentLength()>0 && target != null && target.length() != conn.getContentLength())
+				failed = true;
+			else
+				finished = true;
 		} catch (IOException e) {
 			failed = true;
 			failureReason = e.getMessage();

@@ -21,8 +21,6 @@ public class SWTEntry implements DisplayAdapterEntry {
 		entry = e;
 		comp = c;
 		entry.setDisplayAdapter(this);
-		label = new Label(comp,SWT.NULL);
-		label.setText(entry.getLabel());
 		if (entry.getType() == Entry.TYPE_BOOLEAN) {
 			control = new Button(comp, SWT.CHECK);
 			((Button)control).addSelectionListener(new SelectionAdapter () {
@@ -31,7 +29,17 @@ public class SWTEntry implements DisplayAdapterEntry {
 					entry.setValue(Boolean.toString(((Button)control).getSelection()));
 				}
 			});
+			((Button)control).setText(entry.getLabel());
+			GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+			gd.horizontalSpan = 2;
+			control.setLayoutData(gd);
+		} else if(entry.getType() == Entry.TYPE_LABEL) {
+			label = new Label(comp,SWT.NULL);
+			GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+			gd.horizontalSpan = 2;
+			label.setLayoutData(gd);
 		} else {
+			label = new Label(comp,SWT.NULL);
 			control = new Text(comp, SWT.SINGLE | SWT.BORDER);
 			GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 			control.setLayoutData(gd);
@@ -43,23 +51,29 @@ public class SWTEntry implements DisplayAdapterEntry {
 				}
 			});
 		}
+		if (label != null)
+			label.setText(entry.getLabel());
 	}
 
 	public void dispose() {
-		if (!label.isDisposed()) label.dispose();
-		if (!control.isDisposed()) control.dispose();
+		if (label != null && !label.isDisposed()) label.dispose();
+		if (control!=null && !control.isDisposed()) control.dispose();
 	}
 
 	public boolean isEnabled() {
+		if (entry.getType() == Entry.TYPE_LABEL) return false;
 		return control.isEnabled();
 	}
 
 	public void setEnabled(boolean e) {
+		if (entry.getType() == Entry.TYPE_LABEL) return;
 		control.setEnabled(e);
 	}
 
 	public void updateValue() {
-		if (entry.getType() == Entry.TYPE_BOOLEAN) {
+		if (entry.getType() == Entry.TYPE_LABEL) {
+
+		} else if (entry.getType() == Entry.TYPE_BOOLEAN) {
 			((Button)control).setSelection(Boolean.parseBoolean(entry.getValue()));
 		} else {
 			((Text)control).setText(entry.getValue());

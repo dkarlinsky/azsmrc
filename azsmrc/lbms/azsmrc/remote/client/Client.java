@@ -5,11 +5,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,7 +17,6 @@ import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -27,13 +24,6 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
-
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 
 import lbms.azsmrc.remote.client.events.ClientEventListener;
 import lbms.azsmrc.remote.client.events.ClientUpdateListener;
@@ -55,12 +45,19 @@ import lbms.azsmrc.shared.RemoteConstants;
 import lbms.tools.stats.StatsInputStream;
 import lbms.tools.stats.StatsOutputStream;
 
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+
 public class Client {
 
 	private static final long TRANSACTION_TIMEOUT = 1500;
 
 	private Semaphore semaphore = new Semaphore(1);
-	private boolean transaction, ssl;
+	private boolean transaction, ssl, fastMode;
 	private URL server;
 	private String username;
 	private String password;
@@ -103,6 +100,7 @@ public class Client {
 		failedConnections 	= 0;
 		timer 	= new Timer("Client Timer",1);
 		ssl 	= false;
+		fastMode = false;
 		debug = Logger.getLogger("lbms.azsmrc.client");
 		debug.addHandler(new Handler() {
 			private Formatter sF = new Formatter() {
@@ -750,21 +748,30 @@ public class Client {
 	}
 
 	protected void callAzParameterListener(String key, String value, int type) {
+		if (!verifyParameter(key, value, type)) return;
 		for (ParameterListener l:parameterListeners) {
 			l.azParameter(key, value, type);
 		}
 	}
 
 	protected void callPluginParameterListener(String key, String value, int type) {
+		if (!verifyParameter(key, value, type)) return;
 		for (ParameterListener l:parameterListeners) {
 			l.pluginParameter(key, value, type);
 		}
 	}
 
 	protected void callCoreParameterListener(String key, String value, int type) {
+		if (!verifyParameter(key, value, type)) return;
 		for (ParameterListener l:parameterListeners) {
 			l.coreParameter(key, value, type);
 		}
+	}
+
+	protected boolean verifyParameter (String key, String value, int type) {
+		if (key == null || value == null) return false;
+		if (type<1 || type>4) return false;
+		return true;
 	}
 
 	//---------------------------------------------------------//

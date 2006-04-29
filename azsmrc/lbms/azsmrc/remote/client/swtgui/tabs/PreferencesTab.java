@@ -6,6 +6,8 @@
 package lbms.azsmrc.remote.client.swtgui.tabs;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
@@ -18,6 +20,11 @@ import lbms.azsmrc.remote.client.swtgui.dialogs.SSLCertWizard;
 import lbms.azsmrc.remote.client.swtgui.dialogs.UpdateDialog;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.shared.RemoteConstants;
+import lbms.tools.flexyconf.ContentProvider;
+import lbms.tools.flexyconf.Entry;
+import lbms.tools.flexyconf.FCInterface;
+import lbms.tools.flexyconf.FlexyConfiguration;
+import lbms.tools.flexyconf.swt.SWTMenu;
 import lbms.tools.updater.Update;
 import lbms.tools.updater.UpdateListener;
 import lbms.tools.updater.Updater;
@@ -53,11 +60,28 @@ public class PreferencesTab {
 	private Button trayMinimize, trayExit, showSplash, popupsEnabled;
 	private Button autoClipboard, autoConsole, exitConfirm;
 	private Button updateBeta, singleUser;
+	private Tree menuTree;
 
 	private Composite cOptions;
 	private Properties properties;
 
 	private ParameterListener pl;
+	private FlexyConfiguration fc;
+	private SWTMenu fcm;
+	private Properties azProps = new Properties();
+	private ParameterListener azParam = new ParameterListener() {
+		public void azParameter(String key, String value, int type) {}
+		public void pluginParameter(String key, String value, int type) {}
+
+		public void coreParameter(final String key,final  String value,final  int type) {
+			azProps.setProperty(key, value);
+			RCMain.getRCMain().getDisplay().syncExec(new Runnable() {
+				public void run() {
+					fc.getFCInterface().getEntryUpdateListener().updated(key, value);
+				}
+			});
+		}
+	};
 
 	private boolean bModified = false;
 
@@ -92,6 +116,7 @@ public class PreferencesTab {
 					box.open();
 				}
 				if(pl != null) RCMain.getRCMain().getClient().removeParameterListener(pl);
+				closeAzFlexyConf();
 			}
 
 		});
@@ -134,27 +159,27 @@ public class PreferencesTab {
 
 
 		//Tree on left side
-		Tree tree = new Tree(sash,SWT.BORDER | SWT.H_SCROLL);
+		menuTree = new Tree(sash,SWT.BORDER | SWT.H_SCROLL);
 		gridData = new GridData(GridData.FILL_BOTH);
 		gridData.horizontalSpan = 1;
-		tree.setLayoutData(gridData);
+		menuTree.setLayoutData(gridData);
 
-		final TreeItem tiConnection = new TreeItem(tree,SWT.NULL);
+		final TreeItem tiConnection = new TreeItem(menuTree,SWT.NULL);
 		tiConnection.setText("Connection");
 
-		final TreeItem tiMainWindow = new TreeItem(tree,SWT.NULL);
+		final TreeItem tiMainWindow = new TreeItem(menuTree,SWT.NULL);
 		tiMainWindow.setText("Main Window");
 
-		final TreeItem tiMisc = new TreeItem(tree,SWT.NULL);
+		final TreeItem tiMisc = new TreeItem(menuTree,SWT.NULL);
 		tiMisc.setText("Miscellaneous");
 
-		final TreeItem tiUpdate = new TreeItem(tree,SWT.NULL);
+		final TreeItem tiUpdate = new TreeItem(menuTree,SWT.NULL);
 		tiUpdate.setText("Update");
 
-		final TreeItem tiPlugin = new TreeItem(tree,SWT.NULL);
+		final TreeItem tiPlugin = new TreeItem(menuTree,SWT.NULL);
 		tiPlugin.setText("Plugin Settings");
 
-		tree.addListener(SWT.Selection, new Listener(){
+		menuTree.addListener(SWT.Selection, new Listener(){
 
 			public void handleEvent(Event event) {
 				if(bModified){
@@ -202,7 +227,7 @@ public class PreferencesTab {
 		cOptions.setLayout(new GridLayout(2,false));
 
 		//default selection
-		tree.setSelection(new TreeItem[] {tiConnection});
+		menuTree.setSelection(new TreeItem[] {tiConnection});
 		makeConnectionPreferences(cOptions);
 
 		//set the sash weight
@@ -251,6 +276,8 @@ public class PreferencesTab {
 
 		prefsTab.setControl(parent);
 		parentTab.setSelection(prefsTab);
+
+		initAzFlexyConf();
 	}
 
 
@@ -550,21 +577,21 @@ public class PreferencesTab {
 			}
 
 		});
-		
-		
+
+
 		Group gTimes = new Group(composite, SWT.NULL);
 		gTimes.setText("Update Times (Reopen Preferences Tab to update)");
 		gTimes.setLayout(new GridLayout(1, false));
-		
+
 		Label azsmrcUptime = new Label(gTimes, SWT.NULL);
 		azsmrcUptime.setText("AzSMRC Uptime: " + DisplayFormatters.formatTime((RCMain.getRCMain().getRunTime())));
-		
+
 		Label lastUpdate = new Label(gTimes, SWT.NULL);
 		lastUpdate.setText("Last Update Check: " + DisplayFormatters.formatDate(Long.parseLong(RCMain.getRCMain().getProperties().getProperty("update.lastcheck","0"))));
-		
+
 		Label nextUpdate = new Label(gTimes, SWT.NULL);
 		nextUpdate.setText("Next Update Check: " + DisplayFormatters.formatDate(Long.parseLong(RCMain.getRCMain().getProperties().getProperty("update.lastcheck","0"))+ (1000 * 60 * 60 * 24)));
-		
+
 		composite.layout();
 	}
 
@@ -837,6 +864,75 @@ public class PreferencesTab {
 
 		//Update Timer
 		RCMain.getRCMain().updateTimer(true);
+	}
+
+	private void initAzFlexyConf() {
+		System.out.println("Trying to initialize AzRemoteConf");
+		try {
+			InputStream is = this.getClass().getClassLoader().getResourceAsStream("lbms/azsmrc/remote/client/swtgui/tabs/AzureusPreferences.xml");
+			fc = FlexyConfiguration.readFromStream(is);
+			Client client = RCMain.getRCMain().getClient();
+			final FCInterface fci = fc.getFCInterface();
+
+			fci.setContentProvider(new ContentProvider() {
+
+				Client client = RCMain.getRCMain().getClient();
+
+				public String getDefaultValue(String key, int type) {
+					System.out.println("AzConf Get Def: "+key+" type: "+type );
+					String v = azProps.getProperty(key);
+					if (v==null) {
+						client.sendGetCoreParameter(key, type);
+						switch (type) {
+						case Entry.TYPE_STRING:
+							return "Loading Preferences...";
+						case Entry.TYPE_BOOLEAN:
+							return "false";
+						default:
+							return "0";
+						}
+					}
+					else return v;
+				}
+				public String getValue(String key, int type) {
+					System.out.println("AzConf Get: "+key+" type: "+type );
+					String v = azProps.getProperty(key);
+					if (v==null) {
+						client.sendGetCoreParameter(key, type);
+						switch (type) {
+						case Entry.TYPE_STRING:
+							return "Loading Preferences...";
+						case Entry.TYPE_BOOLEAN:
+							return "false";
+						default:
+							return "0";
+						}
+					}
+					else return v;
+				}
+				public void setValue(String key, String value, int type) {
+					System.out.println("AzConf Set: "+key+" value: "+value+" type: "+type);
+					client.sendSetCoreParameter(key, value, type);
+					azProps.setProperty(key, value);
+				}
+			});
+
+			client.addParameterListener(azParam);
+
+			//this will query the whole AzConfiguration at once
+			client.transactionStart();
+			fc.getRootSection().initAll();
+			client.transactionCommit();
+
+			fcm = new SWTMenu(fc,menuTree,cOptions);
+			fcm.addAsSubItem();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void closeAzFlexyConf() {
+		RCMain.getRCMain().getClient().removeParameterListener(azParam);
 	}
 
 }

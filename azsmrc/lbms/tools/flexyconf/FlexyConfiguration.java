@@ -51,20 +51,54 @@ public class FlexyConfiguration {
 		return rootSection;
 	}
 
+	/**
+	 * Writes the FlexyConf to a File.
+	 * 
+	 * @param f File to write to
+	 * @throws IOException
+	 */
 	public void saveToFile (File f) throws IOException {
-		OutputStream os = null;
+		saveToStream(new FileOutputStream(f));
+	}
+
+	/**
+	 * Writes the FlexyConf to the Stream,
+	 * 
+	 * The Stream is closed after completition.
+	 * 
+	 * @param os Stream to write to
+	 * @throws IOException
+	 */
+	public void saveToStream (OutputStream os) throws IOException {
 		try {
-			os = new FileOutputStream(f);
 			new XMLOutputter (Format.getPrettyFormat()).output(toDocument(), os);
 		} finally {
 			if (os!=null)os.close();
 		}
 	}
 
+	/**
+	 * Reads the FlexyConf from a File.
+	 * 
+	 * @param f File to read from
+	 * @return FlexyConf instance
+	 * @throws IOException
+	 */
 	public static FlexyConfiguration readFromFile(File f) throws IOException {
-		InputStream is = null;
+			return readFromStream( new FileInputStream(f) );
+	}
+
+	/**
+	 * Reads the FlexyConf from the Stream.
+	 * 
+	 * The Stream is closed after completition.
+	 * 
+	 * @param is Stream to read from 
+	 * @return FlexyConf instance
+	 * @throws IOException
+	 */
+	public static FlexyConfiguration readFromStream(InputStream is) throws IOException {
 		try {
-			is = new FileInputStream(f);
 			SAXBuilder builder = new SAXBuilder();
 			Document xmlDom = builder.build(is);
 			return new FlexyConfiguration(xmlDom);

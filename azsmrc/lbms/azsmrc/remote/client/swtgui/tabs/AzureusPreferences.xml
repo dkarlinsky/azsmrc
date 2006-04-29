@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlexyConfiguration>
+	<Section label="Azureus Remote">
+		<Section label="Server">
+			<Entry key="TCP.Listen.Port" label="Incoming TCP Port" type="int" index="0" validate="1..65535"/>
+			<Entry key="Peer Sources" label="Peer Sources" type="label" index="1" />
+			<Entry key="Peer Source Selection Default.Tracker" label="Tracker" type="boolean" index="2" />
+			<Entry key="Peer Source Selection Default.DHT" label="DHT" type="boolean" index="3" />
+			<Entry key="Peer Source Selection Default.PeerExchange" label="PeerExchange" type="boolean" index="4" />
+			<Entry key="Peer Source Selection Default.Plugin" label="Plugin" type="boolean" index="5" />
+			<Entry key="Networks" label="Networks" type="label" index="6" />
+			<Entry key="Network Selection Default.Public" label="Public" type="boolean" index="7" />
+			<Entry key="Network Selection Default.I2P" label="I2P" type="boolean" index="8" />
+			<Entry key="Network Selection Default.Tor" label="Tor" type="boolean" index="9" />
+		</Section>
+	</Section>
+</FlexyConfiguration>

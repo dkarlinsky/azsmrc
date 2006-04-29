@@ -5,7 +5,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,7 +45,7 @@ public class SFDownload extends Download {
 			failureReason = "Couldn't load mirrors";
 			failed = true;
 			System.out.println(failureReason);
-			throw new Exception ("Error occured:"+failureReason);
+			throw new Exception ("SFDownload Error occured:"+failureReason);
 		}
 		Matcher sfMirror = mirrorPattern.matcher(sfContent.getBuffer());
 		String fileLocation = source.getPath();
