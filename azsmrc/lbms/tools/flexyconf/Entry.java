@@ -28,8 +28,9 @@ public class Entry implements Comparable<Entry> {
 
 	}
 
-	public Entry (Element e, FCInterface fci) {
+	public Entry (Element e, Section parent, FCInterface fci) {
 		this.fci = fci;
+		this.section = parent;
 		readFromElement(e);
 		System.out.println("Entry "+label+" created");
 	}
@@ -69,6 +70,10 @@ public class Entry implements Comparable<Entry> {
 		}
 	}
 
+	/**
+	 * @param s
+	 * @return
+	 */
 	public int string2Type (String s) {
 		if (s.equalsIgnoreCase("string")) {
 			return TYPE_STRING;
@@ -86,6 +91,10 @@ public class Entry implements Comparable<Entry> {
 		return 0;
 	}
 
+	/**
+	 * @param i
+	 * @return
+	 */
 	public String type2String (int i) {
 		switch (i) {
 		case TYPE_STRING:
@@ -112,6 +121,11 @@ public class Entry implements Comparable<Entry> {
 		}
 	}
 
+	protected void triggerDependencyCheck() {
+		if (getType()==TYPE_BOOLEAN)
+			section.checkDependency(getKey(), Boolean.parseBoolean(getValue()));
+	}
+
 	public int compareTo(Entry o) {
 		return index-o.index;
 	}
@@ -127,7 +141,7 @@ public class Entry implements Comparable<Entry> {
 	 * @return Returns the lable.
 	 */
 	public String getLabel() {
-		return label;
+		return fci.getI18NProvider().translate(label);
 	}
 
 	/**
@@ -155,6 +169,9 @@ public class Entry implements Comparable<Entry> {
 	 * @return Returns the value.
 	 */
 	public String getValue() {
+		if (value == null) {
+			value = fci.getContentProvider().getValue(getKey(), getType());
+		}
 		return value;
 	}
 
@@ -163,9 +180,10 @@ public class Entry implements Comparable<Entry> {
 			if (!validator.validate(v)) {
 				setValueQuiet(fci.getContentProvider().getDefaultValue(getKey(), getType()));
 				return;
+			} else {
+				fci.getContentProvider().setValue(getKey(), v, getType());
+				fci.callEntryUpdateListener(getKey(), v);
 			}
-		if (fci!=null)
-			fci.callEntryUpdateListener(getKey(), getValue());
 		setValueQuiet(v);
 	}
 
@@ -212,5 +230,11 @@ public class Entry implements Comparable<Entry> {
 		this.fci = fci;
 	}
 
-
+	public void init() {
+		getValue();
+		if (displayAdapter != null) {
+			displayAdapter.updateValue();
+		}
+		triggerDependencyCheck();
+	}
 }

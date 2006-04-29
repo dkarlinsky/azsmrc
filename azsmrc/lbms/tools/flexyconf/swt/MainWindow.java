@@ -36,12 +36,12 @@ public class MainWindow {
 	private Shell shell;
 	private Tree tree;
 	private Composite mainComp;
-	private FlexyConfiguration fc;
 	private SWTMenu fcMenu;
+	private FlexyConfiguration fc;
 
 
-	private MainWindow(){
-
+	private MainWindow(FlexyConfiguration fc){
+		this.fc = fc;
 		shell = new Shell (FlexyConfigMain.getFlexyConfigMain().getDisplay());
 		shell.setLayout(new GridLayout(1,false));
 
@@ -190,14 +190,10 @@ public class MainWindow {
 		int y = bounds.y +(bounds.height - rect.height) / 2;
 		shell.setLocation (x, y);
 
-		try {
-			fc = FlexyConfiguration.readFromFile(new File("lbms/tools/flexyconf/sampleConf.xml"));
+
 			fcMenu = new SWTMenu(fc,tree,mainComp);
 			fcMenu.addAsRoot();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+
 
 		//open shell
 		shell.open();
@@ -210,8 +206,8 @@ public class MainWindow {
 
 
 
-	public static MainWindow open(){
-		return new MainWindow();
+	public static MainWindow open(FlexyConfiguration fc){
+		return new MainWindow(fc);
 	}
 
 

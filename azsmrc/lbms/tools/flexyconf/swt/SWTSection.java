@@ -1,29 +1,26 @@
 package lbms.tools.flexyconf.swt;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.*;
 
 import lbms.tools.flexyconf.DisplayAdapterSection;
 import lbms.tools.flexyconf.Entry;
 import lbms.tools.flexyconf.Section;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
+
 public class SWTSection implements DisplayAdapterSection {
 	private Composite comp;
-	private Tree tree;
-	private TreeItem parent;
 	private Section section;
-
 	private TreeItem treeItem;
 
 
 	private SWTSection (Section s, Tree t, Composite c, boolean root) {
 		section = s;
-		tree = t;
 		comp = c;
 		comp.setLayout(new GridLayout(2,false));
 		if (!root) {
@@ -38,7 +35,6 @@ public class SWTSection implements DisplayAdapterSection {
 
 	private SWTSection (Section s, TreeItem t, Composite c) {
 		section = s;
-		parent = t;
 		comp = c;
 		treeItem = new TreeItem(t,SWT.None);
 		treeItem.setText(s.getLabel());
@@ -66,6 +62,7 @@ public class SWTSection implements DisplayAdapterSection {
 		for (Entry e:entries) {
 			new SWTEntry(e,comp);
 		}
+		section.init();
 		comp.layout();
 	}
 

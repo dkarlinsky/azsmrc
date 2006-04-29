@@ -31,7 +31,7 @@ public class Section {
 		}
 		elems = e.getChildren("Entry");
 		for (Element elem:elems) {
-			Entry en = new Entry(elem,fci);
+			Entry en = new Entry(elem,this,fci);
 			entries.put(en.getKey(), en);
 		}
 	}
@@ -96,6 +96,13 @@ public class Section {
 		Set<String> keys = entries.keySet();
 		for (String k:keys) {
 			entries.get(k).checkDependency(key, enabled);
+		}
+	}
+
+	public void init() {
+		Set<String> keys = entries.keySet();
+		for (String k:keys) {
+			entries.get(k).init();
 		}
 	}
 }

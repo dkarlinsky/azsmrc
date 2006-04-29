@@ -23,7 +23,6 @@ public class SWTMenu implements DisplayAdapter {
 			public void widgetDefaultSelected(SelectionEvent e) {}
 
 			public void widgetSelected(SelectionEvent e) {
-				System.out.println("Tree Selected");
 				TreeItem t =(TreeItem)e.item;
 				SWTSection s = (SWTSection)t.getData("SWTSection");
 				s.fillMenu();

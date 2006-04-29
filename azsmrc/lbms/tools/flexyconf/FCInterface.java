@@ -10,11 +10,19 @@ public class FCInterface {
 			Entry e = getEntry(key);
 			if (e!=null) {
 				e.setValueQuiet(value);
+				e.triggerDependencyCheck();
 			}
 		};
 	};
 	private ContentProvider cp;
-	private I18NProvider inp;
+	/**
+	 * The Basic I18N Provider will simply return the key.
+	 */
+	private I18NProvider inp = new I18NProvider() {
+		public String translate(String key) {
+			return key;
+		}
+	};
 
 	private FlexyConfiguration fc;
 
@@ -55,6 +63,11 @@ public class FCInterface {
 	}
 
 	/**
+	 * This EntryUpdateListener can be used as callback to set the values.
+	 * 
+	 * Use this listener to set the values if the
+	 * ContentProvider is asynchronous.
+	 * 
 	 * @return Returns the entryUpdateListener.
 	 */
 	public EntryUpdateListener getEntryUpdateListener() {

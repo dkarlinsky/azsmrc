@@ -7,7 +7,7 @@
 		</Section>
 		<Section label="secondMenu">
 			<Entry key="secondMenu.item1" label="blabla" type="boolean" index="0"/>
-			<Entry key="secondMenu.item2" label="TestRegex" index="1" validate=".+@.+\..+" type="string" dependsOn="firstMenu.item1" />
+			<Entry key="secondMenu.item2" label="TestRegex" index="1" validate=".+@.+\..+" type="string" dependsOn="secondMenu.item1" />
 		</Section>
 	</Section>
 </FlexyConfiguration>
