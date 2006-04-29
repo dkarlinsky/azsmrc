@@ -40,7 +40,62 @@ public class SWTEntry implements DisplayAdapterEntry {
 				GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 				gd.horizontalSpan = 2;
 				label.setLayoutData(gd);
-			} else {
+			} else if(entry.getType() == Entry.TYPE_INT ||
+					entry.getType() == Entry.TYPE_LONG){ 
+				label = new Label(comp,SWT.NULL);
+				control = new Text(comp, SWT.SINGLE | SWT.BORDER);
+				GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+				control.setLayoutData(gd);
+				control.addListener (SWT.Verify, new Listener () {
+					public void handleEvent (Event e) {
+						String string = e.text;
+						char [] chars = new char [string.length ()];
+						string.getChars (0, chars.length, chars, 0);
+						for (int i=0; i<chars.length; i++) {
+							if (!('0' <= chars [i] && chars [i] <= '9')) {
+								e.doit = false;
+								return;
+							}
+						}
+					}
+				});
+
+				control.addFocusListener(new FocusListener() {
+					public void focusGained(FocusEvent e) {}
+
+					public void focusLost(FocusEvent e) {
+						entry.setValue(((Text)control).getText());
+					}
+				});
+			}
+			else if(entry.getType() == Entry.TYPE_DOUBLE ||
+					entry.getType() == Entry.TYPE_FLOAT){ 
+				label = new Label(comp,SWT.NULL);
+				control = new Text(comp, SWT.SINGLE | SWT.BORDER);
+				GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+				control.setLayoutData(gd);
+				control.addListener (SWT.Verify, new Listener () {
+					public void handleEvent (Event e) {
+						String string = e.text;
+						char [] chars = new char [string.length ()];
+						string.getChars (0, chars.length, chars, 0);
+						for (int i=0; i<chars.length; i++) {
+							if (!('0' <= chars [i] && chars [i] <= '9') && chars [i] != '.') {
+								e.doit = false;
+								return;
+							}
+						}
+					}
+				});
+
+				control.addFocusListener(new FocusListener() {
+					public void focusGained(FocusEvent e) {}
+
+					public void focusLost(FocusEvent e) {
+						entry.setValue(((Text)control).getText());
+					}
+				});
+			}else {
 				label = new Label(comp,SWT.NULL);
 				control = new Text(comp, SWT.SINGLE | SWT.BORDER);
 				GridData gd = new GridData(GridData.FILL_HORIZONTAL);
