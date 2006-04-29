@@ -25,7 +25,8 @@ public class SWTMenu implements DisplayAdapter {
 			public void widgetSelected(SelectionEvent e) {
 				TreeItem t =(TreeItem)e.item;
 				SWTSection s = (SWTSection)t.getData("SWTSection");
-				s.fillMenu();
+				if (s!=null)
+					s.fillMenu();
 			}
 		});
 	}
