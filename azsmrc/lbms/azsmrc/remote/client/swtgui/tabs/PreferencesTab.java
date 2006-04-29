@@ -225,7 +225,7 @@ public class PreferencesTab {
 
 		});
 
-		sc = new ScrolledComposite(sash, SWT.BORDER |  SWT.V_SCROLL);
+		sc = new ScrolledComposite(sash, SWT.V_SCROLL);
 		
 		cOptions = new Composite(sc,SWT.BORDER);
 		gridData = new GridData(GridData.FILL_BOTH);
