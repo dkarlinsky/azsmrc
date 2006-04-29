@@ -1831,6 +1831,8 @@ public class DownloadManagerShell {
 		connectionStatusIcon.getDisplay().syncExec( new Runnable() {
 			public void run() {
 				try {
+					if(connectionStatusIcon == null || connectionStatusIcon.isDisposed())
+						return;
 					if(connection == 0){
 						connectionStatusIcon.setImage(ImageRepository.getImage("connect_no"));
 						connectionStatusIcon.setToolTipText("Not Connected to server");
