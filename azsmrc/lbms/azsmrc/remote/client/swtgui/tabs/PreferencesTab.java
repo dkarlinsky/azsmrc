@@ -600,19 +600,6 @@ public class PreferencesTab {
 		});
 
 
-		Group gTimes = new Group(composite, SWT.NULL);
-		gTimes.setText("Update Times (Reopen Preferences Tab to update)");
-		gTimes.setLayout(new GridLayout(1, false));
-
-		Label azsmrcUptime = new Label(gTimes, SWT.NULL);
-		azsmrcUptime.setText("AzSMRC Uptime: " + DisplayFormatters.formatTime((RCMain.getRCMain().getRunTime())));
-
-		Label lastUpdate = new Label(gTimes, SWT.NULL);
-		lastUpdate.setText("Last Update Check: " + DisplayFormatters.formatDate(Long.parseLong(RCMain.getRCMain().getProperties().getProperty("update.lastcheck","0"))));
-
-		Label nextUpdate = new Label(gTimes, SWT.NULL);
-		nextUpdate.setText("Next Update Check: " + DisplayFormatters.formatDate(Long.parseLong(RCMain.getRCMain().getProperties().getProperty("update.lastcheck","0"))+ (1000 * 60 * 60 * 24)));
-
 		composite.layout();
 	}
 
