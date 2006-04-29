@@ -34,23 +34,25 @@
 		<linefilter source="${azureus.dir}/org/gudy/azureus2/internat" target="${root.dir}/${build.dir}/lbms/azsmrc/remote/client/swtgui/flexyconf" filter="^ConfigView\..+" />		
 	</target>
 
-	<target name="compile" depends="init">
+	<target name="compile" depends="init,checkAzFiles" if="azFilesOk">
 		<echo message="Compiling Source..." />
 		<path id="libs.classpath">
 			<fileset dir="${root.dir}/${libs.dir}" includes="**/*.jar" />
-			<fileset dir="${swt.jar}" includes="swt.jar" />
-			<fileset dir="${azureus.jar}" includes="Azureus2.jar" />
-			<fileset dir="${azureus.dir}" includes="**/*.class" />
+			<fileset dir="${swt.jar}" includes="swt.jar" />				
+			<fileset dir="${azureus.jar}" includes="Azureus2.jar" />	
+			<dirset dir="${azureus.dir}" includes="*"/>
 		</path>
 
-		<javac srcdir="${root.dir}" destdir="${root.dir}/${build.dir}" excludes="${generic.excludes}" nowarn="yes" includeAntRuntime="no" debug="true" debuglevel="lines,vars,source" verbose="yes">
+		<javac srcdir="${root.dir}" destdir="${root.dir}/${build.dir}" excludes="${generic.excludes}" nowarn="yes" includeAntRuntime="no" debug="true" debuglevel="lines,vars,source" verbose="yes" optimize="yes">
 			<include name="${source.dir}/**/*"/>
+			<exclude name="${root.dir}/${build.dir}"/>
 			<classpath refid="libs.classpath" />
 		</javac>
 	</target>
 
 	<target name="cleanBuild">
 		<antcall target="compile" />
+		<antcall target="cleanDist" />
 		<antcall target="jar" />
 	</target>
 
