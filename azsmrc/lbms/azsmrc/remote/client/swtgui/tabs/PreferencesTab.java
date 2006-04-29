@@ -33,10 +33,14 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -63,6 +67,7 @@ public class PreferencesTab {
 	private Tree menuTree;
 
 	private Composite cOptions;
+	private ScrolledComposite sc;
 	private Properties properties;
 
 	private ParameterListener pl;
@@ -220,12 +225,25 @@ public class PreferencesTab {
 
 		});
 
-		cOptions = new Composite(sash,SWT.BORDER);
+		sc = new ScrolledComposite(sash, SWT.BORDER |  SWT.V_SCROLL);
+		
+		cOptions = new Composite(sc,SWT.BORDER);
 		gridData = new GridData(GridData.FILL_BOTH);
 		gridData.horizontalSpan = 1;
 		cOptions.setLayoutData(gridData);
 		cOptions.setLayout(new GridLayout(2,false));
 
+		sc.setContent(cOptions);
+		sc.setExpandVertical(true);
+		sc.setExpandHorizontal(true);
+		sc.addControlListener(new ControlAdapter() {
+			public void controlResized(ControlEvent e) {
+				Rectangle r = sc.getClientArea();
+				sc.setMinSize(cOptions.computeSize(r.width, SWT.DEFAULT));
+			}
+		});
+		
+		
 		//default selection
 		menuTree.setSelection(new TreeItem[] {tiConnection});
 		makeConnectionPreferences(cOptions);
@@ -349,6 +367,7 @@ public class PreferencesTab {
 		});
 		addModListener(updateIntervalClosed_Text,SWT.Modify);
 		composite.layout();
+		sc.setContent(composite);
 	}
 
 
