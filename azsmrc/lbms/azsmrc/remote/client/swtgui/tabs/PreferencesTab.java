@@ -226,7 +226,7 @@ public class PreferencesTab {
 		});
 
 		sc = new ScrolledComposite(sash, SWT.V_SCROLL);
-		
+
 		cOptions = new Composite(sc,SWT.BORDER);
 		gridData = new GridData(GridData.FILL_BOTH);
 		gridData.horizontalSpan = 1;
@@ -242,8 +242,8 @@ public class PreferencesTab {
 				sc.setMinSize(cOptions.computeSize(r.width, SWT.DEFAULT));
 			}
 		});
-		
-		
+
+
 		//default selection
 		menuTree.setSelection(new TreeItem[] {tiConnection});
 		makeConnectionPreferences(cOptions);
@@ -888,7 +888,7 @@ public class PreferencesTab {
 	private void initAzFlexyConf() {
 		System.out.println("Trying to initialize AzRemoteConf");
 		try {
-			InputStream is = this.getClass().getClassLoader().getResourceAsStream("lbms/azsmrc/remote/client/swtgui/tabs/AzureusPreferences.xml");
+			InputStream is = this.getClass().getClassLoader().getResourceAsStream("lbms/azsmrc/remote/client/swtgui/flexyconf/AzureusPreferences.xml");
 			fc = FlexyConfiguration.readFromStream(is);
 			Client client = RCMain.getRCMain().getClient();
 			final FCInterface fci = fc.getFCInterface();
