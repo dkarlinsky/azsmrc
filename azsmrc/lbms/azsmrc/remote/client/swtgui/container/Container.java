@@ -314,7 +314,7 @@ public abstract class Container implements Comparable<Container> {
 							if(rate <= 0)
 								item.setText(tableColumns.indexOf(RemoteConstants.ST_LIMIT_DOWN),"Maximum");
 							else
-								item.setText(tableColumns.indexOf(RemoteConstants.ST_LIMIT_DOWN),DisplayFormatters.formatByteCountToBase10KBEtc(rate));
+								item.setText(tableColumns.indexOf(RemoteConstants.ST_LIMIT_DOWN),DisplayFormatters.formatByteCountToBase10KBEtcPerSec(rate));
 						}
 						oldDownloadRate = rate;
 					}
@@ -327,7 +327,7 @@ public abstract class Container implements Comparable<Container> {
 							if(rate <= 0)
 								item.setText(tableColumns.indexOf(RemoteConstants.ST_LIMIT_UP),"Maximum");
 							else
-								item.setText(tableColumns.indexOf(RemoteConstants.ST_LIMIT_UP),DisplayFormatters.formatByteCountToBase10KBEtc(rate));
+								item.setText(tableColumns.indexOf(RemoteConstants.ST_LIMIT_UP),DisplayFormatters.formatByteCountToBase10KBEtcPerSec(rate));
 						}
 						oldUploadRate = rate;
 					}
