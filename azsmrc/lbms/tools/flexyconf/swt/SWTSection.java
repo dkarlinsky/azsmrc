@@ -10,6 +10,7 @@ import lbms.tools.flexyconf.Section;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -85,6 +86,9 @@ public class SWTSection implements DisplayAdapterSection {
 			}
 			section.init();
 			comp.layout();
+			if (comp.getParent() instanceof ScrolledComposite) {
+				((ScrolledComposite) comp.getParent()).setMinSize(comp.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+			}
 		} catch (SWTException e) {
 			e.printStackTrace();
 		}
