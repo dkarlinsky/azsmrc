@@ -74,6 +74,7 @@ public class LineFilter extends Task {
 	public void convertFile(File inf, File oDir) throws IOException {
 		BufferedReader br = null;
 		BufferedWriter bw = null;
+		System.out.println("Converting: "+inf.getAbsolutePath());
 		try {
 			br = new BufferedReader(new FileReader(inf));
 			File out = new File (oDir,inf.getName());

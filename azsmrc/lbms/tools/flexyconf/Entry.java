@@ -1,15 +1,22 @@
 package lbms.tools.flexyconf;
 
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import org.jdom.Element;
 
 public class Entry implements ConfigEntity {
-	public static final int TYPE_LABEL 		= -1; //special Entry that only displays the label
+
 	public static final int TYPE_STRING 	= 1;
 	public static final int TYPE_INT		= 2;
 	public static final int TYPE_BOOLEAN	= 3;
 	public static final int TYPE_FLOAT		= 4;
 	public static final int TYPE_DOUBLE		= 5;
 	public static final int TYPE_LONG		= 6;
+
+	public static final int TYPE_LABEL 		= -1; //special Entry that only displays the label
+	public static final int TYPE_URL 		= -2; //special Entry that displays an URL
 
 
 	private String label;
@@ -24,6 +31,9 @@ public class Entry implements ConfigEntity {
 	private DisplayAdapterEntry displayAdapter;
 	private Section section;
 	private FCInterface fci;
+
+	private SortedSet<Option> options = new TreeSet<Option>();
+	private boolean option;
 
 	public Entry () {
 
@@ -69,6 +79,12 @@ public class Entry implements ConfigEntity {
 				e1.printStackTrace();
 			}
 		}
+		List<Element> opts = e.getChildren("Option");
+		if (opts.size()>0) {
+			option = true;
+			for (Element opt:opts)
+				options.add(new Option(opt,fci));
+		}
 	}
 
 	/**
@@ -90,6 +106,8 @@ public class Entry implements ConfigEntity {
 			return TYPE_LONG;
 		} else if (s.equalsIgnoreCase("label")) {
 			return TYPE_LABEL;
+		} else if (s.equalsIgnoreCase("url")) {
+			return TYPE_URL;
 		}
 		return 0;
 	}
@@ -114,6 +132,8 @@ public class Entry implements ConfigEntity {
 			return "long";
 		case TYPE_LABEL:
 			return "label";
+		case TYPE_URL:
+			return "url";
 		}
 		return "";
 	}
@@ -182,7 +202,7 @@ public class Entry implements ConfigEntity {
 	 * @return Returns the value.
 	 */
 	public String getValue() {
-		if (getType() == TYPE_LABEL) return "";
+		if (getType() == TYPE_LABEL || getType() == TYPE_URL) return "";
 		if (value == null) {
 			value = fci.getContentProvider().getValue(getKey(), getType());
 		}
@@ -250,5 +270,19 @@ public class Entry implements ConfigEntity {
 			displayAdapter.updateValue();
 		}
 		triggerDependencyCheck();
+	}
+
+	/**
+	 * @return the option
+	 */
+	public boolean isOption() {
+		return option;
+	}
+
+	/**
+	 * @return the options
+	 */
+	public Option[] getOptions() {
+		return options.toArray(Option.EMPTY_OPT_ARRAY);
 	}
 }
