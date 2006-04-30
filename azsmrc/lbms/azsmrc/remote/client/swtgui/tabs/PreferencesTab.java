@@ -240,7 +240,7 @@ public class PreferencesTab {
 		sc.addControlListener(new ControlAdapter() {
 			public void controlResized(ControlEvent e) {
 				Rectangle r = sc.getClientArea();
-				sc.setMinSize(cOptions.computeSize(r.width, SWT.DEFAULT));
+				sc.setMinSize(cOptions.computeSize(SWT.DEFAULT, r.height));
 			}
 		});
 
