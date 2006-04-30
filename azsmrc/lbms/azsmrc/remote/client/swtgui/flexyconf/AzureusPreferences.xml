@@ -26,6 +26,18 @@
 				<Entry key="network.tcp.socket.SO_RCVBUF" label="ConfigView.section.connection.advanced.SO_RCVBUF" type="int" index="5" />
 				<Entry key="network.tcp.socket.IPTOS" label="ConfigView.section.connection.advanced.IPTOS" type="string" index="6" />
 			</Section>
+			<Section label="ConfigView.section.connection.encryption" index="2">
+				<Entry key="" label="ConfigView.section.connection.encryption.encrypt.info" type="label" index="0" />
+				<Entry key="http://azureus.aelitis.com/wiki/index.php/Avoid_traffic_shaping" label="ConfigView.section.connection.encryption.encrypt.info.link" type="url" index="1" />
+				<Entry key="network.transport.encrypted.require" label="ConfigView.section.connection.encryption.require_encrypted_transport" type="boolean" index="2" />
+				<Entry key="network.transport.encrypted.min_level" label="ConfigView.section.connection.encryption.min_encryption_level" type="string" index="3" dependsOn="network.transport.encrypted.require" >
+					<Option value="Plain" label="Plain" index="0" />
+					<Option value="RC4" label="RC4" index="1" />
+				</Entry>
+				<Entry key="" label="ConfigView.section.connection.encryption.encrypt.fallback_info" type="label" index="4"  dependsOn="network.transport.encrypted.require" />
+				<Entry key="network.transport.encrypted.fallback.outgoing" label="ConfigView.section.connection.encryption.encrypt.fallback_outgoing" type="boolean" index="5" dependsOn="network.transport.encrypted.require" />
+				<Entry key="network.transport.encrypted.fallback.incoming" label="ConfigView.section.connection.encryption.encrypt.fallback_incoming" type="boolean" index="6" dependsOn="network.transport.encrypted.require" />
+			</Section>
 		</Section>
 	</Section>
 </FlexyConfiguration>
