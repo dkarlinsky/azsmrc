@@ -41,7 +41,6 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -49,7 +48,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
@@ -239,8 +237,7 @@ public class PreferencesTab {
 		sc.setExpandHorizontal(true);
 		sc.addControlListener(new ControlAdapter() {
 			public void controlResized(ControlEvent e) {
-				Rectangle r = sc.getClientArea();
-				sc.setMinSize(cOptions.computeSize(SWT.DEFAULT, r.height));
+				sc.setMinSize(cOptions.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 			}
 		});
 
@@ -367,7 +364,7 @@ public class PreferencesTab {
 			}
 		});
 		addModListener(updateIntervalClosed_Text,SWT.Modify);
-		composite.layout();		
+		composite.layout();
 	}
 
 
