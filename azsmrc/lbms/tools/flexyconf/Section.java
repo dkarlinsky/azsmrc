@@ -6,17 +6,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import lbms.tools.flexyconf.swt.SWTEntry;
 
 import org.jdom.Element;
 
-public class Section extends AbstractEntryContainer {
-	private List<Section> children = new ArrayList<Section>();
+public class Section extends AbstractEntryContainer implements Comparable<Section>{
+	private Set<Section> children = new TreeSet<Section>();
 	private List<Group> groups = new ArrayList<Group>();
 	private String label;
 	private FCInterface fci;
 	private DisplayAdapterSection displayAdapter;
+	private int index;
 
 	public Section () {
 
@@ -25,6 +27,9 @@ public class Section extends AbstractEntryContainer {
 	public Section (Element e, FCInterface fci) {
 		this.fci = fci;
 		label = e.getAttributeValue("label");
+		String indexString = e.getAttributeValue("index");
+		if (indexString!=null)index = Integer.parseInt(indexString);
+		else index = 0;
 		List<Element> elems = e.getChildren("Section");
 		for (Element elem:elems) {
 			children.add(new Section(elem,fci));
@@ -43,6 +48,7 @@ public class Section extends AbstractEntryContainer {
 	public Element toElement() {
 		Element s = new Element ("Secetion");
 		s.setAttribute("label", label);
+		s.setAttribute("index", Integer.toString(index));
 		Set<String> keys = entries.keySet();
 		for (String k:keys) {
 			s.addContent(entries.get(k).toElement());
@@ -108,7 +114,7 @@ public class Section extends AbstractEntryContainer {
 	/**
 	 * @return the children
 	 */
-	public List<Section> getChildren() {
+	public Set<Section> getChildren() {
 		return children;
 	}
 
@@ -129,5 +135,9 @@ public class Section extends AbstractEntryContainer {
 		for (Section child:children) {
 			child.initAll();
 		}
+	}
+
+	public int compareTo(Section o) {
+		return index-o.index;
 	}
 }

@@ -1,6 +1,7 @@
 package lbms.tools.flexyconf.swt;
 
 import java.util.List;
+import java.util.Set;
 
 import lbms.tools.flexyconf.ConfigEntity;
 import lbms.tools.flexyconf.DisplayAdapterSection;
@@ -53,14 +54,14 @@ public class SWTSection implements DisplayAdapterSection {
 	}
 
 	private void addSubSections(Tree t, Composite c) {
-		List<Section> sects = section.getChildren();
+		Set<Section> sects = section.getChildren();
 		for (Section s:sects) {
 			SWTSection.addAsChild(s,t,c);
 		}
 	}
 
 	private void addSubSections(TreeItem t, Composite c) {
-		List<Section> sects = section.getChildren();
+		Set<Section> sects = section.getChildren();
 		for (Section s:sects) {
 			SWTSection.addAsChild(s,t,c);
 		}

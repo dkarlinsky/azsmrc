@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FlexyConfiguration>
-	<Section label="root">
-		<Section label="firstMenu">
+	<Section label="root" index="0">
+		<Section label="firstMenu" index="0">
 			<Entry key="firstMenu.item1" label="Enable Stuff" type="boolean" index="0"/>
 			<Entry key="firstMenu.item2" label="Level" validate="1..5" type="int" dependsOn="firstMenu.item1" index="1" />
 		</Section>
-		<Section label="secondMenu">
+		<Section label="secondMenu" index="1">
 			<Entry key="secondMenu.item1" label="blabla" type="boolean" index="0"/>
 			<Entry key="secondMenu.item2" label="TestRegex" index="1" validate=".+@.+\..+" type="string" dependsOn="secondMenu.item1" />
 		</Section>
