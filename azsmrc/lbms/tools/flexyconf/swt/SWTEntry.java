@@ -77,12 +77,13 @@ public class SWTEntry implements DisplayAdapterEntry {
 
 				label = new Label(comp,SWT.NULL);
 				if (entry.isOption()) {
-					control = new Combo(comp,SWT.DROP_DOWN);
+					control = new Combo(comp,SWT.DROP_DOWN | SWT.READ_ONLY);
 
 					Option[] opts = entry.getOptions();
 					for (Option opt:opts) {
 						((Combo)control).add(opt.getLabel());
 					}
+					((Combo)control).select(0);
 					((Combo)control).addSelectionListener(new SelectionListener() {
 						public void widgetDefaultSelected(SelectionEvent e) {}
 						public void widgetSelected(SelectionEvent e) {
