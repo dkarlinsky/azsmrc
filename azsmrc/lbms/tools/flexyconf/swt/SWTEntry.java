@@ -4,6 +4,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -87,7 +89,7 @@ public class SWTEntry implements DisplayAdapterEntry {
 					((Combo)control).addSelectionListener(new SelectionListener() {
 						public void widgetDefaultSelected(SelectionEvent e) {}
 						public void widgetSelected(SelectionEvent e) {
-							Combo comb = (Combo)e.item;
+							Combo comb = (Combo)control;
 							int selected = comb.getSelectionIndex();
 							entry.setValue(entry.getOptions()[selected].getValue());
 						}
