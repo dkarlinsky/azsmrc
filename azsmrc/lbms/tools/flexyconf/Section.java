@@ -108,7 +108,7 @@ public class Section extends AbstractEntryContainer implements Comparable<Sectio
 	 * @return the label
 	 */
 	public String getLabel() {
-		return label;
+		return fci.getI18NProvider().translate(label);
 	}
 
 	/**

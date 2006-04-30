@@ -1,6 +1,5 @@
 package lbms.tools.flexyconf.swt;
 
-import java.util.List;
 import java.util.Set;
 
 import lbms.tools.flexyconf.ConfigEntity;
@@ -48,6 +47,7 @@ public class SWTSection implements DisplayAdapterSection {
 			treeItem = new TreeItem(t,SWT.None);
 			treeItem.setText(s.getLabel());
 			treeItem.setData("SWTSection", this);
+			addSubSections(treeItem, c);
 		} catch (SWTException e) {
 			e.printStackTrace();
 		}
