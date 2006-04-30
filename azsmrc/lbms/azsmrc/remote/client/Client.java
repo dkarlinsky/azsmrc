@@ -170,6 +170,9 @@ public class Client {
 					item = transactionQueue.poll();
 				}
 				sendHttpRequest(reqDoc);
+				if (fastMode && transactionQueue.size()>0) {
+					send();
+				}
 				semaphore.release();
 			}
 		}).start();
@@ -905,5 +908,21 @@ public class Client {
 	 */
 	public boolean isSSLEncrypted() {
 		return ssl;
+	}
+
+
+	/**
+	 * @return the fastMode
+	 */
+	public boolean isFastMode() {
+		return fastMode;
+	}
+
+
+	/**
+	 * @param fastMode the fastMode to set
+	 */
+	public void setFastMode(boolean fastMode) {
+		this.fastMode = fastMode;
 	}
 }
