@@ -445,6 +445,7 @@ public class RCMain implements Launchable {
 		client.setServer(properties.getProperty("connection_lastURL",null));
 		client.setUsername(properties.getProperty("connection_username"));
 		client.setPassword(properties.getProperty("connection_password"));
+		client.setFastMode(Boolean.parseBoolean(properties.getProperty("client.fastmode", "false")));
 		client.addSpeedUpdateListener(new SpeedUpdateListener() {
 			public void setSpeed(final int d, final int u) {
 				if(display != null)
