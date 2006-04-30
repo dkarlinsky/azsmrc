@@ -83,7 +83,7 @@ public class MessageDialog {
 	public static MessageDialog error(final Display display, final String title, final String message) {
 		if(!Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("popups_enabled", "true")))
 			return null;
-		return new MessageDialog(display, true,TIME_TO_CLOSE,STEPS,title,message, TYPE_ERROR);
+		return new MessageDialog(display, false,TIME_TO_CLOSE,STEPS,title,message, TYPE_ERROR);
 	}
 
 	/**
@@ -107,7 +107,7 @@ public class MessageDialog {
 
 				popupImage = new Image(display, ImageRepository.getImage("popup"), SWT.IMAGE_COPY);
 				splash = new Shell(SWT.ON_TOP);
-
+				int titleSpacing = 0;
 				FormLayout formLayout = new FormLayout();
 				formLayout.marginHeight = 0;
 				formLayout.marginWidth = 0;
@@ -115,7 +115,22 @@ public class MessageDialog {
 
 				splash.setLayout(formLayout);
 
+
 				GC gc = new GC(popupImage);
+
+				if (type == TYPE_ERROR) {
+					Image error = display.getSystemImage(SWT.ICON_ERROR);
+					if (error != null) {
+						gc.drawImage(error, 5, 5);
+						titleSpacing = error.getBounds().width+5;
+					}
+				} else if (type == TYPE_WARNING) {
+					Image error = display.getSystemImage(SWT.ICON_WARNING);
+					if (error != null) {
+						gc.drawImage(error, 5, 5);
+						titleSpacing = error.getBounds().width+5;
+					}
+				}
 
 				Font initialFont = gc.getFont();
 				FontData[] fontData = initialFont.getFontData();
@@ -130,7 +145,7 @@ public class MessageDialog {
 				}
 				Font titleFont = new Font(RCMain.getRCMain().getDisplay(), fontData);
 				gc.setFont(titleFont);
-				gc.drawText(title, 10, 8, true);
+				gc.drawText(title, titleSpacing+10, 8, true);
 				titleFont.dispose();
 				gc.setFont(messageFont);
 				Rectangle rect = new Rectangle(60,45,150,150);
@@ -169,12 +184,12 @@ public class MessageDialog {
 				splash.pack();
 				splash.layout();
 
-
-				timerEvent = RCMain.getRCMain().getMainTimer().addEvent(System.currentTimeMillis()+timeToClose, new TimerEventPerformer() {
-					public void perform(TimerEvent event) {
-						hideShell();
-					}
-				});
+				if (bautoclose)
+					timerEvent = RCMain.getRCMain().getMainTimer().addEvent(System.currentTimeMillis()+timeToClose, new TimerEventPerformer() {
+						public void perform(TimerEvent event) {
+							hideShell();
+						}
+					});
 
 				btnOK.addListener(SWT.Selection, new Listener(){
 					public void handleEvent(Event arg0) {
