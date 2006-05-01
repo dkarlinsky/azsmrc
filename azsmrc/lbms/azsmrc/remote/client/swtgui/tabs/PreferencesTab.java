@@ -532,7 +532,7 @@ public class PreferencesTab {
 
 		addModListener(autoUpdate,SWT.Selection);
 
-		//update button
+		/*//update button
 		final Button updateCheck = new Button(composite,SWT.PUSH);
 		gridData = new GridData(GridData.GRAB_HORIZONTAL);
 		gridData.horizontalSpan = 2;
@@ -592,7 +592,7 @@ public class PreferencesTab {
 
 			}
 
-		});
+		});*/
 
 
 		composite.layout();

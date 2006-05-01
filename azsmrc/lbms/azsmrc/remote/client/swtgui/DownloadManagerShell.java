@@ -445,7 +445,7 @@ public class DownloadManagerShell {
 
 		new MenuItem(toolSubmenu,SWT.SEPARATOR);
 
-		MenuItem menuUpdate = new MenuItem(toolSubmenu,SWT.PUSH);
+		/*MenuItem menuUpdate = new MenuItem(toolSubmenu,SWT.PUSH);
 		menuUpdate.setText("Check for &Updates");
 		menuUpdate.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
@@ -501,14 +501,14 @@ public class DownloadManagerShell {
 				} catch (MalformedURLException e2) {
 				}
 			}
-		});
+		});*/
 
 
 		//-----Help Submenu
 
 		MenuItem menuAbout = new MenuItem(helpSubmenu,SWT.PUSH);
 		menuAbout.setText("&About");
-		
+
 		menuAbout.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				ReadmeTab.open(tabFolder);
