@@ -395,7 +395,7 @@ public class MainWindow {
 
 				if(item.getText(3).equalsIgnoreCase("")){
 					item.setText(3,defaultMap.get(keys[tableIndex]).replace("\n", "\\n"));
-					item.setForeground(3,I18NMe.getI18NMe().getDisplay().getSystemColor(SWT.COLOR_DARK_RED));
+					item.setForeground(3,I18NMe.getI18NMe().getDisplay().getSystemColor(SWT.COLOR_RED));
 				}else
 					item.setForeground(3,I18NMe.getI18NMe().getDisplay().getSystemColor(SWT.COLOR_BLACK));
 
