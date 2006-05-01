@@ -41,6 +41,7 @@ public class Updater {
 	private URL remoteUpdateFile;
 	private File currentUpdates;
 	private File dir;
+	private File tmpDir;
 
 	private UpdateList localUpdateList;
 	private UpdateList remoteUpdateList;
@@ -53,6 +54,8 @@ public class Updater {
 		this.remoteUpdateFile = remoteUpdateFile;
 		this.currentUpdates = currentUpdates;
 		this.dir = dir;
+		this.tmpDir = new File(dir,"_Update");
+		tmpDir.mkdir();
 	}
 
 	/**
@@ -164,6 +167,7 @@ public class Updater {
 							remoteLoc = new URL (choosenUpdate.getUrl()+"/"+u.getPath()+u.getName());
 						}
 						File localLoc = new File(dir,u.getPath()+u.getName());
+						File localTmp = new File(tmpDir,u.getPath()+u.getName());
 						if (localLoc.exists()) {
 							try {
 								String localHash = CryptoTools.formatByte(CryptoTools.messageDigestFile(localLoc.getAbsolutePath(), "SHA-1"));
@@ -202,10 +206,10 @@ public class Updater {
 						Download dl;
 						switch (u.getType()) {
 						case UpdateFile.TYPE_NORMAL:
-							dl = new HTTPDownload (remoteLoc,localLoc);
+							dl = new HTTPDownload (remoteLoc,localTmp);
 							break;
 						case UpdateFile.TYPE_SF_NET:
-							dl = new SFDownload (remoteLoc,localLoc);
+							dl = new SFDownload (remoteLoc,localTmp);
 							break;
 						default:
 							dl=null;
@@ -219,6 +223,7 @@ public class Updater {
 						e.printStackTrace();
 					}
 				}
+				callListenerInitializeUpdate(downloads.toArray(new Download[0]));
 				//Need to typecast here since java screws up
 				List<Callable<Download>> x = new ArrayList<Callable<Download>>(downloads);
 				if (downloads.size()!=0) {
@@ -244,15 +249,16 @@ public class Updater {
 						e.printStackTrace();
 					}
 					for (UpdateFile u:files) {
+						File localTmp = new File(tmpDir,u.getPath()+u.getName());
 						File localLoc = new File(dir,u.getPath()+u.getName());
-						if (localLoc.exists()) {
+						if (localTmp.exists()) {
 							try {
-								String localHash = CryptoTools.formatByte(CryptoTools.messageDigestFile(localLoc.getAbsolutePath(), "SHA-1"));
+								String localHash = CryptoTools.formatByte(CryptoTools.messageDigestFile(localTmp.getAbsolutePath(), "SHA-1"));
 								if (!localHash.equalsIgnoreCase(u.getHash())) {
 									failed = true;
 									lastError = "File "+u.getName()+" failed Hash check";
 									callListenerUpdateError(lastError);
-									localLoc.delete();
+									localTmp.delete();
 									continue;
 								}
 								if (u.isArchive()) {
@@ -261,6 +267,8 @@ public class Updater {
 									} else if (u.getName().endsWith(".zip")){
 										ArchiveTools.unpackZip(localLoc, dir);
 									}
+								} else {
+									localTmp.renameTo(localLoc);
 								}
 							} catch (Exception e) {
 								failed = true;
@@ -334,7 +342,7 @@ public class Updater {
 	}
 
 	private void callListenerException (Exception e) {
-		System.out.println("ListenerException " + e.getMessage());
+		System.out.println("UpdateException " + e.getMessage());
 		for (UpdateListener l:listeners) {
 			System.out.println("X");
 			l.exception(e);
@@ -368,6 +376,12 @@ public class Updater {
 	private void callListenerUpdateFinished() {
 		for (UpdateListener l:listeners) {
 			l.updateFinished();
+		}
+	}
+
+	private void callListenerInitializeUpdate(Download[] dls) {
+		for (UpdateListener l:listeners) {
+			l.initializeUpdate(dls);
 		}
 	}
 

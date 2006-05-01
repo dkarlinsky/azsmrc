@@ -647,6 +647,10 @@ public class RCMain implements Launchable {
 				}
 				normalLogger.info("Update Error: "+error);
 			}
+			public void initializeUpdate(lbms.tools.Download[] dls) {
+				// TODO Add the Progressmonitor stuff
+
+			}
 		});
 		if (Boolean.parseBoolean(properties.getProperty("update.autocheck", "true"))) {
 			long lastcheck = Long.parseLong(properties.getProperty("update.lastcheck", "0"));
