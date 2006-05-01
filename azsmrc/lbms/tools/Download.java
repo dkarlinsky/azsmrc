@@ -6,6 +6,10 @@ import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.Callable;
 
+/**
+ * @author Damokles
+ *
+ */
 public abstract class Download implements Runnable, Callable<Download> {
 
 	public static final int TIMEOUT = 30000;
@@ -20,19 +24,44 @@ public abstract class Download implements Runnable, Callable<Download> {
 
 	protected URL source;
 	protected File target;
-	protected String failureReason;
+	protected String failureReason = "";
 	protected boolean finished = false;
 	protected boolean failed = false;
 	protected List<DownloadListener> dlListener = new Vector<DownloadListener>();
+
+	/**
+	 * The current State of the Download
+	 */
 	protected int state = 0;
+
+	/**
+	 * If abort is true the Download should stop
+	 * Downloading, close all Streams and go into
+	 * State ABORTED
+	 */
 	protected boolean abort = false;
 
 	protected Download() {}
 
+	/**
+	 * Constructs a new Download.
+	 * 
+	 * The contents will be stored in a StringBuffer
+	 * 
+	 * @param source
+	 */
 	public Download(URL source) {
 		this.source = source;
 	}
 
+	/**
+	 * Constructs a new Download.
+	 * 
+	 * The contents will be stored in the target File
+	 * 
+	 * @param source URL do download from
+	 * @param target File to write to
+	 */
 	public Download(URL source, File target) {
 		this.source = source;
 		this.target = target;
@@ -57,24 +86,17 @@ public abstract class Download implements Runnable, Callable<Download> {
 	}
 
 	/**
-	 * @param source The source to set.
-	 */
-	public void setSource(URL source) {
-		this.source = source;
-	}
-
-	/**
-	 * @return Returns the target.
+	 * @return Returns the target or null
 	 */
 	public File getTarget() {
 		return target;
 	}
 
 	/**
-	 * @param target The target to set.
+	 * @return the state
 	 */
-	public void setTarget(File target) {
-		this.target = target;
+	public int getState() {
+		return state;
 	}
 
 	/**

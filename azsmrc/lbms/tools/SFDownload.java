@@ -8,10 +8,29 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * @author Damokles
+ *
+ */
 public class SFDownload extends Download {
 
 	private static Pattern mirrorPattern = Pattern.compile("<td><a href=\"[\\w/:.]+?\\?use_mirror=(\\w+)\"><b>Download</b></a></td>");
 	private List<URL> mirrors = new ArrayList<URL>();
+
+	/**
+	 * This listener is used to pass the underlying HTTPDownload
+	 * status to the caller.
+	 */
+	private DownloadListener dlL = new DownloadListener() {
+		public void progress(long bytesRead, long bytesTotal) {
+			callProgress(bytesRead, bytesTotal);
+		}
+
+		public void stateChanged(int oldState, int newState) {
+			if (newState == STATE_CONNECTING || newState == STATE_DOWNLOADING)
+				callStateChanged(newState);
+		}
+	};
 
 	public SFDownload(URL source, File target) {
 		super(source, target);
@@ -61,12 +80,16 @@ public class SFDownload extends Download {
 				e.printStackTrace();
 			}
 		}
+		String referer = source.toExternalForm();
 		//Downloading file
 		for (URL x:mirrors) {
 			try {
 				//System.out.println("Trying: "+x.toExternalForm());
 				HTTPDownload file = new HTTPDownload(x,target);
+				file.setReferer(referer);
+				file.addDownloadListener(dlL);
 				file.call();
+				file.removeDownloadListener(dlL);
 				if (file.hasFailed() || !file.hasFinished()) continue;
 				else {
 					callStateChanged(STATE_FINISHED);
