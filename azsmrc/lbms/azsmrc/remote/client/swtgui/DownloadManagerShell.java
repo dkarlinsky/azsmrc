@@ -445,63 +445,15 @@ public class DownloadManagerShell {
 
 		new MenuItem(toolSubmenu,SWT.SEPARATOR);
 
-		/*MenuItem menuUpdate = new MenuItem(toolSubmenu,SWT.PUSH);
+		MenuItem menuUpdate = new MenuItem(toolSubmenu,SWT.PUSH);
 		menuUpdate.setText("Check for &Updates");
 		menuUpdate.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
-				final Updater updater;
-				try {
-					final Properties properties = RCMain.getRCMain().getProperties();
-					updater = new Updater(new URL(RemoteConstants.UPDATE_URL),new File("update.xml.gz"),new File(System.getProperty("user.dir")));
-					updater.addListener(new UpdateListener() {
-						public void exception(Exception e) {
-							System.out.println(e);
-
-						}
-						public void noUpdate() {
-							if (RCMain.getRCMain().getMainWindow() != null) {
-								RCMain.getRCMain().getMainWindow().setStatusBarText("No Update Available");
-							}
-							RCMain.getRCMain().getNormalLogger().info("No Update Available");
-						}
-						public void updateAvailable(Update update) {
-							if (RCMain.getRCMain().getMainWindow() != null) {
-								RCMain.getRCMain().getMainWindow().setStatusBarText("Update Available: Version "+update.getVersion());
-							}
-							RCMain.getRCMain().getNormalLogger().info("Update Available: Version "+update.getVersion());
-							if (Boolean.parseBoolean(properties.getProperty("update.autoupdate", "false"))) {
-								updater.doUpdate();
-							}else{
-								new UpdateDialog(RCMain.getRCMain().getDisplay(),update,updater);
-							}
-						}
-						public void updateFailed(String reason) {
-							if (RCMain.getRCMain().getMainWindow() != null) {
-								RCMain.getRCMain().getMainWindow().setStatusBarText("Update Failed",SWT.COLOR_RED);
-							}
-							RCMain.getRCMain().getNormalLogger().info("Update Failed");
-						}
-						public void updateFinished() {
-							if (RCMain.getRCMain().getMainWindow() != null) {
-								RCMain.getRCMain().getMainWindow().setStatusBarText("Update Finished");
-							}
-							RCMain.getRCMain().getNormalLogger().info("Update Finished");
-						}
-						public void updateError(String error) {
-							if (RCMain.getRCMain().getMainWindow() != null) {
-								RCMain.getRCMain().getMainWindow().setStatusBarText("Update Error");
-							}
-							RCMain.getRCMain().getNormalLogger().info(error);
-						}
-					});
-
-					updater.checkForUpdates(Boolean.parseBoolean(properties.getProperty("update.beta", "false")));
-					properties.setProperty("update.lastcheck",Long.toString(System.currentTimeMillis()));
-					RCMain.getRCMain().saveConfig();
-				} catch (MalformedURLException e2) {
-				}
+				RCMain.getRCMain().getUpdater().checkForUpdates(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("update.beta", "false")));
+				RCMain.getRCMain().getProperties().setProperty("update.lastcheck",Long.toString(System.currentTimeMillis()));
+				RCMain.getRCMain().saveConfig();
 			}
-		});*/
+		});
 
 
 		//-----Help Submenu
