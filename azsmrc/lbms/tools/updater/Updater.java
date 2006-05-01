@@ -264,20 +264,23 @@ public class Updater {
 								}
 								if (u.isArchive()) {
 									if (u.getName().endsWith(".gz")) {
-										ArchiveTools.unpackGZipFile(localLoc, dir);
+										ArchiveTools.unpackGZipFile(localTmp, dir);
 									} else if (u.getName().endsWith(".zip")){
-										ArchiveTools.unpackZip(localLoc, dir);
+										ArchiveTools.unpackZip(localTmp, dir);
 									}
 								} else {
 									localTmp.renameTo(localLoc);
 								}
 							} catch (Exception e) {
 								failed = true;
+								lastError = e.getMessage();
 								e.printStackTrace();
 								callListenerException(e);
 							}
-						} else {
+						} else if (!localLoc.exists()) {
 							failed = true;
+							lastError = "File doesn't exist"+localTmp.getAbsolutePath();
+							callListenerUpdateError(lastError);
 						}
 					}
 				}
