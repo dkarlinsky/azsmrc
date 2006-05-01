@@ -192,6 +192,7 @@ public class CustomProgressBar {
 
 	private void paintReliefProgress(int imageWidth, int imageHeight, Integer completed, GC gc) {
 		int widthToPaint = getWidthToPaint(completed, imageWidth);
+		if (widthToPaint<2)return;
 		int heightToPaint = imageHeight - 1;
 		gc.setBackground(getProgressHighlightColor());
 		gc.fillRectangle(1, 1, widthToPaint, heightToPaint);
