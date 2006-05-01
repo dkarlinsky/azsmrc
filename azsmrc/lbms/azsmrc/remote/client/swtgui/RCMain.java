@@ -670,11 +670,13 @@ public class RCMain implements Launchable {
 	}
 
 	private void shutdown() {
+		System.out.println("Shutting down");
 		timer.destroy();
 		DownloadContainer.saveColumns();
 		SeedContainer.saveColumns();
 		getRunTime();
 		saveConfig();
+		System.out.println("Shutdown completed");
 	}
 
 	public long getRunTime() {
