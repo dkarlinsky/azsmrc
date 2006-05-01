@@ -249,6 +249,19 @@ public class Updater {
 						callListenerException(e);
 						e.printStackTrace();
 					}
+
+					//check if all files for the update are present
+					for (UpdateFile u:files) {
+						File localTmp = new File(tmpDir,u.getPath()+u.getName());
+						File localLoc = new File(dir,u.getPath()+u.getName());
+						if (!(localTmp.exists() || localLoc.exists())) {
+							failed = true;
+							lastError = "File "+u.getName()+" is missing";
+							callListenerUpdateError(lastError);
+						}
+					}
+
+					if (!failed) //if all files for the update are present
 					for (UpdateFile u:files) {
 						File localTmp = new File(tmpDir,u.getPath()+u.getName());
 						File localLoc = new File(dir,u.getPath()+u.getName());
@@ -268,6 +281,7 @@ public class Updater {
 									} else if (u.getName().endsWith(".zip")){
 										ArchiveTools.unpackZip(localTmp, dir);
 									}
+									localTmp.delete(); //Delete the Archive after unpack
 								} else {
 									localTmp.renameTo(localLoc);
 								}
