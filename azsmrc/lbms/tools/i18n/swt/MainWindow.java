@@ -9,11 +9,11 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -44,7 +44,7 @@ public class MainWindow {
 	private Label currentlyOpened;
 	private Table mainTable;
 	private Button save;
-
+	private Color backgroundC;
 
 
 	//non-swt stuff
@@ -65,8 +65,10 @@ public class MainWindow {
 			public void shellActivated(ShellEvent arg0) {}
 
 			public void shellClosed(ShellEvent arg0) {
-				I18NMe.getI18NMe().close();
-
+				if(backgroundC != null && !backgroundC.isDisposed())
+					backgroundC.dispose();
+				
+				I18NMe.getI18NMe().close();				
 			}
 
 			public void shellDeactivated(ShellEvent arg0) {}
@@ -288,7 +290,7 @@ public class MainWindow {
 		tableGroup.setLayout(new GridLayout(2,false));
 		gd = new GridData(GridData.FILL_BOTH);
 		gd.horizontalSpan = 3;
-		gd.verticalSpan = 55;
+		gd.verticalSpan = 90;
 		tableGroup.setLayoutData(gd);
 
 		Composite bComp = new Composite(tableGroup, SWT.NULL);
@@ -355,7 +357,6 @@ public class MainWindow {
 		//----Main Table
 		mainTable = new Table(tableGroup, SWT.FULL_SELECTION | SWT.VIRTUAL | SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
 		gd = new GridData(GridData.FILL_BOTH);
-		//gd.verticalSpan = 50;
 		gd.horizontalSpan = 2;
 		mainTable.setLayoutData(gd);
 		mainTable.setHeaderVisible(true);
@@ -366,7 +367,7 @@ public class MainWindow {
 
 		TableColumn keyCol = new TableColumn(mainTable,SWT.LEFT);
 		keyCol.setText("Key");
-		keyCol.setWidth(300);
+		keyCol.setWidth(200);
 
 		TableColumn defaultCol = new TableColumn(mainTable, SWT.LEFT);
 		defaultCol.setText("Default");
@@ -375,7 +376,7 @@ public class MainWindow {
 		TableColumn transCol = new TableColumn(mainTable,SWT.LEFT);
 		transCol.setText("Translated");
 		transCol.setToolTipText("Double Click on a question to open it");
-		transCol.setWidth(300);
+		transCol.setWidth(400);
 
 
 		//main setdata listener for table
@@ -395,9 +396,13 @@ public class MainWindow {
 				if(item.getText(3).equalsIgnoreCase("")){
 					item.setText(3,defaultMap.get(keys[tableIndex]).replace("\n", "\\n"));
 					item.setForeground(3,I18NMe.getI18NMe().getDisplay().getSystemColor(SWT.COLOR_DARK_RED));
+				}else
+					item.setForeground(3,I18NMe.getI18NMe().getDisplay().getSystemColor(SWT.COLOR_BLACK));
+
+				if(tableIndex%2==0) {
+					item.setBackground(getBackgroundColor());					
 				}
-
-
+				
 			}
 
 		});
@@ -412,23 +417,33 @@ public class MainWindow {
 				int index = mainTable.getTopIndex ();
 				while (index < mainTable.getItemCount ()) {
 					boolean visible = false;
-					final TableItem item = mainTable.getItem (index);
-					for (int i=0; i<mainTable.getColumnCount (); i++) {
-						Rectangle rect = item.getBounds (i);
+					final TableItem item = mainTable.getItem (index);					
+						Rectangle rect = item.getBounds (3);
 						if (rect.contains (pt)) {
-							final int column = i;
+							final int column = 3;							
 							final Text text = new Text (mainTable, SWT.NONE);
 							Listener textListener = new Listener () {
 								public void handleEvent (final Event e) {
 									switch (e.type) {
 										case SWT.FocusOut:
 											item.setText (column, text.getText ());
-											text.dispose ();
+											if(!item.getText(2).equalsIgnoreCase(text.getText())){
+												transMap.put(item.getText(1), text.getText());
+												clearTable();
+												setIsSaved(false);
+											}
+											text.dispose ();											
 											break;
 										case SWT.Traverse:
 											switch (e.detail) {
 												case SWT.TRAVERSE_RETURN:
 													item.setText (column, text.getText ());
+													if(!item.getText(2).equalsIgnoreCase(text.getText())){
+														transMap.put(item.getText(1), text.getText());
+														clearTable();
+														setIsSaved(false);
+													}												
+													
 													//FALL THROUGH
 												case SWT.TRAVERSE_ESCAPE:
 													text.dispose ();
@@ -440,16 +455,15 @@ public class MainWindow {
 							};
 							text.addListener (SWT.FocusOut, textListener);
 							text.addListener (SWT.Traverse, textListener);
-							editor.setEditor (text, item, i);
-							text.setText (item.getText (i));
+							editor.setEditor (text, item, 3);
+							text.setText (item.getText (3));
 							text.selectAll ();
 							text.setFocus ();
 							return;
 						}
 						if (!visible && rect.intersects (clientArea)) {
 							visible = true;
-						}
-					}
+						}					
 					if (!visible) return;
 					index++;
 				}
@@ -536,7 +550,7 @@ public class MainWindow {
 		I18NMe.getI18NMe().getDisplay().asyncExec(new Runnable(){
 			public void run() {
 				isSaved = bisSaved;
-				save.setEnabled(bisSaved);
+				save.setEnabled(!bisSaved);
 			}
 		});
 	}
@@ -562,5 +576,31 @@ public class MainWindow {
 		//open shell
 		shell.open();
 	}
+	
+	/**
+	 * Generate a nice light background color for tables based off of list_background
+	 * @return Color
+	 */
+    public Color getBackgroundColor(){
+
+
+        if(I18NMe.getI18NMe().getDisplay()==null && I18NMe.getI18NMe().getDisplay().isDisposed()){
+        	backgroundC = null;
+            return backgroundC;
+        }
+        try{
+        	backgroundC = new Color(I18NMe.getI18NMe().getDisplay() ,
+                    new RGB(I18NMe.getI18NMe().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRed()-20,
+                    		I18NMe.getI18NMe().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getGreen()-20,
+                    		I18NMe.getI18NMe().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getBlue()-20));
+
+        }catch(Exception e){
+        	backgroundC = I18NMe.getI18NMe().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
+        }
+
+
+
+    return backgroundC;
+}
 
 }//EOF
