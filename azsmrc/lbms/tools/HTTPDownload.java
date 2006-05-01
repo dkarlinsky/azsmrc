@@ -45,7 +45,7 @@ public class HTTPDownload extends Download  {
 
 			conn.addRequestProperty("Accept-Encoding","gzip, deflate");
 			conn.addRequestProperty("User-Agent", userAgent);
-			if (!referer.equals(""))
+			if (referer != null)
 				conn.addRequestProperty("Referer", referer);
 
 			callStateChanged(STATE_CONNECTING);
@@ -136,7 +136,7 @@ public class HTTPDownload extends Download  {
 	}
 
 	/**
-	 * @return the referer
+	 * @return the referer or null
 	 */
 	public String getReferer() {
 		return referer;
