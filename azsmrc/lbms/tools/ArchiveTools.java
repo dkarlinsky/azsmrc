@@ -15,26 +15,29 @@ public class ArchiveTools {
 	public static void unpackZip(File zipFile, File parentDir) throws IOException {
 		ZipFile zip = new ZipFile(zipFile);
 		Enumeration<ZipEntry> e =(Enumeration<ZipEntry>)zip.entries();
-		while (e.hasMoreElements()) {
-			ZipEntry ze = e.nextElement();
-			if (ze.isDirectory()) {
-				new File (parentDir,ze.getName()).mkdirs();
-			} else {
-				InputStream input = null;
-				FileOutputStream fos = null;
-				try {
-					fos = new FileOutputStream(new File (parentDir,ze.getName()));
-					input = zip.getInputStream(ze);
-					for (int b=0;(b=input.read())!=-1;) {
-						fos.write(b);
+		try {
+			while (e.hasMoreElements()) {
+				ZipEntry ze = e.nextElement();
+				if (ze.isDirectory()) {
+					new File (parentDir,ze.getName()).mkdirs();
+				} else {
+					InputStream input = null;
+					FileOutputStream fos = null;
+					try {
+						fos = new FileOutputStream(new File (parentDir,ze.getName()));
+						input = zip.getInputStream(ze);
+						for (int b=0;(b=input.read())!=-1;) {
+							fos.write(b);
+						}
+					} finally {
+						if (input != null) input.close();
+						if (fos != null) fos.close();
 					}
-				} finally {
-					if (input != null) input.close();
-					if (fos != null) fos.close();
-					zip.close();
 				}
+				System.out.println(ze.getName());
 			}
-			System.out.println(ze.getName());
+		} finally {
+			zip.close();
 		}
 	}
 
