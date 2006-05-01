@@ -141,7 +141,7 @@ public class Client {
 	public void transactionCommit() {
 		if (transactionTimeout != null) transactionTimeout.cancel();
 		transaction = false;
-		debug.fine("Transaction Committed");
+		debug.fine("Transaction Committed ("+transactionQueue.size()+" items)");
 		send();
 	}
 
@@ -171,6 +171,7 @@ public class Client {
 				}
 				sendHttpRequest(reqDoc);
 				if (fastMode && transactionQueue.size()>0) {
+					debug.fine("FastMode Send");
 					send();
 				}
 				semaphore.release();
