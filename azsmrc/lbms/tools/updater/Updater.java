@@ -54,8 +54,9 @@ public class Updater {
 		this.remoteUpdateFile = remoteUpdateFile;
 		this.currentUpdates = currentUpdates;
 		this.dir = dir;
-		this.tmpDir = new File(dir,"_Update");
+		tmpDir = new File(dir,"_Update");
 		tmpDir.mkdir();
+		tmpDir.deleteOnExit();
 	}
 
 	/**
