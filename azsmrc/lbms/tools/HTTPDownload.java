@@ -7,10 +7,15 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.InflaterInputStream;
+
+import lbms.tools.stats.StatsInputStream;
 
 public class HTTPDownload extends Download  {
 
 	private StringBuffer buffer;
+	private String referer;
+	private String userAgent = "Mozilla/5.0 (Windows; U; Windows NT 5.1; de; rv:1.8.0.2) Gecko/20060308 Firefox/1.5.0.2";
 
 	public HTTPDownload(URL source, File target) {
 		super(source, target);
@@ -34,18 +39,33 @@ public class HTTPDownload extends Download  {
 		InputStream is = null;
 		try {
 			HttpURLConnection conn = (HttpURLConnection)source.openConnection();
-			conn.setConnectTimeout(Download.TIMEOUT);
+			conn.setConnectTimeout(TIMEOUT);
+			conn.setReadTimeout(TIMEOUT);
 			conn.setDoInput(true);
-			conn.addRequestProperty("Accept-Encoding","gzip");
+
+			conn.addRequestProperty("Accept-Encoding","gzip, deflate");
+			conn.addRequestProperty("User-Agent", userAgent);
+			if (!referer.equals(""))
+				conn.addRequestProperty("Referer", referer);
+
+			callStateChanged(STATE_CONNECTING);
 			conn.connect();
-			is =  conn.getInputStream();
+
+			StatsInputStream sis = new StatsInputStream (conn.getInputStream());
+			is = sis;
 			String encoding = conn.getHeaderField( "content-encoding");
+			int contentLength = conn.getContentLength();
 
-		  	boolean	gzip = encoding != null && encoding.equalsIgnoreCase("gzip");		
+			boolean	gzip = encoding != null && (encoding.equalsIgnoreCase("gzip") || encoding.equalsIgnoreCase("x-gzip"));
+			boolean	deflate = encoding != null && (encoding.equalsIgnoreCase("deflate") || encoding.equalsIgnoreCase("x-deflate"));
 
-		  	if ( gzip ){		  		
-		  		is = new GZIPInputStream( is );
-		  	}
+			if ( gzip ){
+				is = new GZIPInputStream( is );
+			} else if (deflate) {
+				is = new InflaterInputStream(is);
+			}
+			callStateChanged(STATE_DOWNLOADING);
+
 			if (target != null) {
 				target.createNewFile();
 				FileOutputStream os = null;
@@ -53,26 +73,48 @@ public class HTTPDownload extends Download  {
 					os = new FileOutputStream(target);
 					int r = is.read();
 					while (r!=-1) {
+						if (abort) {
+							os.close();
+							is.close();
+							callStateChanged(STATE_ABORTED);
+							failed = true;
+							failureReason = "Aborted by User";
+							return this;
+						}
 						os.write((char)r);
 						r = is.read();
+						callProgress(sis.getBytesRead(), contentLength);
 					}
 				} finally {
 					if (os != null)
 						os.close();
 				}
 			} else {
-				buffer = new StringBuffer((conn.getContentLength()>0)?conn.getContentLength():1024);
+				buffer = new StringBuffer((contentLength>0)?contentLength:4096);
 				int r = is.read();
 				while (r!=-1) {
+					if (abort) {
+						is.close();
+						callStateChanged(STATE_ABORTED);
+						failed = true;
+						failureReason = "Aborted by User";
+						return this;
+					}
 					buffer.append((char)r);
 					r = is.read();
+					callProgress(sis.getBytesRead(), contentLength);
 				}
 			}
-			if (conn.getContentLength()>0 && target != null && target.length() != conn.getContentLength())
+			if (contentLength>0 && target != null && !(gzip || deflate) && target.length() != contentLength) {
 				failed = true;
-			else
+				callStateChanged(STATE_FAILURE);
+			}
+			else {
 				finished = true;
+				callStateChanged(STATE_FINISHED);
+			}
 		} catch (IOException e) {
+			callStateChanged(STATE_FAILURE);
 			failed = true;
 			failureReason = e.getMessage();
 			e.printStackTrace();
@@ -91,5 +133,37 @@ public class HTTPDownload extends Download  {
 	 */
 	public StringBuffer getBuffer() {
 		return buffer;
+	}
+
+	/**
+	 * @return the referer
+	 */
+	public String getReferer() {
+		return referer;
+	}
+
+	/**
+	 * This needs to be set before the Download is executed
+	 * 
+	 * @param referer the referer to set
+	 */
+	public void setReferer(String referer) {
+		this.referer = referer;
+	}
+
+	/**
+	 * @return the userAgent
+	 */
+	public String getUserAgent() {
+		return userAgent;
+	}
+
+	/**
+	 * This needs to be set before the Download is executed
+	 * 
+	 * @param userAgent the userAgent to set
+	 */
+	public void setUserAgent(String userAgent) {
+		this.userAgent = userAgent;
 	}
 }

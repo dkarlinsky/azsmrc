@@ -19,8 +19,7 @@ public class SFDownload extends Download {
 	}
 
 	public SFDownload(URL source) {
-		super(source);
-		// TODO Auto-generated constructor stub
+		throw new UnsupportedOperationException("This Download needs a target.");
 	}
 
 	public void run() {
@@ -34,14 +33,17 @@ public class SFDownload extends Download {
 	public Download call() throws Exception {
 		HTTPDownload sfContent = new HTTPDownload(source);
 		try {
+			callStateChanged(STATE_INITIALIZING);
 			sfContent.call();
 		} catch (Exception e1) {
 			e1.printStackTrace();
+			callStateChanged(STATE_FAILURE);
 			failureReason = e1.getMessage();
 			failed = true;
 			throw e1;
 		}
 		if (sfContent.hasFailed() || !sfContent.hasFinished()) {
+			callStateChanged(STATE_FAILURE);
 			failureReason = "Couldn't load mirrors";
 			failed = true;
 			System.out.println(failureReason);
@@ -66,13 +68,16 @@ public class SFDownload extends Download {
 				HTTPDownload file = new HTTPDownload(x,target);
 				file.call();
 				if (file.hasFailed() || !file.hasFinished()) continue;
-				else return this;
+				else {
+					callStateChanged(STATE_FINISHED);
+					return this;
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 		//I hope we are not getting here
-
+		callStateChanged(STATE_FAILURE);
 		failureReason = "Couldn't Download file";
 		failed = true;
 		System.out.println(failureReason);
