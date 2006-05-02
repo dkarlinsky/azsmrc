@@ -314,7 +314,7 @@ public class PreferencesTab {
 		gridData = new GridData(GridData.GRAB_HORIZONTAL);
 		gridData.horizontalSpan = 2;
 		fastMode.setLayoutData(gridData);
-		fastMode.setText("FastMode:  This mode uses more network bandwidth, but will immediatly resend if there a items in the queue");
+		fastMode.setText("FastMode:  This mode uses more network bandwidth, but will increase the responsiveness of AzSMRC");
 
 		fastMode.setSelection(Boolean.parseBoolean(properties.getProperty("client.fastmode","false")));
 		addModListener(fastMode,SWT.Selection);
