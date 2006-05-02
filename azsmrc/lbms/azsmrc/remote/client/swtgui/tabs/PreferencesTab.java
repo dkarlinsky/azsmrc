@@ -59,7 +59,7 @@ public class PreferencesTab {
 
 	private Label pluginLabel;
 	private Text updateIntervalOpen_Text, updateIntervalClosed_Text;
-	private Button autoOpen, autoConnect, autoUpdateCheck, autoUpdate;
+	private Button fastMode,autoOpen, autoConnect, autoUpdateCheck, autoUpdate;
 	private Button trayMinimize, trayExit, showSplash, popupsEnabled;
 	private Button autoClipboard, autoConsole, exitConfirm;
 	private Button updateBeta, singleUser;
@@ -316,6 +316,16 @@ public class PreferencesTab {
 		}
 		addModListener(autoConnect,SWT.Selection);
 
+		//fastMode
+		fastMode = new Button(composite,SWT.CHECK);
+		gridData = new GridData(GridData.GRAB_HORIZONTAL);
+		gridData.horizontalSpan = 2;
+		fastMode.setLayoutData(gridData);
+		fastMode.setText("FastMode:  This mode uses more network bandwidth, but will immediatly resend if there a items in the queue");
+
+		fastMode.setSelection(Boolean.parseBoolean(properties.getProperty("client.fastmode","false")));
+		addModListener(fastMode,SWT.Selection);
+
 		//Update Interval Open
 		Label updateIntervalOpen_Label = new Label(composite,SWT.NULL);
 		updateIntervalOpen_Label.setText("Update Interval while the main window is open (in seconds, minimum of 3):       ");
@@ -381,11 +391,8 @@ public class PreferencesTab {
 		gridData.horizontalSpan = 2;
 		autoOpen.setLayoutData(gridData);
 		autoOpen.setText("AutoOpen: Auto open main window when program is started");
-
-		if (Boolean.parseBoolean(properties.getProperty("auto_open","false"))) {
-			autoOpen.setSelection(true);
-		}
-
+		
+		autoOpen.setSelection(Boolean.parseBoolean(properties.getProperty("auto_open","false")));
 		addModListener(autoOpen,SWT.Selection);
 
 
@@ -443,11 +450,7 @@ public class PreferencesTab {
 		popupsEnabled.setLayoutData(gridData);
 		popupsEnabled.setText("Popup Alerts Enabled");
 
-		if (Boolean.parseBoolean(properties.getProperty("popups_enabled","true"))) {
-			popupsEnabled.setSelection(true);
-		}else
-			popupsEnabled.setSelection(false);
-
+		popupsEnabled.setSelection(Boolean.parseBoolean(properties.getProperty("popups_enabled","true")));		
 		addModListener(popupsEnabled,SWT.Selection);
 
 
@@ -458,11 +461,7 @@ public class PreferencesTab {
 		showSplash.setLayoutData(gridData);
 		showSplash.setText("Show splash screen on startup");
 
-		if(Boolean.parseBoolean(properties.getProperty("show_splash","true"))){
-			showSplash.setSelection(true);
-		}else
-			showSplash.setSelection(false);
-
+		showSplash.setSelection(Boolean.parseBoolean(properties.getProperty("show_splash","true")));		
 		addModListener(showSplash,SWT.Selection);
 
 
@@ -472,10 +471,8 @@ public class PreferencesTab {
 		gridData.horizontalSpan = 2;
 		autoClipboard.setLayoutData(gridData);
 		autoClipboard.setText("Clipboard Monitor: Monitor the users clipboard at all times for torrent URLs and files");
-
-		if (Boolean.parseBoolean(properties.getProperty("auto_clipboard",Utilities.isLinux()? "false" : "true"))) {
-			autoClipboard.setSelection(true);
-		}
+		
+		autoClipboard.setSelection(Boolean.parseBoolean(properties.getProperty("auto_clipboard",Utilities.isLinux()? "false" : "true")));		
 		addModListener(autoClipboard,SWT.Selection);
 
 
@@ -496,26 +493,20 @@ public class PreferencesTab {
 		gridData.horizontalSpan = 2;
 		updateBeta.setLayoutData(gridData);
 
-		if(Boolean.parseBoolean(properties.getProperty("update.beta", "false"))){
-			updateBeta.setSelection(true);
-		}else
-			updateBeta.setSelection(false);
-
+		
+		updateBeta.setSelection(Boolean.parseBoolean(properties.getProperty("update.beta", "false")));		
 		addModListener(updateBeta,SWT.Selection);
 
 
 		//Auto Update Check
-
 		autoUpdateCheck = new Button(composite,SWT.CHECK);
 		gridData = new GridData(GridData.GRAB_HORIZONTAL);
 		gridData.horizontalSpan = 2;
 		autoUpdateCheck.setLayoutData(gridData);
 		autoUpdateCheck.setText("Auto Check for Updates: Allow AzSMRC to check for and alert the user to updates");
 
-		if (Boolean.parseBoolean(properties.getProperty("update.autocheck","true"))) {
-			autoUpdateCheck.setSelection(true);
-		}
-
+		
+		autoUpdateCheck.setSelection(Boolean.parseBoolean(properties.getProperty("update.autocheck","true")));
 		addModListener(autoUpdateCheck,SWT.Selection);
 
 		//Perform Auto Update
@@ -526,73 +517,22 @@ public class PreferencesTab {
 		autoUpdate.setLayoutData(gridData);
 		autoUpdate.setText("Auto Update: If an update is found, automatically merge the files without any user interaction");
 
-		if (Boolean.parseBoolean(properties.getProperty("update.autoupdate","false"))) {
-			autoUpdate.setSelection(true);
-		}
-
+		autoUpdate.setSelection(Boolean.parseBoolean(properties.getProperty("update.autoupdate","false")));
 		addModListener(autoUpdate,SWT.Selection);
 
-		/*//update button
+		//update button
 		final Button updateCheck = new Button(composite,SWT.PUSH);
 		gridData = new GridData(GridData.GRAB_HORIZONTAL);
 		gridData.horizontalSpan = 2;
 		updateCheck.setLayoutData(gridData);
 		updateCheck.setText("Check online for updates");
 		updateCheck.addListener(SWT.Selection, new Listener(){
-
-			public void handleEvent(Event arg0) {
-				final Updater updater;
-				try {
-					updater = new Updater(new URL(RemoteConstants.UPDATE_URL),new File("update.xml.gz"),new File(System.getProperty("user.dir")));
-					updater.addListener(new UpdateListener() {
-						public void exception(Exception e) {
-
-
-						}
-						public void noUpdate() {
-							if (RCMain.getRCMain().getMainWindow() != null) {
-								RCMain.getRCMain().getMainWindow().setStatusBarText("No Update Available");
-							}
-							RCMain.getRCMain().getNormalLogger().info("No Update Available");
-						}
-						public void updateAvailable(Update update) {
-							if (RCMain.getRCMain().getMainWindow() != null) {
-								RCMain.getRCMain().getMainWindow().setStatusBarText("Update Available: Version "+update.getVersion());
-							}
-							RCMain.getRCMain().getNormalLogger().info("Update Available: Version "+update.getVersion());
-							if (Boolean.parseBoolean(properties.getProperty("update.autoupdate", "false"))) {
-								updater.doUpdate();
-							}else{
-								new UpdateDialog(RCMain.getRCMain().getDisplay(),update,updater);
-							}
-						}
-						public void updateFailed(String reason) {
-							if (RCMain.getRCMain().getMainWindow() != null) {
-								RCMain.getRCMain().getMainWindow().setStatusBarText("Update Failed",SWT.COLOR_RED);
-							}
-							RCMain.getRCMain().getNormalLogger().info("Update Failed");
-						}
-						public void updateFinished() {
-							if (RCMain.getRCMain().getMainWindow() != null) {
-								RCMain.getRCMain().getMainWindow().setStatusBarText("Update Finished");
-							}
-							RCMain.getRCMain().getNormalLogger().info("Update Finished");
-						}
-						public void updateError(String error) {
-							// TODO Auto-generated method stub
-
-						}
-					});
-
-					updater.checkForUpdates(Boolean.parseBoolean(properties.getProperty("update.beta", "false")));
-					properties.setProperty("update.lastcheck",Long.toString(System.currentTimeMillis()));
-					RCMain.getRCMain().saveConfig();
-				} catch (MalformedURLException e2) {
-				}
-
+			public void handleEvent(Event arg0) {								
+				RCMain.getRCMain().getUpdater().checkForUpdates(Boolean.parseBoolean(properties.getProperty("update.beta", "false")));
+				properties.setProperty("update.lastcheck",Long.toString(System.currentTimeMillis()));
+				RCMain.getRCMain().saveConfig();		
 			}
-
-		});*/
+		});
 
 
 		composite.layout();
@@ -737,107 +677,56 @@ public class PreferencesTab {
 
 
 		//Store AutoOpen
-		if(autoOpen != null && !autoOpen.isDisposed()){
-			if(autoOpen.getSelection())
-				properties.setProperty("auto_open", "true");
-			else
-				properties.setProperty("auto_open", "false");
-		}
+		if(autoOpen != null && !autoOpen.isDisposed())
+			properties.setProperty("auto_open", Boolean.toString(autoOpen.getSelection()));
+
+		//fastmode
+		if(fastMode != null && !fastMode.isDisposed())
+			properties.setProperty("client.fastmode", Boolean.toString(fastMode.getSelection()));
 
 		//Store AutoSave
-		if(autoConnect != null && !autoConnect.isDisposed()){
-			if(autoConnect.getSelection())
-				properties.setProperty("auto_connect", "true");
-			else
-				properties.setProperty("auto_connect", "false");
-		}
+		if(autoConnect != null && !autoConnect.isDisposed())			
+			properties.setProperty("auto_connect", Boolean.toString(autoConnect.getSelection()));
 
 		//update Beta
-		if(updateBeta != null && !updateBeta.isDisposed()){
-			if(updateBeta.getSelection())
-				properties.setProperty("update.beta", "true");
-			else
-				properties.setProperty("update.beta", "false");
-		}
-
-
-
+		if(updateBeta != null && !updateBeta.isDisposed())
+			properties.setProperty("update.beta", Boolean.toString(updateBeta.getSelection()));			
 
 		//Store AutoUpdateCheck
-		if(autoUpdateCheck != null && !autoUpdateCheck.isDisposed()){
-			if(autoUpdateCheck.getSelection())
-				properties.setProperty("update.autocheck", "true");
-			else
-				properties.setProperty("update.autocheck", "false");
-		}
-
-
+		if(autoUpdateCheck != null && !autoUpdateCheck.isDisposed())			
+			properties.setProperty("update.autocheck", Boolean.toString(autoUpdateCheck.getSelection()));
 
 		//Store AutoUpdate
-		if(autoUpdate != null && !autoUpdate.isDisposed()){
-			if(autoUpdate.getSelection())
-				properties.setProperty("update.autoupdate", "true");
-			else
-				properties.setProperty("update.autoupdate", "false");
-		}
-
+		if(autoUpdate != null && !autoUpdate.isDisposed())
+			properties.setProperty("update.autoupdate", Boolean.toString(autoUpdate.getSelection()));
 
 		//Store tray options
-		if(trayMinimize != null && !trayMinimize.isDisposed()){
-			if(trayMinimize.getSelection())
-				properties.setProperty("tray.minimize","true");
-			else
-				properties.setProperty("tray.minimize","false");
-		}
+		if(trayMinimize != null && !trayMinimize.isDisposed())
+			properties.setProperty("tray.minimize", Boolean.toString(trayMinimize.getSelection()));
 
-		if(trayExit != null && !trayExit.isDisposed()){
-			if(trayExit.getSelection())
-				properties.setProperty("tray.exit","true");
-			else
-				properties.setProperty("tray.exit","false");
-		}
-
+		//TrayExit
+		if(trayExit != null && !trayExit.isDisposed())
+			properties.setProperty("tray.exit",Boolean.toString(trayExit.getSelection()));
 
 		//Store Confirm exit
-		if(exitConfirm != null && !exitConfirm.isDisposed()){
-			if(exitConfirm.getSelection())
-				properties.setProperty("confirm.exit", "true");
-			else
-				properties.setProperty("confirm.exit", "false");
-		}
+		if(exitConfirm != null && !exitConfirm.isDisposed())
+			properties.setProperty("confirm.exit", Boolean.toString(exitConfirm.getSelection()));
 
 		//Store popupsEnabled
-		if(popupsEnabled != null && !popupsEnabled.isDisposed()){
-			if(popupsEnabled.getSelection())
-				properties.setProperty("popups_enabled", "true");
-			else
-				properties.setProperty("popups_enabled", "false");
-		}
-
+		if(popupsEnabled != null && !popupsEnabled.isDisposed())
+			properties.setProperty("popups_enabled", Boolean.toString(popupsEnabled.getSelection()));
 
 		//Store Splash Screen Setting
-		if(showSplash != null && !showSplash.isDisposed()){
-			if(showSplash.getSelection())
-				properties.setProperty("show_splash","true");
-			else
-				properties.setProperty("show_splash","false");
-		}
+		if(showSplash != null && !showSplash.isDisposed())
+			properties.setProperty("show_splash", Boolean.toString(showSplash.getSelection()));
 
 		//Store the autoClipboard setting
-		if(autoClipboard != null && !autoClipboard.isDisposed()){
-			if(autoClipboard.getSelection())
-				properties.setProperty("auto_clipboard", "true");
-			else
-				properties.setProperty("auto_clipboard", "false");
-		}
+		if(autoClipboard != null && !autoClipboard.isDisposed())
+			properties.setProperty("auto_clipboard", Boolean.toString(autoClipboard.getSelection()));
 
 		//Store auto console setting
-		if(autoConsole != null && !autoConsole.isDisposed()){
-			if(autoConsole.getSelection())
-				properties.setProperty("auto_console", "true");
-			else
-				properties.setProperty("auto_console", "false");
-		}
+		if(autoConsole != null && !autoConsole.isDisposed())
+			properties.setProperty("auto_console", Boolean.toString(autoConsole.getSelection()));
 
 		//Plugin Setting to core
 		if(singleUser != null && !singleUser.isDisposed()){
