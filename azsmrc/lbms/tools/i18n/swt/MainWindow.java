@@ -52,7 +52,7 @@ public class MainWindow {
 	private File currentI18NLocalizedFile;
 	private Map<String,String> defaultMap;
 	private Map<String,String> transMap;
-	private boolean isSaved;
+	private boolean isSaved = true;
 	private String workingDir;
 
 
@@ -65,11 +65,80 @@ public class MainWindow {
 
 			public void shellActivated(ShellEvent arg0) {}
 
-			public void shellClosed(ShellEvent arg0) {
-				if(backgroundC != null && !backgroundC.isDisposed())
-					backgroundC.dispose();
+			public void shellClosed(ShellEvent event) {
+				if(!isSaved){
+					MessageBox mbox = new MessageBox(shell,SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
+					mbox.setText("Unsaved Progress");
+					mbox.setMessage("You have unsaved progress.  Do you want to save before you exit?");
+					int choice = mbox.open();
+					switch(choice){
+					
+					case SWT.CANCEL:
+						event.doit = false;
+						return;
+					
+					case SWT.NO:
+						I18NMe.getI18NMe().close();
+						break;
+					
+					case SWT.YES:
+						if(currentI18NLocalizedFile != null && currentI18NDefaultFile != null){
+							try {
+								I18NTools.writeToFile(currentI18NDefaultFile, defaultMap);
+								I18NTools.writeToFile(currentI18NLocalizedFile, transMap);
+								isSaved = true;
+							} catch (IOException e1) {
+								MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
+								mb.setText("Save Error");
+								mb.setMessage("Problems writing I18N File.  IOException error!");
+								mb.open();
+								e1.printStackTrace();
+							}
+						}else{
+							FileDialog dialog = new FileDialog (shell, SWT.SAVE);
+							dialog.setText("Enter Translated File Name to Save");
+							if(workingDir != null)
+								dialog.setFilterPath(workingDir);
+							String fileString = dialog.open();					
+							if(fileString != null){
+								try{
+									currentI18NLocalizedFile = new File(fileString);
+									workingDir = currentI18NLocalizedFile.getParent();
+									if(!currentI18NLocalizedFile.exists())
+										currentI18NLocalizedFile.createNewFile();
 
-				I18NMe.getI18NMe().close();				
+									if(!currentI18NLocalizedFile.isFile() ||
+											!currentI18NLocalizedFile.canRead() ||
+											!currentI18NLocalizedFile.canWrite()){
+										MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
+										mb.setText("Open Error");
+										mb.setMessage("Problems reading choosen i18n File.  Either File is not a File" +
+										"or it cannot be read or written to.");
+										mb.open();
+									}
+								}catch(Exception error){
+									error.printStackTrace();
+								}
+
+								try {
+									I18NTools.writeToFile(currentI18NDefaultFile, defaultMap);
+									I18NTools.writeToFile(currentI18NLocalizedFile, transMap);
+									isSaved = true;
+								} catch (IOException e1) {
+									MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
+									mb.setText("Save Error");
+									mb.setMessage("Problems writing I18N File.  IOException error!");
+									mb.open();
+									e1.printStackTrace();
+								}
+							}
+						}
+						
+						
+					}
+				}				
+				
+				I18NMe.getI18NMe().close();		
 			}
 
 			public void shellDeactivated(ShellEvent arg0) {}
@@ -98,10 +167,13 @@ public class MainWindow {
 			public void handleEvent (Event e) {
 				FileDialog dialog = new FileDialog (shell, SWT.SAVE);
 				dialog.setText("Choose New Default File");
-				String fileString = dialog.open();
+				if(workingDir != null)
+					dialog.setFilterPath(workingDir);				
+				String fileString = dialog.open();				
 				if(fileString != null){
 					try{
 						currentI18NDefaultFile = new File(fileString);
+						workingDir = currentI18NDefaultFile.getParent();
 						if(currentI18NDefaultFile.isFile()){
 							MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK | SWT.CANCEL);
 							mb.setText("File Exists");
@@ -131,7 +203,7 @@ public class MainWindow {
 						e1.printStackTrace();
 					}
 					clearTable();
-					setIsSaved(false,true);
+					setIsSaved(true);
 				}
 			}
 		});
@@ -146,10 +218,13 @@ public class MainWindow {
 			public void handleEvent (Event e) {
 				FileDialog dialog = new FileDialog (shell, SWT.OPEN);
 				dialog.setText("Open Default File");
+				if(workingDir != null)
+					dialog.setFilterPath(workingDir);
 				String fileString = dialog.open();
 				if(fileString != null){
 					try{
 						currentI18NDefaultFile = new File(fileString);
+						workingDir = currentI18NDefaultFile.getParent();
 						if(!currentI18NDefaultFile.isFile() ||
 								!currentI18NDefaultFile.canRead() ||
 								!currentI18NDefaultFile.canWrite()){
@@ -175,11 +250,77 @@ public class MainWindow {
 						e1.printStackTrace();
 					}
 					clearTable();
-					setIsSaved(false,true);
+					setIsSaved(true);
 				}
 			}
 		});
+		
+		new MenuItem(fileSubmenu, SWT.SEPARATOR);
+		
+		//TransNew
+		final MenuItem menuTransNew = new MenuItem(fileSubmenu, SWT.PUSH);
+		menuTransNew.setText ("New Localized &File\tCtrl+F");
+		menuTransNew.setAccelerator (SWT.MOD1 + 'F');
+		menuTransNew.addListener (SWT.Selection, new Listener () {
+			public void handleEvent (Event e) {
+				FileDialog dialog = new FileDialog (shell, SWT.OPEN);
+				dialog.setText("New Localized File");
+				if(workingDir != null)
+					dialog.setFilterPath(workingDir);
+				String fileString = dialog.open();
+				if(fileString != null){
+					try{
+						currentI18NLocalizedFile = new File(fileString);
+						workingDir = currentI18NLocalizedFile.getParent();
+						if(currentI18NDefaultFile.getPath().equalsIgnoreCase(currentI18NLocalizedFile.getPath())){
+							MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
+							mb.setText("Error");
+							mb.setMessage("Your choosen localized file is the same as your choosen default file.  Please choose another localized file.");
+							mb.open();
+							return;
+						}
+						
+						if(currentI18NLocalizedFile.exists()){
+							MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK | SWT.CANCEL);
+							mb.setText("File Exists");
+							mb.setMessage("The choosen file already exists.  Do you want to overwrite it with a blank localized file?");
+							int option = mb.open();
+							if(option == SWT.CANCEL)
+								return;
+							
+						}
+							currentI18NLocalizedFile.createNewFile();
 
+						if(!currentI18NLocalizedFile.isFile() ||
+								!currentI18NLocalizedFile.canRead() ||
+								!currentI18NLocalizedFile.canWrite()){
+							MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
+							mb.setText("Open Error");
+							mb.setMessage("Problems reading choosen i18n File.  Either File is not a File" +
+							"or it cannot be read or written to.");
+							mb.open();
+						}
+					}catch(Exception error){
+						error.printStackTrace();
+					}
+
+					try {
+						transMap = I18NTools.readFromFile(currentI18NLocalizedFile);
+					} catch (IOException e1) {
+						MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
+						mb.setText("Open Error");
+						mb.setMessage("Problems loading I18N File.  IOException error!");
+						mb.open();
+						e1.printStackTrace();
+					}
+					clearTable();
+					setIsSaved(true);
+				}
+			}
+		});
+		
+		
+		//TransOpen
 		final MenuItem menuTransOpen = new MenuItem(fileSubmenu, SWT.PUSH);
 		menuTransOpen.setText ("Open &Localized File\tCtrl+L");
 		menuTransOpen.setAccelerator (SWT.MOD1 + 'L');
@@ -187,10 +328,20 @@ public class MainWindow {
 			public void handleEvent (Event e) {
 				FileDialog dialog = new FileDialog (shell, SWT.OPEN);
 				dialog.setText("Open Localized Default File");
+				if(workingDir != null)
+					dialog.setFilterPath(workingDir);
 				String fileString = dialog.open();
 				if(fileString != null){
 					try{
 						currentI18NLocalizedFile = new File(fileString);
+						workingDir = currentI18NLocalizedFile.getParent();
+						if(currentI18NDefaultFile.getPath().equalsIgnoreCase(currentI18NLocalizedFile.getPath())){
+							MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
+							mb.setText("Error");
+							mb.setMessage("Your choosen localized file is the same as your choosen default file.  Please choose another localized file.");
+							mb.open();
+							return;
+						}
 						if(!currentI18NLocalizedFile.exists())
 							currentI18NLocalizedFile.createNewFile();
 
@@ -217,10 +368,14 @@ public class MainWindow {
 						e1.printStackTrace();
 					}
 					clearTable();
-					setIsSaved(false, true);
+					setIsSaved(true);
 				}
 			}
 		});
+		
+		new MenuItem(fileSubmenu, SWT.SEPARATOR);
+		
+		//Save
 		final MenuItem menuSave = new MenuItem(fileSubmenu, SWT.PUSH);
 		menuSave.setText ("&Save Localized File\tCtrl+S");
 		menuSave.setAccelerator (SWT.MOD1 + 'S');
@@ -239,10 +394,13 @@ public class MainWindow {
 				}else{
 					FileDialog dialog = new FileDialog (shell, SWT.SAVE);
 					dialog.setText("Save Localized File");
+					if(workingDir != null)
+						dialog.setFilterPath(workingDir);
 					String fileString = dialog.open();
 					if(fileString != null){
 						try{
 							currentI18NLocalizedFile = new File(fileString);
+							workingDir = currentI18NLocalizedFile.getParent();
 							if(!currentI18NLocalizedFile.exists())
 								currentI18NLocalizedFile.createNewFile();
 
@@ -276,17 +434,20 @@ public class MainWindow {
 		});
 
 
-
+		//Save as
 		final MenuItem menuSaveAs = new MenuItem(fileSubmenu, SWT.PUSH);
 		menuSaveAs.setText ("Save Localized File &As");		
 		menuSaveAs.addListener (SWT.Selection, new Listener () {
 			public void handleEvent (Event e) {
 				FileDialog dialog = new FileDialog (shell, SWT.SAVE);
 				dialog.setText("Save Localized File As");
-				String fileString = dialog.open();
+				if(workingDir != null)
+					dialog.setFilterPath(workingDir);
+				String fileString = dialog.open();				
 				if(fileString != null){
 					try{
 						currentI18NLocalizedFile = new File(fileString);
+						workingDir = currentI18NLocalizedFile.getParent();
 						if(!currentI18NLocalizedFile.exists())
 							currentI18NLocalizedFile.createNewFile();
 
@@ -328,6 +489,77 @@ public class MainWindow {
 		MenuItem menuExit = new MenuItem (fileSubmenu, SWT.PUSH);
 		menuExit.addListener (SWT.Selection, new Listener () {
 			public void handleEvent (Event e) {
+				if(!isSaved){
+					MessageBox mbox = new MessageBox(shell,SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
+					mbox.setText("Unsaved Progress");
+					mbox.setMessage("You have unsaved progress.  Do you want to save before you exit?");
+					int choice = mbox.open();
+					switch(choice){
+					
+					case SWT.CANCEL:
+						return;
+					
+					case SWT.NO:
+						I18NMe.getI18NMe().close();
+						break;
+					
+					case SWT.YES:
+						if(currentI18NLocalizedFile != null && currentI18NDefaultFile != null){
+							try {
+								I18NTools.writeToFile(currentI18NDefaultFile, defaultMap);
+								I18NTools.writeToFile(currentI18NLocalizedFile, transMap);
+								isSaved = true;
+							} catch (IOException e1) {
+								MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
+								mb.setText("Save Error");
+								mb.setMessage("Problems writing I18N File.  IOException error!");
+								mb.open();
+								e1.printStackTrace();
+							}
+						}else{
+							FileDialog dialog = new FileDialog (shell, SWT.SAVE);
+							dialog.setText("Enter Translated File Name to Save");
+							if(workingDir != null)
+								dialog.setFilterPath(workingDir);
+							String fileString = dialog.open();					
+							if(fileString != null){
+								try{
+									currentI18NLocalizedFile = new File(fileString);
+									workingDir = currentI18NLocalizedFile.getParent();
+									if(!currentI18NLocalizedFile.exists())
+										currentI18NLocalizedFile.createNewFile();
+
+									if(!currentI18NLocalizedFile.isFile() ||
+											!currentI18NLocalizedFile.canRead() ||
+											!currentI18NLocalizedFile.canWrite()){
+										MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
+										mb.setText("Open Error");
+										mb.setMessage("Problems reading choosen i18n File.  Either File is not a File" +
+										"or it cannot be read or written to.");
+										mb.open();
+									}
+								}catch(Exception error){
+									error.printStackTrace();
+								}
+
+								try {
+									I18NTools.writeToFile(currentI18NDefaultFile, defaultMap);
+									I18NTools.writeToFile(currentI18NLocalizedFile, transMap);
+									isSaved = true;
+								} catch (IOException e1) {
+									MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
+									mb.setText("Save Error");
+									mb.setMessage("Problems writing I18N File.  IOException error!");
+									mb.open();
+									e1.printStackTrace();
+								}
+							}
+						}
+						
+						
+					}
+				}				
+				
 				I18NMe.getI18NMe().close();
 			}
 		});
@@ -339,11 +571,13 @@ public class MainWindow {
 			public void menuHidden(MenuEvent arg0) {}
 
 			public void menuShown(MenuEvent arg0) {
-				if(defaultMap == null)
+				if(defaultMap == null){
 					menuTransOpen.setEnabled(false);
-				else
+					menuTransNew.setEnabled(false);
+				}else{
 					menuTransOpen.setEnabled(true);
-
+					menuTransNew.setEnabled(true);
+				}
 
 				if(isSaved || transMap == null){
 					menuSave.setEnabled(false);
@@ -410,6 +644,7 @@ public class MainWindow {
 				defaultMap.put(newKey[0], newKey[1]);
 				transMap.put(newKey[0], "");
 				clearTable();			
+				isSaved = false;
 
 			}			
 		});
@@ -426,6 +661,7 @@ public class MainWindow {
 					try {
 						I18NTools.writeToFile(currentI18NDefaultFile, defaultMap);
 						I18NTools.writeToFile(currentI18NLocalizedFile, transMap);
+						isSaved = true;
 					} catch (IOException e1) {
 						MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
 						mb.setText("Save Error");
@@ -436,10 +672,13 @@ public class MainWindow {
 				}else{
 					FileDialog dialog = new FileDialog (shell, SWT.SAVE);
 					dialog.setText("Enter Translated File Name to Save");
-					String fileString = dialog.open();
+					if(workingDir != null)
+						dialog.setFilterPath(workingDir);
+					String fileString = dialog.open();					
 					if(fileString != null){
 						try{
 							currentI18NLocalizedFile = new File(fileString);
+							workingDir = currentI18NLocalizedFile.getParent();
 							if(!currentI18NLocalizedFile.exists())
 								currentI18NLocalizedFile.createNewFile();
 
@@ -459,6 +698,7 @@ public class MainWindow {
 						try {
 							I18NTools.writeToFile(currentI18NDefaultFile, defaultMap);
 							I18NTools.writeToFile(currentI18NLocalizedFile, transMap);
+							isSaved = true;
 						} catch (IOException e1) {
 							MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
 							mb.setText("Save Error");
@@ -544,24 +784,15 @@ public class MainWindow {
 							final int column = i;							
 							final Text text = new Text (mainTable, SWT.NONE);
 							Listener textListener = new Listener () {
-								public void handleEvent (final Event e) {
-									int open = 0;
+								public void handleEvent (final Event e) {									
 									switch (e.type) {
 									case SWT.FocusOut:
 										if(column == 1 && !item.getText(1).equalsIgnoreCase(text.getText())){
 											if(defaultMap.containsKey(text.getText())){
-												if(open != SWT.OPEN){
-													MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
-													mb.setText("Error");
-													mb.setMessage("You have entered a key value that is already in the file.  Please choose a unique key.");
-													open = mb.open();														
-												}
-												text.setText (item.getText (column));														
-												text.selectAll ();
-												text.setFocus ();
+												text.dispose();	
 												break;
 											}
-											
+
 											//Key is different!
 											String key = item.getText(1);
 											String defaultValue = item.getText(2);
@@ -577,16 +808,18 @@ public class MainWindow {
 											String newKey = text.getText();
 											defaultMap.put(newKey, defaultValue);
 											transMap.put(newKey, defaultValue);										
-											
+											isSaved = false;
 										}else if(column == 2 && !item.getText(2).equalsIgnoreCase(text.getText())){
 											//default is different!
 											defaultMap.put(item.getText(1), text.getText());
+											isSaved = false;
 										}else if(column == 3 && !item.getText(3).equalsIgnoreCase(text.getText())){
 											//trans if different!
 											transMap.put(item.getText(1), text.getText());
+											isSaved = false;
 										}										
 										clearTable();
-										setIsSaved(false, true);
+										setIsSaved(true);
 										text.dispose ();											
 										break;
 									case SWT.Traverse:
@@ -594,19 +827,10 @@ public class MainWindow {
 										case SWT.TRAVERSE_RETURN:											
 											if(column == 1 && !item.getText(1).equalsIgnoreCase(text.getText())){
 												if(defaultMap.containsKey(text.getText())){
-													if(open != SWT.OPEN){
-														MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
-														mb.setText("Error");
-														mb.setMessage("You have entered a key value that is already in the file.  Please choose a unique key.");
-														open = mb.open();	
-													}
-													
-													text.setText (item.getText (column));														
-													text.selectAll ();
-													text.setFocus ();
+													text.dispose();
 													break;
 												}
-												
+
 												//Key is different!
 												String key = item.getText(1);
 												String defaultValue = item.getText(2);
@@ -622,16 +846,18 @@ public class MainWindow {
 												String newKey = text.getText();
 												defaultMap.put(newKey, defaultValue);
 												transMap.put(newKey, defaultValue);										
-												
+												isSaved = false;
 											}else if(column == 2 && !item.getText(2).equalsIgnoreCase(text.getText())){
 												//default is different!
 												defaultMap.put(item.getText(1), text.getText());
+												isSaved = false;
 											}else if(column == 4 && !item.getText(3).equalsIgnoreCase(text.getText())){
 												//trans if different!
 												transMap.put(item.getText(1), text.getText());
+												isSaved = false;
 											}
 											clearTable();
-											setIsSaved(false, true);												
+											setIsSaved(true);												
 
 											//FALL THROUGH
 										case SWT.TRAVERSE_ESCAPE:
@@ -659,14 +885,14 @@ public class MainWindow {
 				}
 			}
 		});
-		
 
-		
+
+
 
 		//Open the main shell
 		centerShellandOpen(shell);
 
-		setIsSaved(false, false);
+		setIsSaved(false);
 
 	}
 
@@ -741,10 +967,9 @@ public class MainWindow {
 	}
 
 
-	private void setIsSaved(final boolean bisSaved, final boolean bSaveAddButtons){
+	private void setIsSaved(final boolean bSaveAddButtons){
 		I18NMe.getI18NMe().getDisplay().asyncExec(new Runnable(){
-			public void run() {
-				isSaved = bisSaved;
+			public void run() {				
 				save.setEnabled(bSaveAddButtons);
 				add.setEnabled(bSaveAddButtons);
 			}
