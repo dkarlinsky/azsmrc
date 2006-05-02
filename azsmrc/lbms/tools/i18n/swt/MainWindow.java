@@ -35,7 +35,6 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.tools.i18n.*;
 
 public class MainWindow {
@@ -56,13 +55,13 @@ public class MainWindow {
 	private Map<String,String> transMap;
 	private boolean isSaved = true;
 	private String workingDir;
-	
+
 	private static Image icon;
 
 
 	private MainWindow(){
 		icon = new Image(ETC.getETC().getDisplay(),
-				ImageRepository.class.getClassLoader().getResourceAsStream("lbms/tools/i18n/swt/icon.png"));
+				MainWindow.class.getClassLoader().getResourceAsStream("lbms/tools/i18n/swt/icon.png"));
 		shell = new Shell (ETC.getETC().getDisplay());
 		if(icon != null) shell.setImage(icon);
 		shell.setLayout(new GridLayout(1,false));
@@ -79,15 +78,15 @@ public class MainWindow {
 					mbox.setMessage("You have unsaved progress.  Do you want to save before you exit?");
 					int choice = mbox.open();
 					switch(choice){
-					
+
 					case SWT.CANCEL:
 						event.doit = false;
 						return;
-					
+
 					case SWT.NO:
 						ETC.getETC().close();
 						break;
-					
+
 					case SWT.YES:
 						if(currentI18NLocalizedFile != null && currentI18NDefaultFile != null){
 							try {
@@ -106,7 +105,7 @@ public class MainWindow {
 							dialog.setText("Enter Translated File Name to Save");
 							if(workingDir != null)
 								dialog.setFilterPath(workingDir);
-							String fileString = dialog.open();					
+							String fileString = dialog.open();
 							if(fileString != null){
 								try{
 									currentI18NLocalizedFile = new File(fileString);
@@ -140,12 +139,12 @@ public class MainWindow {
 								}
 							}
 						}
-						
-						
+
+
 					}
-				}				
-				
-				ETC.getETC().close();		
+				}
+
+				ETC.getETC().close();
 			}
 
 			public void shellDeactivated(ShellEvent arg0) {}
@@ -175,8 +174,8 @@ public class MainWindow {
 				FileDialog dialog = new FileDialog (shell, SWT.SAVE);
 				dialog.setText("Choose New Default File");
 				if(workingDir != null)
-					dialog.setFilterPath(workingDir);				
-				String fileString = dialog.open();				
+					dialog.setFilterPath(workingDir);
+				String fileString = dialog.open();
 				if(fileString != null){
 					try{
 						currentI18NDefaultFile = new File(fileString);
@@ -261,9 +260,9 @@ public class MainWindow {
 				}
 			}
 		});
-		
+
 		new MenuItem(fileSubmenu, SWT.SEPARATOR);
-		
+
 		//TransNew
 		final MenuItem menuTransNew = new MenuItem(fileSubmenu, SWT.PUSH);
 		menuTransNew.setText ("New Localized &File\tCtrl+F");
@@ -286,7 +285,7 @@ public class MainWindow {
 							mb.open();
 							return;
 						}
-						
+
 						if(currentI18NLocalizedFile.exists()){
 							MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK | SWT.CANCEL);
 							mb.setText("File Exists");
@@ -294,7 +293,7 @@ public class MainWindow {
 							int option = mb.open();
 							if(option == SWT.CANCEL)
 								return;
-							
+
 						}
 							currentI18NLocalizedFile.createNewFile();
 
@@ -325,8 +324,8 @@ public class MainWindow {
 				}
 			}
 		});
-		
-		
+
+
 		//TransOpen
 		final MenuItem menuTransOpen = new MenuItem(fileSubmenu, SWT.PUSH);
 		menuTransOpen.setText ("Open &Localized File\tCtrl+L");
@@ -379,9 +378,9 @@ public class MainWindow {
 				}
 			}
 		});
-		
+
 		new MenuItem(fileSubmenu, SWT.SEPARATOR);
-		
+
 		//Save
 		final MenuItem menuSave = new MenuItem(fileSubmenu, SWT.PUSH);
 		menuSave.setText ("&Save Localized File\tCtrl+S");
@@ -443,14 +442,14 @@ public class MainWindow {
 
 		//Save as
 		final MenuItem menuSaveAs = new MenuItem(fileSubmenu, SWT.PUSH);
-		menuSaveAs.setText ("Save Localized File &As");		
+		menuSaveAs.setText ("Save Localized File &As");
 		menuSaveAs.addListener (SWT.Selection, new Listener () {
 			public void handleEvent (Event e) {
 				FileDialog dialog = new FileDialog (shell, SWT.SAVE);
 				dialog.setText("Save Localized File As");
 				if(workingDir != null)
 					dialog.setFilterPath(workingDir);
-				String fileString = dialog.open();				
+				String fileString = dialog.open();
 				if(fileString != null){
 					try{
 						currentI18NLocalizedFile = new File(fileString);
@@ -502,14 +501,14 @@ public class MainWindow {
 					mbox.setMessage("You have unsaved progress.  Do you want to save before you exit?");
 					int choice = mbox.open();
 					switch(choice){
-					
+
 					case SWT.CANCEL:
 						return;
-					
+
 					case SWT.NO:
 						ETC.getETC().close();
 						break;
-					
+
 					case SWT.YES:
 						if(currentI18NLocalizedFile != null && currentI18NDefaultFile != null){
 							try {
@@ -528,7 +527,7 @@ public class MainWindow {
 							dialog.setText("Enter Translated File Name to Save");
 							if(workingDir != null)
 								dialog.setFilterPath(workingDir);
-							String fileString = dialog.open();					
+							String fileString = dialog.open();
 							if(fileString != null){
 								try{
 									currentI18NLocalizedFile = new File(fileString);
@@ -562,11 +561,11 @@ public class MainWindow {
 								}
 							}
 						}
-						
-						
+
+
 					}
-				}				
-				
+				}
+
 				ETC.getETC().close();
 			}
 		});
@@ -602,10 +601,10 @@ public class MainWindow {
 		helpItem.setText ("Help");
 		Menu helpSubmenu = new Menu (shell, SWT.DROP_DOWN);
 		helpItem.setMenu (helpSubmenu);
-		
+
 		//About
 		MenuItem menuAbout = new MenuItem(helpSubmenu, SWT.PUSH);
-		menuAbout.setText ("About");		
+		menuAbout.setText ("About");
 		menuAbout.addListener (SWT.Selection, new Listener () {
 			public void handleEvent (Event e) {
 				MessageBox mb = new MessageBox(shell,SWT.ICON_INFORMATION | SWT.OK);
@@ -653,13 +652,13 @@ public class MainWindow {
 		bComp.setLayoutData(gd);
 
 		add = new Button(bComp, SWT.PUSH);
-		add.setText("Add New Key");		
+		add.setText("Add New Key");
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		add.setLayoutData(gd);
 		add.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
 				NewDialog dlog = new NewDialog("Enter New Key and Default Value");
-				String[] newKey = dlog.open();				
+				String[] newKey = dlog.open();
 				if(newKey[0] == null) return; //User Cancelled
 				if(newKey[0].equalsIgnoreCase("")){
 					MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
@@ -671,10 +670,10 @@ public class MainWindow {
 
 				defaultMap.put(newKey[0], newKey[1]);
 				transMap.put(newKey[0], "");
-				clearTable();			
+				clearTable();
 				isSaved = false;
 
-			}			
+			}
 		});
 
 
@@ -702,7 +701,7 @@ public class MainWindow {
 					dialog.setText("Enter Translated File Name to Save");
 					if(workingDir != null)
 						dialog.setFilterPath(workingDir);
-					String fileString = dialog.open();					
+					String fileString = dialog.open();
 					if(fileString != null){
 						try{
 							currentI18NLocalizedFile = new File(fileString);
@@ -788,7 +787,7 @@ public class MainWindow {
 					item.setForeground(3,ETC.getETC().getDisplay().getSystemColor(SWT.COLOR_BLACK));
 
 				if(tableIndex%2==0) {
-					item.setBackground(getBackgroundColor());					
+					item.setBackground(getBackgroundColor());
 				}
 
 			}
@@ -805,19 +804,19 @@ public class MainWindow {
 				int index = mainTable.getTopIndex ();
 				while (index < mainTable.getItemCount ()) {
 					boolean visible = false;
-					final TableItem item = mainTable.getItem (index);					
+					final TableItem item = mainTable.getItem (index);
 					for (int i=1; i<mainTable.getColumnCount (); i++) {
 						Rectangle rect = item.getBounds (i);
 						if (rect.contains (pt)) {
-							final int column = i;							
+							final int column = i;
 							final Text text = new Text (mainTable, SWT.NONE);
 							Listener textListener = new Listener () {
-								public void handleEvent (final Event e) {									
+								public void handleEvent (final Event e) {
 									switch (e.type) {
 									case SWT.FocusOut:
 										if(column == 1 && !item.getText(1).equalsIgnoreCase(text.getText())){
 											if(defaultMap.containsKey(text.getText())){
-												text.dispose();	
+												text.dispose();
 												break;
 											}
 
@@ -835,7 +834,7 @@ public class MainWindow {
 											//add them back in with new key
 											String newKey = text.getText();
 											defaultMap.put(newKey, defaultValue);
-											transMap.put(newKey, defaultValue);										
+											transMap.put(newKey, defaultValue);
 											isSaved = false;
 										}else if(column == 2 && !item.getText(2).equalsIgnoreCase(text.getText())){
 											//default is different!
@@ -845,14 +844,14 @@ public class MainWindow {
 											//trans if different!
 											transMap.put(item.getText(1), text.getText());
 											isSaved = false;
-										}										
+										}
 										clearTable();
 										setIsSaved(true);
-										text.dispose ();											
+										text.dispose ();
 										break;
 									case SWT.Traverse:
 										switch (e.detail) {
-										case SWT.TRAVERSE_RETURN:											
+										case SWT.TRAVERSE_RETURN:
 											if(column == 1 && !item.getText(1).equalsIgnoreCase(text.getText())){
 												if(defaultMap.containsKey(text.getText())){
 													text.dispose();
@@ -873,7 +872,7 @@ public class MainWindow {
 												//add them back in with new key
 												String newKey = text.getText();
 												defaultMap.put(newKey, defaultValue);
-												transMap.put(newKey, defaultValue);										
+												transMap.put(newKey, defaultValue);
 												isSaved = false;
 											}else if(column == 2 && !item.getText(2).equalsIgnoreCase(text.getText())){
 												//default is different!
@@ -885,7 +884,7 @@ public class MainWindow {
 												isSaved = false;
 											}
 											clearTable();
-											setIsSaved(true);												
+											setIsSaved(true);
 
 											//FALL THROUGH
 										case SWT.TRAVERSE_ESCAPE:
@@ -897,9 +896,9 @@ public class MainWindow {
 								}
 							};
 							text.addListener (SWT.FocusOut, textListener);
-							text.addListener (SWT.Traverse, textListener);							
+							text.addListener (SWT.Traverse, textListener);
 							editor.setEditor (text, item, i);
-							text.setText (item.getText (i));														
+							text.setText (item.getText (i));
 							text.selectAll ();
 							text.setFocus ();
 							return;
@@ -938,9 +937,9 @@ public class MainWindow {
 				if(currentI18NDefaultFile != null)
 					defaultName = currentI18NDefaultFile.getName();
 				if(currentI18NLocalizedFile != null)
-					transName = currentI18NLocalizedFile.getName(); 
+					transName = currentI18NLocalizedFile.getName();
 				if(currentlyOpened != null || !currentlyOpened.isDisposed())
-					currentlyOpened.setText("Current Default File: " + defaultName + 
+					currentlyOpened.setText("Current Default File: " + defaultName +
 							"\nCurrent Localized File: " + transName);
 				if(shell != null || !shell.isDisposed()){
 					if(defaultName.equalsIgnoreCase("None"))
@@ -997,7 +996,7 @@ public class MainWindow {
 
 	private void setIsSaved(final boolean bSaveAddButtons){
 		ETC.getETC().getDisplay().asyncExec(new Runnable(){
-			public void run() {				
+			public void run() {
 				save.setEnabled(bSaveAddButtons);
 				add.setEnabled(bSaveAddButtons);
 			}
