@@ -184,12 +184,22 @@ public class SSLCertWizard {
 
 		final Text alias_field =new Text(parent,SWT.BORDER);
 
-		alias_field.setText("Azureus");
+		alias_field.setText("my.domain.com");	
+		
 
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 2;
 		alias_field.setLayoutData(gridData);
 
+		Label alias_about = new Label(parent, SWT.NULL);
+		alias_about.setText("Note: Alias needs to be either your IP or your fully qualified domain name");
+		alias_about.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		gridData.horizontalSpan = 3;
+		alias_about.setLayoutData(gridData);
+		
+		
+		
 		// strength
 
 		Label strength_label = new Label(parent,SWT.NULL);
