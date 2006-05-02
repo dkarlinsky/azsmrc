@@ -2,13 +2,13 @@ package lbms.tools.i18n.swt;
 
 import org.eclipse.swt.widgets.Display;
 
-public class I18NMe {
+public class ETC {
 
 	protected Display display;
 	protected boolean terminated;
 	private MainWindow mainWindow;
 
-	private static I18NMe i18nMe;
+	private static ETC etc;
 
 	/**
 	 * @param args
@@ -19,17 +19,17 @@ public class I18NMe {
 
 
 	public static void start(){
-		if(i18nMe == null){
-			i18nMe = new I18NMe();
+		if(etc == null){
+			etc = new ETC();
 		}
 
-		i18nMe.open();
+		etc.open();
 
 	}
 
 
-	public I18NMe(){
-		System.out.println("Starting up I18NMe");
+	public ETC(){
+		System.out.println("Starting up ETC");
 	}
 
 
@@ -55,8 +55,8 @@ public class I18NMe {
 		return display;
 	}
 
-	public static I18NMe getI18NMe(){
-		return i18nMe;
+	public static ETC getETC(){
+		return etc;
 	}
 
 	public MainWindow getMainWindow(){

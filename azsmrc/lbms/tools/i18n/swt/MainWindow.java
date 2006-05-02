@@ -12,6 +12,7 @@ import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
@@ -34,6 +35,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
+import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.tools.i18n.*;
 
 public class MainWindow {
@@ -54,10 +56,15 @@ public class MainWindow {
 	private Map<String,String> transMap;
 	private boolean isSaved = true;
 	private String workingDir;
+	
+	private static Image icon;
 
 
 	private MainWindow(){
-		shell = new Shell (I18NMe.getI18NMe().getDisplay());
+		icon = new Image(ETC.getETC().getDisplay(),
+				ImageRepository.class.getClassLoader().getResourceAsStream("lbms/tools/i18n/swt/icon.png"));
+		shell = new Shell (ETC.getETC().getDisplay());
+		if(icon != null) shell.setImage(icon);
 		shell.setLayout(new GridLayout(1,false));
 
 		//listener for shell disposal
@@ -78,7 +85,7 @@ public class MainWindow {
 						return;
 					
 					case SWT.NO:
-						I18NMe.getI18NMe().close();
+						ETC.getETC().close();
 						break;
 					
 					case SWT.YES:
@@ -138,7 +145,7 @@ public class MainWindow {
 					}
 				}				
 				
-				I18NMe.getI18NMe().close();		
+				ETC.getETC().close();		
 			}
 
 			public void shellDeactivated(ShellEvent arg0) {}
@@ -500,7 +507,7 @@ public class MainWindow {
 						return;
 					
 					case SWT.NO:
-						I18NMe.getI18NMe().close();
+						ETC.getETC().close();
 						break;
 					
 					case SWT.YES:
@@ -560,7 +567,7 @@ public class MainWindow {
 					}
 				}				
 				
-				I18NMe.getI18NMe().close();
+				ETC.getETC().close();
 			}
 		});
 		menuExit.setText ("&Exit\tCtrl+Q");
@@ -590,6 +597,27 @@ public class MainWindow {
 
 		});
 
+		//- File Submenu
+		MenuItem helpItem = new MenuItem (bar, SWT.CASCADE);
+		helpItem.setText ("Help");
+		Menu helpSubmenu = new Menu (shell, SWT.DROP_DOWN);
+		helpItem.setMenu (helpSubmenu);
+		
+		//About
+		MenuItem menuAbout = new MenuItem(helpSubmenu, SWT.PUSH);
+		menuAbout.setText ("About");		
+		menuAbout.addListener (SWT.Selection, new Listener () {
+			public void handleEvent (Event e) {
+				MessageBox mb = new MessageBox(shell,SWT.ICON_INFORMATION | SWT.OK);
+				mb.setText("About");
+				mb.setMessage("ETC:  EasyTranslationCreator" +
+						"\n\nVersion 1.0" +
+						"\n\nAuthors:  Leonard Br\u00FCnings and Marc Schaubach" +
+						"\n\nhttp://azsmrc.sourceforge.net");
+				mb.open();
+			}
+		});
+
 
 		//---------------------Main Composite---------------------------\\
 		Composite parent = new Composite(shell,SWT.NULL);
@@ -601,7 +629,7 @@ public class MainWindow {
 		parent.setLayoutData(gd);
 
 		currentlyOpened = new Label(parent,SWT.BORDER | SWT.CENTER);
-		currentlyOpened.setBackground(I18NMe.getI18NMe().getDisplay().getSystemColor(SWT.COLOR_GRAY));
+		currentlyOpened.setBackground(ETC.getETC().getDisplay().getSystemColor(SWT.COLOR_GRAY));
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 3;
 		currentlyOpened.setLayoutData(gd);
@@ -755,9 +783,9 @@ public class MainWindow {
 
 				if(item.getText(3).equalsIgnoreCase("")){
 					item.setText(3,defaultMap.get(keys[tableIndex]).replace("\n", "\\n"));
-					item.setForeground(3,I18NMe.getI18NMe().getDisplay().getSystemColor(SWT.COLOR_RED));
+					item.setForeground(3,ETC.getETC().getDisplay().getSystemColor(SWT.COLOR_RED));
 				}else
-					item.setForeground(3,I18NMe.getI18NMe().getDisplay().getSystemColor(SWT.COLOR_BLACK));
+					item.setForeground(3,ETC.getETC().getDisplay().getSystemColor(SWT.COLOR_BLACK));
 
 				if(tableIndex%2==0) {
 					item.setBackground(getBackgroundColor());					
@@ -903,7 +931,7 @@ public class MainWindow {
 	 * @param newlyOpenedExam
 	 */
 	private void setOpenedLabels(){
-		I18NMe.getI18NMe().getDisplay().syncExec(new Runnable(){
+		ETC.getETC().getDisplay().syncExec(new Runnable(){
 			public void run() {
 				String defaultName = "None";
 				String transName = "None";
@@ -916,9 +944,9 @@ public class MainWindow {
 							"\nCurrent Localized File: " + transName);
 				if(shell != null || !shell.isDisposed()){
 					if(defaultName.equalsIgnoreCase("None"))
-						shell.setText("I18NMe");
+						shell.setText("ETC");
 					else
-						shell.setText("I18NMe: " + defaultName);
+						shell.setText("ETC: " + defaultName);
 				}
 			}
 		});
@@ -935,7 +963,7 @@ public class MainWindow {
 
 
 	public void setButtons(final boolean baddNew){
-		I18NMe.getI18NMe().getDisplay().syncExec(new Runnable(){
+		ETC.getETC().getDisplay().syncExec(new Runnable(){
 
 			public void run() {
 
@@ -945,7 +973,7 @@ public class MainWindow {
 	}
 
 	public void clearTable(){
-		I18NMe.getI18NMe().getDisplay().syncExec(new Runnable(){
+		ETC.getETC().getDisplay().syncExec(new Runnable(){
 
 			public void run() {
 				if(mainTable != null || !mainTable.isDisposed()){
@@ -968,7 +996,7 @@ public class MainWindow {
 
 
 	private void setIsSaved(final boolean bSaveAddButtons){
-		I18NMe.getI18NMe().getDisplay().asyncExec(new Runnable(){
+		ETC.getETC().getDisplay().asyncExec(new Runnable(){
 			public void run() {				
 				save.setEnabled(bSaveAddButtons);
 				add.setEnabled(bSaveAddButtons);
@@ -987,7 +1015,7 @@ public class MainWindow {
 		shell.pack();
 
 		//Center Shell
-		Monitor primary = I18NMe.getI18NMe().getDisplay().getPrimaryMonitor ();
+		Monitor primary = ETC.getETC().getDisplay().getPrimaryMonitor ();
 		Rectangle bounds = primary.getBounds ();
 		Rectangle rect = shell.getBounds ();
 		int x = bounds.x + (bounds.width - rect.width) / 2;
@@ -1005,18 +1033,18 @@ public class MainWindow {
 	public Color getBackgroundColor(){
 
 
-		if(I18NMe.getI18NMe().getDisplay()==null && I18NMe.getI18NMe().getDisplay().isDisposed()){
+		if(ETC.getETC().getDisplay()==null && ETC.getETC().getDisplay().isDisposed()){
 			backgroundC = null;
 			return backgroundC;
 		}
 		try{
-			backgroundC = new Color(I18NMe.getI18NMe().getDisplay() ,
-					new RGB(I18NMe.getI18NMe().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRed()-20,
-							I18NMe.getI18NMe().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getGreen()-20,
-							I18NMe.getI18NMe().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getBlue()-20));
+			backgroundC = new Color(ETC.getETC().getDisplay() ,
+					new RGB(ETC.getETC().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRed()-20,
+							ETC.getETC().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getGreen()-20,
+							ETC.getETC().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getBlue()-20));
 
 		}catch(Exception e){
-			backgroundC = I18NMe.getI18NMe().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
+			backgroundC = ETC.getETC().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
 		}
 
 

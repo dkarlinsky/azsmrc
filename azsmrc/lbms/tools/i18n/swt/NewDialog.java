@@ -31,7 +31,7 @@ public class NewDialog {
 	}
 
 	public String[] open() {
-		final Display display = I18NMe.getI18NMe().getDisplay();
+		final Display display = ETC.getETC().getDisplay();
 		if (display == null)
 			return null;
 
