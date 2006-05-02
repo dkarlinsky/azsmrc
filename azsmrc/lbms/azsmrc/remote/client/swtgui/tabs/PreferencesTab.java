@@ -5,11 +5,8 @@
  */
 package lbms.azsmrc.remote.client.swtgui.tabs;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Properties;
 
 import lbms.azsmrc.remote.client.Client;
@@ -17,7 +14,6 @@ import lbms.azsmrc.remote.client.Utilities;
 import lbms.azsmrc.remote.client.events.ParameterListener;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.dialogs.SSLCertWizard;
-import lbms.azsmrc.remote.client.swtgui.dialogs.UpdateDialog;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.tools.flexyconf.ContentProvider;
 import lbms.tools.flexyconf.Entry;
@@ -26,9 +22,6 @@ import lbms.tools.flexyconf.FlexyConfiguration;
 import lbms.tools.flexyconf.I18NProvider;
 import lbms.tools.flexyconf.swt.SWTMenu;
 import lbms.tools.i18n.I18NTranslator;
-import lbms.tools.updater.Update;
-import lbms.tools.updater.UpdateListener;
-import lbms.tools.updater.Updater;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
