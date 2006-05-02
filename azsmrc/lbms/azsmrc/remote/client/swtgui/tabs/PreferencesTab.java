@@ -54,7 +54,7 @@ public class PreferencesTab {
 	private Text updateIntervalOpen_Text, updateIntervalClosed_Text;
 	private Button fastMode,autoOpen, autoConnect, autoUpdateCheck, autoUpdate;
 	private Button trayMinimize, trayExit, showSplash, popupsEnabled;
-	private Button autoClipboard, autoConsole, exitConfirm;
+	private Button autoClipboard, autoConsole, showHost, exitConfirm;
 	private Button updateBeta, singleUser;
 	private Tree menuTree;
 
@@ -425,7 +425,15 @@ public class PreferencesTab {
 		autoConsole.setText("Auto open console when opening main window");
 		autoConsole.setSelection(Boolean.parseBoolean(properties.getProperty("auto_console","false"))?true:false);
 		addModListener(autoConsole,SWT.Selection);
-
+		
+		//showhost
+		showHost = new Button(composite,SWT.CHECK);
+		gridData = new GridData(GridData.GRAB_HORIZONTAL);
+		gridData.horizontalSpan = 2;
+		showHost.setLayoutData(gridData);
+		showHost.setText("Show connected server url in the main tab title");
+		showHost.setSelection(Boolean.parseBoolean(properties.getProperty("mainwindow.showHost","false")));
+		addModListener(showHost,SWT.Selection);
 
 		composite.layout();
 	}
@@ -721,6 +729,11 @@ public class PreferencesTab {
 		if(autoConsole != null && !autoConsole.isDisposed())
 			properties.setProperty("auto_console", Boolean.toString(autoConsole.getSelection()));
 
+		//showHost setting
+		if(showHost != null && !showHost.isDisposed())
+			properties.setProperty("mainwindow.showHost", Boolean.toString(showHost.getSelection()));
+		
+		
 		//Plugin Setting to core
 		if(singleUser != null && !singleUser.isDisposed()){
 			Client client = RCMain.getRCMain().getClient();

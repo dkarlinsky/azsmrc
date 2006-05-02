@@ -938,9 +938,19 @@ public class DownloadManagerShell {
 							String userLoggedIn = RCMain.getRCMain().getClient().getUsername();
 							if(myTorrents != null || !myTorrents.isDisposed()){
 								if(bSingleUserMode){
-									myTorrents.setText("ALL Torrents");
+									
+									if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("mainwindow.showHost","false"))){
+										myTorrents.setText("ALL Torrents: " + RCMain.getRCMain().getClient().getServer().getHost());	
+									}else
+										myTorrents.setText("ALL Torrents");
+									
+									
 								}else if(userLoggedIn != null)
-									myTorrents.setText(userLoggedIn + "'s Torrents");
+									if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("mainwindow.showHost","false"))){
+										myTorrents.setText(userLoggedIn + "'s Torrents: " + RCMain.getRCMain().getClient().getServer().getHost());	
+									}else
+										myTorrents.setText(userLoggedIn + "'s Torrents");
+									
 								else
 									myTorrents.setText("My Torrents");
 							}
