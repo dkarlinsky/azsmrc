@@ -17,6 +17,30 @@
 				<Entry key="Network Selection Default.I2P" label="ConfigView.section.connection.networks.I2P" type="boolean" index="2" />
 				<Entry key="Network Selection Default.Tor" label="ConfigView.section.connection.networks.Tor" type="boolean" index="3" />
 			</Group>
+			<Section label="ConfigView.section.proxy" index="0">
+				<Group label="ConfigView.section.proxy.group.tracker" index="0">
+					<Entry key="Enable.Proxy" label="ConfigView.section.proxy.enable_proxy" type="boolean" index="0" />
+					<Entry key="Enable.SOCKS" label="ConfigView.section.proxy.enable_socks" type="boolean" index="1" dependsOn="Enable.Proxy"/>
+					<Entry key="Proxy.Host" label="ConfigView.section.proxy.host" type="string" index="2" dependsOn="Enable.Proxy"/>
+					<Entry key="Proxy.Port" label="ConfigView.section.proxy.port" type="string" index="3" dependsOn="Enable.Proxy"/>
+					<Entry key="Proxy.Username" label="ConfigView.section.proxy.username" type="string" index="4" dependsOn="Enable.Proxy"/>
+					<Entry key="Proxy.Password" label="ConfigView.section.proxy.password" type="string" index="5" dependsOn="Enable.Proxy"/>
+				</Group>
+				<Group label="ConfigView.section.proxy.group.peer" index="0">
+					<Entry key="Proxy.Data.Enable" label="ConfigView.section.proxy.enable_socks.peer" type="boolean" index="0" />
+					<Entry key="Proxy.Data.SOCKS.inform" label="ConfigView.section.proxy.peer.informtracker" type="boolean" index="1" dependsOn="Proxy.Data.Enable"/>
+					<Entry key="Proxy.Data.SOCKS.version" label="ConfigView.section.proxy.socks.version" type="string" index="2" dependsOn="Proxy.Data.Enable">
+						<Option value="V4" label="V4" index="0" />
+						<Option value="V4a" label="V4a" index="1" />
+						<Option value="V54" label="V5" index="2" />
+					</Entry>
+					<Entry key="Proxy.Data.Same" label="ConfigView.section.proxy.peer.same" type="boolean" index="3" dependsOn="Proxy.Data.Enable"/>
+					<Entry key="Proxy.Data.Host" label="ConfigView.section.proxy.host" type="string" index="4" dependsOn="Proxy.Data.Enable"/>
+					<Entry key="Proxy.Data.Port" label="ConfigView.section.proxy.port" type="string" index="5" dependsOn="Proxy.Data.Enable"/>
+					<Entry key="Proxy.Data.Username" label="ConfigView.section.proxy.username" type="string" index="6" dependsOn="Proxy.Data.Enable"/>
+					<Entry key="Proxy.Data.Password" label="ConfigView.section.proxy.password" type="string" index="7" dependsOn="Proxy.Data.Enable"/>
+				</Group>
+			</Section>
 			<Section label="ConfigView.section.connection.advanced" index="1">
 				<Entry key="network.max.simultaneous.connect.attempts" label="ConfigView.section.connection.network.max.simultaneous.connect.attempts" type="int" index="0" validate="1..100"/>
 				<Entry key="Bind IP" label="ConfigView.label.bindip" type="string" index="1" />
