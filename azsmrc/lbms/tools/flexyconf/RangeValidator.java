@@ -13,41 +13,45 @@ class RangeValidator extends Validator {
 		String[] parts = rule.split("\\.\\.");
 		RangeValidator r = new RangeValidator();
 		r.type = type;
-		switch (type) {
-		case Entry.TYPE_STRING:
-			throw new InvalidTypeException ("Range Validator is not applicable for the Type String.");
-		case Entry.TYPE_FLOAT:
-		case Entry.TYPE_DOUBLE:
-			if (parts.length==1) {
-				r.dmin = Double.parseDouble(parts[0]);
-				r.dmax = Double.MAX_VALUE;
-			} else {
-				if (parts[0].length()==0) {
-					r.dmin = Double.MIN_VALUE;
-				} else {
+		try {
+			switch (type) {
+			case Entry.TYPE_STRING:
+				throw new InvalidTypeException ("Range Validator is not applicable for the Type String.");
+			case Entry.TYPE_FLOAT:
+			case Entry.TYPE_DOUBLE:
+				if (parts.length==1) {
 					r.dmin = Double.parseDouble(parts[0]);
-				}
-				r.dmax = Double.parseDouble(parts[1]);
-			}
-			if (r.lmin>=r.lmax) throw new InvalidRuleException("Invalid Rule: min ("+r.dmin+") is >= max ("+r.dmax+") "+rule);
-			break;
-		case Entry.TYPE_INT:
-		case Entry.TYPE_LONG:
-			if (parts.length==1) {
-				r.lmin = Long.parseLong(parts[0]);
-				r.lmax = Long.MAX_VALUE;
-			} else {
-				if (parts[0].length()==0) {
-					r.lmin = Long.MIN_VALUE;
+					r.dmax = Double.MAX_VALUE;
 				} else {
-					r.lmin = Long.parseLong(parts[0]);
+					if (parts[0].length()==0) {
+						r.dmin = Double.MIN_VALUE;
+					} else {
+						r.dmin = Double.parseDouble(parts[0]);
+					}
+					r.dmax = Double.parseDouble(parts[1]);
 				}
-				r.lmax = Long.parseLong(parts[1]);
+				if (r.lmin>=r.lmax) throw new InvalidRuleException("Invalid Rule: min ("+r.dmin+") is >= max ("+r.dmax+") "+rule);
+				break;
+			case Entry.TYPE_INT:
+			case Entry.TYPE_LONG:
+				if (parts.length==1) {
+					r.lmin = Long.parseLong(parts[0]);
+					r.lmax = Long.MAX_VALUE;
+				} else {
+					if (parts[0].length()==0) {
+						r.lmin = Long.MIN_VALUE;
+					} else {
+						r.lmin = Long.parseLong(parts[0]);
+					}
+					r.lmax = Long.parseLong(parts[1]);
+				}
+				if (r.lmin>=r.lmax) throw new InvalidRuleException("Invalid Rule: min ("+r.lmin+") is >= max ("+r.lmax+") "+rule);
+				break;
+			default:
+				throw new InvalidTypeException ("Range Validator is not applicable for the selected Type.");
 			}
-			if (r.lmin>=r.lmax) throw new InvalidRuleException("Invalid Rule: min ("+r.lmin+") is >= max ("+r.lmax+") "+rule);
-			break;
-		default:
-			throw new InvalidTypeException ("Range Validator is not applicable for the selected Type.");
+		} catch (NumberFormatException e) {
+			throw new InvalidRuleException(e);
 		}
 		return r;
 	}

@@ -10,4 +10,11 @@ public class InvalidRuleException extends Exception {
 		super(message);
 	}
 
+	public InvalidRuleException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public InvalidRuleException(Throwable cause) {
+		super(cause);
+	}
 }
