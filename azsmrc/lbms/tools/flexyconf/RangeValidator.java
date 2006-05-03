@@ -18,14 +18,32 @@ class RangeValidator extends Validator {
 			throw new InvalidTypeException ("Range Validator is not applicable for the Type String.");
 		case Entry.TYPE_FLOAT:
 		case Entry.TYPE_DOUBLE:
-			r.dmin = Double.parseDouble(parts[0]);
-			r.dmax = Double.parseDouble(parts[1]);
+			if (parts.length==1) {
+				r.dmin = Double.parseDouble(parts[0]);
+				r.dmax = Double.MAX_VALUE;
+			} else {
+				if (parts[0].length()==0) {
+					r.dmin = Double.MIN_VALUE;
+				} else {
+					r.dmin = Double.parseDouble(parts[0]);
+				}
+				r.dmax = Double.parseDouble(parts[1]);
+			}
 			if (r.lmin>=r.lmax) throw new InvalidRuleException("Invalid Rule: min ("+r.dmin+") is >= max ("+r.dmax+") "+rule);
 			break;
 		case Entry.TYPE_INT:
 		case Entry.TYPE_LONG:
-			r.lmin = Long.parseLong(parts[0]);
-			r.lmax = Long.parseLong(parts[1]);
+			if (parts.length==1) {
+				r.lmin = Long.parseLong(parts[0]);
+				r.lmax = Long.MAX_VALUE;
+			} else {
+				if (parts[0].length()==0) {
+					r.lmin = Long.MIN_VALUE;
+				} else {
+					r.lmin = Long.parseLong(parts[0]);
+				}
+				r.lmax = Long.parseLong(parts[1]);
+			}
 			if (r.lmin>=r.lmax) throw new InvalidRuleException("Invalid Rule: min ("+r.lmin+") is >= max ("+r.lmax+") "+rule);
 			break;
 		default:
@@ -38,9 +56,17 @@ class RangeValidator extends Validator {
 	public boolean validate(String value) {
 		switch (type) {
 		case Entry.TYPE_FLOAT:
+			{
+				double x = Double.parseDouble(value);
+				if (x > Float.MAX_VALUE || x < Float.MIN_VALUE) return false;
+			}
 		case Entry.TYPE_DOUBLE:
 			return validate(Double.parseDouble(value));
 		case Entry.TYPE_INT:
+			{
+				long x = Long.parseLong(value);
+				if (x > Integer.MAX_VALUE || x < Integer.MIN_VALUE) return false;
+			}
 		case Entry.TYPE_LONG:
 			return validate(Long.parseLong(value));
 		default:
