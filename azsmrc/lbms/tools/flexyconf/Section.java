@@ -123,6 +123,14 @@ public class Section extends AbstractEntryContainer implements Comparable<Sectio
 	}
 
 	@Override
+	protected void checkDependency(String key, boolean enabled) {
+		super.checkDependency(key, enabled);
+		for (Group g:groups) {
+			g.checkDependency(key, enabled);
+		}
+	}
+
+	@Override
 	public void init() {
 		super.init();
 		for (Group g:groups) {
