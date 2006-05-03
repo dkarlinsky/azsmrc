@@ -938,19 +938,19 @@ public class DownloadManagerShell {
 							String userLoggedIn = RCMain.getRCMain().getClient().getUsername();
 							if(myTorrents != null || !myTorrents.isDisposed()){
 								if(bSingleUserMode){
-									
+
 									if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("mainwindow.showHost","false"))){
-										myTorrents.setText("ALL Torrents: " + RCMain.getRCMain().getClient().getServer().getHost());	
+										myTorrents.setText("ALL Torrents: " + RCMain.getRCMain().getClient().getServer().getHost());
 									}else
 										myTorrents.setText("ALL Torrents");
-									
-									
+
+
 								}else if(userLoggedIn != null)
 									if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("mainwindow.showHost","false"))){
-										myTorrents.setText(userLoggedIn + "'s Torrents: " + RCMain.getRCMain().getClient().getServer().getHost());	
+										myTorrents.setText(userLoggedIn + "'s Torrents: " + RCMain.getRCMain().getClient().getServer().getHost());
 									}else
 										myTorrents.setText(userLoggedIn + "'s Torrents");
-									
+
 								else
 									myTorrents.setText("My Torrents");
 							}
@@ -3123,24 +3123,24 @@ public class DownloadManagerShell {
 					DND.DROP_TARGET_MOVE);
 
 			if (SWT.getVersion() >= 3107) {
-				dropTarget.setTransfer(new Transfer[] { HTMLTransfer.getInstance(),
-						URLTransfer.getInstance(), FileTransfer.getInstance(),
-						TextTransfer.getInstance() });
+				dropTarget.setTransfer(new Transfer[] {
+						FileTransfer.getInstance(), /*HTMLTransfer.getInstance(),*/
+						/*URLTransfer.getInstance(),*/	TextTransfer.getInstance()
+						});
 			} else {
-				dropTarget.setTransfer(new Transfer[] { URLTransfer.getInstance(),
-						FileTransfer.getInstance(), TextTransfer.getInstance() });
+				dropTarget.setTransfer(new Transfer[] { FileTransfer.getInstance(),
+						/*URLTransfer.getInstance(),*/	TextTransfer.getInstance() });
 			}
 
 			dropTarget.addDropListener(new DropTargetAdapter() {
-				public void dropAccept(DropTargetEvent event) {
-					event.currentDataType = URLTransfer.pickBestType(event.dataTypes,
-							event.currentDataType);
-				}
 
 				public void dragEnter(DropTargetEvent event) {
 					// no event.data on dragOver, use drag_drop_line_start to determine if
 					// ours
-					if(drag_drop_line_start < 0) {
+
+					if (FileTransfer.getInstance().isSupportedType(event.currentDataType)) {
+						event.detail = DND.DROP_COPY;
+					} else 	if(drag_drop_line_start < 0) {
 						if(event.detail != DND.DROP_COPY) {
 							if ((event.operations & DND.DROP_LINK) > 0)
 								event.detail = DND.DROP_LINK;
@@ -3157,6 +3157,18 @@ public class DownloadManagerShell {
 					if (!(event.data instanceof String) || !((String)event.data).equals("moveRow")) {
 						openDroppedTorrents(event);
 						return;
+					}
+
+					if (event.data instanceof String || event.data instanceof String[]) {
+						final String[] sourceNames = (event.data instanceof String[]) ?
+								(String[]) event.data : new String[] { (String) event.data };
+						for (String s : sourceNames) {
+							File f = new File(s);
+							if (f.exists() && f.isFile()) {
+								openDroppedTorrents(event);
+								return;
+							}
+						}
 					}
 
 					// Torrent file from shell dropped
@@ -3229,27 +3241,26 @@ public class DownloadManagerShell {
 				event.detail = DND.DROP_NONE;
 			if (event.detail == DND.DROP_NONE)
 				return;
-
+			List<String> files = new ArrayList<String>();
 			for (int i = 0; (i < sourceNames.length); i++) {
 				final File source = new File(sourceNames[i]);
-				String sURL = parseTextForURL(sourceNames[i]);
 
-				if (sURL != null || !source.exists()) {
-					//openTorrentWindow(null, new String[] { sURL }, bOverrideToStopped);
-					//System.out.println("Dropped is a URL: " + sURL);
-					OpenByURLDialog.openWithURL(sURL);
+				if (!source.exists()) {
+					try {
+						new URL(sourceNames[i]);
+						OpenByURLDialog.openWithURL(sourceNames[i]);
+					} catch (MalformedURLException e) {}
 				} else if (source.isFile()) {
 					String filename = source.getAbsolutePath();
 					try {
 						if (!isTorrentFile(filename)) {
 							RCMain.getRCMain().getDebugLogger().info("openDroppedTorrents: file not a torrent file");
 
-
 							//Torrent creation if we ever support that in FF
 							//ShareUtils.shareFile(azureus_core, filename);
 						} else {
 							System.out.println("Dropped file IS torrent -- to open: " + filename);
-							new OpenByFileDialog(RCMain.getRCMain().getDisplay(),new String[] {filename});
+							files.add(filename);
 							/* openTorrentWindow(null, new String[] { filename },
 										bOverrideToStopped);*/
 						}
@@ -3281,11 +3292,9 @@ public class DownloadManagerShell {
 						}*/
 				}
 			}
-		} else if (event.data instanceof URLTransfer.URLType) {
-			System.out.println("Dropped is a URLTransfer.UrlType: " + ((URLTransfer.URLType) event.data).linkURL);
-			/* openTorrentWindow(null,
-						new String[] { ((URLTransfer.URLType) event.data).linkURL },
-						bOverrideToStopped);*/
+			if (files.size()>0) {
+				new OpenByFileDialog (RCMain.getRCMain().getDisplay(), files.toArray(new String[0]));
+			}
 		}
 	}
 
