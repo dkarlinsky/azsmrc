@@ -451,7 +451,11 @@ public class RCMain implements Launchable {
 				if(display != null)
 					display.syncExec(new Runnable() {
 						public void run() {
-							setTrayToolTip("AzSMRC: D:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d)+" - U:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u));
+							//setTrayToolTip("AzSMRC: D:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d)+" - U:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u));
+							setTrayToolTip(RCMain.getRCMain().getMainWindow().getSeedsDownloadsCount()[0] + " seeding, " 
+									+ RCMain.getRCMain().getMainWindow().getSeedsDownloadsCount()[1] + " downloading, "
+									+ "D: "+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d)  
+									+ ", U: "+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u));
 						}
 					});
 			}

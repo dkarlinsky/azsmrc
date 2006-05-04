@@ -3473,4 +3473,8 @@ public class DownloadManagerShell {
 		});
 
 	}
+	
+	public int[] getSeedsDownloadsCount(){
+		return new int[]{seedsMap.size(), downloadsMap.size()};
+	}
 }//EOF
