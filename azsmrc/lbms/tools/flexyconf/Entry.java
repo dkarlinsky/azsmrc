@@ -33,7 +33,7 @@ public class Entry implements ConfigEntity {
 	private FCInterface fci;
 
 	private SortedSet<Option> options = new TreeSet<Option>();
-	private boolean option;
+	private boolean option, negativeDepend;
 
 	public Entry () {
 
@@ -52,8 +52,12 @@ public class Entry implements ConfigEntity {
 		e.setAttribute("key", key);
 		e.setAttribute("type", type2String(type));
 		e.setAttribute("label", label);
-		if (dependsOn!=null)
-			e.setAttribute("dependsOn", dependsOn);
+		if (dependsOn!=null) {
+			if (negativeDepend)
+				e.setAttribute("dependsOn", '^'+dependsOn);
+			else
+				e.setAttribute("dependsOn", dependsOn);
+		}
 		if (rule!=null)
 			e.setAttribute("validate", rule);
 		return e;
@@ -67,6 +71,11 @@ public class Entry implements ConfigEntity {
 		if (indexString!=null)index = Integer.parseInt(indexString);
 		else index = 0;
 		dependsOn = e.getAttributeValue("dependsOn");
+		if (dependsOn!=null && dependsOn.indexOf('^') ==0) {
+			negativeDepend = true;
+			dependsOn = dependsOn.substring(1);
+		}
+
 		rule = e.getAttributeValue("validate");
 		if (rule!=null) {
 			try {
@@ -142,7 +151,7 @@ public class Entry implements ConfigEntity {
 		if (dependsOn == null || dependsOn.equals("")) return;
 		else if(dependsOn.equalsIgnoreCase(key)) {
 			if(displayAdapter!=null)
-				displayAdapter.setEnabled(enabled);
+				displayAdapter.setEnabled(negativeDepend ? !enabled : enabled);
 		}
 	}
 
