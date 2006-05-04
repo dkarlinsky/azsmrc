@@ -401,10 +401,7 @@ public class ScrapeDialog {
 		deleteOnSend.addListener(SWT.Selection, new Listener(){
 
 			public void handleEvent(Event arg0) {
-				if(deleteOnSend.getSelection())
-					RCMain.getRCMain().getProperties().setProperty("delete.on.send", "true");
-				else
-					RCMain.getRCMain().getProperties().setProperty("delete.on.send", "false");
+				RCMain.getRCMain().getProperties().setProperty("delete.on.send", Boolean.toString(deleteOnSend.getSelection()));
 				//Store the new setting
 				RCMain.getRCMain().saveConfig();
 			}
