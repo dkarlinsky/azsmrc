@@ -46,7 +46,6 @@ import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByURLDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ScrapeDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ServerUpdateDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.TableColumnEditorDialog;
-import lbms.azsmrc.remote.client.swtgui.dialogs.UpdateDialog;
 import lbms.azsmrc.remote.client.swtgui.tabs.ConsoleTab;
 import lbms.azsmrc.remote.client.swtgui.tabs.ManageUsersTab;
 import lbms.azsmrc.remote.client.swtgui.tabs.PreferencesTab;
@@ -56,9 +55,6 @@ import lbms.azsmrc.remote.client.swtgui.tabs.TorrentDetailsTab;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.shared.EncodingUtil;
 import lbms.azsmrc.shared.RemoteConstants;
-import lbms.tools.updater.Update;
-import lbms.tools.updater.UpdateListener;
-import lbms.tools.updater.Updater;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
@@ -74,7 +70,6 @@ import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.FileTransfer;
-import org.eclipse.swt.dnd.HTMLTransfer;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.ControlEvent;
@@ -2913,70 +2908,7 @@ public class DownloadManagerShell {
 		RCMain.getRCMain().getProperties().setProperty("transfer_states", Integer.toString(options));
 	}
 
-	/*private void createDropTarget(final Control control) {
-		DropTarget dropTarget = new DropTarget(control, DND.DROP_DEFAULT | DND.DROP_MOVE | DND.DROP_COPY | DND.DROP_LINK);
-		dropTarget.setTransfer(new Transfer[] {URLTransfer.getInstance(), FileTransfer.getInstance()});
-		dropTarget.addDropListener(new DropTargetAdapter() {
-			public void dragOver(DropTargetEvent event) {
-				if(URLTransfer.getInstance().isSupportedType(event.currentDataType)) {
-					event.detail = DND.DROP_COPY;
-				}
-			}
-			public void drop(DropTargetEvent event) {
-				openDroppedTorrents(event);
-			}
-		});
-	}
 
-	public static void
-	openDroppedTorrents(
-			DropTargetEvent event)
-	{
-		if(event.data == null)
-			return;
-
-		boolean bOverrideToStopped = event.detail == DND.DROP_COPY;
-
-		if(event.data instanceof String[] || event.data instanceof String) {
-			final String[] sourceNames = (event.data instanceof String[]) ?
-					(String[]) event.data : new String[] { (String) event.data };
-					if (sourceNames == null)
-						event.detail = DND.DROP_NONE;
-					if (event.detail == DND.DROP_NONE)
-						return;
-
-					for (int i = 0;(i < sourceNames.length); i++) {
-						final File source = new File(sourceNames[i]);
-						if (source.isFile()) {
-							String filename = source.getAbsolutePath();
-							try {
-								if (filename.endsWith(".torrent")) {
-									//FireFrogMain.getFFM().getClient().sendAddDownload(source);
-									System.out.println("Valid FILE!!! -- " + filename);
-								} else {
-									System.out.println("This is not a valid torrent File: "+filename);
-								}
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-						} else {
-							System.out.println("This is not a valid File: "+source);
-							// Probably a URL.. let torrentwindow handle it
-							// openTorrentWindow(null, new String[] { sourceNames[i] },
-							//		bOverrideToStopped);
-						}
-					}
-		} else if (event.data instanceof URLTransfer.URLType) {
-			System.out.println("This is a URL Transfer");
-
-			System.out.println(((URLTransfer.URLType)event.data).toString());
-			System.out.println(((URLTransfer.URLType) event.data).linkURL);
-//          openTorrentWindow(null,
-			//			new String[] { ((URLTransfer.URLType) event.data).linkURL },
-			//			bOverrideToStopped);
-		} else
-			System.out.println("something else" + event.data);
-	}*/
 
 	private class CLabelPadding extends CLabel {
 		private int lastWidth = 0;
@@ -3350,91 +3282,6 @@ public class DownloadManagerShell {
 			return false;
 		}
 	}
-
-
-	/*    protected void
-	construct(
-		InputStream     is )
-
-		throws TOTorrentException
-	{
-		ByteArrayOutputStream metaInfo = new ByteArrayOutputStream();
-
-		try{
-			byte[] buf = new byte[32*1024]; // raised this limit as 2k was rather too small
-
-			// do a check to see if it's a BEncode file.
-			int iFirstByte = is.read();
-
-			if (    iFirstByte != 'd' &&
-					iFirstByte != 'e' &&
-					iFirstByte != 'i' &&
-					!(iFirstByte >= '0' && iFirstByte <= '9')){
-
-					// often people download an HTML file by accident - if it looks like HTML
-					// then produce a more informative error
-
-				try{
-					metaInfo.write(iFirstByte);
-
-					int nbRead;
-
-					while ((nbRead = is.read(buf)) > 0 && metaInfo.size() < 32000 ){
-
-						metaInfo.write(buf, 0, nbRead);
-					}
-
-					String  char_data = new String( metaInfo.toByteArray());
-
-					if ( char_data.toLowerCase().indexOf( "html") != -1 ){
-
-						char_data = HTMLUtils.convertHTMLToText2( char_data );
-
-						char_data = HTMLUtils.splitWithLineLength( char_data, 80 );
-
-						if ( char_data.length() > 400 ){
-
-							char_data = char_data.substring(0,400) + "...";
-						}
-
-						throw(  new TOTorrentException(
-									"Contents maybe HTML:\n" + char_data,
-									TOTorrentException.RT_DECODE_FAILS ));
-					}
-				}catch( Throwable e ){
-
-					if ( e instanceof TOTorrentException ){
-
-						throw((TOTorrentException)e);
-					}
-
-						// ignore this
-				}
-
-				throw( new TOTorrentException( "Contents invalid - bad header",
-						TOTorrentException.RT_DECODE_FAILS ));
-
-			}
-
-
-
-			metaInfo.write(iFirstByte);
-
-			int nbRead;
-
-			while ((nbRead = is.read(buf)) > 0){
-
-				metaInfo.write(buf, 0, nbRead);
-			}
-		}catch( IOException e ){
-
-			throw( new TOTorrentException( "TOTorrentDeserialise: IO exception reading torrent '" + e.toString()+ "'",
-											TOTorrentException.RT_READ_FAILS ));
-		}
-
-		construct( metaInfo.toByteArray());
-	}*/
-
 
 
 	public void saveColumnWidthsToPreferencesFile(){
