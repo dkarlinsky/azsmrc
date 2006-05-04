@@ -103,7 +103,7 @@ public class Entry implements ConfigEntity {
 	public int string2Type (String s) {
 		if (s.equalsIgnoreCase("string")) {
 			return TYPE_STRING;
-		} else if (s.equalsIgnoreCase("int")) {
+		} else if (s.equalsIgnoreCase("integer")) {
 			return TYPE_INT;
 		} else if (s.equalsIgnoreCase("boolean")) {
 			return TYPE_BOOLEAN;
@@ -130,7 +130,7 @@ public class Entry implements ConfigEntity {
 		case TYPE_STRING:
 			return "string";
 		case TYPE_INT:
-			return "int";
+			return "integer";
 		case TYPE_BOOLEAN:
 			return "boolean";
 		case TYPE_FLOAT:
