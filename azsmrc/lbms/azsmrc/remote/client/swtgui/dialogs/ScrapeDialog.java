@@ -54,7 +54,8 @@ public class ScrapeDialog {
 	private Table torrentTable;	
 	private CTabFolder tabFolder;
 	private Display display;
-
+	private Button deleteOnSend;
+	private Shell shell;
 
 	private ScrapeDialog(){
 		//set the display
@@ -64,7 +65,7 @@ public class ScrapeDialog {
 		lastDir = RCMain.getRCMain().getProperties().getProperty("Last.Directory");
 		
 		//Shell
-		final Shell shell = new Shell(display);
+		shell = new Shell(display);
 		shell.setLayout(new GridLayout(1,false));
 		shell.setText("Scrape a Torrent File");
 
@@ -286,7 +287,7 @@ public class ScrapeDialog {
 			e.printStackTrace();
 		}
 
-		Composite parent = new Composite(tabFolder,SWT.NULL);
+		final Composite parent = new Composite(tabFolder,SWT.NULL);
 		GridData gd = new GridData(GridData.FILL_BOTH);
 		gd.grabExcessHorizontalSpace= true;
 		gd.grabExcessVerticalSpace = true;
@@ -299,11 +300,12 @@ public class ScrapeDialog {
 		Composite comboComp = new Composite(parent,SWT.NULL);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.grabExcessHorizontalSpace = true;
+		gd.horizontalSpan = 2;
 		comboComp.setLayoutData(gd);
 		
 		gl = new GridLayout();
 		gl.marginWidth = 0;
-		gl.numColumns = 2;
+		gl.numColumns = 3;
 		comboComp.setLayout(gl);
 		
 		final Combo combo = new Combo(comboComp,SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -312,7 +314,10 @@ public class ScrapeDialog {
 		//Pull the URL from the torrent and put it in the combo
 		combo.add(atc.getTorrent().getAnnounceURL().toString());
 		combo.select(0);
-
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		combo.setLayoutData(gd);
+		
+		
 		//Pull the group from the torrent
 		TOTorrentAnnounceURLGroup torrentGroup = atc.getTorrent().getAnnounceURLGroup();
 
@@ -334,12 +339,14 @@ public class ScrapeDialog {
 		//button for Scrape -- still in comboComp
 		Button scrape = new Button(comboComp,SWT.PUSH);
 		scrape.setText("Scrape");
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		scrape.setLayoutData(gd);
 
 		//button for Add Torrent
-		final Button add = new Button(parent, SWT.PUSH);
+		final Button add = new Button(comboComp, SWT.PUSH);
 		add.setText("Send Torrent to Server");
 		add.setToolTipText("Choose files from the torrent in the table below that you want to add, then click here to send torrent to the server");
-		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
+		gd = new GridData(GridData.FILL_HORIZONTAL | GridData.HORIZONTAL_ALIGN_END);
 		add.setLayoutData(gd);
 		add.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
@@ -350,7 +357,16 @@ public class ScrapeDialog {
                     	int[] props = atc.getFileProperties();
                         //Main add to Azureus
                         RCMain.getRCMain().getClient().sendAddDownload(atc.getTorrentFile(), props);	
-                    }					
+                    }
+					if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("delete.on.send", "false"))){
+						if(!atc.deleteFile()){
+							MessageBox messageBox = new MessageBox(shell,
+									SWT.ICON_ERROR | SWT.OK);
+							messageBox.setText("Error");
+							messageBox.setMessage("Error deleting " + atc.getTorrentFile().getName());
+							messageBox.open();
+						}
+					}
 				}else{
 					//we are not connected .. so alert the user
 					MessageBox messageBox = new MessageBox(add.getShell(),SWT.ICON_INFORMATION | SWT.OK);
@@ -370,10 +386,30 @@ public class ScrapeDialog {
 			status.setText("Status:  Using previous scrape data");
 		else
 			status.setText("Status:  Not Scraped Yet");
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 2;
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		gd.horizontalSpan = 1;
+		gd.grabExcessHorizontalSpace = true;
 		status.setLayoutData(gd);
 
+		
+		deleteOnSend = new Button(parent,SWT.CHECK);
+		deleteOnSend.setText("Delete local copy on send");
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
+		gd.horizontalSpan = 1;
+		deleteOnSend.setLayoutData(gd);
+		deleteOnSend.setSelection(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("delete.on.send", "false")));
+		deleteOnSend.addListener(SWT.Selection, new Listener(){
+
+			public void handleEvent(Event arg0) {
+				if(deleteOnSend.getSelection())
+					RCMain.getRCMain().getProperties().setProperty("delete.on.send", "true");
+				else
+					RCMain.getRCMain().getProperties().setProperty("delete.on.send", "false");
+				//Store the new setting
+				RCMain.getRCMain().saveConfig();
+			}
+
+		});
 
 		//ProgressBar
 		final ProgressBar pb = new ProgressBar(parent,SWT.SMOOTH | SWT.HORIZONTAL | SWT.INDETERMINATE);
@@ -617,7 +653,8 @@ public class ScrapeDialog {
 
 							public void run() {
 								pb.setVisible(false);
-								status.setText("Status:  Failed - " + reason);								
+								status.setText("Status:  Failed - " + reason);	
+								parent.layout();
 							}							
 						});
 						
@@ -635,6 +672,7 @@ public class ScrapeDialog {
 								srURL.setText(sr.getScrapeUrl());
 								srURL.setToolTipText(sr.getScrapeUrl());
 								atc.setScrapeResults(sr);
+								parent.layout();
 							}
 							
 						});
