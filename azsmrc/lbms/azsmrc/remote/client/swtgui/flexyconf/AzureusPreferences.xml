@@ -3,7 +3,7 @@
 	<Section label="Azureus Remote" index="0">
 		<Entry key="" label="All remote settings will be applied instantly -- no need to save." type="label" index="0" />
 		<Section label="ConfigView.section.server" index="0">
-			<Entry key="TCP.Listen.Port" label="ConfigView.label.serverport" type="int" index="0" validate="1..65535"/>
+			<Entry key="TCP.Listen.Port" label="ConfigView.label.serverport" type="integer" index="0" validate="1..65535"/>
 			<Group label="ConfigView.section.connection.group.peersources" index="1">
 				<Entry key="" label="ConfigView.section.connection.group.peersources.info" type="label" index="0" />
 				<Entry key="Peer Source Selection Default.Tracker" label="ConfigView.section.connection.peersource.Tracker" type="boolean" index="1" />
@@ -42,12 +42,12 @@
 				</Group>
 			</Section>
 			<Section label="ConfigView.section.connection.advanced" index="1">
-				<Entry key="network.max.simultaneous.connect.attempts" label="ConfigView.section.connection.network.max.simultaneous.connect.attempts" type="int" index="0" validate="1..100"/>
+				<Entry key="network.max.simultaneous.connect.attempts" label="ConfigView.section.connection.network.max.simultaneous.connect.attempts" type="integer" index="0" validate="1..100"/>
 				<Entry key="Bind IP" label="ConfigView.label.bindip" type="string" index="1" />
-				<Entry key="network.bind.local.port" label="ConfigView.section.connection.advanced.bind_port" type="int" index="2" validate="0..65535"/>
-				<Entry key="network.tcp.mtu.size" label="ConfigView.section.connection.advanced.mtu" type="int" index="3" validate="0..524288" />
-				<Entry key="network.tcp.socket.SO_SNDBUF" label="ConfigView.section.connection.advanced.SO_SNDBUF" type="int" index="4" />
-				<Entry key="network.tcp.socket.SO_RCVBUF" label="ConfigView.section.connection.advanced.SO_RCVBUF" type="int" index="5" />
+				<Entry key="network.bind.local.port" label="ConfigView.section.connection.advanced.bind_port" type="integer" index="2" validate="0..65535"/>
+				<Entry key="network.tcp.mtu.size" label="ConfigView.section.connection.advanced.mtu" type="integer" index="3" validate="0..524288" />
+				<Entry key="network.tcp.socket.SO_SNDBUF" label="ConfigView.section.connection.advanced.SO_SNDBUF" type="integer" index="4" />
+				<Entry key="network.tcp.socket.SO_RCVBUF" label="ConfigView.section.connection.advanced.SO_RCVBUF" type="integer" index="5" />
 				<Entry key="network.tcp.socket.IPTOS" label="ConfigView.section.connection.advanced.IPTOS" type="string" index="6" />
 			</Section>
 			<Section label="ConfigView.section.connection.encryption" index="2">
