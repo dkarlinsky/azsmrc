@@ -87,6 +87,11 @@
 				<Entry key="AutoSpeed Choking Ping Millis" label="ConfigView.section.transfer.autospeed.chokeping" type="integer" index="5" />
 				<Entry key="Auto Upload Speed Debug Enabled" label="ConfigView.section.transfer.autospeed.enabledebug" type="boolean" index="6" />
 			</Section>
+			<Section label="ConfigView.section.transfer.lan" index="1">
+				<Entry key="LAN Speed Enabled" label="ConfigView.section.transfer.lan.enable" type="boolean" index="0" />
+				<Entry key="Max LAN Upload Speed KBs" label="ConfigView.section.transfer.lan.uploadrate" type="integer" index="1" dependsOn="LAN Speed Enabled" />
+				<Entry key="Max LAN Download Speed KBs" label="ConfigView.section.transfer.lan.downloadrate" type="integer" index="2" dependsOn="LAN Speed Enabled" />
+			</Section>
 		</Section>
 	</Section>
 </FlexyConfiguration>
