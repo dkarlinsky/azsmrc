@@ -45,7 +45,7 @@
 				<Entry key="network.max.simultaneous.connect.attempts" label="ConfigView.section.connection.network.max.simultaneous.connect.attempts" type="int" index="0" validate="1..100"/>
 				<Entry key="Bind IP" label="ConfigView.label.bindip" type="string" index="1" />
 				<Entry key="network.bind.local.port" label="ConfigView.section.connection.advanced.bind_port" type="int" index="2" validate="0..65535"/>
-				<Entry key="network.tcp.mtu.size" label="ConfigView.section.connection.advanced.mtu" type="int" index="3" />
+				<Entry key="network.tcp.mtu.size" label="ConfigView.section.connection.advanced.mtu" type="int" index="3" validate="0..524288" />
 				<Entry key="network.tcp.socket.SO_SNDBUF" label="ConfigView.section.connection.advanced.SO_SNDBUF" type="int" index="4" />
 				<Entry key="network.tcp.socket.SO_RCVBUF" label="ConfigView.section.connection.advanced.SO_RCVBUF" type="int" index="5" />
 				<Entry key="network.tcp.socket.IPTOS" label="ConfigView.section.connection.advanced.IPTOS" type="string" index="6" />
@@ -61,6 +61,31 @@
 				<Entry key="" label="ConfigView.section.connection.encryption.encrypt.fallback_info" type="label" index="4"  dependsOn="network.transport.encrypted.require" />
 				<Entry key="network.transport.encrypted.fallback.outgoing" label="ConfigView.section.connection.encryption.encrypt.fallback_outgoing" type="boolean" index="5" dependsOn="network.transport.encrypted.require" />
 				<Entry key="network.transport.encrypted.fallback.incoming" label="ConfigView.section.connection.encryption.encrypt.fallback_incoming" type="boolean" index="6" dependsOn="network.transport.encrypted.require" />
+			</Section>
+		</Section>
+		<Section label="ConfigView.section.transfer" index="1">
+			<Entry key="Max Upload Speed KBs" label="ConfigView.label.maxuploadspeed" type="integer" index="0" validate="0.." />
+			<Entry key="enable.seedingonly.upload.rate" label="ConfigView.label.maxuploadspeedseeding" type="boolean" index="1" />
+			<Entry key="Max Upload Speed Seeding KBs" label="ConfigView.label.maxuploadspeedseeding" type="integer" index="2" validate="0.." dependsOn="enable.seedingonly.upload.rate" />
+			<Entry key="Max Download Speed KBs" label="ConfigView.label.maxdownloadspeed" type="integer" index="3" validate="0.." />
+			<Entry key="Max Uploads" label="ConfigView.label.maxuploads" type="integer" index="4" validate="2.." />
+			<Entry key="enable.seedingonly.maxuploads" label="ConfigView.label.maxuploadsseeding" type="boolean" index="5" />
+			<Entry key="Max Uploads Seeding" label="ConfigView.label.maxuploadsseeding" type="integer" index="6" validate="2.." dependsOn="enable.seedingonly.maxuploads" />			
+			<Entry key="Max.Peer.Connections.Per.Torrent" label="ConfigView.label.max_peers_per_torrent" type="integer" index="7" validate="0.." />
+			<Entry key="Max.Peer.Connections.Total" label="ConfigView.label.max_peers_total" type="integer" index="8" validate="0.." />
+			<Entry key="Allow Same IP Peers" label="ConfigView.label.allowsameip" type="boolean" index="9" />
+			<Entry key="Use Lazy Bitfield" label="ConfigView.label.lazybitfield" type="boolean" index="10" />
+			<Entry key="Prioritize First Piece" label="ConfigView.label.prioritizefirstpiece" type="boolean" index="11" />
+			<Entry key="Prioritize Most Completed Files" label="ConfigView.label.prioritizemostcompletedfiles" type="boolean" index="12" />
+			<Entry key="Ignore.peer.ports" label="ConfigView.label.transfer.ignorepeerports" type="string" index="13" />
+			<Section label="ConfigView.section.transfer.autospeed" index="0">
+				<Entry key="" label="ConfigView.section.transfer.autospeed.info" type="label" index="0" />
+				<Entry key="AutoSpeed Min Upload KBs" label="ConfigView.section.transfer.autospeed.minupload" type="integer" index="1" />
+				<Entry key="AutoSpeed Max Upload KBs" label="ConfigView.section.transfer.autospeed.maxupload" type="integer" index="2" />
+				<Entry key="Auto Upload Speed Enabled" label="ConfigView.section.transfer.autospeed.enableauto" type="boolean" index="3" />
+				<Entry key="Auto Upload Speed Seeding Enabled" label="ConfigView.section.transfer.autospeed.enableautoseeding" type="boolean" index="4" dependsOn="^Auto Upload Speed Enabled" />
+				<Entry key="AutoSpeed Choking Ping Millis" label="ConfigView.section.transfer.autospeed.chokeping" type="integer" index="5" />
+				<Entry key="Auto Upload Speed Debug Enabled" label="ConfigView.section.transfer.autospeed.enabledebug" type="boolean" index="6" />
 			</Section>
 		</Section>
 	</Section>
