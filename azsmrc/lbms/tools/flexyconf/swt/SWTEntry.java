@@ -24,6 +24,7 @@ public class SWTEntry implements DisplayAdapterEntry {
 
 	private static Cursor handCursor;
 	private static Color blueColor;
+	private static final int NUMERIC_FIELD_WIDTH = 30;
 
 	private Composite comp;
 	private Entry entry;
@@ -96,10 +97,12 @@ public class SWTEntry implements DisplayAdapterEntry {
 					});
 				} else {
 					control = new Text(comp, SWT.SINGLE | SWT.BORDER);
-					GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-					control.setLayoutData(gd);
 					if(entry.getType() == Entry.TYPE_INT ||
 							entry.getType() == Entry.TYPE_LONG) {
+
+						GridData gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+						gd.widthHint = NUMERIC_FIELD_WIDTH;
+						control.setLayoutData(gd);
 						control.addListener (SWT.Verify, new Listener () {
 							public void handleEvent (Event e) {
 								String string = e.text;
@@ -114,7 +117,11 @@ public class SWTEntry implements DisplayAdapterEntry {
 							}
 						});
 					} else if(entry.getType() == Entry.TYPE_DOUBLE ||
-							entry.getType() == Entry.TYPE_FLOAT){
+							entry.getType() == Entry.TYPE_FLOAT) {
+
+						GridData gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+						gd.widthHint = NUMERIC_FIELD_WIDTH;
+						control.setLayoutData(gd);
 						control.addListener (SWT.Verify, new Listener () {
 							public void handleEvent (Event e) {
 								String string = e.text;
@@ -128,6 +135,9 @@ public class SWTEntry implements DisplayAdapterEntry {
 								}
 							}
 						});
+					} else {
+						GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+						control.setLayoutData(gd);
 					}
 
 					control.addFocusListener(new FocusListener() {
