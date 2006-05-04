@@ -93,5 +93,38 @@
 				<Entry key="Max LAN Download Speed KBs" label="ConfigView.section.transfer.lan.downloadrate" type="integer" index="2" dependsOn="LAN Speed Enabled" />
 			</Section>
 		</Section>
+		<Section label="ConfigView.section.stats" index="3">
+			<Entry key="Stats Enable" label="ConfigView.section.stats.enable" type="boolean" index="0" />
+			<Entry key="Stats Dir" label="ConfigView.section.stats.defaultsavepath" type="string" index="1" dependsOn="Stats Enable" />
+			<Entry key="Stats File" label="ConfigView.section.stats.savefile" type="string" index="2" dependsOn="Stats Enable" />
+			<Entry key="Stats XSL File" label="ConfigView.section.stats.xslfile" type="string" index="3" dependsOn="Stats Enable" />
+			<Entry key="http://azureus.sourceforge.net/faq.php#20" label="ConfigView.section.stats.xslfiledetails" type="url" index="4" />
+			<Entry key="Stats Period" label="ConfigView.section.stats.savefreq" type="string" index="5" dependsOn="Stats Enable" >
+				<Option value="1" label="1 s" index="0" />
+				<Option value="5" label="5 s" index="1" />
+				<Option value="10" label="10 s" index="2" />
+				<Option value="20" label="20 s" index="3" />
+				<Option value="30" label="30 s" index="4" />
+				<Option value="40" label="40 s" index="5" />
+				<Option value="50" label="50 s" index="6" />
+				<Option value="60" label="1 min" index="7" />
+				<Option value="120" label="2 min" index="8" />
+				<Option value="180" label="3 min" index="9" />
+				<Option value="240" label="4 min" index="10" />
+				<Option value="300" label="5 min" index="11" />
+				<Option value="600" label="10 min" index="12" />
+				<Option value="1200" label="20 min" index="13" />
+				<Option value="1800" label="30 min" index="14" />
+				<Option value="2400" label="40 min" index="15" />
+				<Option value="3000" label="50 min" index="16" />
+				<Option value="3600" label="1 h" index="17" />
+				<Option value="7200" label="2 h" index="18" />
+				<Option value="10800" label="3 h" index="19" />
+				<Option value="14400" label="4 h" index="20" />
+				<Option value="18000" label="5 h" index="21" />
+				<Option value="43200" label="12 h" index="22" />
+				<Option value="86400" label="24 h" index="23" />
+			</Entry>
+		</Section>
 	</Section>
 </FlexyConfiguration>
