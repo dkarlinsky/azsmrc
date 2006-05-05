@@ -234,7 +234,6 @@ public class OpenByFileDialog {
 					RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
 						public void run() {
 							try{
-								RCMain.getRCMain().getClient().getRemoteInfo().refreshDriveInfo();
 								Map<String,String> driveMap = RCMain.getRCMain().getClient().getRemoteInfo().getDriveInfo();
 
 								if(driveMap.containsKey("save.dir") && driveMap.containsKey("save.dir.path")){
