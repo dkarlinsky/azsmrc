@@ -503,46 +503,14 @@ public class OpenByFileDialog {
 	private void createDragDrop(final Table parent) {
 		try {
 
-			Transfer[] types = new Transfer[] { TextTransfer.getInstance() };
-
-			DragSource dragSource = new DragSource(parent, DND.DROP_MOVE);
-			dragSource.setTransfer(types);
-			dragSource.addDragListener(new DragSourceAdapter() {
-				public void dragStart(DragSourceEvent event) {
-					Table table = parent;
-					if (table.getSelectionCount() != 0
-							&& table.getSelectionCount() != table
-									.getItemCount()) {
-						event.doit = true;
-						// System.out.println("DragStart");
-						drag_drop_line_start = table.getSelectionIndex();
-					} else {
-						event.doit = false;
-						drag_drop_line_start = -1;
-					}
-				}
-
-				public void dragSetData(DragSourceEvent event) {
-					event.data = "moveRow";
-				}
-			});
-
 			DropTarget dropTarget = new DropTarget(parent, DND.DROP_DEFAULT
 					| DND.DROP_MOVE | DND.DROP_COPY | DND.DROP_LINK
 					| DND.DROP_TARGET_MOVE);
 
-			if (SWT.getVersion() >= 3107) {
-				dropTarget
-						.setTransfer(new Transfer[] {
-								HTMLTransfer.getInstance(),
-								URLTransfer.getInstance(),
-								FileTransfer.getInstance(),
-								TextTransfer.getInstance() });
-			} else {
-				dropTarget.setTransfer(new Transfer[] {
-						URLTransfer.getInstance(), FileTransfer.getInstance(),
+
+			dropTarget.setTransfer(new Transfer[] {FileTransfer.getInstance(),
 						TextTransfer.getInstance() });
-			}
+
 
 			dropTarget.addDropListener(new DropTargetAdapter() {
 				public void dropAccept(DropTargetEvent event) {
@@ -554,13 +522,8 @@ public class OpenByFileDialog {
 					// no event.data on dragOver, use drag_drop_line_start to
 					// determine if
 					// ours
-					if (drag_drop_line_start < 0) {
-						if (event.detail != DND.DROP_COPY) {
-							if ((event.operations & DND.DROP_LINK) > 0)
-								event.detail = DND.DROP_LINK;
-							else if ((event.operations & DND.DROP_COPY) > 0)
-								event.detail = DND.DROP_COPY;
-						}
+					if (FileTransfer.getInstance().isSupportedType(event.currentDataType)) {
+						event.detail = DND.DROP_COPY;
 					} else if (TextTransfer.getInstance().isSupportedType(
 							event.currentDataType)) {
 						event.feedback = DND.FEEDBACK_EXPAND
@@ -604,22 +567,7 @@ public class OpenByFileDialog {
 
 			for (int i = 0; (i < sourceNames.length); i++) {
 				final File source = new File(sourceNames[i]);
-				String sURL = DownloadManagerShell
-						.parseTextForURL(sourceNames[i]);
-
-				if (sURL != null || !source.exists()) {
-					// openTorrentWindow(null, new String[] { sURL },
-					// bOverrideToStopped);
-					// System.out.println("Dropped is a URL: " + sURL);
-					MessageBox messageBox = new MessageBox(RCMain.getRCMain()
-							.getMainWindow().getShell(), SWT.ICON_ERROR
-							| SWT.OK);
-					messageBox.setText("Error");
-					messageBox.setMessage("You have dropped a URL:\n" + sURL
-							+ "\nPlease drop only torrent files.");
-					messageBox.open();
-					return;
-				} else if (source.isFile()) {
+				if (source.isFile()) {
 					String filename = source.getAbsolutePath();
 					try {
 						if (!DownloadManagerShell.isTorrentFile(filename)) {
@@ -671,10 +619,6 @@ public class OpenByFileDialog {
 					return;
 				}
 			}
-		} else if (event.data instanceof URLTransfer.URLType) {
-			System.out.println("Dropped is a URLTransfer.UrlType: "
-					+ ((URLTransfer.URLType) event.data).linkURL);
-
 		}
 	}
 
