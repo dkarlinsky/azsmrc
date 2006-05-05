@@ -8,10 +8,10 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Vector;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -61,7 +61,7 @@ public class Client {
 	private URL server;
 	private String username;
 	private String password;
-	private Queue<Element> transactionQueue = new LinkedList<Element>();
+	private Queue<Element> transactionQueue = new ConcurrentLinkedQueue<Element>();
 	private TimerEvent transactionTimeout;
 	private Timer timer;
 	private int failedConnections;
@@ -73,13 +73,14 @@ public class Client {
 	private RemoteInfoImpl remoteInfo;
 	private RemoteUpdateManagerImpl remoteUpdateManager;
 
-	private List<ClientUpdateListener> 	clientUpdateListeners	= new ArrayList<ClientUpdateListener>();
-	private List<SpeedUpdateListener> 	speedUpdateListners		= new ArrayList<SpeedUpdateListener>();
-	private List<ExceptionListener> 	exceptionListeners		= new ArrayList<ExceptionListener>();
-	private List<ConnectionListener> 	connectionListeners		= new ArrayList<ConnectionListener>();
-	private List<ClientEventListener> 	eventListeners			= new ArrayList<ClientEventListener>();
-	private List<HTTPErrorListener> 	httpErrorListeners		= new ArrayList<HTTPErrorListener>();
-	private List<ParameterListener>		parameterListeners		= new ArrayList<ParameterListener>();
+	//use Vector of Collections.synchronizedList here
+	private List<ClientUpdateListener> 	clientUpdateListeners	= new Vector<ClientUpdateListener>();
+	private List<SpeedUpdateListener> 	speedUpdateListners		= new Vector<SpeedUpdateListener>();
+	private List<ExceptionListener> 	exceptionListeners		= new Vector<ExceptionListener>();
+	private List<ConnectionListener> 	connectionListeners		= new Vector<ConnectionListener>();
+	private List<ClientEventListener> 	eventListeners			= new Vector<ClientEventListener>();
+	private List<HTTPErrorListener> 	httpErrorListeners		= new Vector<HTTPErrorListener>();
+	private List<ParameterListener>		parameterListeners		= new Vector<ParameterListener>();
 
 	public Client () {
 		init();
@@ -170,15 +171,16 @@ public class Client {
 					item = transactionQueue.poll();
 				}
 				sendHttpRequest(reqDoc);
-				if (fastMode && transactionQueue.size()>0) {
+				//if new elements are in the queue and fastmode is on send again
+				if (fastMode && transactionQueue.peek()!=null) {
 					debug.fine("FastMode Send");
 					send();
 				}
 				semaphore.release();
 			}
 		}).start();
-
 	}
+
 
 	private void sendHttpRequest(Document req) {
 		if (server == null) return;
