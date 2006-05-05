@@ -682,8 +682,10 @@ public class PreferencesTab {
 			properties.setProperty("auto_open", Boolean.toString(autoOpen.getSelection()));
 
 		//fastmode
-		if(fastMode != null && !fastMode.isDisposed())
+		if(fastMode != null && !fastMode.isDisposed()){
 			properties.setProperty("client.fastmode", Boolean.toString(fastMode.getSelection()));
+			RCMain.getRCMain().getClient().setFastMode(fastMode.getSelection());
+		}
 
 		//Store AutoSave
 		if(autoConnect != null && !autoConnect.isDisposed())			
