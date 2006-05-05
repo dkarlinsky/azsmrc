@@ -171,12 +171,12 @@ public class Client {
 					item = transactionQueue.poll();
 				}
 				sendHttpRequest(reqDoc);
+				semaphore.release();
 				//if new elements are in the queue and fastmode is on send again
 				if (fastMode && transactionQueue.peek()!=null) {
 					debug.fine("FastMode Send");
 					send();
 				}
-				semaphore.release();
 			}
 		}).start();
 	}
