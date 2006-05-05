@@ -136,6 +136,7 @@ public class OpenByFileDialog {
 							lastDir = container.getFilePath();
 							RCMain.getRCMain().getProperties().setProperty("Last.Directory", lastDir);
 							RCMain.getRCMain().saveConfig();
+							filesTable.setSelection(item);
 						}
 					} catch (UnsupportedEncodingException e1) {
 						e1.printStackTrace();
@@ -650,6 +651,8 @@ public class OpenByFileDialog {
 				}
 			}
 
+		}else{
+			System.out.println("Error... " + tName + " not in map!");
 		}
 	}
 
