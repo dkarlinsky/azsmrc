@@ -216,6 +216,7 @@ public class OpenByURLDialog {
 	 */
 	public static void open(){
 		Display display = RCMain.getRCMain().getDisplay();
+		final String url = RCMain.getRCMain().getAWTClipboardString();
 		if(display == null) return;
 		display.asyncExec(new Runnable(){
 			public void run() {
@@ -227,7 +228,7 @@ public class OpenByURLDialog {
 						return;
 					}
 				}
-				new OpenByURLDialog(null);
+				new OpenByURLDialog(url);
 			}
 
 		});
