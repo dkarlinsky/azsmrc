@@ -821,7 +821,8 @@ public class RCMain implements Launchable {
 	 * @param connection -- int -- 0 for no connection, 1 for connecting, 2 for connected
 	 */
 	public void setTrayIcon(int connection){
-		if(connection==0){
+		if(systrayItem == null || systrayItem.isDisposed()) return;
+		if(connection==0){			
 			systrayItem.setToolTipText("AzSMRC -- Not Connected");
 			systrayItem.setImage(ImageRepository.getImage("TrayIcon_Red"));
 		}else if(connection == 1){
