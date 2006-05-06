@@ -680,6 +680,7 @@ public class RCMain implements Launchable {
 		SeedContainer.saveColumns();
 		getRunTime();
 		saveConfig();
+		ImageRepository.unLoadImages();
 		System.out.println("Shutdown completed");
 	}
 
