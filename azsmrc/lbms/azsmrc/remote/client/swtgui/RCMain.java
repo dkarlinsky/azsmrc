@@ -164,9 +164,9 @@ public class RCMain implements Launchable {
 		connect = (Boolean.parseBoolean(properties.getProperty("auto_connect","false")));
 		createContents();
 		if (connect) {
-			if (properties.getProperty("connection_password", "").equals("")
-					|| properties.getProperty("connection_username", "").equals("")
-					|| properties.getProperty("connection_lastURL", "").equals("")) {
+			if (properties.getProperty("connection_password_0", "").equals("")
+					|| properties.getProperty("connection_username_0", "").equals("")
+					|| properties.getProperty("connection_lastURL_0", "").equals("")) {
 				connect = false;
 			} else if (Boolean.parseBoolean(properties.getProperty("auto_open", "true"))) {
 				updateTimer(true);
@@ -442,9 +442,9 @@ public class RCMain implements Launchable {
 		System.out.println("Creating Client.");
 		client = new Client();
 		client.setDebugLogger(debugLogger);
-		client.setServer(properties.getProperty("connection_lastURL",null));
-		client.setUsername(properties.getProperty("connection_username"));
-		client.setPassword(properties.getProperty("connection_password"));
+		client.setServer(properties.getProperty("connection_lastURL_0",null));
+		client.setUsername(properties.getProperty("connection_username_0"));
+		client.setPassword(properties.getProperty("connection_password_0"));
 		client.setFastMode(Boolean.parseBoolean(properties.getProperty("client.fastmode", "false")));
 		client.addSpeedUpdateListener(new SpeedUpdateListener() {
 			public void setSpeed(final int d, final int u) {

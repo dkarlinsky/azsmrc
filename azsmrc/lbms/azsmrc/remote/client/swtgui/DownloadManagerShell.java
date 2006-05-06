@@ -255,9 +255,9 @@ public class DownloadManagerShell {
 			public void handleEvent (Event e){
 				Properties properties = RCMain.getRCMain().getProperties();
 				if (
-						properties.getProperty("connection_lastURL",null) != null &&
-						properties.getProperty("connection_username",null) != null &&
-						properties.getProperty("connection_password",null) != null) {
+						properties.getProperty("connection_lastURL_0",null) != null &&
+						properties.getProperty("connection_username_0",null) != null &&
+						properties.getProperty("connection_password_0",null) != null) {
 					RCMain.getRCMain().connect(true);
 					initializeConnection();
 				} else
@@ -490,9 +490,9 @@ public class DownloadManagerShell {
 			public void handleEvent (Event e){
 				Properties properties = RCMain.getRCMain().getProperties();
 				if (
-						properties.getProperty("connection_lastURL",null) != null &&
-						properties.getProperty("connection_username",null) != null &&
-						properties.getProperty("connection_password",null) != null) {
+						properties.getProperty("connection_lastURL_0",null) != null &&
+						properties.getProperty("connection_username_0",null) != null &&
+						properties.getProperty("connection_password_0",null) != null) {
 					RCMain.getRCMain().connect(true);
 					initializeConnection();
 				} else

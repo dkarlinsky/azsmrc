@@ -80,153 +80,24 @@ public class ConnectionDialog {
 		urlCombo = new Combo(miniComp1,SWT.BORDER | SWT.FLAT);
 		gridData = new GridData(GridData.GRAB_HORIZONTAL);
 		gridData.widthHint = 235;
-		urlCombo.setLayoutData(gridData);
-
-		if(properties.containsKey("connection_url")){
-			urlCombo.add(properties.getProperty("connection_url"));
-			urlCombo.select(0);
-		}
-		if(properties.containsKey("connection_url_2")){
-			urlCombo.add(properties.getProperty("connection_url_2"));
-			urlCombo.select(0);
-		}
-		if(properties.containsKey("connection_url_3")){
-			urlCombo.add(properties.getProperty("connection_url_3"));
-			urlCombo.select(0);
-		}
+		urlCombo.setLayoutData(gridData);				
 		urlCombo.addListener(SWT.FocusOut, new Listener(){
-
 			public void handleEvent(Event arg0) {
 				if(urlCombo.getText().startsWith("http://")){
 					urlCombo.setText(urlCombo.getText().substring(7));
 				}else if(urlCombo.getText().startsWith("https://")){
 					urlCombo.setText(urlCombo.getText().substring(8));
 				}
-
 			}
-
 		});
 
 
 
 		urlCombo.addListener(SWT.Selection, new Listener(){
-
 			public void handleEvent(Event arg0) {
-				int index = urlCombo.getSelectionIndex();
-				if(index == 0){
-					//https button
-					if(properties.containsKey("connection_https")){
-						use_https.setSelection(properties.getProperty("connection_https").equalsIgnoreCase("true"));
-					}
-
-					//port
-					if(properties.containsKey("connection_port"))
-						port_text.setText(properties.getProperty("connection_port"));
-					else
-						port_text.setText("49009");
-
-					//username
-					if(properties.containsKey("connection_username"))
-						username_text.setText(properties.getProperty("connection_username"));
-
-
-					//password
-					if(properties.containsKey("connection_password"))
-						password_text.setText(properties.getProperty("connection_password"));
-
-
-					//button settings
-					if(properties.containsKey("connection_username")){
-						save_settings.setSelection(true);
-						save_password.setEnabled(true);
-					}
-					if(properties.containsKey("connection_password")){
-						save_password.setEnabled(true);
-						save_password.setSelection(true);
-					}else{
-						if(save_settings.getSelection())
-							save_password.setEnabled(true);
-						else
-							save_password.setEnabled(false);
-					}
-				}else if(index == 1){
-					//https button
-					if(properties.containsKey("connection_https_2")){
-						use_https.setSelection(properties.getProperty("connection_https_2").equalsIgnoreCase("true"));
-					}
-
-					//port
-					if(properties.containsKey("connection_port_2"))
-						port_text.setText(properties.getProperty("connection_port_2"));
-					else
-						port_text.setText("49009");
-
-					//username
-					if(properties.containsKey("connection_username_2"))
-						username_text.setText(properties.getProperty("connection_username_2"));
-
-
-					//password
-					if(properties.containsKey("connection_password_2"))
-						password_text.setText(properties.getProperty("connection_password_2"));
-
-
-					//button settings
-					if(properties.containsKey("connection_username_2")){
-						save_settings.setSelection(true);
-						save_password.setEnabled(true);
-					}
-					if(properties.containsKey("connection_password_2")){
-						save_password.setEnabled(true);
-						save_password.setSelection(true);
-					}else{
-						if(save_settings.getSelection())
-							save_password.setEnabled(true);
-						else
-							save_password.setEnabled(false);
-					}
-				}else if(index == 2){
-					//https button
-					if(properties.containsKey("connection_https_3")){
-						use_https.setSelection(properties.getProperty("connection_https_3").equalsIgnoreCase("true"));
-					}
-
-					//port
-					if(properties.containsKey("connection_port_3"))
-						port_text.setText(properties.getProperty("connection_port_3"));
-					else
-						port_text.setText("49009");
-
-					//username
-					if(properties.containsKey("connection_username_3"))
-						username_text.setText(properties.getProperty("connection_username_3"));
-
-
-					//password
-					if(properties.containsKey("connection_password_3"))
-						password_text.setText(properties.getProperty("connection_password_3"));
-
-
-					//button settings
-					if(properties.containsKey("connection_username_3")){
-						save_settings.setSelection(true);
-						save_password.setEnabled(true);
-					}
-					if(properties.containsKey("connection_password_3")){
-						save_password.setEnabled(true);
-						save_password.setSelection(true);
-					}else{
-						if(save_settings.getSelection())
-							save_password.setEnabled(true);
-						else
-							save_password.setEnabled(false);
-					}
-				}
-
-
-
+				int index = urlCombo.getSelectionIndex();				
+				loadIndex(index);				
 			}
-
 		});
 
 
@@ -249,8 +120,8 @@ public class ConnectionDialog {
 		gridData.horizontalSpan = 1;
 		use_https.setLayoutData(gridData);
 
-		if(properties.containsKey("connection_https")){
-			use_https.setSelection(properties.getProperty("connection_https").equalsIgnoreCase("true"));
+		if(properties.containsKey("connection_https_0")){
+			use_https.setSelection(Boolean.parseBoolean(properties.getProperty("connection_https_0")));
 		}
 
 		Label help = new Label(miniComp2,SWT.NULL);
@@ -277,11 +148,9 @@ public class ConnectionDialog {
 		gridData.widthHint = 40;
 		port_text.setLayoutData(gridData);
 
-		if(properties.containsKey("connection_port"))
-			port_text.setText(properties.getProperty("connection_port"));
-		else
-			port_text.setText("49009");
-
+		port_text.setText(properties.containsKey("connection_port_0")?
+				properties.getProperty("connection_port_0"):"49009");
+		
 
 		port_text.addListener (SWT.Verify, new Listener () {
 			public void handleEvent (Event e) {
@@ -307,8 +176,8 @@ public class ConnectionDialog {
 		gridData.widthHint = 100;
 		username_text.setLayoutData(gridData);
 
-		if(properties.containsKey("connection_username"))
-			username_text.setText(properties.getProperty("connection_username"));
+		if(properties.containsKey("connection_username_0"))
+			username_text.setText(properties.getProperty("connection_username_0"));
 
 		//Fourth Line
 		Label password_label = new Label(comp,SWT.NULL);
@@ -320,8 +189,8 @@ public class ConnectionDialog {
 		gridData.widthHint = 100;
 		password_text.setLayoutData(gridData);
 
-		if(properties.containsKey("connection_password"))
-			password_text.setText(properties.getProperty("connection_password"));
+		if(properties.containsKey("connection_password_0"))
+			password_text.setText(properties.getProperty("connection_password_0"));
 
 		//Fifth and Sixth line
 		save_settings = new Button(comp,SWT.CHECK);
@@ -340,19 +209,12 @@ public class ConnectionDialog {
 		gridData.horizontalSpan = 2;
 		save_password.setLayoutData(gridData);
 
-		if(properties.containsKey("connection_username")){
-			save_settings.setSelection(true);
-			save_password.setEnabled(true);
-		}
-		if(properties.containsKey("connection_password")){
-			save_password.setEnabled(true);
-			save_password.setSelection(true);
-		}else{
-			if(save_settings.getSelection())
-				save_password.setEnabled(true);
-			else
-				save_password.setEnabled(false);
-		}
+		
+		save_settings.setSelection(properties.containsKey("connection_username_0"));
+		save_password.setEnabled(properties.containsKey("connection_username_0"));
+		save_password.setSelection(properties.containsKey("connection_password_0"));
+		
+
 		save_settings.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
 				if(save_settings.getSelection()){
@@ -364,23 +226,69 @@ public class ConnectionDialog {
 			}
 		});
 
-
-
-
-
-
 		//Seventh Line
 		Composite button_comp = new Composite(shell, SWT.NULL);
-		gridData = new GridData(GridData.GRAB_HORIZONTAL);
+		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		button_comp.setLayoutData(gridData);
 
 		gridLayout = new GridLayout();
-		gridLayout.numColumns = 2;
+		gridLayout.numColumns = 3;
 		gridLayout.marginWidth = 0;
 		button_comp.setLayout(gridLayout);
 
-		Button connect = new Button(button_comp,SWT.PUSH);
+		Button delete = new Button(button_comp, SWT.PUSH);
+		delete.setText("Remove Profile");
+		delete.setToolTipText("Remove currently selected saved profile");
+		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		gridData.grabExcessHorizontalSpace = true;
+		delete.setLayoutData(gridData);
+		delete.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				int index = urlCombo.getSelectionIndex();				
+							
+				use_https.setSelection(false);
+				port_text.setText("");
+				username_text.setText("");
+				save_settings.setSelection(false);
+				save_password.setSelection(false);
+				save_password.setEnabled(false);
+				password_text.setText("");
+				
+				if(index == 0){
+					
+					removePropertySet(0);
+					
+					if(containsNumber(1) && containsNumber(2)){
+						shiftProperties(1, 0);
+						shiftProperties(2, 1);
+						removePropertySet(2);
+					}else if(containsNumber(1) && !containsNumber(2)){
+						shiftProperties(1, 0);
+						removePropertySet(1);
+					}	
+				}else if(index == 1){
+					if(containsNumber(2)){
+						shiftProperties(2,1);
+						removePropertySet(2);
+					}else
+						removePropertySet(1);					
+				}else if(index == 2){
+					removePropertySet(2);
+				}
+				
+				
+				fillCombo();
+				
+				if(port_text.getText().equalsIgnoreCase(""))
+					port_text.setText("49009");
+			}			
+		});
+		
+		
+		Button connect = new Button(button_comp,SWT.PUSH);		
 		connect.setText("Connect");
+		gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
+		connect.setLayoutData(gridData);
 		connect.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
 				if(urlCombo.getText().equalsIgnoreCase("")
@@ -438,93 +346,40 @@ public class ConnectionDialog {
 				}
 				Properties properties = RCMain.getRCMain().getProperties();
 				if(save_settings.getSelection()){
-					boolean bshift = true; 
-/*					if(properties.containsKey("connection_url")){
-						if(properties.containsKey("connection_url_2")){
-							if(properties.containsKey("connection_url_3")){
-								if(!properties.getProperty("connection_url_3").equalsIgnoreCase(urlCombo.getText()) &&
-										!properties.getProperty("connection_url_2").equalsIgnoreCase(urlCombo.getText()) &&
-										!properties.getProperty("connection_url").equalsIgnoreCase(urlCombo.getText())){
-									bshift = true;
-								}
+					
+					boolean bpresent = false;
+					
+					for(int i = 0; i < 3; i++){						
+						if(properties.containsKey("connection_lastURL_" + i)){
+							/*System.out.println("connection_lastURL_" + i + ":  " + properties.getProperty("connection_lastURL_" + i) + " | " + url_string + 
+									" || " + properties.getProperty("connection_username_" + i) + " | " + username_text.getText());*/
+							if(properties.getProperty("connection_lastURL_" + i).equalsIgnoreCase(url_string) &&
+									properties.getProperty("connection_username_" + i).equalsIgnoreCase(username_text.getText())){
+								bpresent = true;
 							}
-							if(!properties.getProperty("connection_url_2").equalsIgnoreCase(urlCombo.getText()) &&
-									!properties.getProperty("connection_url").equalsIgnoreCase(urlCombo.getText())){
-								bshift = true;
-							}
-
 						}
-						if(!properties.getProperty("connection_url").equalsIgnoreCase(urlCombo.getText())){
-							bshift = true;
-						}
-					}*/
-					if(bshift){
-						//we have a 3rd or 2nd stored and it is new, so we have shift everything
-						
-						//we always have a url.. so shift it down
-						if(properties.containsKey("connection_url_2"))
-							properties.setProperty("connection_url_3", properties.getProperty("connection_url_2"));
-						if(properties.containsKey("connection_url"))
-							properties.setProperty("connection_url_2", properties.getProperty("connection_url"));
-
-						//we always have a ssl setting.. so shift it down
-						if(properties.containsKey("connection_https_2"))
-							properties.setProperty("connection_https_3", properties.getProperty("connection_https_2"));
-						if(properties.containsKey("connection_https"))
-							properties.setProperty("connection_https_2", properties.getProperty("connection_https"));
-
-
-						//we always have a port, so shift it down
-						if(properties.containsKey("connection_port_2"))
-							properties.setProperty("connection_port_3", properties.getProperty("connection_port_2"));
-						if(properties.containsKey("connection_port"))
-							properties.setProperty("connection_port_2", properties.getProperty("connection_port"));
-
-
-						//we should always have the lastURL.. so shift it down
-						if(properties.containsKey("connection_lastURL_2"))
-							properties.setProperty("connection_lastURL_3", properties.getProperty("connection_lastURL_2"));
-						if(properties.containsKey("connection_lastURL"))
-							properties.setProperty("connection_lastURL_2", properties.getProperty("connection_lastURL"));
-
-						
-						//we are in a save settings if.. so shift it down
-						if(properties.containsKey("connection_username_2"))
-							properties.setProperty("connection_username_3", properties.getProperty("connection_username_2"));
-						if(properties.containsKey("connection_username"))
-							properties.setProperty("connection_username_2", properties.getProperty("connection_username"));
-
-
-						if(properties.containsKey("connection_password_2"))
-							properties.setProperty("connection_password_3", properties.getProperty("connection_password_2"));
-						if(properties.containsKey("connection_password"))
-							properties.setProperty("connection_password_2", properties.getProperty("connection_password"));
-
+					}
+					
+					if(!bpresent){
+						if(properties.containsKey("connection_url_1"))
+							shiftProperties(1, 2);
+						if(properties.containsKey("connection_url_0"))
+							shiftProperties(0, 1);
 					}
 
 
-					properties.setProperty("connection_url", urlCombo.getText());
-					if(use_https.getSelection())
-						properties.setProperty("connection_https", "true");
-					else
-						properties.setProperty("connection_https", "false");
-					properties.setProperty("connection_port", port_text.getText());
-					properties.setProperty("connection_lastURL", url_string);
-					properties.setProperty("connection_username", username_text.getText());
+
+					properties.setProperty("connection_url_0", urlCombo.getText());
+					
+					properties.setProperty("connection_https_0", Boolean.toString(use_https.getSelection()));
+					properties.setProperty("connection_port_0", port_text.getText());
+					properties.setProperty("connection_lastURL_0", url_string);
+					properties.setProperty("connection_username_0", username_text.getText());
 
 					if(save_password.getSelection()){
-						properties.setProperty("connection_password", password_text.getText());
+						properties.setProperty("connection_password_0", password_text.getText());
 					}else
-						properties.remove("connection_password");
-				}else{
-					/*//Clear out the keys here -- we can't clear things out.. 
-					properties.remove("connection_url");
-					properties.remove("connection_https");
-					properties.remove("connection_port");
-					properties.remove("connection_username");
-					properties.remove("connection_password");
-					properties.remove("connection_lastURL");
-					 */
+						properties.remove("connection_password_0");
 				}
 				RCMain.getRCMain().saveConfig();
 
@@ -548,15 +403,126 @@ public class ConnectionDialog {
 
 		Button cancel = new Button(button_comp,SWT.PUSH);
 		cancel.setText("Cancel");
+		gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
+		cancel.setLayoutData(gridData);
 		cancel.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
 				shell.close();
 			}
 		});
 
-
+		fillCombo();
 
 		//Center and open shell
 		GUI_Utilities.centerShellandOpen(shell);
 	}
-}
+	
+	
+	private void shiftProperties(int from, int to){
+		
+		if(properties.containsKey("connection_url_" + from))
+			properties.setProperty("connection_url_" + to, properties.getProperty("connection_url_" + from));
+		
+		//we always have a ssl setting.. so shift it down
+		if(properties.containsKey("connection_https_" + from))
+			properties.setProperty("connection_https_" + to, properties.getProperty("connection_https_" + from));
+		
+		//we always have a port, so shift it down
+		if(properties.containsKey("connection_port_" + from))
+			properties.setProperty("connection_port_" + to, properties.getProperty("connection_port_" + from));
+		
+		//we should always have the lastURL.. so shift it down
+		if(properties.containsKey("connection_lastURL_" + from))
+			properties.setProperty("connection_lastURL_" + to, properties.getProperty("connection_lastURL_" + from));
+		
+		//we are in a save settings situation.. so shift it down
+		if(properties.containsKey("connection_username_" + from))
+			properties.setProperty("connection_username_" + to, properties.getProperty("connection_username_" + from));
+		
+		
+		if(properties.containsKey("connection_password_" + from))
+			properties.setProperty("connection_password_" + to, properties.getProperty("connection_password_" + from));
+		
+		RCMain.getRCMain().saveConfig();
+	}
+	
+	private void removePropertySet(int set){
+		properties.remove("connection_https_" + set);
+		properties.remove("connection_lastURL_" + set);
+		properties.remove("connection_port_" + set);
+		properties.remove("connection_password_" + set);
+		properties.remove("connection_url_" + set);
+		properties.remove("connection_username_" + set);
+		RCMain.getRCMain().saveConfig();
+	}
+	
+	private void loadIndex(int index){
+		//https button
+		if(properties.containsKey("connection_https_" + index )){
+			use_https.setSelection(Boolean.getBoolean(properties.getProperty("connection_https_" + index)));
+		}
+
+		//port
+		if(properties.containsKey("connection_port_" + index))
+			port_text.setText(properties.getProperty("connection_port_" + index));
+		else
+			port_text.setText("49009");
+
+		//username
+		if(properties.containsKey("connection_username_" + index))
+			username_text.setText(properties.getProperty("connection_username_" + index));
+
+
+		//password
+		if(properties.containsKey("connection_password_" + index))
+			password_text.setText(properties.getProperty("connection_password_" + index));
+
+
+		//button settings
+		if(properties.containsKey("connection_username_" + index)){
+			save_settings.setSelection(true);
+			save_password.setEnabled(true);
+		}
+		if(properties.containsKey("connection_password_" + index)){
+			save_password.setEnabled(true);
+			save_password.setSelection(true);
+		}else{
+			if(save_settings.getSelection())
+				save_password.setEnabled(true);
+			else
+				save_password.setEnabled(false);
+		}
+	}
+	
+	private boolean containsNumber(int number){		
+		if(properties.containsKey("connection_url_" + number) &&
+				properties.containsKey("connection_username_" + number))
+			return true;		
+		else
+			return false;
+	}
+	
+	private void fillCombo(){
+		urlCombo.removeAll();
+		if(!containsNumber(0) && containsNumber(2)){
+			 shiftProperties(2,0);
+			 removePropertySet(2);
+			 if(containsNumber(3)){
+				 shiftProperties(3,1);
+				 removePropertySet(3);
+			 }		 			 
+		}	
+		
+		
+		for(int i = 0; i < 3; i++){
+			if(containsNumber(i)){
+				urlCombo.add(properties.getProperty("connection_url_" + i));
+				urlCombo.select(0);
+			}	
+		}
+		
+		if(containsNumber(0))
+			loadIndex(0);
+	}
+	
+}//EOF
