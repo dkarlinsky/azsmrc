@@ -1690,12 +1690,13 @@ public class DownloadManagerShell {
 			}
 
 			public void shellDeiconified(ShellEvent arg0) {
-
+				RCMain.getRCMain().updateTimer(true);
 			}
 
 			public void shellIconified(ShellEvent arg0) {
 				if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("tray.minimize","true"))){
 					DOWNLOAD_MANAGER_SHELL.setVisible(false);
+					RCMain.getRCMain().updateTimer(false);
 				}
 
 			}
