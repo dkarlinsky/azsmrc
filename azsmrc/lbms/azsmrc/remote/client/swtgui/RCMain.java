@@ -28,6 +28,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.net.ssl.SSLHandshakeException;
 
@@ -452,9 +453,9 @@ public class RCMain implements Launchable {
 					display.syncExec(new Runnable() {
 						public void run() {
 							//setTrayToolTip("AzSMRC: D:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d)+" - U:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u));
-							setTrayToolTip(RCMain.getRCMain().getMainWindow().getSeedsDownloadsCount()[0] + " seeding, " 
+							setTrayToolTip(RCMain.getRCMain().getMainWindow().getSeedsDownloadsCount()[0] + " seeding, "
 									+ RCMain.getRCMain().getMainWindow().getSeedsDownloadsCount()[1] + " downloading, "
-									+ "D: "+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d)  
+									+ "D: "+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d)
 									+ ", U: "+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u));
 						}
 					});
@@ -823,7 +824,7 @@ public class RCMain implements Launchable {
 	 */
 	public void setTrayIcon(int connection){
 		if(systrayItem == null || systrayItem.isDisposed()) return;
-		if(connection==0){			
+		if(connection==0){
 			systrayItem.setToolTipText("AzSMRC -- Not Connected");
 			systrayItem.setImage(ImageRepository.getImage("TrayIcon_Red"));
 		}else if(connection == 1){
@@ -914,26 +915,36 @@ public class RCMain implements Launchable {
 			clipboard.removeFlavorListener(listen);
 		}*/
 
-
-
 		clipboard.addFlavorListener(new FlavorListener(){
+			Pattern magnetPattern = Pattern.compile("^magnet:\\?xt=urn:btih:[A-Za-z2-7]{32}$",Pattern.CASE_INSENSITIVE);
+
 			public void flavorsChanged(FlavorEvent event) {
 				if(connect && Boolean.parseBoolean(properties.getProperty("auto_clipboard",Utilities.isLinux()? "false" : "true"))){
 					Transferable contents = clipboard.getContents(this);
 					if ( ( contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor) ) {
 						try {
-							final String string = (String) contents.getTransferData(DataFlavor.stringFlavor);
-							if(string.indexOf("torrent") < 0 && string.indexOf("magnet") < 0) return;
-							/*//validate to see if this is a URL
-							new URL(string);
+							final String string = ((String) contents.getTransferData(DataFlavor.stringFlavor)).trim();
+							if(!string.contains("torrent") && !string.contains("magnet")) return;
+							boolean valid = false;
 
-*/							//all looks good.. now make sure DMS is open and open up the Open by URL
-							clipboard.setContents(emptyTransfer,null); //clear Transfer
-							display.asyncExec(new Runnable(){
-								public void run() {
-									OpenByURLDialog.openWithURL(string);
-								}
-							});
+							if (magnetPattern.matcher(string).find()) {
+								valid = true;
+							} else {
+								try {
+									new URL(string);
+									valid = true;
+								} catch (MalformedURLException e) {}
+							}
+							if (valid) {
+								clipboard.setContents(emptyTransfer,null); //clear Transfer
+								display.asyncExec(new Runnable(){
+									public void run() {
+										OpenByURLDialog.openWithURL(string);
+									}
+								});
+							} else {
+								System.out.println("Not Valid URL: "+ string);
+							}
 						} catch(Exception e) {
 							//Just a regular string.. so ignore
 							e.printStackTrace();
