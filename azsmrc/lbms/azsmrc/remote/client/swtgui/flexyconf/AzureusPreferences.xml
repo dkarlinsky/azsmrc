@@ -93,6 +93,34 @@
 				<Entry key="Max LAN Download Speed KBs" label="ConfigView.section.transfer.lan.downloadrate" type="integer" index="2" dependsOn="LAN Speed Enabled" />
 			</Section>
 		</Section>
+		<Section label="ConfigView.section.files" index="2">
+			<Entry key="Zero New" label="ConfigView.label.zeronewfiles" type="boolean" index="0" dependsOn="^Enable incremental file creation" />
+			<Entry key="Enable incremental file creation" label="ConfigView.label.incrementalfile" type="boolean" index="1" dependsOn="^Zero New" />
+			<Entry key="File.truncate.if.too.large" label="ConfigView.section.file.truncate.too.large" type="boolean" index="2" />
+			<Entry key="Check Pieces on Completion" label="ConfigView.label.checkOncompletion" type="boolean" index="3" />
+			<Entry key="File.strict.locking" label="ConfigView.label.strictfilelocking" type="boolean" index="4" />
+			<Entry key="Use Resume" label="ConfigView.label.usefastresume" type="boolean" index="5" />
+			<Group label="" index="6">
+				<Entry key="Save Resume Interval" label="ConfigView.label.saveresumeinterval" type="integer" index="0" dependsOn="Use Resume" />
+				<Entry key="On Resume Recheck All" label="ConfigView.section.file.resume.recheck.all" type="boolean" index="1" dependsOn="Use Resume" />
+				<Entry key="File.save.peers.enable" label="ConfigView.section.file.save.peers.enable" type="boolean" index="2" dependsOn="Use Resume" />
+				<Entry key="File.save.peers.max" label="ConfigView.section.file.save.peers.max" type="integer" index="3" dependsOn="Use Resume" />
+			</Group>
+			<Entry key="Use default data dir" label="ConfigView.label.defaultsavepath" type="boolean" index="7" />
+			<Entry key="Default save path" label="ConfigView.label.defaultsavepath" type="string" index="8"/>
+			<Entry key="Move Completed When Done" label="ConfigView.label.movecompleted" type="boolean" index="9" />
+			<Group label="" index="10" >
+				<Entry key="Completed Files Directory" label="ConfigView.label.directory" type="string" index="0"  dependsOn="Move Completed When Done" />
+				<Entry key="Move Torrent When Done" label="ConfigView.label.movetorrent" type="boolean" index="1" dependsOn="Move Completed When Done" />
+				<Entry key="Move Only When In Default Save Dir" label="ConfigView.label.moveonlyusingdefaultsave" type="boolean" index="2" dependsOn="Move Completed When Done" />
+				<Entry key="Copy And Delete Data Rather Than Move" label="ConfigView.label.copyanddeleteratherthanmove" type="boolean" index="3" dependsOn="Move Completed When Done" />
+			</Group>
+			<Entry key="priorityExtensions" label="ConfigView.label.priorityExtensions" type="string" index="11"/>
+			<Entry key="priorityExtensionsIgnoreCase" label="ConfigView.label.ignoreCase" type="boolean" index="12" />
+			<Entry key="Confirm Data Delete" label="ConfigView.section.file.confirm_data_delete" type="boolean" index="13" />
+			<Entry key="Move Deleted Data To Recycle Bin" label="ConfigView.section.file.nativedelete" type="boolean" index="14" />
+			<Entry key="Use Config File Backups" label="ConfigView.label.backupconfigfiles" type="boolean" index="15" />
+		</Section>
 		<Section label="ConfigView.section.stats" index="3">
 			<Entry key="Stats Enable" label="ConfigView.section.stats.enable" type="boolean" index="0" />
 			<Entry key="Stats Dir" label="ConfigView.section.stats.defaultsavepath" type="string" index="1" dependsOn="Stats Enable" />
