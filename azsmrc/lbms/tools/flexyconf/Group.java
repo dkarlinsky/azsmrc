@@ -15,6 +15,9 @@ public class Group extends AbstractEntryContainer implements ConfigEntity {
 		this.fci = fci;
 		this.section = parent;
 		label = e.getAttributeValue("label");
+		String indexString = e.getAttributeValue("index");
+		if (indexString!=null)index = Integer.parseInt(indexString);
+		else index = 0;
 		List<Element> elems = e.getChildren("Entry");
 		for (Element elem:elems) {
 			Entry en = new Entry(elem,section,fci);
@@ -25,6 +28,7 @@ public class Group extends AbstractEntryContainer implements ConfigEntity {
 	public Element toElement() {
 		Element s = new Element ("Group");
 		s.setAttribute("label", label);
+		s.setAttribute("index", Integer.toString(index));
 		Set<String> keys = entries.keySet();
 		for (String k:keys) {
 			s.addContent(entries.get(k).toElement());
