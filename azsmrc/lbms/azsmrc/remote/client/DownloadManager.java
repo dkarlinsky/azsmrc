@@ -84,6 +84,20 @@ DownloadManager
 	getSortedDownloads();
 
 	/**
+	 * Gets Seeding Downloads only
+	 * @return
+	 */
+	public Download[]
+	getSeedingDownloadsOnly();
+
+	/**
+	 * Gets only non finished downloads
+	 * @return
+	 */
+	public Download[]
+	getDownloadsOnly();
+
+	/**
 	 * pause all running downloads
 	 *
 	 */

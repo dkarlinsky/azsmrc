@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -17,8 +18,10 @@ import lbms.azsmrc.remote.client.events.DownloadManagerListener;
 
 public class DownloadManagerImpl implements DownloadManager {
 
-	Map<String, DownloadImpl> downloads = Collections.synchronizedMap( new TreeMap<String, DownloadImpl>() );
-	List<DownloadManagerListener> listeners =Collections.synchronizedList( new ArrayList<DownloadManagerListener>() );
+	private static final Download[] emptyDlArray = new Download[0];
+
+	private Map<String, DownloadImpl> downloads = Collections.synchronizedMap( new TreeMap<String, DownloadImpl>() );
+	private List<DownloadManagerListener> listeners =Collections.synchronizedList( new ArrayList<DownloadManagerListener>() );
 
 	public void addDownload(File torrent_file) {
 		// TODO Auto-generated method stub
@@ -41,11 +44,11 @@ public class DownloadManagerImpl implements DownloadManager {
 	}
 
 	public Download[] getDownloads() {
-		return downloads.values().toArray(new Download[] {});
+		return downloads.values().toArray(emptyDlArray);
 	}
 
 	public Download[] getSortedDownloads() {
-		Download[] dls = downloads.values().toArray(new Download[] {});
+		Download[] dls = downloads.values().toArray(emptyDlArray);
 		Arrays.sort(dls, new Comparator<Download>() {
 			public int compare(Download o1, Download o2) {
 				if (o1.getPosition() == o2.getPosition()) {
@@ -54,6 +57,30 @@ public class DownloadManagerImpl implements DownloadManager {
 			}
 		});
 		return dls;
+	}
+
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.DownloadManager#getDownloadsOnly()
+	 */
+	public Download[] getDownloadsOnly() {
+		List<Download> dl = new ArrayList<Download>();
+		for (Download d:downloads.values()) {
+			if (d.getState()!= Download.ST_SEEDING && d.getStats().getCompleted() != 1000)
+				dl.add(d);
+		}
+		return dl.toArray(emptyDlArray);
+	}
+
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.DownloadManager#getSeedingDownloadsOnly()
+	 */
+	public Download[] getSeedingDownloadsOnly() {
+		List<Download> dl = new ArrayList<Download>();
+		for (Download d:downloads.values()) {
+			if (d.getState()== Download.ST_SEEDING || d.getStats().getCompleted() == 1000)
+				dl.add(d);
+		}
+		return dl.toArray(emptyDlArray);
 	}
 
 	public void pauseDownloads() {
