@@ -73,6 +73,7 @@ public class Client {
 	private RemoteInfoImpl remoteInfo;
 	private RemoteUpdateManagerImpl remoteUpdateManager;
 
+
 	//use Vector of Collections.synchronizedList here
 	private List<ClientUpdateListener> 	clientUpdateListeners	= new Vector<ClientUpdateListener>();
 	private List<SpeedUpdateListener> 	speedUpdateListners		= new Vector<SpeedUpdateListener>();
@@ -336,34 +337,14 @@ public class Client {
 		Element sendElement = getSendElement();
 		sendElement.setAttribute("switch", "addDownload");
 		sendElement.setAttribute("location", "XML");
-		Element torrent = new Element ("Torrent");
 		if (fileOptions != null) {
-			torrent.setAttribute("fileOptions", EncodingUtil.IntArrayToString(fileOptions));
+			sendElement.setAttribute("fileOptions", EncodingUtil.IntArrayToString(fileOptions));
 		}
-		FileInputStream fis = null;
 		try {
-			fis = new FileInputStream(torrentFile);
-			byte[] input = new byte[(int)torrentFile.length()];
-			for(int i = 0; i < input.length; i++)
-			{
-				int j = fis.read();
-				if(j == -1)
-					break;
-				input[i] = (byte)j;
-			}
-			torrent.setText(EncodingUtil.encode(input));
-			sendElement.addContent(torrent);
+			sendElement.addContent(loadTorrentToXML(torrentFile));
 			enqueue(sendElement);
-		} catch (FileNotFoundException e) {
-			callExceptionListener(e, true);
-			e.printStackTrace();
 		} catch (IOException e) {
-			callExceptionListener(e, true);
 			e.printStackTrace();
-		} finally {
-			try {
-				if (fis != null) fis.close();
-			} catch (IOException e) {}
 		}
 	}
 
@@ -657,6 +638,85 @@ public class Client {
 
 	public void sendGetGlobalStats() {
 		send(); //globalStats are allways requested so just send here
+	}
+
+	//********************************************************//
+
+	public void sendGetTrackerTorrents() {
+		Element sendElement = getSendElement();
+		sendElement.setAttribute("switch", "getTrackerTorrents");
+		enqueue(sendElement);
+	}
+
+	public void sendHostTorrent (File torrentFile, boolean persistent, boolean passive) {
+		Element sendElement = getSendElement();
+		sendElement.setAttribute("switch", "hostTorrent");
+		sendElement.setAttribute("location", "XML");
+		sendElement.setAttribute("persistent", Boolean.toString(persistent));
+		sendElement.setAttribute("passive", Boolean.toString(passive));
+		try {
+			sendElement.addContent(loadTorrentToXML(torrentFile));
+			enqueue(sendElement);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void sendHostTorrent (Download dl, boolean persistent, boolean passive) {
+		Element sendElement = getSendElement();
+		sendElement.setAttribute("switch", "hostTorrent");
+		sendElement.setAttribute("location", "Download");
+		sendElement.setAttribute("hash", dl.getHash());
+		sendElement.setAttribute("persistent", Boolean.toString(persistent));
+		sendElement.setAttribute("passive", Boolean.toString(passive));
+		enqueue(sendElement);
+	}
+
+	public void sendPublishTorrent (File torrentFile) {
+		Element sendElement = getSendElement();
+		sendElement.setAttribute("switch", "publishTorrent");
+		sendElement.setAttribute("location", "XML");
+		try {
+			sendElement.addContent(loadTorrentToXML(torrentFile));
+			enqueue(sendElement);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void sendPublishTorrent (Download dl) {
+		Element sendElement = getSendElement();
+		sendElement.setAttribute("switch", "publishTorrent");
+		sendElement.setAttribute("location", "Download");
+		sendElement.setAttribute("hash", dl.getHash());
+		enqueue(sendElement);
+	}
+	//--------------------------------------------------------//
+
+	public Element loadTorrentToXML (File torrentFile) throws IOException {
+		Element torrent = new Element ("Torrent");
+		FileInputStream fis = null;
+		try {
+			fis = new FileInputStream(torrentFile);
+			byte[] input = new byte[(int)torrentFile.length()];
+			for(int i = 0; i < input.length; i++)
+			{
+				int j = fis.read();
+				if(j == -1)
+					break;
+				input[i] = (byte)j;
+			}
+			torrent.setText(EncodingUtil.encode(input));
+		} catch (IOException e) {
+			callExceptionListener(e, true);
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+				if (fis != null) fis.close();
+			} catch (IOException e) {}
+		}
+		return torrent;
 	}
 
 	//--------------------------------------------------------//

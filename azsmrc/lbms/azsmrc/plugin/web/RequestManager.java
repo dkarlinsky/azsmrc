@@ -38,6 +38,7 @@ import org.gudy.azureus2.plugins.torrent.Torrent;
 import org.gudy.azureus2.plugins.torrent.TorrentAttribute;
 import org.gudy.azureus2.plugins.torrent.TorrentException;
 import org.gudy.azureus2.plugins.torrent.TorrentManager;
+import org.gudy.azureus2.plugins.tracker.TrackerException;
 import org.gudy.azureus2.plugins.tracker.web.TrackerWebPageResponse;
 import org.gudy.azureus2.plugins.update.Update;
 import org.gudy.azureus2.plugins.update.UpdateCheckInstance;
@@ -201,6 +202,15 @@ public class RequestManager {
 		response.setAttribute("switch", "Events");
 		user.getEvents(response);
 		return response;
+	}
+
+	private Torrent getTorrentFromXML (Element e) throws TorrentException {
+		String torrentData = e.getText();
+		return Plugin.getPluginInterface().getTorrentManager().createFromBEncodedData(EncodingUtil.decode(torrentData));
+	}
+
+	private Download getDownloadByHash (String hash) throws DownloadException {
+		return Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
 	}
 
 	private void setDlStats (Element dle, Download dl, int switches) {
@@ -371,13 +381,12 @@ public class RequestManager {
 						};
 					}).start();
 				} else if (location.equalsIgnoreCase("XML")) {
-					String torrentData = xmlRequest.getChildText("Torrent");
 					try {
 						TorrentManager torrentManager = Plugin.getPluginInterface().getTorrentManager();
 						TorrentAttribute ta = torrentManager.getAttribute(TorrentAttribute.TA_CATEGORY);
-						Torrent newTorrent = torrentManager.createFromBEncodedData(EncodingUtil.decode(torrentData));
+						Torrent newTorrent = getTorrentFromXML(xmlRequest.getChild("Torrent"));
 
-						String fileOptions = xmlRequest.getChild("Torrent").getAttributeValue("fileOptions");
+						String fileOptions = xmlRequest.getAttributeValue("fileOptions");
 						if (fileOptions!=null) {
 							int[] opt = EncodingUtil.StringToIntArray(fileOptions);
 							System.out.println("AzSMRC addDL: found FileOptions: "+EncodingUtil.IntArrayToString(opt));
@@ -432,7 +441,7 @@ public class RequestManager {
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser || user.hasDownload(hash)) {
 					try {
-						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+						Download dl = getDownloadByHash (hash);
 						if (dl.getState() != Download.ST_STOPPED)dl.stop();
 						if (xmlRequest.getAttributeValue("delTorrent")!=null) {
 							try {
@@ -460,7 +469,7 @@ public class RequestManager {
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser || user.hasDownload(hash)) {
 					try {
-						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+						Download dl = getDownloadByHash (hash);
 						dl.stop();
 					} catch (DownloadException e) {
 						user.eventException(e);
@@ -477,7 +486,7 @@ public class RequestManager {
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser || user.hasDownload(hash)) {
 					try {
-						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+						Download dl = getDownloadByHash (hash);
 						dl.stopAndQueue();
 					} catch (DownloadException e) {
 						user.eventException(e);
@@ -494,7 +503,7 @@ public class RequestManager {
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser || user.hasDownload(hash)) {
 					try {
-						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+						Download dl = getDownloadByHash (hash);
 						dl.restart();
 					} catch (DownloadException e) {
 						user.eventException(e);
@@ -511,7 +520,7 @@ public class RequestManager {
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser || user.hasDownload(hash)) {
 					try {
-						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+						Download dl = getDownloadByHash (hash);
 						dl.recheckData();
 					} catch (DownloadException e) {
 						user.eventException(e);
@@ -528,7 +537,7 @@ public class RequestManager {
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser || user.hasDownload(hash)) {
 					try {
-						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+						Download dl = getDownloadByHash (hash);
 						dl.setMaximumDownloadKBPerSecond(xmlRequest.getAttribute("limit").getIntValue());
 					} catch (DownloadException e) {
 						user.eventException(e);
@@ -547,7 +556,7 @@ public class RequestManager {
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser || user.hasDownload(hash)) {
 					try {
-						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+						Download dl = getDownloadByHash (hash);
 						dl.setUploadRateLimitBytesPerSecond(xmlRequest.getAttribute("limit").getIntValue());
 					} catch (DownloadException e) {
 						user.eventException(e);
@@ -566,7 +575,7 @@ public class RequestManager {
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser || user.hasDownload(hash)) {
 					try {
-						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+						Download dl = getDownloadByHash (hash);
 						dl.start();
 					} catch (DownloadException e) {
 						user.eventException(e);
@@ -584,7 +593,7 @@ public class RequestManager {
 				if (singleUser || user.hasDownload(hash)) {
 					try {
 						int newpos = xmlRequest.getAttribute("position").getIntValue();
-						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+						Download dl = getDownloadByHash (hash);
 						dl.setPosition(newpos);
 					} catch (DataConversionException e) {
 						// TODO Auto-generated catch block
@@ -604,7 +613,7 @@ public class RequestManager {
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if ((singleUser || user.hasDownload(hash)) && user.checkAccess(RemoteConstants.RIGHTS_FORCESTART)) {
 					try {
-						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+						Download dl = getDownloadByHash (hash);
 						dl.setForceStart(Boolean.parseBoolean(xmlRequest.getAttributeValue("start")));
 					} catch (DownloadException e) {
 						user.eventException(e);
@@ -622,7 +631,7 @@ public class RequestManager {
 				if (singleUser || user.hasDownload(hash)) {
 					try {
 						int newpos = xmlRequest.getAttribute("position").getIntValue();
-						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+						Download dl = getDownloadByHash (hash);
 						dl.moveTo(newpos);
 					} catch (DataConversionException e) {
 						// TODO Auto-generated catch block
@@ -642,7 +651,7 @@ public class RequestManager {
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser || user.hasDownload(hash)) {
 					try {
-						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+						Download dl = getDownloadByHash (hash);
 						dl.moveUp();
 					} catch (DownloadException e) {
 						user.eventException(e);
@@ -659,7 +668,7 @@ public class RequestManager {
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser || user.hasDownload(hash)) {
 					try {
-						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+						Download dl = getDownloadByHash (hash);
 						dl.moveDown();
 					} catch (DownloadException e) {
 						user.eventException(e);
@@ -676,7 +685,7 @@ public class RequestManager {
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser || user.hasDownload(hash)) {
 					try {
-						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+						Download dl = getDownloadByHash (hash);
 						dl.requestTrackerScrape(false);
 					} catch (DownloadException e) {
 						user.eventException(e);
@@ -693,7 +702,7 @@ public class RequestManager {
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser || user.hasDownload(hash)) {
 					try {
-						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+						Download dl = getDownloadByHash (hash);
 						dl.requestTrackerAnnounce(false);
 					} catch (DownloadException e) {
 						user.eventException(e);
@@ -710,7 +719,7 @@ public class RequestManager {
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser || user.hasDownload(hash)) {
 					try {
-						final Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+						final Download dl = getDownloadByHash (hash);
 						final File target = new File (xmlRequest.getAttributeValue("target"));
 						if (target.exists() && target.isDirectory()) {
 							new Thread(new Runnable() {
@@ -747,7 +756,7 @@ public class RequestManager {
 					try {
 						Element transferList = new Element("Transfers");
 						int options = xmlRequest.getAttribute("options").getIntValue();
-						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+						Download dl = getDownloadByHash (hash);
 						Element dle = new Element ("Transfer");
 						setDlStats(dle, dl, options);
 						transferList.addContent(dle);
@@ -805,7 +814,7 @@ public class RequestManager {
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser || user.hasDownload(hash)) {
 					try {
-						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+						Download dl = getDownloadByHash (hash);
 						DiskManagerFileInfo[] dmfi=  dl.getDiskManagerFileInfo();
 						Element files = new Element("Files");
 						for (int i=0; i<dmfi.length;i++) {
@@ -835,7 +844,7 @@ public class RequestManager {
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser || user.hasDownload(hash)) {
 					try {
-						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+						Download dl = getDownloadByHash (hash);
 						DiskManagerFileInfo[] dmfi=  dl.getDiskManagerFileInfo();
 						if (xmlRequest.getAttributeValue("index")!=null) {
 							try {
@@ -866,7 +875,7 @@ public class RequestManager {
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser || user.hasDownload(hash)) {
 					try {
-						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+						Download dl = getDownloadByHash (hash);
 						Torrent tor = dl.getTorrent();
 						response.setAttribute("hash",hash);
 						Element as = new Element ("AdvancedStats");
@@ -1270,6 +1279,77 @@ public class RequestManager {
 						user.eventMessage("SSL Certificate successfully created.");
 					} catch (Exception e) {
 						user.eventException(e,"CreateSSLCert");
+					}
+				}
+				return false;
+			}
+		});
+		addHandler("hostTorrent", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {
+				if (!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) return false;
+
+				String location = xmlRequest.getAttributeValue("location");
+				Torrent torrent = null;
+				if (location.equalsIgnoreCase("XML")) {
+					try {
+						torrent = getTorrentFromXML(xmlRequest.getChild("Torrent"));
+					} catch (TorrentException e) {
+						e.printStackTrace();
+						user.eventException(e);
+					}
+				} else if (location.equalsIgnoreCase("Download")) {
+					try {
+						String hash = xmlRequest.getAttributeValue("hash");
+						torrent = getDownloadByHash(hash).getTorrent();
+
+					} catch (DownloadException e) {
+						e.printStackTrace();
+						user.eventException(e);
+					}
+				}
+				if (torrent != null) {
+					try {
+						Plugin.getPluginInterface().getTracker().host(torrent,
+								Boolean.parseBoolean(xmlRequest.getAttributeValue("persistent")),
+								Boolean.parseBoolean(xmlRequest.getAttributeValue("passive")));
+					} catch (TrackerException e) {
+						e.printStackTrace();
+						user.eventException(e);
+					}
+				}
+				return false;
+			}
+		});
+
+		addHandler("publishTorrent", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {
+				if (!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) return false;
+
+				String location = xmlRequest.getAttributeValue("location");
+				Torrent torrent = null;
+				if (location.equalsIgnoreCase("XML")) {
+					try {
+						torrent = getTorrentFromXML(xmlRequest.getChild("Torrent"));
+					} catch (TorrentException e) {
+						e.printStackTrace();
+						user.eventException(e);
+					}
+				} else if (location.equalsIgnoreCase("Download")) {
+					try {
+						String hash = xmlRequest.getAttributeValue("hash");
+						torrent = getDownloadByHash(hash).getTorrent();
+
+					} catch (DownloadException e) {
+						e.printStackTrace();
+						user.eventException(e);
+					}
+				}
+				if (torrent != null) {
+					try {
+						Plugin.getPluginInterface().getTracker().publish(torrent);
+					} catch (TrackerException e) {
+						e.printStackTrace();
+						user.eventException(e);
 					}
 				}
 				return false;
