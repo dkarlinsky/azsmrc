@@ -384,7 +384,7 @@ public class PreferencesTab {
 		gridData.horizontalSpan = 2;
 		autoOpen.setLayoutData(gridData);
 		autoOpen.setText("AutoOpen: Auto open main window when program is started");
-		
+
 		autoOpen.setSelection(Boolean.parseBoolean(properties.getProperty("auto_open","false")));
 		addModListener(autoOpen,SWT.Selection);
 
@@ -425,7 +425,7 @@ public class PreferencesTab {
 		autoConsole.setText("Auto open console when opening main window");
 		autoConsole.setSelection(Boolean.parseBoolean(properties.getProperty("auto_console","false"))?true:false);
 		addModListener(autoConsole,SWT.Selection);
-		
+
 		//showhost
 		showHost = new Button(composite,SWT.CHECK);
 		gridData = new GridData(GridData.GRAB_HORIZONTAL);
@@ -451,7 +451,7 @@ public class PreferencesTab {
 		popupsEnabled.setLayoutData(gridData);
 		popupsEnabled.setText("Popup Alerts Enabled");
 
-		popupsEnabled.setSelection(Boolean.parseBoolean(properties.getProperty("popups_enabled","true")));		
+		popupsEnabled.setSelection(Boolean.parseBoolean(properties.getProperty("popups_enabled","true")));
 		addModListener(popupsEnabled,SWT.Selection);
 
 
@@ -462,7 +462,7 @@ public class PreferencesTab {
 		showSplash.setLayoutData(gridData);
 		showSplash.setText("Show splash screen on startup");
 
-		showSplash.setSelection(Boolean.parseBoolean(properties.getProperty("show_splash","true")));		
+		showSplash.setSelection(Boolean.parseBoolean(properties.getProperty("show_splash","true")));
 		addModListener(showSplash,SWT.Selection);
 
 
@@ -472,8 +472,8 @@ public class PreferencesTab {
 		gridData.horizontalSpan = 2;
 		autoClipboard.setLayoutData(gridData);
 		autoClipboard.setText("Clipboard Monitor: Monitor the users clipboard at all times for torrent URLs and files");
-		
-		autoClipboard.setSelection(Boolean.parseBoolean(properties.getProperty("auto_clipboard",Utilities.isLinux()? "false" : "true")));		
+
+		autoClipboard.setSelection(Boolean.parseBoolean(properties.getProperty("auto_clipboard",Utilities.isLinux()? "false" : "true")));
 		addModListener(autoClipboard,SWT.Selection);
 
 
@@ -494,8 +494,8 @@ public class PreferencesTab {
 		gridData.horizontalSpan = 2;
 		updateBeta.setLayoutData(gridData);
 
-		
-		updateBeta.setSelection(Boolean.parseBoolean(properties.getProperty("update.beta", "false")));		
+
+		updateBeta.setSelection(Boolean.parseBoolean(properties.getProperty("update.beta", "false")));
 		addModListener(updateBeta,SWT.Selection);
 
 
@@ -506,7 +506,7 @@ public class PreferencesTab {
 		autoUpdateCheck.setLayoutData(gridData);
 		autoUpdateCheck.setText("Auto Check for Updates: Allow AzSMRC to check for and alert the user to updates");
 
-		
+
 		autoUpdateCheck.setSelection(Boolean.parseBoolean(properties.getProperty("update.autocheck","true")));
 		addModListener(autoUpdateCheck,SWT.Selection);
 
@@ -528,10 +528,10 @@ public class PreferencesTab {
 		updateCheck.setLayoutData(gridData);
 		updateCheck.setText("Check online for updates");
 		updateCheck.addListener(SWT.Selection, new Listener(){
-			public void handleEvent(Event arg0) {								
+			public void handleEvent(Event arg0) {
 				RCMain.getRCMain().getUpdater().checkForUpdates(Boolean.parseBoolean(properties.getProperty("update.beta", "false")));
 				properties.setProperty("update.lastcheck",Long.toString(System.currentTimeMillis()));
-				RCMain.getRCMain().saveConfig();		
+				RCMain.getRCMain().saveConfig();
 			}
 		});
 
@@ -688,15 +688,15 @@ public class PreferencesTab {
 		}
 
 		//Store AutoSave
-		if(autoConnect != null && !autoConnect.isDisposed())			
+		if(autoConnect != null && !autoConnect.isDisposed())
 			properties.setProperty("auto_connect", Boolean.toString(autoConnect.getSelection()));
 
 		//update Beta
 		if(updateBeta != null && !updateBeta.isDisposed())
-			properties.setProperty("update.beta", Boolean.toString(updateBeta.getSelection()));			
+			properties.setProperty("update.beta", Boolean.toString(updateBeta.getSelection()));
 
 		//Store AutoUpdateCheck
-		if(autoUpdateCheck != null && !autoUpdateCheck.isDisposed())			
+		if(autoUpdateCheck != null && !autoUpdateCheck.isDisposed())
 			properties.setProperty("update.autocheck", Boolean.toString(autoUpdateCheck.getSelection()));
 
 		//Store AutoUpdate
@@ -734,8 +734,8 @@ public class PreferencesTab {
 		//showHost setting
 		if(showHost != null && !showHost.isDisposed())
 			properties.setProperty("mainwindow.showHost", Boolean.toString(showHost.getSelection()));
-		
-		
+
+
 		//Plugin Setting to core
 		if(singleUser != null && !singleUser.isDisposed()){
 			Client client = RCMain.getRCMain().getClient();
@@ -785,7 +785,7 @@ public class PreferencesTab {
 
 			//I18N i18n = I18N.
 			InputStream fcIs = this.getClass().getClassLoader().getResourceAsStream("lbms/azsmrc/remote/client/swtgui/flexyconf/AzureusPreferences.xml");
-			fc = FlexyConfiguration.readFromStream(fcIs);
+			fc = FlexyConfiguration.readFromStream(fcIs, "Azureus");
 			Client client = RCMain.getRCMain().getClient();
 			final FCInterface fci = fc.getFCInterface();
 			fci.setI18NProvider(new I18NProvider() {

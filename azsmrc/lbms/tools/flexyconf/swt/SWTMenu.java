@@ -20,11 +20,12 @@ public class SWTMenu implements DisplayAdapter {
 		this.target = target;
 		fc = c;
 		tree.addSelectionListener(new SelectionListener() {
+			private String domain = fc.getFCInterface().getDomain();
 			public void widgetDefaultSelected(SelectionEvent e) {}
 
 			public void widgetSelected(SelectionEvent e) {
 				TreeItem t =(TreeItem)e.item;
-				SWTSection s = (SWTSection)t.getData("SWTSection");
+				SWTSection s = (SWTSection)t.getData(domain+"_SWTSection");
 				if (s!=null)
 					s.fillMenu();
 			}

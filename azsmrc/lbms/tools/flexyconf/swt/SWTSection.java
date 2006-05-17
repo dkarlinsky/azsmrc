@@ -31,7 +31,7 @@ public class SWTSection implements DisplayAdapterSection {
 			if (!root) {
 				treeItem = new TreeItem(t,SWT.None);
 				treeItem.setText(s.getLabel());
-				treeItem.setData("SWTSection", this);
+				treeItem.setData(section.getFCInterface().getDomain()+"_SWTSection", this);
 				addSubSections(treeItem, c);
 			} else {
 				addSubSections(t, c);
@@ -47,7 +47,7 @@ public class SWTSection implements DisplayAdapterSection {
 			comp = c;
 			treeItem = new TreeItem(t,SWT.None);
 			treeItem.setText(s.getLabel());
-			treeItem.setData("SWTSection", this);
+			treeItem.setData(section.getFCInterface().getDomain()+"_SWTSection", this);
 			addSubSections(treeItem, c);
 		} catch (SWTException e) {
 			e.printStackTrace();

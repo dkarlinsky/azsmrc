@@ -16,6 +16,12 @@ public class FCInterface {
 	};
 	private ContentProvider cp;
 	/**
+	 * The domain should be used if you want to use
+	 * multiple Flexyconfs in one Tree, or wherever
+	 * there could be collisions
+	 */
+	private String domain = "";
+	/**
 	 * The Basic I18N Provider will simply return the key.
 	 */
 	private I18NProvider inp = new I18NProvider() {
@@ -30,8 +36,21 @@ public class FCInterface {
 		this.fc = fc;
 	}
 
+	public FCInterface (FlexyConfiguration fc, String domain) {
+		this.fc = fc;
+		this.domain = domain;
+	}
+
 	public Entry getEntry (String key) {
 		return fc.getRoot().getEntry(key);
+	}
+
+
+	/**
+	 * @return the domain
+	 */
+	public String getDomain() {
+		return domain;
 	}
 
 	/**

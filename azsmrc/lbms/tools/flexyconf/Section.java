@@ -58,6 +58,10 @@ public class Section extends AbstractEntryContainer implements Comparable<Sectio
 		return s;
 	}
 
+	public FCInterface getFCInterface() {
+		return fci;
+	}
+
 	@Override
 	public Entry getEntry (String key) {
 		if (entries.containsKey(key))

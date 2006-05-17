@@ -30,6 +30,12 @@ public class FlexyConfiguration {
 		rootSection = new Section (root.getChild("Section"), fci);
 	}
 
+	public FlexyConfiguration (Document doc, String domain) {
+		Element root = doc.getRootElement();
+		fci = new FCInterface (this,domain);
+		rootSection = new Section (root.getChild("Section"), fci);
+	}
+
 	public Document toDocument () {
 		Document doc = new Document();
 		Element root = new Element ("FlexyConfiguration");
@@ -44,6 +50,7 @@ public class FlexyConfiguration {
 	public FCInterface getFCInterface() {
 		return fci;
 	}
+
 	/**
 	 * @return the rootSection
 	 */
@@ -89,19 +96,32 @@ public class FlexyConfiguration {
 	}
 
 	/**
+	 * Reads the FlexyConf from a File.
+	 * 
+	 * @param f File to read from
+	 * @param domain Configuration domain
+	 * @return FlexyConf instance
+	 * @throws IOException
+	 */
+	public static FlexyConfiguration readFromFile(File f, String domain) throws IOException {
+		return readFromStream( new FileInputStream(f), domain );
+}
+
+	/**
 	 * Reads the FlexyConf from the Stream.
 	 * 
 	 * The Stream is closed after completition.
 	 * 
 	 * @param is Stream to read from 
+	 * @param domain Configuration domain
 	 * @return FlexyConf instance
 	 * @throws IOException
 	 */
-	public static FlexyConfiguration readFromStream(InputStream is) throws IOException {
+	public static FlexyConfiguration readFromStream(InputStream is, String domain) throws IOException {
 		try {
 			SAXBuilder builder = new SAXBuilder();
 			Document xmlDom = builder.build(is);
-			return new FlexyConfiguration(xmlDom);
+			return new FlexyConfiguration(xmlDom, domain);
 			//SWTMenu = new SWTMenu(fc,)
 		} catch (JDOMException e) {
 			e.printStackTrace();
@@ -109,5 +129,9 @@ public class FlexyConfiguration {
 		} finally {
 			if (is!=null)is.close();
 		}
+	}
+
+	public static FlexyConfiguration readFromStream(InputStream is) throws IOException {
+		return readFromStream(is,"");
 	}
 }
