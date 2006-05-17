@@ -6,8 +6,9 @@ Index
 3.  Installation
 4.  Setup
 5.  Manually starting the remote
-6.  Website
-7.  Donating
+6.  Known issues
+7.  Website
+8.  Donating
 ------------------
 
 1.  What is AzSMRC?
@@ -144,7 +145,15 @@ java -classpath launcher.jar lbms.tools.launcher.Launcher
 
 	java -classpath launcher.jar  -Djava.library.path=. lbms.tools.launcher.Launcher
 
-6.	Website
+
+6.  Known issues
+
+- If a user is heavily restricted (does not have normal user access) in Windows, then
+the system clipboard monitor feature will not work as that user does not have access
+to the 'system clipboard'
+
+
+7.	Website
 
 Our ProjectPage is: http://sourceforge.net/projects/azsmrc
 
@@ -153,7 +162,7 @@ You can find the forum there too.
 
 We have a normal Website too: http://azsmrc.sourceforge.net/
 
-7.  Donations
+8.  Donations
 
 Donations are always welcome!  We have several methods for donating availble.
 
