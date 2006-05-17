@@ -836,11 +836,11 @@ public class MainWindow {
 											defaultMap.put(newKey, defaultValue);
 											transMap.put(newKey, defaultValue);
 											isSaved = false;
-										}else if(column == 2 && !item.getText(2).equalsIgnoreCase(text.getText())){
+										}else if(column == 2 /*&& !item.getText(2).equalsIgnoreCase(text.getText())*/){
 											//default is different!
 											defaultMap.put(item.getText(1), text.getText());
 											isSaved = false;
-										}else if(column == 3 && !item.getText(3).equalsIgnoreCase(text.getText())){
+										}else if(column == 3 /*&& !item.getText(3).equalsIgnoreCase(text.getText())*/){
 											//trans if different!
 											transMap.put(item.getText(1), text.getText());
 											isSaved = false;
