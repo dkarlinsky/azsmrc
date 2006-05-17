@@ -674,7 +674,7 @@ public class OpenByFileDialog {
 			if((saveDirFree - totalSizeAdj) > (1024l * 1024l * 2l/*2 GB */) ){
 				totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
 			}else if((saveDirFree - totalSizeAdj) > (1024l * 20l /*20 MB */)){
-				totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_YELLOW));
+				totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_DARK_YELLOW));
 			}else {
 				totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_DARK_RED));
 			}
@@ -690,7 +690,7 @@ public class OpenByFileDialog {
 			if((destDirFree - totalSizeAdj) > (1024l * 1024l * 2l/*2 GB */) ){
 				totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
 			}else if((destDirFree - totalSizeAdj) > (1024l * 20l /*20 MB */)){
-				totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_YELLOW));
+				totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_DARK_YELLOW));
 			}else {
 				totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_DARK_RED));
 			}
@@ -699,7 +699,9 @@ public class OpenByFileDialog {
 		}else{
 			totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
 		}
-
+		if(totalSizeAdj == 0){
+			totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+		}
 		totalSLabel.setText("Total size of selected downloads to send to server: ");
 		totalS.setText(DisplayFormatters.formatByteCountToBase10KBEtc(totalSize));
 	}
