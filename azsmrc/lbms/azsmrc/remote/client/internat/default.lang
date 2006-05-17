@@ -1,8 +1,6 @@
-dialog.connectiondialog.cancel.text=Cancel
 dialog.connectiondialog.connect.messagebox.message.fillall=Please fill out all of the information.
 dialog.connectiondialog.connect.messagebox.message.portrange=Port given is out of range.  Please provide a port number between 1 and 65000.
 dialog.connectiondialog.connect.messagebox.message.validURL=The server URL is not valid.  Please fix.
-dialog.connectiondialog.connect.messagebox.title=Error
 dialog.connectiondialog.connect.text=Connect
 dialog.connectiondialog.help1.tooltip=Examples:  \n'localhost' \n'workstation.azureusathome.net' \n'123.4.56.78'
 dialog.connectiondialog.help2.messagebox.message=a) Server - create certificate\n(Tools->Options->Security)\n\nb) Server - enable SSL in plugin options\n(Tools->Options->Plugins->AzMultiUser)\n\nc) Restart Azureus\n\nd) Client - Click the SSL box on connection dialog
@@ -18,3 +16,7 @@ dialog.connectiondialog.shell.text=Connect to Remote Server
 dialog.connectiondialog.url.label=Servername or IP:
 dialog.connectiondialog.use_https.label=Use secure https protocol to connect to this server?
 dialog.connectiondialog.username.label=Username:
+global.cancel=Cancel
+global.error=Error
+global.ok=OK
+global.save=Save

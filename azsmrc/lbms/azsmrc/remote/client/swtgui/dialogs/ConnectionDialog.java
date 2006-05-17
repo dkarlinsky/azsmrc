@@ -300,7 +300,7 @@ public class ConnectionDialog {
 						|| username_text.getText().equalsIgnoreCase("")
 						|| password_text.getText().equalsIgnoreCase("")){
 					MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-					messageBox.setText(I18N.translate(PFX + "connect.messagebox.title"));
+					messageBox.setText(I18N.translate("global.error"));
 					messageBox.setMessage(I18N.translate(PFX + "connect.messagebox.message.fillall"));
 					messageBox.open();
 					return;
@@ -312,7 +312,7 @@ public class ConnectionDialog {
 					port = Integer.parseInt(port_text.getText());
 					if(port < 1 || port > 65000 ){
 						MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-						messageBox.setText(I18N.translate(PFX + "connect.messagebox.title"));
+						messageBox.setText(I18N.translate("global.error"));
 						messageBox.setMessage(I18N.translate(PFX + "connect.messagebox.message.portrange"));
 						messageBox.open();
 						return;
@@ -343,7 +343,7 @@ public class ConnectionDialog {
 				}catch(Exception f){
 					f.printStackTrace();
 					MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-					messageBox.setText(I18N.translate(PFX + "connect.messagebox.title"));
+					messageBox.setText(I18N.translate("global.error"));
 					messageBox.setMessage(I18N.translate(PFX + "connect.messagebox.message.validURL"));
 					messageBox.open();
 					return;
@@ -406,7 +406,7 @@ public class ConnectionDialog {
 
 
 		Button cancel = new Button(button_comp,SWT.PUSH);
-		cancel.setText(I18N.translate(PFX + "cancel.text"));
+		cancel.setText(I18N.translate("global.cancel"));
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		cancel.setLayoutData(gridData);
 		cancel.addListener(SWT.Selection, new Listener(){
