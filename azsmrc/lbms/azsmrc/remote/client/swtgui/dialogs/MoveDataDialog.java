@@ -31,6 +31,7 @@ public class MoveDataDialog {
     private Download download;
     private DownloadAdvancedStats das;
 	private Label tDir;
+	private Group gName;
 
 	//I18N prefix
 	public static final String PFX = "dialog.movedatadialog.";
@@ -53,6 +54,8 @@ public class MoveDataDialog {
                     RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
 						public void run() {
 							tDir.setText(das.getSaveDir());
+							gName.layout();
+
 						}
                     });
                 }
@@ -83,7 +86,7 @@ public class MoveDataDialog {
 		gd.grabExcessVerticalSpace = true;
 		parent.setLayoutData(gd);
 
-		Group gName = new Group(parent,SWT.NULL);
+		gName = new Group(parent,SWT.NULL);
 		gName.setLayout(new GridLayout(2,false));
 		gd = new GridData(GridData.FILL_BOTH);
 		gd.grabExcessHorizontalSpace= true;
