@@ -46,6 +46,9 @@ public class ConnectionDialog {
 	private Button save_settings;
 	private Button save_password;
 
+	//I18N prefix
+	public static final String PFX = "dialog.connectiondialog.";
+
 	public ConnectionDialog(Display display){
 		properties = RCMain.getRCMain().getProperties();
 
@@ -53,7 +56,7 @@ public class ConnectionDialog {
 		//Shell
 		final Shell shell = new Shell(display);
 		shell.setLayout(new GridLayout(1,false));
-		shell.setText(I18N.translate("dialog.connectiondialog.shell.text"));
+		shell.setText(I18N.translate(PFX + "shell.text"));
 
 		//Comp on shell
 		Group comp = new Group(shell,SWT.NULL);
@@ -75,7 +78,7 @@ public class ConnectionDialog {
 
 		//first line
 		Label url_label = new Label(miniComp1,SWT.NULL);
-		url_label.setText(I18N.translate("dialog.connectiondialog.url.label"));
+		url_label.setText(I18N.translate(PFX + "url.label"));
 
 
 		urlCombo = new Combo(miniComp1,SWT.BORDER | SWT.FLAT);
@@ -104,7 +107,7 @@ public class ConnectionDialog {
 
 		Label help1 = new Label(miniComp1,SWT.NULL);
 		help1.setImage(ImageRepository.getImage("information"));
-		help1.setToolTipText(I18N.translate("dialog.connectiondialog.help1.tooltip"));
+		help1.setToolTipText(I18N.translate(PFX + "help1.tooltip"));
 
 
 
@@ -116,7 +119,7 @@ public class ConnectionDialog {
 
 		//add in a second line for https
 		use_https = new Button(miniComp2,SWT.CHECK);
-		use_https.setText(I18N.translate("dialog.connectiondialog.use_https.label"));
+		use_https.setText(I18N.translate(PFX + "use_https.label"));
 		gridData = new GridData(GridData.GRAB_HORIZONTAL);
 		gridData.horizontalSpan = 1;
 		use_https.setLayoutData(gridData);
@@ -127,13 +130,13 @@ public class ConnectionDialog {
 
 		Label help2 = new Label(miniComp2,SWT.NULL);
 		help2.setImage(ImageRepository.getImage("information"));
-		help2.setToolTipText(I18N.translate("dialog.connectiondialog.help2.tooltip"));
+		help2.setToolTipText(I18N.translate(PFX + "help2.tooltip"));
 		help2.setCursor(RCMain.getRCMain().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
 		help2.addListener(SWT.MouseDown, new Listener(){
 			public void handleEvent(Event arg0) {
 				MessageBox messageBox = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK);
-				messageBox.setText(I18N.translate("dialog.connectiondialog.help2.messagebox.title"));
-				messageBox.setMessage(I18N.translate("dialog.connectiondialog.help2.messagebox.message"));
+				messageBox.setText(I18N.translate(PFX + "help2.messagebox.title"));
+				messageBox.setMessage(I18N.translate(PFX + "help2.messagebox.message"));
 				messageBox.open();
 			}
 
@@ -141,7 +144,7 @@ public class ConnectionDialog {
 
 		//second line
 		Label port_label = new Label(comp,SWT.NULL);
-		port_label.setText(I18N.translate("dialog.connectiondialog.port.label"));
+		port_label.setText(I18N.translate(PFX + "port.label"));
 
 
 		port_text = new Text(comp,SWT.BORDER | SWT.SINGLE | SWT.LEFT);
@@ -169,7 +172,7 @@ public class ConnectionDialog {
 
 		//Third Line
 		Label username_label = new Label(comp,SWT.NULL);
-		username_label.setText(I18N.translate("dialog.connectiondialog.username.label"));
+		username_label.setText(I18N.translate(PFX + "username.label"));
 
 
 		username_text = new Text(comp,SWT.BORDER | SWT.SINGLE | SWT.LEFT);
@@ -182,7 +185,7 @@ public class ConnectionDialog {
 
 		//Fourth Line
 		Label password_label = new Label(comp,SWT.NULL);
-		password_label.setText(I18N.translate("dialog.connectiondialog.password.label"));
+		password_label.setText(I18N.translate(PFX + "password.label"));
 
 
 		password_text = new Text(comp,SWT.PASSWORD | SWT.BORDER | SWT.SINGLE | SWT.LEFT);
@@ -198,8 +201,8 @@ public class ConnectionDialog {
 		save_password = new Button(comp,SWT.CHECK);
 
 
-		save_settings.setText(I18N.translate("dialog.connectiondialog.save_settings.label"));
-		save_password.setText(I18N.translate("dialog.connectiondialog.save_password.label"));
+		save_settings.setText(I18N.translate(PFX + "save_settings.label"));
+		save_password.setText(I18N.translate(PFX + "save_password.label"));
 
 
 		gridData = new GridData(GridData.GRAB_HORIZONTAL);
@@ -238,8 +241,8 @@ public class ConnectionDialog {
 		button_comp.setLayout(gridLayout);
 
 		Button delete = new Button(button_comp, SWT.PUSH);
-		delete.setText(I18N.translate("dialog.connectiondialog.removeprofile.text"));
-		delete.setToolTipText(I18N.translate("dialog.connectiondialog.removeprofile.tooltip"));
+		delete.setText(I18N.translate(PFX + "removeprofile.text"));
+		delete.setToolTipText(I18N.translate(PFX + "removeprofile.tooltip"));
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		gridData.grabExcessHorizontalSpace = true;
 		delete.setLayoutData(gridData);
@@ -287,7 +290,7 @@ public class ConnectionDialog {
 
 
 		Button connect = new Button(button_comp,SWT.PUSH);
-		connect.setText(I18N.translate("dialog.connectiondialog.connect.text"));
+		connect.setText(I18N.translate(PFX + "connect.text"));
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		connect.setLayoutData(gridData);
 		connect.addListener(SWT.Selection, new Listener(){
@@ -297,8 +300,8 @@ public class ConnectionDialog {
 						|| username_text.getText().equalsIgnoreCase("")
 						|| password_text.getText().equalsIgnoreCase("")){
 					MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-					messageBox.setText(I18N.translate("dialog.connectiondialog.connect.messagebox.title"));
-					messageBox.setMessage(I18N.translate("dialog.connectiondialog.connect.messagebox.message.fillall"));
+					messageBox.setText(I18N.translate(PFX + "connect.messagebox.title"));
+					messageBox.setMessage(I18N.translate(PFX + "connect.messagebox.message.fillall"));
 					messageBox.open();
 					return;
 				}
@@ -309,8 +312,8 @@ public class ConnectionDialog {
 					port = Integer.parseInt(port_text.getText());
 					if(port < 1 || port > 65000 ){
 						MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-						messageBox.setText(I18N.translate("dialog.connectiondialog.connect.messagebox.title"));
-						messageBox.setMessage(I18N.translate("dialog.connectiondialog.connect.messagebox.message.portrange"));
+						messageBox.setText(I18N.translate(PFX + "connect.messagebox.title"));
+						messageBox.setMessage(I18N.translate(PFX + "connect.messagebox.message.portrange"));
 						messageBox.open();
 						return;
 					}
@@ -340,8 +343,8 @@ public class ConnectionDialog {
 				}catch(Exception f){
 					f.printStackTrace();
 					MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-					messageBox.setText(I18N.translate("dialog.connectiondialog.connect.messagebox.title"));
-					messageBox.setMessage(I18N.translate("dialog.connectiondialog.connect.messagebox.message.validURL"));
+					messageBox.setText(I18N.translate(PFX + "connect.messagebox.title"));
+					messageBox.setMessage(I18N.translate(PFX + "connect.messagebox.message.validURL"));
 					messageBox.open();
 					return;
 				}
@@ -403,7 +406,7 @@ public class ConnectionDialog {
 
 
 		Button cancel = new Button(button_comp,SWT.PUSH);
-		cancel.setText(I18N.translate("dialog.connectiondialog.cancel.text"));
+		cancel.setText(I18N.translate(PFX + "cancel.text"));
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		cancel.setLayoutData(gridData);
 		cancel.addListener(SWT.Selection, new Listener(){
