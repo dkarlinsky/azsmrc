@@ -39,6 +39,7 @@ import org.gudy.azureus2.plugins.torrent.TorrentAttribute;
 import org.gudy.azureus2.plugins.torrent.TorrentException;
 import org.gudy.azureus2.plugins.torrent.TorrentManager;
 import org.gudy.azureus2.plugins.tracker.TrackerException;
+import org.gudy.azureus2.plugins.tracker.TrackerTorrent;
 import org.gudy.azureus2.plugins.tracker.web.TrackerWebPageResponse;
 import org.gudy.azureus2.plugins.update.Update;
 import org.gudy.azureus2.plugins.update.UpdateCheckInstance;
@@ -1353,6 +1354,24 @@ public class RequestManager {
 					}
 				}
 				return false;
+			}
+		});
+		addHandler("getTrackerTorrents", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, final User user) throws IOException {
+
+				TrackerTorrent[] ttorrents = Plugin.getPluginInterface().getTracker().getTorrents();
+				Element torrentsE = new Element ("TrackerTorrents");
+				for (TrackerTorrent tt:ttorrents) {
+					Element tte = new Element ("TrackerTorrent");
+					tte.setAttribute("", "");
+					tte.setAttribute("", "");
+					tte.setAttribute("", "");
+					tte.setAttribute("", "");
+					tte.setAttribute("", "");
+					torrentsE.addContent(tte);
+				}
+				response.addContent(torrentsE);
+				return true;
 			}
 		});
 	}

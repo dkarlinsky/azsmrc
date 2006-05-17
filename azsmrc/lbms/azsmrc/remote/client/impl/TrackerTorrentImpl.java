@@ -3,11 +3,13 @@
  */
 package lbms.azsmrc.remote.client.impl;
 
+import lbms.azsmrc.remote.client.TrackerTorrent;
+
 /**
  * @author Damokles
  *
  */
-public class TrackerTorrent implements lbms.azsmrc.remote.client.TrackerTorrent {
+public class TrackerTorrentImpl implements TrackerTorrent {
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.TrackerTorrent#canBeRemoved()

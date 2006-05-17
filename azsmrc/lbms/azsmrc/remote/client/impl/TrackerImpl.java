@@ -7,8 +7,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Vector;
 
-import org.gudy.azureus2.pluginsimpl.local.tracker.TrackerTorrentImpl;
-
 import lbms.azsmrc.remote.client.Client;
 import lbms.azsmrc.remote.client.Download;
 import lbms.azsmrc.remote.client.Tracker;
