@@ -24,6 +24,7 @@ import lbms.azsmrc.remote.client.swtgui.container.AddTorrentContainer;
 import lbms.azsmrc.remote.client.torrent.TOTorrentException;
 import lbms.azsmrc.remote.client.torrent.TOTorrentFile;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
+import lbms.tools.i18n.I18N;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
@@ -72,6 +73,9 @@ public class OpenByFileDialog {
 
 	//private int drag_drop_line_start = -1;
 
+	//I18N prefix
+	public static final String PFX = "dialog.openbyfiledialog.";
+
 	public OpenByFileDialog(Display display, final String[] filenames) {
 		//pull last dir if available
 		lastDir =  RCMain.getRCMain().getProperties().getProperty("Last.Directory");
@@ -79,7 +83,7 @@ public class OpenByFileDialog {
 		// Shell
 		final Shell shell = new Shell(display);
 		shell.setLayout(new GridLayout(1, false));
-		shell.setText("Send Torrent File to Server");
+		shell.setText(I18N.translate(PFX + "shell.title"));
 
 		// Comp on shell
 		final Group comp = new Group(shell, SWT.NULL);
@@ -93,15 +97,15 @@ public class OpenByFileDialog {
 
 		// first line
 		Button open_file_button = new Button(comp, SWT.PUSH);
-		open_file_button.setToolTipText("Choose a file to upload");
-		open_file_button.setText("Choose a file to upload");
+		open_file_button.setToolTipText(I18N.translate(PFX + "openfile.tooltip"));
+		open_file_button.setText(I18N.translate(PFX + "openfile.text"));
 		if(Utilities.isLinux())
 			open_file_button.setImage(ImageRepository.getImage("open_by_file"));
 		open_file_button.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				FileDialog dialog = new FileDialog(shell, SWT.OPEN);
 				dialog.setFilterExtensions(new String[] { "*.torrent", "*.*" });
-				dialog.setText("Choose Torrent File to Send to Server");
+				dialog.setText(I18N.translate(PFX + "openfile.filedialog.text"));
 				if (lastDir != null) {
 					dialog.setFilterPath(lastDir);
 				}
@@ -114,8 +118,8 @@ public class OpenByFileDialog {
 							AddTorrentContainer container = new AddTorrentContainer(test);
 							if(tMap.containsKey(container.getName())){
 								MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION | SWT.OK);
-								messageBox.setText("Duplicate Torrent");
-								messageBox.setMessage("A torrent by that name has already been loaded into the table");
+								messageBox.setText(I18N.translate(PFX + "openfile.filedialog.duplicate.title"));
+								messageBox.setMessage(I18N.translate(PFX + "openfile.filedialog.duplicate.message"));
 								messageBox.open();
 								return;
 							}
@@ -139,23 +143,23 @@ public class OpenByFileDialog {
 						e1.printStackTrace();
 						MessageBox messageBox = new MessageBox(shell,
 								SWT.ICON_ERROR | SWT.OK);
-						messageBox.setText("Error");
-						messageBox.setMessage("Unsupported Encoding Error.");
+						messageBox.setText(I18N.translate("global.error"));
+						messageBox.setMessage(I18N.translate(PFX + "openfile.error1"));
 						messageBox.open();
 					} catch (TOTorrentException e1) {
 						e1.printStackTrace();
 						MessageBox messageBox = new MessageBox(shell,
 								SWT.ICON_ERROR | SWT.OK);
-						messageBox.setText("Error");
-						messageBox.setMessage("Torrent Loading Error");
+						messageBox.setText(I18N.translate("global.error"));
+						messageBox.setMessage(I18N.translate(PFX + "openfile.error2"));
 						messageBox.open();
 					} catch (Exception e1) {
 						e1.printStackTrace();
 						MessageBox messageBox = new MessageBox(shell,
 								SWT.ICON_ERROR | SWT.OK);
-						messageBox.setText("Error");
+						messageBox.setText(I18N.translate("global.error"));
 						messageBox
-								.setMessage("File not valid, please check permissions and try again.");
+								.setMessage(I18N.translate(PFX + "openfile.error3"));
 						messageBox.open();
 						e1.printStackTrace();
 					}
@@ -163,7 +167,7 @@ public class OpenByFileDialog {
 		});
 
 		Button remove = new Button(comp, SWT.PUSH);
-		remove.setText("Remove selected from list");
+		remove.setText(I18N.translate(PFX + "remove.text"));
 		if(Utilities.isLinux())
 			remove.setImage(ImageRepository.getImage("toolbar_remove"));
 		remove.addSelectionListener(new SelectionListener() {
@@ -193,7 +197,7 @@ public class OpenByFileDialog {
 
 		//      -------Server Free Disk stuff -----------\\
 		final Group details3 = new Group(comp,SWT.NULL);
-		details3.setText("Server Drive Information");
+		details3.setText(I18N.translate(PFX + "serverdrive.group.text"));
 		gridLayout = new GridLayout();
 		gridLayout.numColumns = 3;
 		gridLayout.horizontalSpacing = 30;
@@ -206,23 +210,23 @@ public class OpenByFileDialog {
 
 		//save.dir is the default save dir
 		Label saveDirL = new Label(details3,SWT.NULL);
-		saveDirL.setText("Default Save Directory:");
+		saveDirL.setText(I18N.translate(PFX + "serverdrive.defaultsavedir.text"));
 
 		saveDir = new Label(details3,SWT.NULL);
-		saveDir.setText("Not Received Yet");
+		saveDir.setText(I18N.translate(PFX + "serverdrive.notreceivedyet"));
 
 		saveDirSize = new Label(details3, SWT.NULL);
-		saveDirSize.setText("Not Received Yet");
+		saveDirSize.setText(I18N.translate(PFX + "serverdrive.notreceivedyet"));
 
 		//destination.dir is the user dir
 		Label destDirL = new Label(details3,SWT.NULL);
-		destDirL.setText("User Directory:");
+		destDirL.setText(I18N.translate(PFX + "serverdrive.destinationdir.text"));
 
 		destDir = new Label(details3,SWT.NULL);
-		destDir.setText("Not Received Yet");
+		destDir.setText(I18N.translate(PFX + "serverdrive.notreceivedyet"));
 
 		destDirSize = new Label(details3, SWT.NULL);
-		destDirSize.setText("Not Received Yet");
+		destDirSize.setText(I18N.translate(PFX + "serverdrive.notreceivedyet"));
 
 //		CUL
 		final ClientUpdateListener serverDetails = new ClientUpdateListener(){
@@ -321,11 +325,11 @@ public class OpenByFileDialog {
 		filesTable.setHeaderVisible(true);
 
 		TableColumn name = new TableColumn(filesTable, SWT.NULL);
-		name.setText("Name");
+		name.setText(I18N.translate(PFX + "filesTable.column.name"));
 		name.setWidth(200);
 
 		TableColumn path = new TableColumn(filesTable, SWT.NULL);
-		path.setText("Local Path");
+		path.setText(I18N.translate(PFX + "filesTable.column.localpath"));
 		path.setWidth(350);
 
 		createDragDrop(filesTable);
@@ -343,7 +347,7 @@ public class OpenByFileDialog {
 		});
 
 		Group detailsGroup = new Group(sash, SWT.NULL);
-		detailsGroup.setText("Files in Torrent");
+		detailsGroup.setText(I18N.translate(PFX + "torrentdetail.group.text"));
 		GridLayout gl = new GridLayout();
 		gl.numColumns = 1;
 		gl.marginHeight = 0;
@@ -369,11 +373,11 @@ public class OpenByFileDialog {
 		dCheck.setWidth(30);
 
 		TableColumn dName = new TableColumn(detailsTable, SWT.LEFT);
-		dName.setText("File Name");
+		dName.setText(I18N.translate(PFX + "torrentdetail.table.column.name"));
 		dName.setWidth(350);
 
 		TableColumn dSize = new TableColumn(detailsTable, SWT.RIGHT);
-		dSize.setText("Size");
+		dSize.setText(I18N.translate(PFX + "torrentdetail.table.column.size"));
 		dSize.setWidth(80);
 
 		detailsTable.addListener(SWT.Selection, new Listener() {
@@ -405,7 +409,7 @@ public class OpenByFileDialog {
 		button_comp.setLayout(gridLayout);
 
 		deleteOnSend = new Button(button_comp,SWT.CHECK);
-		deleteOnSend.setText("Delete local copy of torrent after sending");
+		deleteOnSend.setText(I18N.translate(PFX + "deleteonsend.text"));
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 2;
 		deleteOnSend.setLayoutData(gridData);
@@ -425,14 +429,14 @@ public class OpenByFileDialog {
 
 
 		Button connect = new Button(button_comp, SWT.PUSH);
-		connect.setText("Send File(s) to Server");
+		connect.setText(I18N.translate(PFX + "sendfiles.text"));
 		connect.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				if (tMap.size() == 0) {
 					MessageBox messageBox = new MessageBox(shell,
 							SWT.ICON_ERROR | SWT.OK);
-					messageBox.setText("Error");
-					messageBox.setMessage("Please provide a file to upload.");
+					messageBox.setText(I18N.translate("global.error"));
+					messageBox.setMessage(I18N.translate(PFX + "sendfiles.error1"));
 					messageBox.open();
 					return;
 				} else {
@@ -454,8 +458,8 @@ public class OpenByFileDialog {
 							if(!container.deleteFile()){
 								MessageBox messageBox = new MessageBox(shell,
 										SWT.ICON_ERROR | SWT.OK);
-								messageBox.setText("Error");
-								messageBox.setMessage("Error deleting " + container.getTorrentFile().getName());
+								messageBox.setText(I18N.translate("global.error"));
+								messageBox.setMessage(I18N.translate(PFX + "sendfiles.error2")+ " " + container.getTorrentFile().getName());
 								messageBox.open();
 							}
 						}
@@ -466,7 +470,7 @@ public class OpenByFileDialog {
 		});
 
 		Button cancel = new Button(button_comp, SWT.PUSH);
-		cancel.setText("Cancel");
+		cancel.setText(I18N.translate("global.cancel"));
 		cancel.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				shell.close();
@@ -616,9 +620,8 @@ public class OpenByFileDialog {
 					MessageBox messageBox = new MessageBox(RCMain.getRCMain()
 							.getMainWindow().getShell(), SWT.ICON_ERROR
 							| SWT.OK);
-					messageBox.setText("Error");
-					messageBox
-							.setMessage("You have dropped a directory, please drop one file at a time.");
+					messageBox.setText(I18N.translate("global.error"));
+					messageBox.setMessage(I18N.translate(PFX + "clipboard.error1"));
 					messageBox.open();
 					return;
 				}
@@ -678,7 +681,7 @@ public class OpenByFileDialog {
 			}else {
 				totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_DARK_RED));
 			}
-			saveDirSize.setToolTipText("Estimated free disk space\nafter adding download:\n" +
+			saveDirSize.setToolTipText(I18N.translate(PFX + "serverdrive.defaultsavedir.tooltip") +
 					DisplayFormatters.formatKBCountToBase10KBEtc(saveDirFree - totalSizeAdj));
 
 		}else{
@@ -694,7 +697,7 @@ public class OpenByFileDialog {
 			}else {
 				totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_DARK_RED));
 			}
-			destDirSize.setToolTipText("Estimated free disk space\nafter adding download:\n" +
+			destDirSize.setToolTipText(I18N.translate(PFX + "serverdrive.destinationdir.tooltip") +
 					DisplayFormatters.formatKBCountToBase10KBEtc(destDirFree - totalSizeAdj));
 		}else{
 			totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
@@ -702,7 +705,7 @@ public class OpenByFileDialog {
 		if(totalSizeAdj == 0){
 			totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
 		}
-		totalSLabel.setText("Total size of selected downloads to send to server: ");
+		totalSLabel.setText(I18N.translate(PFX + "totalsize.text") + " ");
 		totalS.setText(DisplayFormatters.formatByteCountToBase10KBEtc(totalSize));
 	}
 
