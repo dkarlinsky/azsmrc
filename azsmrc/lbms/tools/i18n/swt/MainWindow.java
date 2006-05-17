@@ -56,6 +56,7 @@ public class MainWindow {
 	private Map<String,String> defaultMap;
 	private Map<String,String> transMap;
 	private boolean isSaved = true;
+	private boolean saveTrans = true;
 	private String workingDir;
 
 	private static Image icon;
@@ -723,13 +724,9 @@ public class MainWindow {
 						e1.printStackTrace();
 					}
 				}else{
-					MessageBox mb = new MessageBox(shell,SWT.ICON_QUESTION | SWT.YES | SWT.NO);
-					mb.setText("No Translation File Given");
-					mb.setMessage("Would you like to save a translation file as well?");
-					int answer = mb.open();
-					switch (answer){
-					case SWT.NO:
+					if(!saveTrans){
 						try{
+							saveTrans = false;
 							I18NTools.writeToFile(currentI18NDefaultFile, defaultMap);
 						} catch (IOException e1) {
 							MessageBox mb4 = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
@@ -738,46 +735,65 @@ public class MainWindow {
 							mb4.open();
 							e1.printStackTrace();
 						}
-						break;
-					case SWT.YES:
-						FileDialog dialog = new FileDialog (shell, SWT.SAVE);
-						dialog.setText("Enter Translated File Name to Save");
-						if(workingDir != null)
-							dialog.setFilterPath(workingDir);
-						String fileString = dialog.open();
-						if(fileString != null){
+					}else{
+						MessageBox mb = new MessageBox(shell,SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+						mb.setText("No Translation File Given");
+						mb.setMessage("Would you like to save a translation file as well?");
+						int answer = mb.open();
+						switch (answer){
+						case SWT.NO:
 							try{
-								currentI18NLocalizedFile = new File(fileString);
-								workingDir = currentI18NLocalizedFile.getParent();
-								if(!currentI18NLocalizedFile.exists())
-									currentI18NLocalizedFile.createNewFile();
-
-								if(!currentI18NLocalizedFile.isFile() ||
-										!currentI18NLocalizedFile.canRead() ||
-										!currentI18NLocalizedFile.canWrite()){
-									MessageBox mb2 = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
-									mb2.setText("Open Error");
-									mb2.setMessage("Problems reading choosen i18n File.  Either File is not a File" +
-									"or it cannot be read or written to.");
-									mb2.open();
-								}
-							}catch(Exception error){
-								error.printStackTrace();
-							}
-
-							try {
+								saveTrans = false;
 								I18NTools.writeToFile(currentI18NDefaultFile, defaultMap);
-								I18NTools.writeToFile(currentI18NLocalizedFile, transMap);
-								isSaved = true;
 							} catch (IOException e1) {
-								MessageBox mb3 = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
-								mb3.setText("Save Error");
-								mb3.setMessage("Problems writing I18N File.  IOException error!");
-								mb3.open();
+								MessageBox mb4 = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
+								mb4.setText("Save Error");
+								mb4.setMessage("Problems writing I18N File.  IOException error!");
+								mb4.open();
 								e1.printStackTrace();
+							}
+							break;
+						case SWT.YES:
+							FileDialog dialog = new FileDialog (shell, SWT.SAVE);
+							dialog.setText("Enter Translated File Name to Save");
+							if(workingDir != null)
+								dialog.setFilterPath(workingDir);
+							String fileString = dialog.open();
+							if(fileString != null){
+								try{
+									currentI18NLocalizedFile = new File(fileString);
+									workingDir = currentI18NLocalizedFile.getParent();
+									if(!currentI18NLocalizedFile.exists())
+										currentI18NLocalizedFile.createNewFile();
+
+									if(!currentI18NLocalizedFile.isFile() ||
+											!currentI18NLocalizedFile.canRead() ||
+											!currentI18NLocalizedFile.canWrite()){
+										MessageBox mb2 = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
+										mb2.setText("Open Error");
+										mb2.setMessage("Problems reading choosen i18n File.  Either File is not a File" +
+										"or it cannot be read or written to.");
+										mb2.open();
+									}
+								}catch(Exception error){
+									error.printStackTrace();
+								}
+
+								try {
+									I18NTools.writeToFile(currentI18NDefaultFile, defaultMap);
+									I18NTools.writeToFile(currentI18NLocalizedFile, transMap);
+									isSaved = true;
+								} catch (IOException e1) {
+									MessageBox mb3 = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
+									mb3.setText("Save Error");
+									mb3.setMessage("Problems writing I18N File.  IOException error!");
+									mb3.open();
+									e1.printStackTrace();
+								}
 							}
 						}
 					}
+
 
 				}
 			}
