@@ -37,6 +37,7 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -53,6 +54,7 @@ public class PreferencesTab {
 	private Label pluginLabel;
 	private Text updateIntervalOpen_Text, updateIntervalClosed_Text;
 	private Button fastMode,autoOpen, autoConnect, autoUpdateCheck, autoUpdate;
+	private Combo langCombo;
 	private Button trayMinimize, trayExit, showSplash, popupsEnabled;
 	private Button autoClipboard, autoConsole, showHost, exitConfirm;
 	private Button updateBeta, singleUser;
@@ -377,6 +379,26 @@ public class PreferencesTab {
 			control.dispose();
 		}
 
+		//Language Combo
+		Label langLabel = new Label(composite, SWT.NULL);
+		langLabel.setText("Langauge used in AzSMRC: ");
+		GridData gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		langLabel.setLayoutData(gd);
+
+		langCombo = new Combo(composite,SWT.DROP_DOWN | SWT.READ_ONLY);
+		langCombo.add("English");
+		langCombo.add("Deutsch");
+
+
+
+		String lang = properties.getProperty("language","en_EN");
+		if(lang.equalsIgnoreCase("en_EN"))
+			langCombo.select(0);
+		else if(lang.equalsIgnoreCase("de_DE"))
+			langCombo.select(1);
+
+
+		addModListener(langCombo, SWT.Selection);
 
 		//Auto Open
 		autoOpen = new Button(composite,SWT.CHECK);
@@ -673,6 +695,19 @@ public class PreferencesTab {
 			}else{
 				properties.setProperty("connection_interval_open", String.valueOf(Long.parseLong(open)*1000));
 				properties.setProperty("connection_interval_closed", String.valueOf(Long.parseLong(closed)*1000));
+			}
+		}
+
+		//Lang Combo store
+		if(langCombo != null && !langCombo.isDisposed()){
+			int choice = langCombo.getSelectionIndex();
+			switch(choice){
+			case (0):
+				properties.setProperty("language", "en_EN");
+				break;
+			case (1):
+				properties.setProperty("language", "de_DE");
+				break;
 			}
 		}
 
