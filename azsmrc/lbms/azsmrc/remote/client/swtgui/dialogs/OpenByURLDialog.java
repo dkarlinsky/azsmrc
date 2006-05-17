@@ -7,6 +7,7 @@ package lbms.azsmrc.remote.client.swtgui.dialogs;
 
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
+import lbms.tools.i18n.I18N;
 
 import org.eclipse.swt.SWT;
 //import org.eclipse.swt.dnd.Clipboard;
@@ -24,14 +25,18 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+
 public class OpenByURLDialog {
+
+	//I18N prefix
+	public static final String PFX = "dialog.openbyurldialog.";
 
 
 	private OpenByURLDialog(final String url){
 		//Shell
 		final Shell shell = new Shell(RCMain.getRCMain().getDisplay());
 		shell.setLayout(new GridLayout(1,false));
-		shell.setText("Add a Torrent by URL");
+		shell.setText(I18N.translate(PFX + "shell.text"));
 
 		//Comp on shell
 		Group comp = new Group(shell,SWT.NULL);
@@ -48,7 +53,7 @@ public class OpenByURLDialog {
 
 		//first line
 		Label url_label = new Label(comp,SWT.NULL);
-		url_label.setText("URL:");
+		url_label.setText(I18N.translate(PFX + "url_label.text"));
 
 
 		final Text url_text = new Text(comp,SWT.BORDER | SWT.SINGLE | SWT.LEFT);
@@ -72,7 +77,7 @@ public class OpenByURLDialog {
 
 		//Second Line
 		final Button needUserPass_button = new Button(comp,SWT.CHECK);
-		needUserPass_button.setText("Send username and password with URL?");
+		needUserPass_button.setText(I18N.translate(PFX + "needUserPass_button.text"));
 		gridData = new GridData(GridData.GRAB_HORIZONTAL);
 		gridData.horizontalSpan = 2;
 		needUserPass_button.setLayoutData(gridData);
@@ -80,7 +85,7 @@ public class OpenByURLDialog {
 
 		//Third Line
 		final Label username_label = new Label(comp,SWT.NULL);
-		username_label.setText("Username:");
+		username_label.setText(I18N.translate(PFX + "username"));
 
 
 		final Text username_text = new Text(comp,SWT.BORDER | SWT.SINGLE | SWT.LEFT);
@@ -91,7 +96,7 @@ public class OpenByURLDialog {
 
 		//Fourth Line
 		final Label password_label = new Label(comp,SWT.NULL);
-		password_label.setText("Password:");
+		password_label.setText(I18N.translate(PFX + "password"));
 
 
 		final Text password_text = new Text(comp,SWT.PASSWORD | SWT.BORDER | SWT.SINGLE | SWT.LEFT);
@@ -137,8 +142,8 @@ public class OpenByURLDialog {
 			public void handleEvent(Event e) {
 				if(url_text.getText().length() <= 1){
 					MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-					messageBox.setText("Error");
-					messageBox.setMessage("Please provide a valid URL");
+					messageBox.setText(I18N.translate("global.error"));
+					messageBox.setMessage(I18N.translate(PFX + "error1"));
 					messageBox.open();
 					return;
 				}
@@ -151,8 +156,8 @@ public class OpenByURLDialog {
 					if(username_text.getText().equalsIgnoreCase("")
 							||password_text.getText().equalsIgnoreCase("")){
 						MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-						messageBox.setText("Error");
-						messageBox.setMessage("Please fill out the username and password or uncheck the box requiring they be sent with the URL.");
+						messageBox.setText(I18N.translate("global.error"));
+						messageBox.setMessage(I18N.translate(PFX + "error2"));
 						messageBox.open();
 						return;
 					}else
@@ -170,7 +175,7 @@ public class OpenByURLDialog {
 
 
 		Button cancel = new Button(button_comp,SWT.PUSH);
-		cancel.setText("Cancel");
+		cancel.setText(I18N.translate("global.cancel"));
 		cancel.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
 				shell.close();
@@ -197,7 +202,7 @@ public class OpenByURLDialog {
 			public void run() {
 				Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
 				for(int i = 0; i < shells.length; i++){
-					if(shells[i].getText().equalsIgnoreCase("Add a Torrent by URL")){
+					if(shells[i].getText().equalsIgnoreCase(I18N.translate(PFX + "shell.text"))){
 						shells[i].setActive();
 						shells[i].setFocus();
 						return;
@@ -222,7 +227,7 @@ public class OpenByURLDialog {
 			public void run() {
 				Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
 				for(int i = 0; i < shells.length; i++){
-					if(shells[i].getText().equalsIgnoreCase("Add a Torrent by URL")){
+					if(shells[i].getText().equalsIgnoreCase(I18N.translate(PFX + "shell.text"))){
 						shells[i].setActive();
 						shells[i].setFocus();
 						return;
