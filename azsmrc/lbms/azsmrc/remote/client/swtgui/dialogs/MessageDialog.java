@@ -14,6 +14,7 @@ import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.util.TimerEvent;
 import lbms.azsmrc.remote.client.util.TimerEventPerformer;
+import lbms.tools.i18n.I18N;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
@@ -49,6 +50,9 @@ public class MessageDialog {
 	private final static int TYPE_MESSAGE = 1;
 	private final static int TYPE_WARNING = 2;
 	private final static int TYPE_ERROR   = 3;
+
+	//I18N prefix
+	public static final String PFX = "dialog.messagedialog.";
 
 	public static MessageDialog message(final Display display, final boolean bautoclose, final int timeToClose, final String title, final String message) {
 		if(!Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("popups_enabled", "true")))
@@ -157,10 +161,10 @@ public class MessageDialog {
 				gc.dispose();
 
 				Button btnOK = new Button(splash, SWT.PUSH);
-				btnOK.setText("OK");
+				btnOK.setText(I18N.translate("global.ok"));
 
 				Button btnHideAll = new Button(splash, SWT.PUSH);
-				btnHideAll.setText("Hide All");
+				btnHideAll.setText(I18N.translate(PFX + "hideall.text"));
 
 				Label lblImage = new Label(splash,SWT.NULL);
 				lblImage.setImage(popupImage);
