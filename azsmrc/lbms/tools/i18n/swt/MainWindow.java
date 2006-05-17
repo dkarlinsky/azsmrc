@@ -9,6 +9,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Color;
@@ -44,7 +46,7 @@ public class MainWindow {
 	private Shell shell;
 	private Label currentlyOpened;
 	private Table mainTable;
-	private Button add,save;
+	private Button add,save,delete;
 	private Color backgroundC;
 
 
@@ -647,7 +649,7 @@ public class MainWindow {
 		tableGroup.setLayoutData(gd);
 
 		Composite bComp = new Composite(tableGroup, SWT.NULL);
-		bComp.setLayout(new GridLayout(2,false));
+		bComp.setLayout(new GridLayout(3,false));
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		bComp.setLayoutData(gd);
 
@@ -676,6 +678,30 @@ public class MainWindow {
 			}
 		});
 
+		delete = new Button(bComp,SWT.PUSH);
+		delete.setText("Delete Selected Keys");
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		delete.setLayoutData(gd);
+		delete.addListener(SWT.Selection, new Listener(){
+
+			public void handleEvent(Event arg0) {
+				TableItem[] items = mainTable.getSelection();
+				if(items.length == 0) return;
+				for(TableItem item:items){
+					String key = item.getText(1);
+					//remove keys
+					if(defaultMap.containsKey(key))
+						defaultMap.remove(key);
+					if(transMap.containsKey(key))
+						transMap.remove(key);
+					clearTable();
+					setIsSaved(true);
+				}
+
+			}
+
+		});
+		delete.setEnabled(false);
 
 		save = new Button (bComp, SWT.PUSH);
 		save.setText("Save All");
@@ -697,43 +723,62 @@ public class MainWindow {
 						e1.printStackTrace();
 					}
 				}else{
-					FileDialog dialog = new FileDialog (shell, SWT.SAVE);
-					dialog.setText("Enter Translated File Name to Save");
-					if(workingDir != null)
-						dialog.setFilterPath(workingDir);
-					String fileString = dialog.open();
-					if(fileString != null){
+					MessageBox mb = new MessageBox(shell,SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+					mb.setText("No Translation File Given");
+					mb.setMessage("Would you like to save a translation file as well?");
+					int answer = mb.open();
+					switch (answer){
+					case SWT.NO:
 						try{
-							currentI18NLocalizedFile = new File(fileString);
-							workingDir = currentI18NLocalizedFile.getParent();
-							if(!currentI18NLocalizedFile.exists())
-								currentI18NLocalizedFile.createNewFile();
-
-							if(!currentI18NLocalizedFile.isFile() ||
-									!currentI18NLocalizedFile.canRead() ||
-									!currentI18NLocalizedFile.canWrite()){
-								MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
-								mb.setText("Open Error");
-								mb.setMessage("Problems reading choosen i18n File.  Either File is not a File" +
-								"or it cannot be read or written to.");
-								mb.open();
-							}
-						}catch(Exception error){
-							error.printStackTrace();
-						}
-
-						try {
 							I18NTools.writeToFile(currentI18NDefaultFile, defaultMap);
-							I18NTools.writeToFile(currentI18NLocalizedFile, transMap);
-							isSaved = true;
 						} catch (IOException e1) {
-							MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
-							mb.setText("Save Error");
-							mb.setMessage("Problems writing I18N File.  IOException error!");
-							mb.open();
+							MessageBox mb4 = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
+							mb4.setText("Save Error");
+							mb4.setMessage("Problems writing I18N File.  IOException error!");
+							mb4.open();
 							e1.printStackTrace();
 						}
+						break;
+					case SWT.YES:
+						FileDialog dialog = new FileDialog (shell, SWT.SAVE);
+						dialog.setText("Enter Translated File Name to Save");
+						if(workingDir != null)
+							dialog.setFilterPath(workingDir);
+						String fileString = dialog.open();
+						if(fileString != null){
+							try{
+								currentI18NLocalizedFile = new File(fileString);
+								workingDir = currentI18NLocalizedFile.getParent();
+								if(!currentI18NLocalizedFile.exists())
+									currentI18NLocalizedFile.createNewFile();
+
+								if(!currentI18NLocalizedFile.isFile() ||
+										!currentI18NLocalizedFile.canRead() ||
+										!currentI18NLocalizedFile.canWrite()){
+									MessageBox mb2 = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
+									mb2.setText("Open Error");
+									mb2.setMessage("Problems reading choosen i18n File.  Either File is not a File" +
+									"or it cannot be read or written to.");
+									mb2.open();
+								}
+							}catch(Exception error){
+								error.printStackTrace();
+							}
+
+							try {
+								I18NTools.writeToFile(currentI18NDefaultFile, defaultMap);
+								I18NTools.writeToFile(currentI18NLocalizedFile, transMap);
+								isSaved = true;
+							} catch (IOException e1) {
+								MessageBox mb3 = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
+								mb3.setText("Save Error");
+								mb3.setMessage("Problems writing I18N File.  IOException error!");
+								mb3.open();
+								e1.printStackTrace();
+							}
+						}
 					}
+
 				}
 			}
 
@@ -778,7 +823,10 @@ public class MainWindow {
 				String[] keys = defaultMap.keySet().toArray(new String[defaultMap.size()]);
 				item.setText(1,keys[tableIndex]);
 				item.setText(2,defaultMap.get(keys[tableIndex]).replace("\n", "\\n"));
-				item.setText(3,transMap.get(keys[tableIndex]).replace("\n", "\\n"));
+				if(transMap.containsKey(keys[tableIndex]))
+					item.setText(3,transMap.get(keys[tableIndex]).replace("\n", "\\n"));
+				else
+					item.setText(3,"");
 
 				if(item.getText(3).equalsIgnoreCase("")){
 					item.setText(3,defaultMap.get(keys[tableIndex]).replace("\n", "\\n"));
@@ -790,6 +838,22 @@ public class MainWindow {
 					item.setBackground(getBackgroundColor());
 				}
 
+			}
+
+		});
+
+		mainTable.addSelectionListener(new SelectionListener(){
+
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			public void widgetSelected(SelectionEvent arg0) {
+				if(mainTable.getSelectionCount() > 0)
+					delete.setEnabled(true);
+				else
+					delete.setEnabled(false);
 			}
 
 		});
