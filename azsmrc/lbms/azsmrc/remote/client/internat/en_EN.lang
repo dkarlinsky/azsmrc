@@ -1,15 +1,1 @@
-dialog.connectiondialog.cancel.text=Cancel
-dialog.connectiondialog.connect.text=Connect
-dialog.connectiondialog.help1.label=Examples:  \n'localhost' \n'workstation.azureusathome.net' \n'123.4.56.78'
-dialog.connectiondialog.help2.label=Click for insturctions on setting up a SSL connection
-dialog.connectiondialog.help2.messagebox.message=a) Server - create certificate\n(Tools->Options->Security)\n\nb) Server - enable SSL in plugin options\n(Tools->Options->Plugins->AzMultiUser)\n\nc) Restart Azureus\n\nd) Client - Click the SSL box on connection dialog
-dialog.connectiondialog.help2.messagebox.title=SSL Information
-dialog.connectiondialog.password.label=Password:
-dialog.connectiondialog.port.label=Port to Connect To:
-dialog.connectiondialog.removeprofile.text=Remove Profile
-dialog.connectiondialog.removeprofile.tooltip=Remove currently selected saved profile
-dialog.connectiondialog.save_password.label=Save password (Note: password will be saved in plain text)
-dialog.connectiondialog.save_settings.label=Save settings for use on next connection
-dialog.connectiondialog.url.label=Servername or IP:
-dialog.connectiondialog.use_https.label=Use secure https protocol to connect to this server?
-dialog.connectiondialog.username.label=Username:
+
