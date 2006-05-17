@@ -29,14 +29,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.dnd.DND;
-import org.eclipse.swt.dnd.DragSource;
-import org.eclipse.swt.dnd.DragSourceAdapter;
-import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.FileTransfer;
-import org.eclipse.swt.dnd.HTMLTransfer;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionEvent;
@@ -67,13 +63,14 @@ public class OpenByFileDialog {
 
 	private String lastDir;
 
-	private Label totalS;
+	private Label totalSLabel, totalS;
 
 	private Label saveDir, saveDirSize, destDir, destDirSize;
 
 	private Map<String, AddTorrentContainer> tMap = new HashMap<String, AddTorrentContainer>();
+	private Map<String,String> driveMap = new HashMap<String,String>();
 
-	private int drag_drop_line_start = -1;
+	//private int drag_drop_line_start = -1;
 
 	public OpenByFileDialog(Display display, final String[] filenames) {
 		//pull last dir if available
@@ -235,7 +232,7 @@ public class OpenByFileDialog {
 					RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
 						public void run() {
 							try{
-								Map<String,String> driveMap = RCMain.getRCMain().getClient().getRemoteInfo().getDriveInfo();
+								driveMap = RCMain.getRCMain().getClient().getRemoteInfo().getDriveInfo();
 
 								if(driveMap.containsKey("save.dir") && driveMap.containsKey("save.dir.path")){
 									saveDir.setText(driveMap.get("save.dir.path"));
@@ -287,9 +284,15 @@ public class OpenByFileDialog {
 
 		//--------------------------Total Size ------------------------\\
 
+		totalSLabel = new Label(comp,SWT.NULL);
+		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		gridData.horizontalSpan = 1;
+		totalSLabel.setLayoutData(gridData);
+
+
 		totalS = new Label(comp,SWT.NULL);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
-		gridData.horizontalSpan = 2;
+		gridData.horizontalSpan = 1;
 		totalS.setLayoutData(gridData);
 
 		setTotalSize();
@@ -644,7 +647,6 @@ public class OpenByFileDialog {
 				detailItem.setText(1, name);
 				detailItem.setText(2, DisplayFormatters
 						.formatByteCountToBase10KBEtc(files[i].getLength()));
-
 				//Shade every other one
 				if(filesTable.indexOf(detailItem)%2!=0){
 					detailItem.setBackground(ColorUtilities.getBackgroundColor());
@@ -665,9 +667,41 @@ public class OpenByFileDialog {
 			if(atc != null)
 				totalSize += atc.getTotalSizeOfDownloads();
 		}
+		long totalSizeAdj = totalSize / 1024l;
+		if(driveMap.containsKey("save.dir") && driveMap.containsKey("save.dir.path")){
+			long saveDirFree = Long.parseLong(driveMap.get("save.dir"));
+			System.out.println(saveDirFree +  " | " + (1024l*1024l*2l) + " | " + totalSizeAdj +  " | " + (saveDirFree - totalSizeAdj));
+			if((saveDirFree - totalSizeAdj) > (1024l * 1024l * 2l/*2 GB */) ){
+				totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
+			}else if((saveDirFree - totalSizeAdj) > (1024l * 20l /*20 MB */)){
+				totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_YELLOW));
+			}else {
+				totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_DARK_RED));
+			}
+			saveDirSize.setToolTipText("Estimated free disk space\nafter adding download:\n" +
+					DisplayFormatters.formatKBCountToBase10KBEtc(saveDirFree - totalSizeAdj));
 
-		totalS.setText("Total size of selected downloads to send to server: " +
-				DisplayFormatters.formatByteCountToBase10KBEtc(totalSize));
+		}else{
+			totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+		}
+
+		if(driveMap.containsKey("destination.dir") && driveMap.containsKey("destination.dir.path")){
+			long destDirFree = Long.parseLong(driveMap.get("destination.dir"));
+			if((destDirFree - totalSizeAdj) > (1024l * 1024l * 2l/*2 GB */) ){
+				totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
+			}else if((destDirFree - totalSizeAdj) > (1024l * 20l /*20 MB */)){
+				totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_YELLOW));
+			}else {
+				totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_DARK_RED));
+			}
+			destDirSize.setToolTipText("Estimated free disk space\nafter adding download:\n" +
+					DisplayFormatters.formatKBCountToBase10KBEtc(destDirFree - totalSizeAdj));
+		}else{
+			totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+		}
+
+		totalSLabel.setText("Total size of selected downloads to send to server: ");
+		totalS.setText(DisplayFormatters.formatByteCountToBase10KBEtc(totalSize));
 	}
 
 }// EOF
