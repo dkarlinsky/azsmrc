@@ -468,7 +468,7 @@ public class RCMain implements Launchable {
 						public void run() {
 							//setTrayToolTip("AzSMRC: D:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d)+" - U:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u));
 							setTrayToolTip(client.getDownloadManager().getSeedingDownloadsOnly().length + " seeding, "
-									+ client.getDownloadManager().getDownloadsOnly().length + " downloading, "
+									+ client.getDownloadManager().getDownloadsOnly().length + " downloading,\n"
 									+ "D: "+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d)
 									+ ", U: "+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u));
 						}
