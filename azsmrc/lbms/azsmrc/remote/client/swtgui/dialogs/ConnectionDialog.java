@@ -124,11 +124,11 @@ public class ConnectionDialog {
 			use_https.setSelection(Boolean.parseBoolean(properties.getProperty("connection_https_0")));
 		}
 
-		Label help = new Label(miniComp2,SWT.NULL);
-		help.setImage(ImageRepository.getImage("information"));
-		help.setToolTipText("Click for insturctions on setting up a SSL connection");
-		help.setCursor(RCMain.getRCMain().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
-		help.addListener(SWT.MouseDown, new Listener(){
+		Label help2 = new Label(miniComp2,SWT.NULL);
+		help2.setImage(ImageRepository.getImage("information"));
+		help2.setToolTipText("Click for insturctions on setting up a SSL connection");
+		help2.setCursor(RCMain.getRCMain().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+		help2.addListener(SWT.MouseDown, new Listener(){
 			public void handleEvent(Event arg0) {
 				MessageBox messageBox = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK);
 				messageBox.setText("SSL Information");
