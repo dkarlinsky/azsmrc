@@ -24,21 +24,25 @@ import lbms.azsmrc.remote.client.events.ClientUpdateListener;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.container.Container;
+import lbms.tools.i18n.I18N;
 
 public class MoveDataDialog {
 
-    private Download download;    
+    private Download download;
     private DownloadAdvancedStats das;
 	private Label tDir;
-    
+
+	//I18N prefix
+	public static final String PFX = "dialog.movedatadialog.";
+
 	public MoveDataDialog(Container container){
-		download = container.getDownload();		
+		download = container.getDownload();
         das = download.getAdvancedStats();
-		
+
         if(!das._isLoaded()){
             das.load();
         }
-        
+
         //The Client update listener
         final ClientUpdateListener cul = new ClientUpdateListener(){
 
@@ -48,8 +52,8 @@ public class MoveDataDialog {
                     das = download.getAdvancedStats();
                     RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
 						public void run() {
-							tDir.setText(das.getSaveDir());							
-						}                    	
+							tDir.setText(das.getSaveDir());
+						}
                     });
                 }
 
@@ -58,61 +62,61 @@ public class MoveDataDialog {
 
         //Add the CUL to the Client
         RCMain.getRCMain().getClient().addClientUpdateListener(cul);
-    
+
 		final Shell shell = new Shell(RCMain.getRCMain().getDisplay());
-		shell.setText("Move Data on Server");
+		shell.setText(I18N.translate(PFX + "shell.text"));
 		shell.setLayout(new GridLayout(1,false));
 
         //Listen for when tab is closed and make sure to remove the client update listener
         shell.addDisposeListener(new DisposeListener(){
             public void widgetDisposed(DisposeEvent arg0) {
-                RCMain.getRCMain().getClient().removeClientUpdateListener(cul);                
+                RCMain.getRCMain().getClient().removeClientUpdateListener(cul);
             }
         });
-		
-		
+
+
 		//Main Composite on shell
 		Composite parent = new Composite(shell,SWT.NULL);
-		parent.setLayout(new GridLayout(2,false));		
+		parent.setLayout(new GridLayout(2,false));
 		GridData gd = new GridData(GridData.FILL_BOTH);
 		gd.grabExcessHorizontalSpace= true;
-		gd.grabExcessVerticalSpace = true;		
+		gd.grabExcessVerticalSpace = true;
 		parent.setLayoutData(gd);
-		
+
 		Group gName = new Group(parent,SWT.NULL);
-		gName.setLayout(new GridLayout(2,false));		
+		gName.setLayout(new GridLayout(2,false));
 		gd = new GridData(GridData.FILL_BOTH);
 		gd.grabExcessHorizontalSpace= true;
-		gd.grabExcessVerticalSpace = true;		
-		gd.horizontalSpan = 2;		 
+		gd.grabExcessVerticalSpace = true;
+		gd.horizontalSpan = 2;
 		gName.setLayoutData(gd);
-		
-		gName.setText("Torrent Information");
-		
+
+		gName.setText(I18N.translate(PFX + "torrentdetails.group.text"));
+
 		Label tNameL = new Label(gName,SWT.NULL);
-		tNameL.setText("Torrent Name: ");
-		
+		tNameL.setText(I18N.translate(PFX + "torrentdetails.name.text"));
+
 		Label tName = new Label(gName,SWT.NULL);
 		String torrentName = download.getName();
 		if(torrentName.length() > 53){
 			torrentName = torrentName.substring(0,50) + "...";
 		}
 		tName.setText(torrentName);
-		
+
 		Label tDirL = new Label(gName,SWT.NULL);
-		tDirL.setText("Current Remote Directory: ");
-		
+		tDirL.setText(I18N.translate(PFX + "torrentdetails.currentdir.text"));
+
 		tDir = new Label(gName,SWT.WRAP);
 		tDir.setText(das.getSaveDir());
-		
+
 		//--------------------
-		
+
 		Label moveToL = new Label(parent,SWT.NULL);
-		moveToL.setText("Input remote server directory");
+		moveToL.setText(I18N.translate(PFX + "torrentdetails.moveto.text"));
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 2;
-		moveToL.setLayoutData(gd);	
-		
+		moveToL.setLayoutData(gd);
+
 		final Text moveTo = new Text(parent,SWT.SINGLE | SWT.BORDER);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 2;
@@ -125,26 +129,26 @@ public class MoveDataDialog {
 				if(arg0.character == SWT.CR){
 					if(das.getSaveDir().equalsIgnoreCase(moveTo.getText())){
 						MessageBox messageBox = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
-						messageBox.setText("Error");
-						messageBox.setMessage("You have put in the same directory where the torrent is already stored.");
+						messageBox.setText(I18N.translate("global.error"));
+						messageBox.setMessage(I18N.translate(PFX + "move.samelocal.message"));
 						messageBox.open();
 						return;
 					}else{
 						download.moveDataFiles(moveTo.getText());
 						shell.dispose();
 						MessageBox messageBox = new MessageBox(RCMain.getRCMain().getMainWindow().getShell(),SWT.ICON_INFORMATION | SWT.OK);
-						messageBox.setText("Request Sent");
-						messageBox.setMessage("Your move data request has been sent to the server.");
+						messageBox.setText(I18N.translate(PFX + "move.title"));
+						messageBox.setMessage(I18N.translate(PFX + "move.message"));
 						messageBox.open();
 						return;
 					}
 				}
-				
+
 			}
-			
+
 		});
-		
-		
+
+
 		Button ok = new Button(parent, SWT.PUSH);
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		ok.setLayoutData(gd);
@@ -153,35 +157,34 @@ public class MoveDataDialog {
 			public void handleEvent(Event arg0) {
 				if(das.getSaveDir().equalsIgnoreCase(moveTo.getText())){
 					MessageBox messageBox = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
-					messageBox.setText("Error");
-					messageBox.setMessage("You have put in the same directory where the torrent is already stored.");
+					messageBox.setText(I18N.translate("global.error"));
+					messageBox.setMessage(I18N.translate(PFX + "move.samelocal.message"));
 					messageBox.open();
 					return;
 				}else{
 					download.moveDataFiles(moveTo.getText());
 					shell.dispose();
 					MessageBox messageBox = new MessageBox(RCMain.getRCMain().getMainWindow().getShell(),SWT.ICON_INFORMATION | SWT.OK);
-					messageBox.setText("Request Sent");
-					messageBox.setMessage("Your move data request has been sent to the server.");
-					messageBox.open();
+					messageBox.setText(I18N.translate(PFX + "move.title"));
+					messageBox.setMessage(I18N.translate(PFX + "move.message"));					messageBox.open();
 					return;
 				}
-				
-			}			
+
+			}
 		});
-		
+
 		Button cancel = new Button(parent, SWT.PUSH);
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		gd.grabExcessHorizontalSpace = true;
 		cancel.setLayoutData(gd);
-		cancel.setText("Cancel");
+		cancel.setText(I18N.translate("global.cancel"));
 		cancel.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
-				shell.dispose();				
-			}			
-		});		
-		
-		
+				shell.dispose();
+			}
+		});
+
+
 		//Center Shell and open
 		shell.pack();
         GUI_Utilities.centerShellandOpen(shell);
