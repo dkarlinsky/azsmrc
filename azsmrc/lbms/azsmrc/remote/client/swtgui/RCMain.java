@@ -59,6 +59,7 @@ import lbms.azsmrc.remote.client.util.TimerEvent;
 import lbms.azsmrc.remote.client.util.TimerEventPerformer;
 import lbms.azsmrc.remote.client.util.TimerEventPeriodic;
 import lbms.azsmrc.shared.RemoteConstants;
+import lbms.tools.i18n.I18N;
 import lbms.tools.launcher.Launchable;
 import lbms.tools.updater.Update;
 import lbms.tools.updater.UpdateListener;
@@ -420,6 +421,19 @@ public class RCMain implements Launchable {
 
 		normalLogger.addHandler(consoleHandler);
 		debugLogger.addHandler(consoleHandler);
+
+		System.out.println("Loading I18N.");
+		InputStream langIs = RCMain.class.getClassLoader().getResourceAsStream("lbms/azsmrc/remote/client/internat/default.lang");
+		if (langIs != null) {
+			try {
+				I18N.initialize(langIs);
+				if (I18N.isInitialized()) {
+					System.out.println("I18N initialized.");
+				}
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
 
 		try {
 			FileHandler fh = new FileHandler(USER_DIR+FSEP+"debug.log",1024*1024,2,true);

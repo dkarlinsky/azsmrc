@@ -14,37 +14,37 @@ public class I18N {
 		i18n.initialize(defaultFile);
 	}
 
-	public void load (File localizedFile) throws IOException {
+	public static void load (File localizedFile) throws IOException {
 		i18n.load(localizedFile);
 	}
 
-	public void initialize(InputStream is) throws IOException {
+	public static void initialize(InputStream is) throws IOException {
 		i18n.initialize(is);
 	}
 
-	public void load (InputStream is) throws IOException {
+	public static void load (InputStream is) throws IOException {
 		i18n.load(is);
 	}
 
-	public String translate (String key) {
+	public static String translate (String key) {
 		return i18n.translate(key);
 	}
 
-	public String translateDefault (String key) {
+	public static String translateDefault (String key) {
 		return i18n.translateDefault(key);
 	}
 
 	/**
 	 * @return Returns the initialized.
 	 */
-	public boolean isInitialized() {
+	public static boolean isInitialized() {
 		return i18n.isInitialized();
 	}
 
 	/**
 	 * @return Returns the localized.
 	 */
-	public boolean isLocalized() {
+	public static boolean isLocalized() {
 		return i18n.isLocalized();
 	}
 }
