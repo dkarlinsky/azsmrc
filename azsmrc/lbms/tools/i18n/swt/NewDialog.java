@@ -1,10 +1,13 @@
 package lbms.tools.i18n.swt;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -114,7 +117,7 @@ public class NewDialog {
 		});
 
 		shell.pack();
-		MainWindow.centerShellandOpen(shell);		
+		centerShellRelativeToandOpen(shell,ETC.getETC().getMainWindow().getShell());		
 		setTextValue(null,null);
 		shell.open();
 
@@ -140,7 +143,28 @@ public class NewDialog {
 		return textValue;
 	}
 
+	/** Centers a Shell and opens it relative to given control
+	 *
+	 * @param shell
+	 * @param control
+	 */
 
+	public static void centerShellRelativeToandOpen(final Shell shell, final Control control){
+		//open shell
+		shell.pack();
+
+		//Center Shell
+
+		final Rectangle bounds = control.getBounds();
+		final Point shellSize = shell.getSize();
+		shell.setLocation(
+				bounds.x + (bounds.width / 2) - shellSize.x / 2,
+				bounds.y + (bounds.height / 2) - shellSize.y / 2
+		);
+
+		//open shell
+		shell.open();
+	}
 }
 
 

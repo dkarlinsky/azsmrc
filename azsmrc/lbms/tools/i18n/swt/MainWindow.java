@@ -1131,4 +1131,7 @@ public class MainWindow {
 		return backgroundC;
 	}
 
+	public Shell getShell(){
+		return shell;
+	}
 }//EOF
