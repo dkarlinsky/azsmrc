@@ -19,6 +19,7 @@ import lbms.azsmrc.remote.client.torrent.scraper.ScrapeResult;
 import lbms.azsmrc.remote.client.torrent.scraper.Scraper;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.shared.EncodingUtil;
+import lbms.tools.i18n.I18N;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -51,23 +52,26 @@ public class ScrapeDialog {
 
 
 	//SWT components
-	private Table torrentTable;	
+	private Table torrentTable;
 	private CTabFolder tabFolder;
 	private Display display;
 	private Button deleteOnSend;
 	private Shell shell;
 
+	//I18N prefix
+	public static final String PFX = "dialog.scrapedialog.";
+
 	private ScrapeDialog(){
 		//set the display
 		display = RCMain.getRCMain().getDisplay();
-		
+
 		//pull in the properties for the lastDir if available
 		lastDir = RCMain.getRCMain().getProperties().getProperty("Last.Directory");
-		
+
 		//Shell
 		shell = new Shell(display);
 		shell.setLayout(new GridLayout(1,false));
-		shell.setText("Scrape a Torrent File");
+		shell.setText(I18N.translate(PFX + "shell.text"));
 
 
 
@@ -81,7 +85,7 @@ public class ScrapeDialog {
 
 
 		final CTabItem mainTab = new CTabItem(tabFolder, SWT.NULL);
-		mainTab.setText("Main");
+		mainTab.setText(I18N.translate(PFX + "detailstab.maintab.text"));
 
 		//Main Composite on shell
 		Composite parent = new Composite(tabFolder,SWT.NULL);
@@ -103,28 +107,25 @@ public class ScrapeDialog {
 		gd.verticalSpan = 2;
 		gd.horizontalSpan = 2;
 		infoLabel.setLayoutData(gd);
-		
+
 		infoLabel.setImage(ImageRepository.getImage("information"));
 		infoLabel.setBackground(display.getSystemColor(SWT.COLOR_GRAY));
-		infoLabel.setText("Load a local torrent file by choosing the 'Load Torrent' button." +
-				"\nA tab will be created for that torrent which will allow you to scrape the " +
-				"\ntracker and see details about the torrent.  From the details tab, you can " +
-				"\nalso send the torrent to the server (if connected).");
+		infoLabel.setText(I18N.translate(PFX + "infolabel.text"));
 
 		//Load Torrent button
 		Button loadTorrent = new Button(parent,SWT.PUSH);
-		loadTorrent.setText("Load Torrent");
+		loadTorrent.setText(I18N.translate(PFX + "loadtorrent_button.text"));
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		gd.grabExcessHorizontalSpace = true;
 		gd.horizontalSpan = 2;
 		loadTorrent.setLayoutData(gd);
-		
+
 		loadTorrent.addListener(SWT.Selection, new Listener(){
 
 			public void handleEvent(Event arg0) {
 				FileDialog dialog = new FileDialog(shell, SWT.OPEN);
 				dialog.setFilterExtensions(new String[] { "*.torrent", "*.*" });
-				dialog.setText("Choose Torrent File to Load");
+				dialog.setText(I18N.translate(PFX + "filedialog.text"));
 				if (lastDir != null) {
 					dialog.setFilterPath(lastDir);
 				}
@@ -156,19 +157,19 @@ public class ScrapeDialog {
 						//Add it to the table
 						TableItem item = new TableItem(torrentTable,SWT.NULL);
 						item.setText(0,atc.getName());
-						
+
 			            //Shade every other one
 			            if(torrentTable.indexOf(item)%2!=0){
 			            	item.setBackground(ColorUtilities.getBackgroundColor());
 			            }
-			            
+
 						//open its tab
 						torrentTabOpen(tabFolder,map.get(atc.getName()));
 
 					}catch(TOTorrentException e){
 						MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION | SWT.OK);
-						messageBox.setText("Invalid Torrent");
-						messageBox.setMessage("Error loading torrent.  Please check the file and try again.");
+						messageBox.setText(I18N.translate(PFX + "filedialog.error.title"));
+						messageBox.setMessage(I18N.translate(PFX + "filedialog.error.message"));
 						messageBox.open();
 						return;
 					}catch(Exception e){
@@ -182,7 +183,7 @@ public class ScrapeDialog {
 
 		//Group for urlTable and buttons
 		Group ttGroup = new Group(parent,SWT.NULL);
-		ttGroup.setText("Loaded Torrents (Double click torrent to view details)");
+		ttGroup.setText(I18N.translate(PFX + "ttGroup.text"));
 		ttGroup.setLayout(new GridLayout(1,false));
 		gd = new GridData(GridData.FILL_BOTH);
 		gd.horizontalSpan = 2;
@@ -191,21 +192,21 @@ public class ScrapeDialog {
 		gd.verticalSpan = 20;
 		ttGroup.setLayoutData(gd);
 
-		//urlTable		
+		//urlTable
 		torrentTable = new Table(ttGroup,SWT.BORDER | SWT.SINGLE |  SWT.V_SCROLL | SWT.H_SCROLL);
-		gd = new GridData(GridData.FILL_BOTH);		
+		gd = new GridData(GridData.FILL_BOTH);
 		torrentTable.setLayoutData(gd);
 		torrentTable.setHeaderVisible(true);
 
 
 		TableColumn ttName = new TableColumn(torrentTable,SWT.NULL);
-		ttName.setText("Torrent Name");
+		ttName.setText(I18N.translate(PFX + "torrentTable.column.name"));
 		ttName.setWidth(600);
 
 
 		//doubleclick listener for the table
 		torrentTable.addListener(SWT.MouseDoubleClick, new Listener(){
-			public void handleEvent(Event arg0) {		
+			public void handleEvent(Event arg0) {
 				TableItem[] items = torrentTable.getSelection();
 				if(items.length > 1) return;
 				CTabItem[] tabs = tabFolder.getItems();
@@ -229,7 +230,7 @@ public class ScrapeDialog {
 
 		//Clear Table
 		Button clearTable = new Button(utButtonComp,SWT.PUSH);
-		clearTable.setText("Clear Loaded Torrents");		
+		clearTable.setText(I18N.translate(PFX + "clearTable_button.text"));
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		clearTable.setLayoutData(gd);
 		clearTable.addListener(SWT.Selection, new Listener(){
@@ -240,23 +241,23 @@ public class ScrapeDialog {
 						item.dispose();
 					}
 				}
-				map.clear();				
+				map.clear();
 				torrentTable.removeAll();
-			}			
+			}
 		});
 
 
 		//Close Dialog
 		Button close = new Button(utButtonComp,SWT.PUSH);
-		close.setText("Close");		
+		close.setText(I18N.translate("global.close"));
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		gd.grabExcessHorizontalSpace = true;
 		close.setLayoutData(gd);
 		close.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
 				shell.dispose();
-			}			
-		});		
+			}
+		});
 
 		mainTab.setControl(parent);
 
@@ -265,9 +266,9 @@ public class ScrapeDialog {
 	}
 
 
-	
-	
-	
+
+
+
 	/**
 	 * The main torrent details tab
 	 * @param tabFolder
@@ -276,14 +277,14 @@ public class ScrapeDialog {
 	private void torrentTabOpen(CTabFolder tabFolder, final AddTorrentContainer atc){
 		//pull previous SR if available
 		ScrapeResult sr = atc.getScrapeResults();
-		
-		
+
+
 		CTabItem tab = new CTabItem(tabFolder,SWT.CLOSE);
 		final Scraper scraper = new Scraper(atc.getTorrent());
 
-		try {			
+		try {
 			tab.setText(atc.getName());
-		} catch (UnsupportedEncodingException e) {			
+		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 
@@ -302,12 +303,12 @@ public class ScrapeDialog {
 		gd.grabExcessHorizontalSpace = true;
 		gd.horizontalSpan = 2;
 		comboComp.setLayoutData(gd);
-		
+
 		gl = new GridLayout();
 		gl.marginWidth = 0;
 		gl.numColumns = 3;
 		comboComp.setLayout(gl);
-		
+
 		final Combo combo = new Combo(comboComp,SWT.DROP_DOWN | SWT.READ_ONLY);
 
 
@@ -316,8 +317,8 @@ public class ScrapeDialog {
 		combo.select(0);
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		combo.setLayoutData(gd);
-		
-		
+
+
 		//Pull the group from the torrent
 		TOTorrentAnnounceURLGroup torrentGroup = atc.getTorrent().getAnnounceURLGroup();
 
@@ -330,22 +331,22 @@ public class ScrapeDialog {
 				URL[] urls = urlSet.getAnnounceURLs();
 				for(URL url:urls){
 					if(!url.toString().equalsIgnoreCase(atc.getTorrent().getAnnounceURL().toString()))
-						combo.add(url.toString());                           		
-				}                        		
+						combo.add(url.toString());
+				}
 			}
 		}
 
 
 		//button for Scrape -- still in comboComp
 		Button scrape = new Button(comboComp,SWT.PUSH);
-		scrape.setText("Scrape");
+		scrape.setText(I18N.translate(PFX + "scrape_button.text"));
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		scrape.setLayoutData(gd);
 
 		//button for Add Torrent
 		final Button add = new Button(comboComp, SWT.PUSH);
-		add.setText("Send Torrent to Server");
-		add.setToolTipText("Choose files from the torrent in the table below that you want to add, then click here to send torrent to the server");
+		add.setText(I18N.translate(PFX + "add_button.text"));
+		add.setToolTipText(I18N.translate(PFX + "add_button.tooltip"));
 		gd = new GridData(GridData.FILL_HORIZONTAL | GridData.HORIZONTAL_ALIGN_END);
 		add.setLayoutData(gd);
 		add.addListener(SWT.Selection, new Listener(){
@@ -356,44 +357,44 @@ public class ScrapeDialog {
                     }else{
                     	int[] props = atc.getFileProperties();
                         //Main add to Azureus
-                        RCMain.getRCMain().getClient().sendAddDownload(atc.getTorrentFile(), props);	
+                        RCMain.getRCMain().getClient().sendAddDownload(atc.getTorrentFile(), props);
                     }
 					if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("delete.on.send", "false"))){
 						if(!atc.deleteFile()){
 							MessageBox messageBox = new MessageBox(shell,
 									SWT.ICON_ERROR | SWT.OK);
-							messageBox.setText("Error");
-							messageBox.setMessage("Error deleting " + atc.getTorrentFile().getName());
+							messageBox.setText(I18N.translate("global.error"));
+							messageBox.setMessage(I18N.translate(PFX + "add_button.error1.message") + " " + atc.getTorrentFile().getName());
 							messageBox.open();
 						}
 					}
 				}else{
 					//we are not connected .. so alert the user
 					MessageBox messageBox = new MessageBox(add.getShell(),SWT.ICON_INFORMATION | SWT.OK);
-					messageBox.setText("Not Connected");
-					messageBox.setMessage("You are not currently connected to a server, please connect and try again.");
+					messageBox.setText(I18N.translate(PFX + "add_button.error2.title"));
+					messageBox.setMessage(I18N.translate(PFX + "add_button.error2.message"));
 					messageBox.open();
 					return;
 				}
-				
+
 			}
-			
+
 		});
-		
+
 		//Label for status
 		final Label status = new Label(parent,SWT.NULL);
 		if(sr != null)
-			status.setText("Status:  Using previous scrape data");
+			status.setText(I18N.translate(PFX + "detailstab.status.text.previous"));
 		else
-			status.setText("Status:  Not Scraped Yet");
+			status.setText(I18N.translate(PFX + "detailstab.status.text.notscraped"));
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		gd.horizontalSpan = 1;
 		gd.grabExcessHorizontalSpace = true;
 		status.setLayoutData(gd);
 
-		
+
 		deleteOnSend = new Button(parent,SWT.CHECK);
-		deleteOnSend.setText("Delete local copy on send");
+		deleteOnSend.setText(I18N.translate(PFX + "detailstab.delete_on_send.text"));
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		gd.horizontalSpan = 1;
 		deleteOnSend.setLayoutData(gd);
@@ -415,168 +416,167 @@ public class ScrapeDialog {
 		pb.setLayoutData(gd);
 		pb.setVisible(false);
 
-		
+
 		//----STATS
 		final Group gStats = new Group(parent,SWT.NULL);
-		gStats.setText("Scrape Results");
+		gStats.setText(I18N.translate(PFX + "detailstab.stats.group.text"));
 		gStats.setLayout(new GridLayout(2,false));
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.grabExcessHorizontalSpace= true;
 		gd.horizontalSpan = 2;
 		gStats.setLayoutData(gd);
 
-		
-		
+
+
 		Label seedsL = new Label(gStats,SWT.NULL);
-		seedsL.setText("Seeds: ");
-		
+		seedsL.setText(I18N.translate(PFX + "detailstab.stats.seedsLabel.text") + " ");
+
 		final Label seeds = new Label(gStats,SWT.NULL);
 		if(sr != null)
 			seeds.setText(String.valueOf(sr.getSeeds()));
 		else
-			seeds.setText("Not Scraped");
+			seeds.setText(I18N.translate(PFX + "detailstab.stats.notscraped.text"));
 
 		Label leechersL = new Label(gStats,SWT.NULL);
-		leechersL.setText("Leechers: ");
-		
+		leechersL.setText(I18N.translate(PFX + "detailstab.stats.leechersLabel.text") + " ");
+
 		final Label leechers = new Label(gStats, SWT.NULL);
 		if(sr != null)
 			leechers.setText(String.valueOf(sr.getLeechers()));
 		else
-			leechers.setText("Not Scraped");
+			leechers.setText(I18N.translate(PFX + "detailstab.stats.notscraped.text"));
 
 		Label downloadedL = new Label(gStats,SWT.NULL);
-		downloadedL.setText("Downloads: ");
-				
+		downloadedL.setText(I18N.translate(PFX + "detailstab.stats.downloadsLabel.text") + " ");
+
 		final Label downloaded = new Label(gStats,SWT.NULL);
 		if(sr != null)
 			downloaded.setText(String.valueOf(sr.getDownloaded()));
 		else
-			downloaded.setText("Not Scraped");
+			downloaded.setText(I18N.translate(PFX + "detailstab.stats.notscraped.text"));
 
-				
+
 		Label srURLL = new Label(gStats,SWT.NULL);
-		srURLL.setText("Scrape URL: ");
+		srURLL.setText(I18N.translate(PFX + "detailstab.stats.scrapeURLLabel.text") + " ");
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 2;
 		srURLL.setLayoutData(gd);
-		
+
 		final Label srURL = new Label(gStats,SWT.NULL);
 		if(sr != null){
 			srURL.setText(sr.getScrapeUrl());
-			srURL.setToolTipText(sr.getScrapeUrl());			
+			srURL.setToolTipText(sr.getScrapeUrl());
 		}else
-			srURL.setText("Not Scraped");
+			srURL.setText(I18N.translate(PFX + "detailstab.stats.notscraped.text"));
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 2;
 		srURL.setLayoutData(gd);
-		
-		
-		
+
+
+
 		//----FILES
-		
+
 		Group gFiles = new Group(parent,SWT.NULL);
-		gFiles.setText("Torrent Details");
+		gFiles.setText(I18N.translate(PFX + "detailstab.files.group.text"));
 		gFiles.setLayout(new GridLayout(2,false));
 		gd = new GridData(GridData.FILL_BOTH);
-		gd.grabExcessHorizontalSpace= true;		
+		gd.grabExcessHorizontalSpace= true;
 		gd.horizontalSpan = 2;
 		gFiles.setLayoutData(gd);
 
 		Composite cLeft = new Composite(gFiles,SWT.NULL);
 		cLeft.setLayout(new GridLayout(2,false));
-		gd = new GridData(GridData.FILL_HORIZONTAL);			
+		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 1;
 		cLeft.setLayoutData(gd);
-		
+
 		//Size
 		Label sizeL = new Label(cLeft,SWT.NULL);
-		sizeL.setText("Size: ");
-		
+		sizeL.setText(I18N.translate(PFX + "detailstab.files.size.text") + " ");
+
 		Label size = new Label(cLeft,SWT.NULL);
 		size.setText(DisplayFormatters.formatByteCountToBase10KBEtc(atc.getTorrent().getSize()));
-		
+
 		//Number of Pieces
 		Label numPiecesL = new Label(cLeft,SWT.NULL);
-		numPiecesL.setText("Pieces: ");
-		
+		numPiecesL.setText(I18N.translate(PFX + "detailstab.files.pieces.text") + " ");
+
 		Label numPieces = new Label(cLeft,SWT.NULL);
 		numPieces.setText(String.valueOf(atc.getTorrent().getNumberOfPieces()));
-		
+
 		//Piece Size
 		Label pieceSizeL = new Label(cLeft,SWT.NULL);
-		pieceSizeL.setText("Piece Size: ");
-		
+		pieceSizeL.setText(I18N.translate(PFX + "detailstab.files.pieceSize.text") + " ");
 		Label pieceSize = new Label(cLeft,SWT.NULL);
 		pieceSize.setText(DisplayFormatters.formatByteCountToBase10KBEtc(atc.getTorrent().getPieceLength()));
-		
-		
-		
+
+
+
 		Composite cRight = new Composite(gFiles,SWT.NULL);
 		cRight.setLayout(new GridLayout(2,false));
 		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.grabExcessHorizontalSpace= true;		
+		gd.grabExcessHorizontalSpace= true;
 		gd.horizontalSpan = 1;
 		cRight.setLayoutData(gd);
-		
-		
+
+
 		//Created on
 		Label dateL = new Label(cRight,SWT.NULL);
-		dateL.setText("Created On: ");
-		
+		dateL.setText(I18N.translate(PFX + "detailstab.files.createdOn.text") + " ");
+
 		Label date = new Label(cRight,SWT.NULL);
 		date.setText(DisplayFormatters.formatDate(atc.getTorrent().getCreationDate()));
-		
+
 		//Created by
 		Label byL = new Label(cRight,SWT.NULL);
-		byL.setText("Created By: ");
-		
+		byL.setText(I18N.translate(PFX + "detailstab.files.createdBy.text") + " ");
+
 		Label by = new Label(cRight,SWT.NULL);
 		by.setText(EncodingUtil.nicePrint(atc.getTorrent().getCreatedBy(),true));
-		
+
 		//Is Private
 		Label privL = new Label(cRight,SWT.NULL);
-		privL.setText("Private: ");
-		
+		privL.setText(I18N.translate(PFX + "detailstab.files.private.text") + " ");
+
 		Label priv = new Label(cRight,SWT.NULL);
 		if(atc.getTorrent().getPrivate())
-			priv.setText("Yes");
+			priv.setText(I18N.translate("global.yes"));
 		else
-			priv.setText("No");
-		
+			priv.setText(I18N.translate("global.no"));
+
 		Composite cBottom = new Composite(gFiles,SWT.NULL);
 		cBottom.setLayout(new GridLayout(1,false));
 		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.grabExcessHorizontalSpace= true;		
+		gd.grabExcessHorizontalSpace= true;
 		gd.horizontalSpan = 2;
 		cBottom.setLayoutData(gd);
-		
+
 		//URL
 		Label tURL = new Label(cBottom,SWT.NULL);
-		tURL.setText("Announce URL: " + atc.getTorrent().getAnnounceURL());
-		
+		tURL.setText(I18N.translate(PFX + "detailstab.files.announceURL.text") + " " + atc.getTorrent().getAnnounceURL());
+
 		//Hash
-		Label hash = new Label(cBottom,SWT.NULL);		
+		Label hash = new Label(cBottom,SWT.NULL);
 		hash.setLayoutData(gd);
-		try {			
-			hash.setText("Hash: " + EncodingUtil.nicePrint(atc.getTorrent().getHash(),false));
+		try {
+			hash.setText(I18N.translate(PFX + "detailstab.files.hash.text") + " " + EncodingUtil.nicePrint(atc.getTorrent().getHash(),false));
 		} catch (TOTorrentException e) {
-			hash.setText("Hash: Unable to properly decode hash");			
+			hash.setText(I18N.translate(PFX + "detailstab.files.hash.error"));
 		}
-        
+
 		//Comments
 		Label commentsL = new Label(cBottom,SWT.NULL);
-		commentsL.setText("Comments: ");
-		
+		commentsL.setText(I18N.translate(PFX + "detailstab.files.commentsLabel.text") + " ");
+
 		Label comments = new Label(cBottom,SWT.NULL);
 		try{
 			comments.setText(new String(atc.getTorrent().getComment()));
 		}catch(Exception e){
-			
+
 		}
-		
-		
-		
+
+
+
 		//Table for files
 		final Table filesTable = new Table(gFiles,SWT.CHECK | SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		gd = new GridData(GridData.FILL_BOTH);
@@ -585,18 +585,18 @@ public class ScrapeDialog {
 		gd.horizontalSpan = 2;
 		filesTable.setLayoutData(gd);
 		filesTable.setHeaderVisible(true);
-		
+
 		TableColumn ftCheck = new TableColumn(filesTable,SWT.NULL);
 		ftCheck.setWidth(30);
-		
+
 		TableColumn ftName = new TableColumn(filesTable,SWT.NULL);
-		ftName.setText("File Name");
+		ftName.setText(I18N.translate(PFX + "detailstab.files.table.column.name"));
 		ftName.setWidth(450);
-		
+
 		TableColumn ftSize = new TableColumn(filesTable,SWT.NULL);
-		ftSize.setText("Size");
+		ftSize.setText(I18N.translate(PFX + "detailstab.files.table.column.size"));
 		ftSize.setWidth(100);
-		
+
 		TOTorrentFile[] files = atc.getFiles();
         int[] properties = atc.getFileProperties();
         for (int i = 0; i < files.length; i++) {
@@ -613,8 +613,8 @@ public class ScrapeDialog {
             detailItem.setText(1, name);
             detailItem.setText(2, DisplayFormatters
                     .formatByteCountToBase10KBEtc(files[i].getLength()));
-            
-            
+
+
             //Shade every other one
             if(filesTable.indexOf(detailItem)%2!=0){
             	detailItem.setBackground(ColorUtilities.getBackgroundColor());
@@ -627,7 +627,7 @@ public class ScrapeDialog {
                 if (event.detail == SWT.CHECK) {
                     TableItem item = (TableItem) event.item;
                     int place = filesTable.indexOf(item);
-                    
+
                     if (item.getChecked()) {
                         atc.setFileProperty(place, 1);
                     } else
@@ -641,7 +641,7 @@ public class ScrapeDialog {
 		//Listener for the Scrape button
 		scrape.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
-				pb.setVisible(true);	
+				pb.setVisible(true);
 				final String urlToScrape = combo.getItem(combo.getSelectionIndex());
 				scraper.addListener(new ScrapeListener(){
 
@@ -650,19 +650,19 @@ public class ScrapeDialog {
 
 							public void run() {
 								pb.setVisible(false);
-								status.setText("Status:  Failed - " + reason);	
+								status.setText(I18N.translate(PFX + "detailstab.status.text.failed") + " - " + reason);
 								parent.layout();
-							}							
+							}
 						});
-						
+
 					}
 
 					public void scrapeFinished(final ScrapeResult sr) {
 						display.asyncExec(new Runnable(){
 							public void run() {
 								pb.setVisible(false);
-								status.setText("Status:  Success");
-								gStats.setText("Scrape Results for " + combo.getItem(combo.getSelectionIndex()));
+								status.setText(I18N.translate(PFX + "detailstab.status.text.success"));
+								gStats.setText(I18N.translate(PFX + "detailstab.stats.group.text.received") + " " + combo.getItem(combo.getSelectionIndex()));
 								seeds.setText(String.valueOf(sr.getSeeds()));
 								leechers.setText(String.valueOf(sr.getLeechers()));
 								downloaded.setText(String.valueOf(sr.getDownloaded()));
@@ -671,21 +671,21 @@ public class ScrapeDialog {
 								atc.setScrapeResults(sr);
 								parent.layout();
 							}
-							
+
 						});
-						
-						
+
+
 					}
 
 				});
-				
+
 				Thread scrapeThread = new Thread(new Runnable(){
 					public void run() {
-						scraper.scrape(urlToScrape);						
+						scraper.scrape(urlToScrape);
 					}
 				});
 				scrapeThread.start();
-			}        	
+			}
 		});
 
 
@@ -694,11 +694,11 @@ public class ScrapeDialog {
 		tab.setControl(parent);
 		tabFolder.setSelection(tab);
 	}
-	
-	
-	
+
+
+
 	/**
-	 * Check to make sure that there are no other ones open and if not 
+	 * Check to make sure that there are no other ones open and if not
 	 * open the ScrapeDialog
 	 */
 	public static void open() {
@@ -708,19 +708,19 @@ public class ScrapeDialog {
 			public void run() {
 				Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
 				for(int i = 0; i < shells.length; i++){
-					if(shells[i].getText().equalsIgnoreCase("Scrape a Torrent File")){
+					if(shells[i].getText().equalsIgnoreCase(I18N.translate(PFX + "shell.text"))){
 						shells[i].setActive();
 						shells[i].setFocus();
 						return;
 					}
 				}
 			   new ScrapeDialog();
-				
+
 			}
-			
+
 		});
 
 	}
-	
-	
+
+
 }//EOF
