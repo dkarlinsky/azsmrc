@@ -8,6 +8,7 @@ import lbms.azsmrc.remote.client.swtgui.container.Container;
 import lbms.azsmrc.remote.client.swtgui.container.DownloadContainer;
 import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
 import lbms.azsmrc.shared.RemoteConstants;
+import lbms.tools.i18n.I18N;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
@@ -38,6 +39,9 @@ public class TableColumnEditorDialog {
     private Point oldPoint;
     private Image oldImage;
 
+//	I18N prefix
+	public static final String PFX = "dialog.tablecolumneditordialog.";
+    
 
     /**
      * Default Constructor
@@ -60,7 +64,7 @@ public class TableColumnEditorDialog {
 
         shell = new Shell(SWT.DIALOG_TRIM | SWT.RESIZE);
 
-        shell.setText("Choose the columns to display");
+        shell.setText(I18N.translate(PFX + "shell.text"));
 
         GridLayout layout = new GridLayout();
         shell.setLayout (layout);
@@ -68,7 +72,7 @@ public class TableColumnEditorDialog {
         GridData gridData;
 
         Label label = new Label(shell,SWT.NULL);
-        label.setText("Drag rows to re-order them");
+        label.setText(I18N.translate(PFX + "infolabel.text"));
         gridData = new GridData(GridData.FILL_HORIZONTAL);
         label.setLayoutData(gridData);
 
@@ -89,7 +93,7 @@ public class TableColumnEditorDialog {
         cButtonArea.setLayout (rLayout);
 
         Button bOk = new Button(cButtonArea,SWT.PUSH);
-        bOk.setText("OK");
+        bOk.setText(I18N.translate("global.ok"));
         rd = new RowData();
         rd.width = 70;
         bOk.setLayoutData(rd);
@@ -101,7 +105,7 @@ public class TableColumnEditorDialog {
         });
 
         Button bCancel = new Button(cButtonArea,SWT.PUSH);
-        bCancel.setText("Cancel");
+        bCancel.setText(I18N.translate("global.cancel"));
         rd = new RowData();
         rd.width = 70;
         bCancel.setLayoutData(rd);
@@ -112,7 +116,7 @@ public class TableColumnEditorDialog {
         });
 
         Button bApply = new Button(cButtonArea,SWT.PUSH);
-        bApply.setText("Apply");
+        bApply.setText(I18N.translate(PFX + "apply_button.text"));
         rd = new RowData();
         rd.width = 70;
         bApply.setLayoutData(rd);
@@ -126,10 +130,10 @@ public class TableColumnEditorDialog {
 
 
         TableColumn column_name = new TableColumn(table, SWT.NONE);
-        column_name.setText("Column Name");
+        column_name.setText(I18N.translate(PFX + "table.column.name"));
 
         TableColumn column_description = new TableColumn(table, SWT.NONE);
-        column_description.setText("Column Description");
+        column_description.setText(I18N.translate(PFX + "table.column.description"));
 
 
         table.getColumn(0).setWidth(160);
@@ -288,73 +292,96 @@ public class TableColumnEditorDialog {
         switch (remoteConstantInteger) {
 
         case RemoteConstants.ST_NAME:
-            return new String[] {"Name", "Name of the Download"};
+            return new String[] {I18N.translate(PFX + "tableitem.name.title"), 
+            		I18N.translate(PFX + "tableitem.name.description")};
 
         case RemoteConstants.ST_POSITION:
-            return new String[] {"Position", "Position of the Download"};
+            return new String[] {I18N.translate(PFX + "tableitem.position.title"), 
+            		I18N.translate(PFX + "tableitem.position.description")};
 
         case RemoteConstants.ST_DOWNLOAD_AVG:
-            return new String[] {"Download Average", "Average Download Speed"};
+            return new String[] {I18N.translate(PFX + "tableitem.downloadAvg.title"),
+            		I18N.translate(PFX + "tableitem.downloadAvg.description")};
 
         case RemoteConstants.ST_UPLOAD_AVG:
-            return new String[] {"Upload Average", "Average Upload Speed"};
+            return new String[] {I18N.translate(PFX + "tableitem.uploadAverage.title"),
+            		I18N.translate(PFX + "tableitem.uploadAverage.description")};
 
         case RemoteConstants.ST_DOWNLOADED:
-            return new String[] {"Downloaded", "Total Amount Downloaded"};
+            return new String[] {I18N.translate(PFX + "tableitem.downloaded.title"),
+            		I18N.translate(PFX + "tableitem.downloaded.description")};
 
         case RemoteConstants.ST_UPLOADED:
-            return new String[] {"Uploaded", "Total Amount Uploaded"};
+            return new String[] {I18N.translate(PFX + "tableitem.uploaded.title"),
+            		I18N.translate(PFX + "tableitem.uploaded.description")};
 
         case RemoteConstants.ST_HEALTH:
-            return new String[] {"Health", "Icon representing the health of the download conneciton"};
+            return new String[] {I18N.translate(PFX + "tableitem.health.title"),
+            		I18N.translate(PFX + "tableitem.health.description")};
 
         case RemoteConstants.ST_COMPLETITION:
-            return new String[] {"Percent Complete", "Progess bar showing percent completion"};
+            return new String[] {I18N.translate(PFX + "tableitem.completion.title"),
+            		I18N.translate(PFX + "tableitem.completion.description")};
 
         case RemoteConstants.ST_AVAILABILITY:
-            return new String[] {"Availability", "Number of full copies being seen"};
+            return new String[] {I18N.translate(PFX + "tableitem.availability.title"),
+            		I18N.translate(PFX + "tableitem.availability.description")};
 
         case RemoteConstants.ST_ETA:
-            return new String[] {"ETA", "Estimated time for the download to finish"};
+            return new String[] {I18N.translate(PFX + "tableitem.eta.title"), 
+            		I18N.translate(PFX + "tableitem.eta.description")};
 
         case RemoteConstants.ST_STATE:
-            return new String[] {"State", ""};
+            return new String[] {I18N.translate(PFX + "tableitem.state.title"),
+            		I18N.translate(PFX + "tableitem.state.description")};
 
         case RemoteConstants.ST_STATUS:
-            return new String[] {"Status", "Overal Status of the tracker"};
+            return new String[] {I18N.translate(PFX + "tableitem.status.title"),
+            		I18N.translate(PFX + "tableitem.status.description")};
 
         case RemoteConstants.ST_SHARE:
-            return new String[] {"Share Ratio", "Ratio of amount uploaded to amount downloaded"};
+            return new String[] {I18N.translate(PFX + "tableitem.ratio.title"), 
+            		I18N.translate(PFX + "tableitem.ratio.description")};
 
         case RemoteConstants.ST_ALL_SEEDS:
-            return new String[] {"Seeds", "Number of seeds you are connected to as well as the total amount of seeds"};
+            return new String[] {I18N.translate(PFX + "tableitem.seeds.title"), 
+            		I18N.translate(PFX + "tableitem.seeds.description")};
 
         case RemoteConstants.ST_ALL_LEECHER:
-            return new String[] {"Leechers", "Number of leechers you are connected to as well as the total amount of leechers"};
+            return new String[] {I18N.translate(PFX + "tableitem.leechers.title"),
+            		I18N.translate(PFX + "tableitem.leechers.description")};
 
         case RemoteConstants.ST_SIZE:
-            return new String[] {"Size", "Total size on disk of the download"};
+            return new String[] {I18N.translate(PFX + "tableitem.size.title"), 
+            		I18N.translate(PFX + "tableitem.size.description")};
 
         case RemoteConstants.ST_TRACKER:
-            return new String[] {"Tracker Status", "Result of the last scrape of the tracker"};
+            return new String[] {I18N.translate(PFX + "tableitem.tracker.title"), 
+            		I18N.translate(PFX + "tableitem.tracker.description")};
 
         case RemoteConstants.ST_DISCARDED:
-            return new String[] {"Discarded", "Amount of bad data discarded"};
+            return new String[] {I18N.translate(PFX + "tableitem.discarded.title"),
+            		I18N.translate(PFX + "tableitem.discarded.description")};
 
         case RemoteConstants.ST_ELAPSED_TIME:
-            return new String[] {"Elapsed Time", "Total elpased time since adding the torrent"};
+            return new String[] {I18N.translate(PFX + "tableitem.elapsed.title"), 
+            		I18N.translate(PFX + "tableitem.elapsed.description")};
 
         case RemoteConstants.ST_TOTAL_AVG:
-            return new String[] {"Swarm Speed", "Total overall speed of the swarm"};
+            return new String[] {I18N.translate(PFX + "tableitem.totalavg.title"), 
+            		I18N.translate(PFX + "tableitem.totalavg.description")};
 
         case RemoteConstants.ST_LIMIT_UP:
-            return new String[] {"Upload Limit", "Set upload limit for each torrent"};
+            return new String[] {I18N.translate(PFX + "tableitem.upLimit.title"), 
+            		I18N.translate(PFX + "tableitem.upLimit.description")};
 
         case RemoteConstants.ST_LIMIT_DOWN:
-            return new String[] {"Download Limit", "Set download limit for each torrent"};
+            return new String[] {I18N.translate(PFX + "tableitem.downLimit.title"),
+            		I18N.translate(PFX + "tableitem.downLimit.description")};
 
         default:
-            return new String[] {"null","null"};
+            return new String[] {I18N.translate("global.error"),
+        		I18N.translate("global.error")};
         }
     }
 
