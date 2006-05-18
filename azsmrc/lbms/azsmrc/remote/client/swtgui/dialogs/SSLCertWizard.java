@@ -4,6 +4,7 @@ package lbms.azsmrc.remote.client.swtgui.dialogs;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.shared.RemoteConstants;
+import lbms.tools.i18n.I18N;
 
 
 import org.eclipse.swt.SWT;
@@ -32,13 +33,16 @@ public class SSLCertWizard {
 	private Composite parent;
 	private Button next,cancel,finish;
 	
-
+//	I18N prefix
+	public static final String PFX = "dialog.sslcertwizard.";
+	
 	public SSLCertWizard(){
 		display = RCMain.getRCMain().getDisplay();
 
 		shell = new Shell(display);		
 		shell.setLayout(new GridLayout(1,false));
-
+		shell.setText(I18N.translate(PFX + "shell.text"));
+		
 		parent = new Composite(shell,SWT.BORDER);
 		parent.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 		GridData gd = new GridData(GridData.FILL_BOTH);
@@ -62,7 +66,7 @@ public class SSLCertWizard {
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalAlignment = GridData.HORIZONTAL_ALIGN_BEGINNING;
 		cancel.setLayoutData(gd);
-		cancel.setText("Cancel");
+		cancel.setText(I18N.translate("global.cancel"));
 		cancel.addListener(SWT.Selection, new Listener(){
 
 			public void handleEvent(Event arg0) {				
@@ -74,7 +78,7 @@ public class SSLCertWizard {
 		next = new Button(buttonComp,SWT.PUSH);
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);		
 		next.setLayoutData(gd);
-		next.setText("Next >");
+		next.setText(I18N.translate(PFX + "next_button.text"));
 		next.setEnabled(false);
 
 
@@ -83,7 +87,7 @@ public class SSLCertWizard {
 		finish = new Button(buttonComp,SWT.PUSH);
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);		
 		finish.setLayoutData(gd);
-		finish.setText("Finish");
+		finish.setText(I18N.translate(PFX + "finish_button.text"));
 		finish.setEnabled(false);
 
 
@@ -96,13 +100,10 @@ public class SSLCertWizard {
 
 
 	public void step1(){
-		shell.setText("SSL Setup Wizard: Step 1 of 3");
+		shell.setText(I18N.translate(PFX + "step1.shell.text"));
 
 		Label info = new Label(parent,SWT.WRAP | SWT.CENTER);
-		info.setText("Step 1 is to identify the location of the 'tools.jar' file located" +
-				"on the server.  This file is distributed with the Java Development Kit (JDK)" +
-				"and will be used to generate the certificate used for secure communication " +
-		"with the server\n\n\n");
+		info.setText(I18N.translate(PFX + "step1.info.text"));
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 3;
 		info.setLayoutData(gd);
@@ -113,7 +114,7 @@ public class SSLCertWizard {
 		gd.horizontalSpan = 3;
 		label.setLayoutData(gd);
 		label.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
-		label.setText("Input directory that contains tools.jar:");
+		label.setText(I18N.translate(PFX + "step1.label.text"));
 
 		final Text text = new Text(parent,SWT.SINGLE | SWT.BORDER);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -149,7 +150,7 @@ public class SSLCertWizard {
 
 
 	public void step2(){
-		shell.setText("SSL Setup Wizard: Step 2 of 3");
+		shell.setText(I18N.translate(PFX + "step2.shell.text"));
 
 		Control[] controls = parent.getChildren();
 		for(Control control:controls){
@@ -157,8 +158,7 @@ public class SSLCertWizard {
 		}
 
 		Label info = new Label(parent,SWT.WRAP | SWT.CENTER);
-		info.setText("Step 2 is certificate creation.  \nSimply fill out " +
-		"the provided information (bogus or real) and a certificate will be created\n");
+		info.setText(I18N.translate(PFX + "step2.info.text"));
 
 		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 3;
@@ -176,7 +176,7 @@ public class SSLCertWizard {
 		// alias
 
 		Label alias_label = new Label(parent,SWT.NULL);
-		alias_label.setText("Alias");
+		alias_label.setText(I18N.translate(PFX + "step2.alias.text"));
 		alias_label.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		gridData.horizontalSpan = 1;
@@ -184,7 +184,7 @@ public class SSLCertWizard {
 
 		final Text alias_field =new Text(parent,SWT.BORDER);
 
-		alias_field.setText("my.domain.com");	
+		alias_field.setText(I18N.translate(PFX + "step2.alias.example"));	
 		
 
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
@@ -192,7 +192,7 @@ public class SSLCertWizard {
 		alias_field.setLayoutData(gridData);
 
 		Label alias_about = new Label(parent, SWT.NULL);
-		alias_about.setText("Note: Alias needs to be either your IP or your fully qualified domain name");
+		alias_about.setText(I18N.translate(PFX + "step2.alias_about.text"));
 		alias_about.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 3;
@@ -203,7 +203,7 @@ public class SSLCertWizard {
 		// strength
 
 		Label strength_label = new Label(parent,SWT.NULL);
-		strength_label.setText("Strength");
+		strength_label.setText(I18N.translate(PFX + "step2.strength.text"));
 		strength_label.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		gridData.horizontalSpan = 1;
@@ -226,12 +226,12 @@ public class SSLCertWizard {
 		// first + last name
 
 		String[]	field_names = { 
-				"First and last name",
-				"Organisational Unit",
-				"Organisation",
-				"City or Locality",
-				"State or Province",
-				"Two-letter country code"
+				I18N.translate(PFX + "step2.name.text"),
+				I18N.translate(PFX + "step2.unit.text"),
+				I18N.translate(PFX + "step2.org.text"),
+				I18N.translate(PFX + "step2.city.text"),
+				I18N.translate(PFX + "step2.state.text"),
+				I18N.translate(PFX + "step2.country.text")
 		};
 
 		final String[]		field_rns = {"CN", "OU", "O", "L", "ST", "C" };
@@ -295,7 +295,7 @@ public class SSLCertWizard {
 	}
 
 	private void step3(){
-		shell.setText("SSL Setup Wizard: Step 3 of 3");
+		shell.setText(I18N.translate(PFX + "step3.shell.text"));
 
 		Control[] controls = parent.getChildren();
 		for(Control control:controls){
@@ -304,11 +304,7 @@ public class SSLCertWizard {
 
 		
 		Label info = new Label(parent,SWT.WRAP);
-		info.setText("\nNow that the certificate has been created, you can enable ssl " +
-				"communication with the server from the remote.\n\nPlease verify that you want ssl to be enabled," +
-				" then choose Finish to restart your Azureus server.  Canceling at this point will not turn " +
-				"on ssl nor will it restart the server.\n\nOnce the server has restarted, you will need " +
-				"to re-connect to the server using the ssl mode enabled.\n");
+		info.setText(I18N.translate(PFX + "step3.info.text"));
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 3;
 		info.setLayoutData(gd);
@@ -316,7 +312,7 @@ public class SSLCertWizard {
 
 		final Button sslEnabled = new Button(parent, SWT.CHECK);
 		sslEnabled.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
-		sslEnabled.setText("Enable SSL communication mode on the server");
+		sslEnabled.setText(I18N.translate(PFX + "step3.enablessl_button.text"));
 		sslEnabled.setSelection(true);
 		
 		finish.addSelectionListener(new SelectionListener(){
