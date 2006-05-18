@@ -14,6 +14,7 @@ import lbms.azsmrc.remote.client.RemoteUpdate;
 import lbms.azsmrc.remote.client.RemoteUpdateManager;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
+import lbms.tools.i18n.I18N;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -32,7 +33,8 @@ import org.eclipse.swt.widgets.TableItem;
 
 public class ServerUpdateDialog {
 
-
+//	I18N prefix
+	public static final String PFX = "dialog.serverupdatedialog.";
 
 	private ServerUpdateDialog(){
 		final RemoteUpdateManager rum = RCMain.getRCMain().getClient().getRemoteUpdateManager();
@@ -41,7 +43,7 @@ public class ServerUpdateDialog {
 		//Shell
 		final Shell shell = new Shell(RCMain.getRCMain().getDisplay());
 		shell.setLayout(new GridLayout(1,false));
-		shell.setText("Updates Available");
+		shell.setText(I18N.translate(PFX + "shell.text"));
 
 		//Comp on shell
 		Composite comp = new Composite(shell,SWT.NULL);
@@ -56,9 +58,9 @@ public class ServerUpdateDialog {
 
 		//first line
 		Label infoLabel = new Label(comp,SWT.BORDER | SWT.CENTER);
-		infoLabel.setText("Azureus Updates Available\nServer: " +
+		infoLabel.setText(I18N.translate(PFX + "infolabel.line1.text") + " " +
 				RCMain.getRCMain().getClient().getServer().getHost() +
-				"\nNumber of Updates: " + rum.getUpdates().length);
+				I18N.translate(PFX + "infolabel.line2.text") + " " + rum.getUpdates().length);
 		infoLabel.setBackground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_GRAY));
 
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -79,11 +81,11 @@ public class ServerUpdateDialog {
 		spacerForCheck.setWidth(30);
 
 		TableColumn name = new TableColumn(table,SWT.NULL);
-		name.setText("Name");
+		name.setText(I18N.translate(PFX + "table.column.name.text"));
 		name.setWidth(300);
 
 		TableColumn version = new TableColumn(table,SWT.NULL);
-		version.setText("New Version");
+		version.setText(I18N.translate(PFX + "table.column.newversion.text"));
 		version.setWidth(100);
 
 		//populate the table with the updates
@@ -113,7 +115,7 @@ public class ServerUpdateDialog {
 
 
 		Button commit = new Button(button_comp,SWT.PUSH);
-		commit.setText("Send Checked to Server");
+		commit.setText(I18N.translate(PFX + "commit_button.text"));
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		commit.setLayoutData(gd);
 		commit.addListener(SWT.Selection, new Listener(){
@@ -134,7 +136,7 @@ public class ServerUpdateDialog {
 
 
 		Button cancel = new Button(button_comp,SWT.PUSH);
-		cancel.setText("Cancel");
+		cancel.setText(I18N.translate("global.cancel"));
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		gd.grabExcessHorizontalSpace = true;
 		gd.horizontalSpan = 2;
@@ -152,7 +154,7 @@ public class ServerUpdateDialog {
 	}
 
 	/**
-	 * Check to make sure that there are no other ones open and if not 
+	 * Check to make sure that there are no other ones open and if not
 	 * open the ServerUpdateDialog
 	 */
 	public static void open() {
@@ -162,18 +164,18 @@ public class ServerUpdateDialog {
 			public void run() {
 				Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
 				for(int i = 0; i < shells.length; i++){
-					if(shells[i].getText().equalsIgnoreCase("Updates Available")){
+					if(shells[i].getText().equalsIgnoreCase(I18N.translate(PFX + "shell.text"))){
 						shells[i].setActive();
 						shells[i].setFocus();
 						return;
 					}
 				}
 			   new ServerUpdateDialog();
-				
+
 			}
-			
+
 		});
 
 	}
-	
+
 }//EOF
