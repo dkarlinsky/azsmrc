@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
+import lbms.tools.i18n.I18N;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
@@ -86,6 +87,9 @@ public class ConsoleTab {
 	private Logger normalLogger;
 	private Logger debugLogger;
 
+	//I18N prefix
+	public static final String PFX = "tab.consoletab.";
+
 	static {
 		dateFormatter = new SimpleDateFormat("[h:mm:ss.SSS] ");
 		formatPos = new FieldPosition(0);
@@ -119,7 +123,7 @@ public class ConsoleTab {
 
 	public ConsoleTab(CTabFolder parentTab){
 		final CTabItem detailsTab = new CTabItem(parentTab, SWT.CLOSE);
-		detailsTab.setText("Console");
+		detailsTab.setText(I18N.translate(PFX + "tab.text"));
 		normalLogger = RCMain.getRCMain().getNormalLogger();
 		debugLogger = RCMain.getRCMain().getDebugLogger();
 
@@ -194,7 +198,7 @@ public class ConsoleTab {
 		cLeft.setLayoutData(gd);
 
 		Button buttonPause = new Button(cLeft, SWT.CHECK);
-		buttonPause.setText("Disable Logging");
+		buttonPause.setText(I18N.translate(PFX + "buttonPause.text"));
 		gd = new GridData();
         gd.horizontalSpan = 2;
 		buttonPause.setLayoutData(gd);
@@ -217,7 +221,7 @@ public class ConsoleTab {
 		});
 
 		buttonAutoScroll = new Button(cLeft, SWT.CHECK);
-		buttonAutoScroll.setText("Auto Scroll");
+		buttonAutoScroll.setText(I18N.translate(PFX + "buttonAutoScroll.text"));
 		gd = new GridData();
         gd.horizontalSpan = 2;
 		buttonAutoScroll.setLayoutData(gd);
@@ -245,7 +249,7 @@ public class ConsoleTab {
 
 
         Label Lhistory = new Label(cLines,SWT.NULL);
-        Lhistory.setText("History Size");
+        Lhistory.setText(I18N.translate(PFX + "labelHistory.text"));
 
         final Spinner spin = new Spinner(cLines,SWT.BORDER);
         spin.setMaximum(10000);
@@ -273,7 +277,7 @@ public class ConsoleTab {
 
         //Button clear
 		Button buttonClear = new Button(cLeft, SWT.PUSH);
-		buttonClear.setText("Clear");
+		buttonClear.setText(I18N.translate("global.clear"));
 		gd = new GridData();
 		buttonClear.setLayoutData(gd);
 		buttonClear.addSelectionListener(new SelectionAdapter() {
@@ -283,7 +287,7 @@ public class ConsoleTab {
 		});
 
         Button writeToFile = new Button(cLeft, SWT.PUSH);
-        writeToFile.setText("Write Log to file");
+        writeToFile.setText(I18N.translate(PFX + "writeToFile_button.text"));
         gd = new GridData();
         writeToFile.setLayoutData(gd);
         writeToFile.addListener(SWT.Selection, new Listener() {
@@ -291,14 +295,14 @@ public class ConsoleTab {
                 try{
                     if(consoleText.getCharCount() == 0){
                         MessageBox messageBox = new MessageBox(cLeft.getShell(), SWT.ICON_ERROR | SWT.OK);
-                        messageBox.setText("Log is Empty");
-                        messageBox.setMessage("The Log is empty, therefore nothing can be written to a file.");
+                        messageBox.setText(I18N.translate(PFX + "writeToFile.messagebox.title"));
+                        messageBox.setMessage(I18N.translate(PFX + "writeToFile.messagebox.message"));
                         messageBox.open();
                         return;
                     }
 
                     FileDialog fileDialog = new FileDialog(cLeft.getShell(), SWT.SAVE);
-                    fileDialog.setText("Please choose a file to save the information to");
+                    fileDialog.setText(I18N.translate(PFX + "writeToFile.filedialog.title"));
                     String[] filterExtensions = {"*.txt","*.log","*.*"};
                     fileDialog.setFilterExtensions(filterExtensions);
                     if(defaultPath != null)
@@ -311,26 +315,23 @@ public class ConsoleTab {
                         if(fileToSave.exists()){
                             if(!fileToSave.canWrite()){
                                 MessageBox messageBox = new MessageBox(cLeft.getShell(), SWT.ICON_ERROR | SWT.OK);
-                                messageBox.setText("Error writing to file");
-                                messageBox.setMessage("Your computer is reporting that the selected file cannot be written to, please retry this operation and select a different file");
+                                messageBox.setText(I18N.translate("global.error"));
+                                messageBox.setMessage(I18N.translate(PFX + "writeToFile.error.text"));
                                 messageBox.open();
                                 return;
                             }
 
                             final Shell shell = new Shell(SWT.DIALOG_TRIM);
                             shell.setLayout(new GridLayout(3,false));
-                            shell.setText("File Exists");
+                            shell.setText(I18N.translate(PFX + "writeToFile.filedialog.duplicatemessage.title"));
                             Label message = new Label(shell,SWT.NULL);
-                            message.setText("Your selected file already exists. \n" +
-                                                        "Choose 'Overwrite' to overwrite it, deleting the original contents \n" +
-                                                        "Choose 'Append' to append the information to the existing file \n" +
-                                                        "Choose 'Cancel' to abort this action all together\n\n");
+                            message.setText(I18N.translate(PFX + "writeToFile.filedialog.duplicatemessage.message"));
                             GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
                             gridData.horizontalSpan = 3;
                             message.setLayoutData(gridData);
 
                             Button overwrite = new Button(shell,SWT.PUSH);
-                            overwrite.setText("Overwrite");
+                            overwrite.setText(I18N.translate(PFX + "writeToFile.filedialog.duplicatemessage.button.overwrite"));
                             overwrite.addListener(SWT.Selection, new Listener(){
                                 public void handleEvent(Event e)
                                 {
@@ -345,7 +346,7 @@ public class ConsoleTab {
 
 
                             Button append = new Button(shell,SWT.PUSH);
-                            append.setText("Append");
+                            append.setText(I18N.translate(PFX + "writeToFile.filedialog.duplicatemessage.button.append"));
                             append.addListener(SWT.Selection, new Listener(){
                                 public void handleEvent(Event e)
                                 {
@@ -356,7 +357,7 @@ public class ConsoleTab {
                             });
 
                             Button cancel = new Button(shell,SWT.PUSH);
-                            cancel.setText("Cancel");
+                            cancel.setText(I18N.translate("global.cancel"));
                             cancel.addListener(SWT.Selection, new Listener(){
                                 public void handleEvent(Event e)
                                 {
@@ -393,8 +394,8 @@ public class ConsoleTab {
                 }catch (Exception f){
                     f.printStackTrace();
                     MessageBox messageBox = new MessageBox(cLeft.getShell(), SWT.ICON_ERROR | SWT.OK);
-                    messageBox.setText("Error writing to file");
-                    messageBox.setMessage("Your computer is reporting that the selected file cannot be written to, please retry this operation and select a different file");
+                    messageBox.setText(I18N.translate("global.error"));
+                    messageBox.setMessage(I18N.translate(PFX + "writeToFile.filedialog.duplicatemessage.message"));
                     messageBox.open();
                 }
             }
@@ -409,7 +410,7 @@ public class ConsoleTab {
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
 		layout.verticalSpacing = 1;
-		cMiddle.setLayout(layout);		
+		cMiddle.setLayout(layout);
 		gd = new GridData(GridData.VERTICAL_ALIGN_FILL);
 		cMiddle.setLayoutData(gd);
 		cMiddle.setText("Log Filters");
@@ -463,8 +464,8 @@ public class ConsoleTab {
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
         debuglabel.setLayoutData(gd);
-        
-        
+
+
         final Combo debugCombo = new Combo(cEnd, SWT.DROP_DOWN | SWT.READ_ONLY);
         debugCombo.add("7 - Show Finest and above (shows most)");
         debugCombo.add("6 - Show Finer and above");
@@ -484,7 +485,7 @@ public class ConsoleTab {
             }
 
         });
-        
+
         final Label debugColor = new Label(cEnd, SWT.BORDER);
         gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
         gd.horizontalSpan = 1;
@@ -503,7 +504,7 @@ public class ConsoleTab {
         debugColor.addMouseListener(new MouseListener(){
 
 			public void mouseDoubleClick(MouseEvent arg0) {
-				RCMain.getRCMain().getProperties().setProperty("debug.color", 
+				RCMain.getRCMain().getProperties().setProperty("debug.color",
 						GUI_Utilities.colorChooserDialog(
 								GUI_Utilities.getRGB(
 		        						RCMain.getRCMain().getProperties().getProperty("debug.color", "r192g192b192")
@@ -518,19 +519,19 @@ public class ConsoleTab {
 		        				)
 		        		)
 		        );
-				
+
 			}
 			public void mouseDown(MouseEvent arg0) {}
-			public void mouseUp(MouseEvent arg0) {}        	
+			public void mouseUp(MouseEvent arg0) {}
         });
-        
+
 
         Label normallabel = new Label(cEnd,SWT.NULL);
         normallabel.setText("Normal Log Level:");
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
         normallabel.setLayoutData(gd);
-        
+
         final Combo normalCombo = new Combo(cEnd, SWT.DROP_DOWN | SWT.READ_ONLY);
         normalCombo.add("7 - Show Finest and above (shows most)");
         normalCombo.add("6 - Show Finer and above");
@@ -570,7 +571,7 @@ public class ConsoleTab {
         normalColor.addMouseListener(new MouseListener(){
 
 			public void mouseDoubleClick(MouseEvent arg0) {
-				RCMain.getRCMain().getProperties().setProperty("normal.color", 
+				RCMain.getRCMain().getProperties().setProperty("normal.color",
 						GUI_Utilities.colorChooserDialog(
 								GUI_Utilities.getRGB(
 		        						RCMain.getRCMain().getProperties().getProperty("normal.color", "r000g255b000")
@@ -585,12 +586,12 @@ public class ConsoleTab {
 		        				)
 		        		)
 		        );
-				
+
 			}
 			public void mouseDown(MouseEvent arg0) {}
-			public void mouseUp(MouseEvent arg0) {}        	
+			public void mouseUp(MouseEvent arg0) {}
         });
-        
+
 
         //new major color group
         Group gAlert = new Group(panel, SWT.NULL);
@@ -599,14 +600,14 @@ public class ConsoleTab {
 		layout.marginWidth = 0;
 		layout.verticalSpacing = 1;
 		layout.numColumns = 2;
-		gAlert.setLayout(layout);		
+		gAlert.setLayout(layout);
 		gd = new GridData(GridData.VERTICAL_ALIGN_FILL);
 		gAlert.setLayoutData(gd);
 		gAlert.setText("Alert Color Settings");
-        
+
 		Label warningL = new Label(gAlert,SWT.NULL);
 		warningL.setText("Warning:");
-		
+
 		final Label warning = new Label(gAlert,SWT.BORDER);
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
         gd.horizontalSpan = 1;
@@ -625,7 +626,7 @@ public class ConsoleTab {
         warning.addMouseListener(new MouseListener(){
 
 			public void mouseDoubleClick(MouseEvent arg0) {
-				RCMain.getRCMain().getProperties().setProperty("warning.color", 
+				RCMain.getRCMain().getProperties().setProperty("warning.color",
 						GUI_Utilities.colorChooserDialog(
 								GUI_Utilities.getRGB(
 		        						RCMain.getRCMain().getProperties().getProperty("warning.color", "r255g255b000")
@@ -640,16 +641,16 @@ public class ConsoleTab {
 		        				)
 		        		)
 		        );
-				
+
 			}
 			public void mouseDown(MouseEvent arg0) {}
-			public void mouseUp(MouseEvent arg0) {}        	
+			public void mouseUp(MouseEvent arg0) {}
         });
-        
-        
+
+
 		Label severeL = new Label(gAlert,SWT.NULL);
 		severeL.setText("Severe:");
-		
+
 		final Label severe = new Label(gAlert,SWT.BORDER);
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
         gd.horizontalSpan = 1;
@@ -668,7 +669,7 @@ public class ConsoleTab {
         severe.addMouseListener(new MouseListener(){
 
 			public void mouseDoubleClick(MouseEvent arg0) {
-				RCMain.getRCMain().getProperties().setProperty("severe.color", 
+				RCMain.getRCMain().getProperties().setProperty("severe.color",
 						GUI_Utilities.colorChooserDialog(
 								GUI_Utilities.getRGB(
 		        						RCMain.getRCMain().getProperties().getProperty("severe.color", "r255g000b000")
@@ -683,18 +684,18 @@ public class ConsoleTab {
 		        				)
 		        		)
 		        );
-				
+
 			}
 			public void mouseDown(MouseEvent arg0) {}
-			public void mouseUp(MouseEvent arg0) {}        	
+			public void mouseUp(MouseEvent arg0) {}
         });
-		
-		
-		
-		
-		
-		
-		
+
+
+
+
+
+
+
 		//Dispose Listener for tab
 		detailsTab.addDisposeListener(new DisposeListener (){
 
@@ -738,8 +739,8 @@ public class ConsoleTab {
 						consoleText.append(buf.toString());
 
 						int nbLinesNow = consoleText.getLineCount();
-						
-                        
+
+
 						if(record.getLevel().intValue() == Level.WARNING.intValue())
 							consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
 									- nbLinesBefore, new Color(RCMain.getRCMain().getDisplay(),
@@ -772,7 +773,7 @@ public class ConsoleTab {
 					        				)
 					        		)
                         	);
-						
+
 
 						if (bAutoScroll)
 							consoleText.setSelection(consoleText.getText().length());
