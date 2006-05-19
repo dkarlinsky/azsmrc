@@ -5,6 +5,7 @@ import java.util.List;
 
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
+import lbms.tools.i18n.I18N;
 import lbms.tools.updater.Changelog;
 import lbms.tools.updater.Update;
 import lbms.tools.updater.UpdateFile;
@@ -34,7 +35,8 @@ public class UpdateDialog{
     private Button accept;
     private CLabel updateLabel1;
 
-
+    //I18N prefix
+	public static final String PFX = "dialog.updatedialog.";
 
     public UpdateDialog(final Display parent, final Update update, final Updater updater) {
 
@@ -64,16 +66,16 @@ public class UpdateDialog{
                     updateLabel1LData.horizontalSpan = 2;
                     updateLabel1LData.horizontalAlignment = GridData.FILL;
                     updateLabel1.setLayoutData(updateLabel1LData);
-                    updateLabel1.setText("Update To Version " + update.getVersion().toString() +
-                            " Available\nImportance Level: " + getImportanceLevelString(update.getImportance_level())+
-                            "\nUpdate Type: " + getTypeString(update.getType()) +
-                            "\nTotal Update Size: " + DisplayFormatters.formatByteCountToBase10KBEtc(totalSize));
+                    updateLabel1.setText(I18N.translate(PFX + "infoLabel.line1") + " " + update.getVersion().toString() +
+                            " " + I18N.translate(PFX + "infoLabel.line2")+ " " + getImportanceLevelString(update.getImportance_level())+
+                            I18N.translate(PFX + "infoLabel.line3") + " " + getTypeString(update.getType()) +
+                            I18N.translate(PFX + "infoLabel.line4") + " " + DisplayFormatters.formatByteCountToBase10KBEtc(totalSize));
                     updateLabel1.setAlignment(SWT.CENTER);
                     updateLabel1.setBackground(dialogShell.getDisplay().getSystemColor(SWT.COLOR_GRAY));
                     //END <<  updateLabel1
 
                     Group gfiles = new Group(dialogShell, SWT.NULL);
-                    gfiles.setText("Files to be updated:");
+                    gfiles.setText(I18N.translate(PFX + "files.group.text"));
                     GridData gd = new GridData(GridData.FILL_BOTH);
                     gd.horizontalSpan = 2;
                     gfiles.setLayoutData(gd);
@@ -90,7 +92,7 @@ public class UpdateDialog{
 
 
                     Group gChangelog = new Group(dialogShell, SWT.NULL);
-                    gChangelog.setText("Changelog:");
+                    gChangelog.setText(I18N.translate(PFX + "changelog.group.text"));
                     gd = new GridData(GridData.FILL_BOTH);
                     gd.horizontalSpan = 2;
                     gChangelog.setLayoutData(gd);
@@ -116,12 +118,16 @@ public class UpdateDialog{
                     List<String> changes = log.getChanges();
                     List<String> features = log.getFeatures();
                     int totalItems = bugs.size() + changes.size() + features.size();
-                    gChangelog.setText("Changelog (" + totalItems +" items):");
+                    gChangelog.setText(I18N.translate(PFX + "changelog.group.text.filled.part1") +
+                    		" (" + totalItems + " " +
+                    		I18N.translate(PFX + "changelog.group.text.filled.part2") + ":");
 
 
                     if(bugs.size() > 0){
                         TreeItem mainBugItem = new TreeItem(ChangelogTree,SWT.NULL);
-                        mainBugItem.setText("BugFixes (" + bugs.size() + " Items)");
+                        mainBugItem.setText(I18N.translate(PFX + "changelog.bugfixes") + " ("
+                        		+ bugs.size() +
+                        		" " + I18N.translate(PFX + "changelog.group.text.filled.part2"));
 
                         for(int j = 0; j < bugs.size(); j++){
                             TreeItem bugItem = new TreeItem(mainBugItem,SWT.NULL);
@@ -133,7 +139,9 @@ public class UpdateDialog{
 
                     if(changes.size() > 0){
                         TreeItem mainChangeItem = new TreeItem(ChangelogTree,SWT.NULL);
-                        mainChangeItem.setText("Changes (" + changes.size() + " Items)");
+                        mainChangeItem.setText(I18N.translate(PFX + "changelog.changes") + " ("
+                        		+ changes.size()
+                        		+ " " + I18N.translate(PFX + "changelog.group.text.filled.part2"));
 
 
                         for(int j = 0; j < changes.size(); j++){
@@ -147,7 +155,9 @@ public class UpdateDialog{
 
                     if(features.size() > 0){
                         TreeItem mainFeatureItem = new TreeItem(ChangelogTree,SWT.NULL);
-                        mainFeatureItem.setText("Feature Additions (" + features.size() + " Items)");
+                        mainFeatureItem.setText(I18N.translate(PFX + "changelog.featureadditions") + " ("
+                        		+ features.size() +
+                        		" " + I18N.translate(PFX + "changelog.group.text.filled.part2"));
 
 
                         for(int j = 0; j < features.size(); j++){
@@ -167,7 +177,7 @@ public class UpdateDialog{
                     acceptLData.horizontalAlignment = GridData.END;
                     acceptLData.grabExcessHorizontalSpace = true;
                     accept.setLayoutData(acceptLData);
-                    accept.setText("Update Now");
+                    accept.setText(I18N.translate(PFX + "accept_button.text"));
                     accept.addListener(SWT.Selection, new Listener() {
                         public void handleEvent(Event arg0) {
                             updater.doUpdate();
@@ -181,7 +191,7 @@ public class UpdateDialog{
                     GridData cancelLData = new GridData();
                     cancelLData.horizontalAlignment = GridData.END;
                     cancel.setLayoutData(cancelLData);
-                    cancel.setText("Cancel");
+                    cancel.setText(I18N.translate("global.cancel"));
                     cancel.addListener(SWT.Selection, new Listener() {
                         public void handleEvent(Event arg0) {
                             dialogShell.close();
@@ -200,19 +210,27 @@ public class UpdateDialog{
     }
 
     private String getImportanceLevelString(int level){
-        if(level == Update.LV_BUGFIX) return "BugFix";
-        else if(level == Update.LV_CHANGE) return "Change";
-        else if(level == Update.LV_FEATURE) return "Feature Enhancement";
-        else if(level == Update.LV_LOW) return "Low";
-        else if(level == Update.LV_SEC_RISK) return "Security Risk";
-        else return "NULL";
+        if(level == Update.LV_BUGFIX)
+        	return I18N.translate(PFX + "changelog.bugfixes");
+        else if(level == Update.LV_CHANGE)
+        	return I18N.translate(PFX + "changelog.changes");
+        else if(level == Update.LV_FEATURE)
+        	return I18N.translate(PFX + "changelog.featureadditions");
+        else if(level == Update.LV_LOW)
+        	return I18N.translate(PFX + "changelog.low");
+        else if(level == Update.LV_SEC_RISK)
+        	return I18N.translate(PFX + "changelog.securityrisk");
+        else return I18N.translate("global.error");
     }
 
     private String getTypeString(int type){
-        if(type == Update.TYPE_BETA) return "Beta Release";
-        else if(type == Update.TYPE_MAINTENANCE) return "Maintenance Release";
-        else if(type == Update.TYPE_STABLE) return "Stable Release";
-        else return "NULL";
+        if(type == Update.TYPE_BETA)
+        	return I18N.translate(PFX + "releasetype.beta");
+        else if(type == Update.TYPE_MAINTENANCE)
+        	return I18N.translate(PFX + "releasetype.maintenance");
+        else if(type == Update.TYPE_STABLE)
+        	return I18N.translate(PFX + "releasetype.stable");
+        else return I18N.translate("global.error");
     }
 
 }
