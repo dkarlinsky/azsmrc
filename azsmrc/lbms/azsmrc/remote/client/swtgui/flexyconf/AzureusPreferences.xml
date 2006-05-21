@@ -120,6 +120,24 @@
 			<Entry key="Confirm Data Delete" label="ConfigView.section.file.confirm_data_delete" type="boolean" index="13" />
 			<Entry key="Move Deleted Data To Recycle Bin" label="ConfigView.section.file.nativedelete" type="boolean" index="14" />
 			<Entry key="Use Config File Backups" label="ConfigView.label.backupconfigfiles" type="boolean" index="15" />
+			<Section label="ConfigView.section.file.perf" index="1">
+				<Entry key="" label="ConfigView.section.file.perf.explain" type="label" index="0"/>
+				<Entry key="diskmanager.friendly.hashchecking" label="ConfigView.section.file.friendly.hashchecking" type="boolean" index="1" />
+				<Entry key="diskmanager.perf.cache.enable" label="ConfigView.section.file.perf.cache.enable" type="boolean" index="2" />
+				<Entry key="diskmanager.perf.cache.size" label="ConfigView.section.file.perf.cache.size" type="integer" index="3" />
+				<Entry key="" label="ConfigView.section.file.perf.cache.size.explain" type="label" index="4"/>
+				<Entry key="diskmanager.perf.cache.notsmallerthan" label="ConfigView.section.file.perf.cache.notsmallerthan" type="integer" index="5" />
+				<Entry key="diskmanager.perf.cache.enable.read" label="ConfigView.section.file.perf.cache.enable.read" type="boolean" index="6" />
+				<Entry key="diskmanager.perf.cache.enable.write" label="ConfigView.section.file.perf.cache.enable.write" type="boolean" index="7" />
+				<Entry key="diskmanager.perf.cache.flushpieces" label="ConfigView.section.file.perf.cache.flushpieces" type="boolean" index="8" />
+				<Entry key="diskmanager.perf.cache.trace" label="ConfigView.section.file.perf.cache.trace" type="boolean" index="9" />
+				<Entry key="File Max Open" label="ConfigView.section.file.max_open_files" type="integer" index="10" />
+				<Entry key="" label="ConfigView.section.file.max_open_files.explain" type="label" index="11"/>
+				<Entry key="diskmanager.perf.write.maxmb" label="ConfigView.section.file.writemblimit" type="integer" index="12" />
+				<Entry key="" label="ConfigView.section.file.writemblimit.explain" type="label" index="13"/>
+				<Entry key="diskmanager.perf.read.maxmb" label="ConfigView.section.file.readmblimit" type="integer" index="14" />
+				<Entry key="" label="ConfigView.section.file.readmblimit.explain" type="label" index="15"/>
+			</Section>
 		</Section>
 		<Section label="ConfigView.section.stats" index="3">
 			<Entry key="Stats Enable" label="ConfigView.section.stats.enable" type="boolean" index="0" />

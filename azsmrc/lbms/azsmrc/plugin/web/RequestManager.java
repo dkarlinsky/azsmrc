@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,6 +25,7 @@ import lbms.azsmrc.shared.UserNotFoundException;
 
 import org.apache.commons.io.FileSystemUtils;
 import org.gudy.azureus2.core3.config.COConfigurationManager;
+import org.gudy.azureus2.core3.internat.MessageText;
 import org.gudy.azureus2.core3.security.SESecurityManager;
 import org.gudy.azureus2.core3.util.Constants;
 import org.gudy.azureus2.plugins.PluginConfig;
@@ -41,11 +44,23 @@ import org.gudy.azureus2.plugins.torrent.TorrentManager;
 import org.gudy.azureus2.plugins.tracker.TrackerException;
 import org.gudy.azureus2.plugins.tracker.TrackerTorrent;
 import org.gudy.azureus2.plugins.tracker.web.TrackerWebPageResponse;
+import org.gudy.azureus2.plugins.ui.config.ConfigSection;
+import org.gudy.azureus2.plugins.ui.config.Parameter;
 import org.gudy.azureus2.plugins.update.Update;
 import org.gudy.azureus2.plugins.update.UpdateCheckInstance;
 import org.gudy.azureus2.plugins.update.UpdateException;
 import org.gudy.azureus2.plugins.utils.resourcedownloader.ResourceDownloader;
 import org.gudy.azureus2.plugins.utils.resourcedownloader.ResourceDownloaderException;
+import org.gudy.azureus2.pluginsimpl.local.ui.config.BooleanParameterImpl;
+import org.gudy.azureus2.pluginsimpl.local.ui.config.ConfigSectionRepository;
+import org.gudy.azureus2.pluginsimpl.local.ui.config.DirectoryParameterImpl;
+import org.gudy.azureus2.pluginsimpl.local.ui.config.FileParameter;
+import org.gudy.azureus2.pluginsimpl.local.ui.config.IntParameterImpl;
+import org.gudy.azureus2.pluginsimpl.local.ui.config.ParameterImpl;
+import org.gudy.azureus2.pluginsimpl.local.ui.config.ParameterRepository;
+import org.gudy.azureus2.pluginsimpl.local.ui.config.StringParameterImpl;
+import org.gudy.azureus2.pluginsimpl.local.ui.model.BasicPluginConfigModelImpl;
+import org.gudy.azureus2.ui.swt.views.ConfigView;
 import org.jdom.DataConversionException;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -212,6 +227,62 @@ public class RequestManager {
 
 	private Download getDownloadByHash (String hash) throws DownloadException {
 		return Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(hash));
+	}
+
+	/**
+	 * This will convert all Parameters in
+	 * Entries of FlexyConf
+	 * 
+	 * @param pluginSection parent to containt the Elements
+	 * @param parameters Parameters to be converted
+	 */
+	private void parameterArrayToEntry (Element pluginSection, Parameter[] parameters) {
+		Map<Parameter,Element> parameterToElement = new HashMap<Parameter,Element>();
+		//Add all parameters
+		for (int j = 0; j < parameters.length; j++) {
+			Parameter parameter = parameters[j];
+			Element entry = new Element ("Entry");
+			if(parameter instanceof StringParameterImpl) {
+				entry.setAttribute("type", "string");
+			} else if(parameter instanceof IntParameterImpl) {
+				entry.setAttribute("type", "integer");
+			} else if(parameter instanceof BooleanParameterImpl) {
+				entry.setAttribute("type", "boolean");
+			} else if(parameter instanceof FileParameter) {
+				entry.setAttribute("type", "string");
+			} else if(parameter instanceof DirectoryParameterImpl) {
+				entry.setAttribute("type", "string");
+			} else
+				continue;
+			entry.setAttribute("key", ((ParameterImpl)parameter).getKey());
+			entry.setAttribute("label", parameter.getLabelText());
+			entry.setAttribute("index", Integer.toString(j));
+			parameterToElement.put(parameter, entry);
+			pluginSection.addContent(entry);
+		}
+		//Check for dependencies
+		for (int j = 0; j < parameters.length; j++) {
+			Parameter parameter = parameters[j];
+			if (parameter instanceof BooleanParameterImpl) {
+				List<Parameter> parametersToEnable = ((BooleanParameterImpl) parameter)
+				.getEnabledOnSelectionParameters();
+				Iterator<Parameter> iter = parametersToEnable.iterator();
+				while (iter.hasNext()) {
+					Parameter parameterToEnable = iter.next();
+					Element entry = parameterToElement.get(parameterToEnable);
+					entry.setAttribute("dependsOn", ((ParameterImpl)parameter).getKey());
+				}
+
+				List<Parameter> parametersToDisable = ((BooleanParameterImpl) parameter)
+				.getDisabledOnSelectionParameters();
+				iter = parametersToDisable.iterator();
+				while (iter.hasNext()) {
+					Parameter parameterToDisable = iter.next();
+					Element entry = parameterToElement.get(parameterToDisable);
+					entry.setAttribute("dependsOn",'^'+((ParameterImpl)parameter).getKey());
+				}
+			}
+		}
 	}
 
 	private void setDlStats (Element dle, Download dl, int switches) {
@@ -1321,6 +1392,78 @@ public class RequestManager {
 				return false;
 			}
 		});
+
+		/*addHandler("getPluginsFlexyConfig", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {
+				System.out.println("Creating PluginFlexyConf");
+				Element fc = new Element("FlexyConfiguration");
+
+				int index = 0;
+
+				List<ConfigSection> pluginSections = ConfigSectionRepository.getInstance().getList();
+				System.out.println("PluginFlexyConf Size1: "+pluginSections.size());
+				for (Object o:pluginSections) {
+					System.out.println(o.getClass());
+					if (o instanceof BasicPluginConfigModelImpl) {
+						BasicPluginConfigModelImpl pluginModel = (BasicPluginConfigModelImpl) o;
+						Parameter[] parameters = pluginModel.getParameters();
+						Element pluginSection = new Element ("Section");
+						pluginSection.setAttribute("index", Integer.toString(index));
+						String name = ((ConfigSection)o).configSectionGetName();
+						String	section_key = name;
+						System.out.println("PluginFlexyConf Adding: "+name);
+
+						// if resource exists without prefix then use it as plugins don't
+						// need to start with the prefix
+
+						if ( !MessageText.keyExists(section_key)){
+							section_key = ConfigView.sSectionPrefix + name;
+						}
+						pluginSection.setAttribute("label",MessageText.getString(section_key));
+						index++;
+						parameterArrayToEntry(pluginSection, parameters);
+					}
+				}
+
+
+				ParameterRepository repository = ParameterRepository.getInstance();
+
+				String[] names = repository.getNames();
+
+				Arrays.sort(names);
+				System.out.println("PluginFlexyConf Size2: "+names.length);
+
+				for (int i = 0; i < names.length; i++) {
+					String pluginName = names[i];
+					System.out.println("PluginFlexyConf Adding: "+pluginName);
+					Parameter[] parameters = repository.getParameterBlock(pluginName);
+					Element pluginSection = new Element ("Section");
+					pluginSection.setAttribute("index", Integer.toString(i+index));
+					fc.addContent(pluginSection);
+
+					// Note: 2070's plugin documentation for PluginInterface.addConfigUIParameters
+					//       said to pass <"ConfigView.plugins." + displayName>.  This was
+					//       never implemented in 2070.  2070 read the key <displayName> without
+					//       the prefix.
+					//
+					//       2071+ uses <sSectionPrefix ("ConfigView.section.plugins.") + pluginName>
+					//       and falls back to <displayName>.  Since
+					//       <"ConfigView.plugins." + displayName> was never implemented in the
+					//       first place, a check for it has not been created
+					boolean bUsePrefix = MessageText.keyExists(ConfigView.sSectionPrefix
+							+ "plugins." + pluginName);
+					if (bUsePrefix) {
+						pluginSection.setAttribute("label", MessageText.getString(ConfigView.sSectionPrefix
+							+ "plugins." + pluginName));
+					} else {
+						pluginSection.setAttribute("label",MessageText.getString(pluginName));
+					}
+					parameterArrayToEntry(pluginSection, parameters);
+				}
+				response.addContent(fc);
+				return true;
+			}
+		});*/
 
 		addHandler("publishTorrent", new RequestHandler() {
 			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {

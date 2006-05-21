@@ -2,7 +2,6 @@ package lbms.azsmrc.remote.client;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -615,6 +614,12 @@ public class Client {
 		sendElement.setAttribute("switch", "getDriveInfo");
 		enqueue(sendElement);
 	}
+
+	/*public void sendGetPluginsFlexyConf() {
+		Element sendElement = getSendElement();
+		sendElement.setAttribute("switch", "getPluginsFlexyConfig");
+		enqueue(sendElement);
+	}*/
 
 	public void sendApplyUpdates(String[] names) {
 		Element sendElement = getSendElement();

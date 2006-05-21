@@ -723,6 +723,7 @@ public class RCMain implements Launchable {
 	public void connect(boolean open) {
 		debugLogger.finer("Connect!");
 		connect = true;
+		/*client.sendGetPluginsFlexyConf();*/
 		updateTimer(open);
 	}
 

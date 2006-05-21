@@ -36,6 +36,16 @@ public class FlexyConfiguration {
 		rootSection = new Section (root.getChild("Section"), fci);
 	}
 
+	public FlexyConfiguration (Element root) {
+		fci = new FCInterface (this);
+		rootSection = new Section (root.getChild("Section"), fci);
+	}
+
+	public FlexyConfiguration (Element root, String domain) {
+		fci = new FCInterface (this,domain);
+		rootSection = new Section (root.getChild("Section"), fci);
+	}
+
 	public Document toDocument () {
 		Document doc = new Document();
 		Element root = new Element ("FlexyConfiguration");

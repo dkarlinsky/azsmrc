@@ -11,10 +11,10 @@ import java.util.Map;
 
 public class I18NTranslator {
 
-	private static Map<String, String> defaultMessages = new HashMap<String, String>();
-	private static Map<String, String> localizedMessages = new HashMap<String, String>();
+	private Map<String, String> defaultMessages = new HashMap<String, String>();
+	private Map<String, String> localizedMessages = new HashMap<String, String>();
 
-	private static boolean initialized, localized;
+	private boolean initialized, localized;
 
 	public void initialize(File defaultFile) throws IOException {
 		load (new BufferedReader(new FileReader(defaultFile)), defaultMessages);
