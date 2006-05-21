@@ -3,11 +3,9 @@
  */
 package lbms.azsmrc.remote.client.swtgui;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
@@ -28,23 +26,25 @@ public class ErrorReporter {
 	public String email = "";
 	public String additionalInfo = "";
 	public String systemInfo = "";
-	public boolean sendSystemInfo;
+	public boolean sendSystemInfo, init;
 
 	public ErrorReporter () {
 		init();
 	}
 
 	public void init() {
+		if (init) return;
 		gatherSystemInfo();
 		readErrorLog();
+		init = true;
 	}
 
-	public void gatherSystemInfo() {
+	private void gatherSystemInfo() {
 		systemInfo  = "OS: "+System.getProperty("os.name")+"\n";
 		systemInfo += "SWT Version: "+SWT.getVersion()+" "+SWT.getPlatform();
 	}
 
-	public void readErrorLog() {
+	private void readErrorLog() {
 		FileReader fr = null;
 		File error = new File("error.log");
 		try {
@@ -64,6 +64,9 @@ public class ErrorReporter {
 		}
 	}
 
+	/**
+	 * This will transmit the Error report to the sf.net site
+	 */
 	public void sendToServer () {
 		Thread t = new Thread (new Runnable() {
 			public void run() {
@@ -74,7 +77,8 @@ public class ErrorReporter {
 					conn.setDoOutput(true);
 					os = conn.getOutputStream();
 					OutputStreamWriter osw = new OutputStreamWriter(os);
-					String send = "error_log="+errorLog+"&email="+email+"&additional_info="+additionalInfo+"&system_info="+systemInfo;
+					String send = "error_log="+errorLog+"&email="+email+"&additional_info="+additionalInfo+"&system_info="+(sendSystemInfo?systemInfo:"");
+					System.out.println("Error Report: "+send);
 					osw.write(send);
 					osw.close();
 				} catch (Exception e) {
