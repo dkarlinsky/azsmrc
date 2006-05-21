@@ -387,7 +387,7 @@ public class PreferencesTab {
 
 		langCombo = new Combo(composite,SWT.DROP_DOWN | SWT.READ_ONLY);
 		langCombo.add("English");
-		langCombo.add("Deutsch");
+		//langCombo.add("Deutsch");
 
 
 
