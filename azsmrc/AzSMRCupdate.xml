@@ -3,6 +3,7 @@
 	<Update url="http://azsmrc.sourceforge.net" version="0.9.5" type="1" importance="50">
 		<Changelog>
 			<BugFix>Fixed the AutoUpdater</BugFix>
+			<BugFix>Fixed the timer not switching to tray mode when the main window was 'hidden' instead of disposed</BugFix>
 			<Feature>Displays Remote Drive Size</Feature>
 			<Feature>Remote Azureus Config (will be extended)</Feature>
 			<Feature>uploaded torrents can now be deleted locally</Feature>
