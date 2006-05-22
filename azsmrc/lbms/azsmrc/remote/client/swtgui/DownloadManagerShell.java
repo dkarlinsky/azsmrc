@@ -532,7 +532,7 @@ public class DownloadManagerShell {
 				if(RCMain.getRCMain().connected())
 					RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
 
-				ErrorDialog ed = new ErrorDialog("test","This is a test of the emergency broadcast system.  Had this been a real emergency you would all have died by now");
+				ErrorDialog ed = new ErrorDialog("test");
 				ed.open();
 			}
 		});

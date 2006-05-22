@@ -25,8 +25,6 @@ public class ErrorDialog {
 
 	private String errorLog;
 
-	private String additionalInfo;
-
 	private String systemInfo;
 
 	private String title;
@@ -37,10 +35,8 @@ public class ErrorDialog {
 
 
 
-	public ErrorDialog(String title, String additionalInfo) {
+	public ErrorDialog(String title) {
 		this.title = title;
-
-		this.additionalInfo = additionalInfo;
 
 		er = new ErrorReporter();
 
@@ -71,7 +67,7 @@ public class ErrorDialog {
 			titleLabel.setImage(display.getSystemImage(SWT.ICON_ERROR));
 		}
 
-		Label detailsLabel = new Label(shell,SWT.NULL);
+/*		Label detailsLabel = new Label(shell,SWT.NULL);
 		detailsLabel.setText(I18N.translate(PFX + "detailsLabel.text"));
 
 
@@ -82,15 +78,15 @@ public class ErrorDialog {
 		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.widthHint = 400;
 		gridData.heightHint = 100;
-		label.setLayoutData(gridData);
+		label.setLayoutData(gridData);*/
 
 		Label errorlogLabel = new Label(shell,SWT.NULL);
 		errorlogLabel.setText(I18N.translate(PFX + "errorlogLabel.text"));
 
 		final Text text = new Text(shell, SWT.BORDER | SWT.V_SCROLL | SWT.READ_ONLY);
-		gridData = new GridData();
-		gridData.widthHint = 400;
-		gridData.heightHint = 100;
+		GridData gridData = new GridData();
+		gridData.widthHint = 500;
+		gridData.heightHint = 75;
 		text.setLayoutData(gridData);
 		text.setText(errorLog);
 
@@ -115,6 +111,17 @@ public class ErrorDialog {
 		infoLabel.setText(I18N.translate(PFX + "infoLabel.text"));
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		infoLabel.setLayoutData(gridData);
+
+
+		Label additionalInfoLabel = new Label(gSend,SWT.NULL);
+		additionalInfoLabel.setText(I18N.translate(PFX + "additionalInfoLabel.text"));
+
+		final Text additionalInfoText = new Text(gSend, SWT.MULTI | SWT.BORDER);
+		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		gridData.heightHint = 100;
+		additionalInfoText.setLayoutData(gridData);
+
+
 
 		final Button bSendEmail = new Button(gSend, SWT.CHECK);
 		bSendEmail.setText(I18N.translate(PFX + "sendemail.text"));
@@ -150,7 +157,8 @@ public class ErrorDialog {
 				try {
 					if(emailText.getEnabled())
 						er.setEmail(emailText.getText());
-					er.setAdditionalInfo(additionalInfo);
+					if(additionalInfoText != null)
+						er.setAdditionalInfo(additionalInfoText.getText());
 					er.sendToServer();
 					shell.dispose();
 				} catch (Exception e) {

@@ -16,6 +16,7 @@ dialog.connectiondialog.shell.text=Connect to Remote Server
 dialog.connectiondialog.url.label=Servername or IP:
 dialog.connectiondialog.use_https.label=Use secure https protocol to connect to this server?
 dialog.connectiondialog.username.label=Username:
+dialog.errordialog.additionalInfoLabel.text=Please describe what happened to produce this error
 dialog.errordialog.detailsLabel.text=Error Details
 dialog.errordialog.errorlogLabel.text=Error Log
 dialog.errordialog.infoLabel.text=Please consider sending this information so that AzSMRC can be made better.\n\nNo information is sent besides that which is shown here.\nInformation sent to http://azsmrc.sourceforge.net\n\n
