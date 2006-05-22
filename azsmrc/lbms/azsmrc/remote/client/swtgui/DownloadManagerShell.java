@@ -532,7 +532,7 @@ public class DownloadManagerShell {
 				if(RCMain.getRCMain().connected())
 					RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
 
-				ErrorDialog ed = new ErrorDialog("test");
+				ErrorDialog ed = new ErrorDialog();
 				ed.open();
 			}
 		});

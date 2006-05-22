@@ -35,8 +35,8 @@ public class ErrorDialog {
 
 
 
-	public ErrorDialog(String title) {
-		this.title = title;
+	public ErrorDialog() {
+		this.title = I18N.translate(PFX + "shell.text");
 
 		er = new ErrorReporter();
 
@@ -67,18 +67,6 @@ public class ErrorDialog {
 			titleLabel.setImage(display.getSystemImage(SWT.ICON_ERROR));
 		}
 
-/*		Label detailsLabel = new Label(shell,SWT.NULL);
-		detailsLabel.setText(I18N.translate(PFX + "detailsLabel.text"));
-
-
-		Text label = new Text(shell, SWT.READ_ONLY | SWT.WRAP | SWT.BORDER | SWT.V_SCROLL);
-		label.setText(additionalInfo);
-
-
-		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
-		gridData.widthHint = 400;
-		gridData.heightHint = 100;
-		label.setLayoutData(gridData);*/
 
 		Label errorlogLabel = new Label(shell,SWT.NULL);
 		errorlogLabel.setText(I18N.translate(PFX + "errorlogLabel.text"));
