@@ -47,6 +47,7 @@ import lbms.azsmrc.remote.client.events.HTTPErrorListener;
 import lbms.azsmrc.remote.client.events.SpeedUpdateListener;
 import lbms.azsmrc.remote.client.swtgui.container.DownloadContainer;
 import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
+import lbms.azsmrc.remote.client.swtgui.dialogs.ErrorDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.MessageDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByFileDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByURLDialog;
@@ -177,6 +178,11 @@ public class RCMain implements Launchable {
 				updateTimer(false);
 				client.sendGetGlobalStats();
 			}
+		}
+		File error = new File(System.getProperty("user.dir")+System.getProperty("file.separator")+"error.log");
+		if (error.exists()) {
+			System.out.println("Crash Detected");
+			ErrorDialog.createAndOpen();
 		}
 		while (!terminated) { //runnig
 			if (!display.readAndDispatch ()) display.sleep ();

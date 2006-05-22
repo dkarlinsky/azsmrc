@@ -169,14 +169,12 @@ public class ErrorDialog {
 
 		shell.pack();
 		GUI_Utilities.centerShellandOpen(shell);
-
-
-
-
-
 	}
 
-
-
+	public static ErrorDialog createAndOpen() {
+		ErrorDialog ed = new ErrorDialog();
+		ed.open();
+		return ed;
+	}
 
 }

@@ -531,9 +531,7 @@ public class DownloadManagerShell {
 			public void handleEvent (Event e){
 				if(RCMain.getRCMain().connected())
 					RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
-
-				ErrorDialog ed = new ErrorDialog();
-				ed.open();
+				ErrorDialog.createAndOpen();
 			}
 		});
 

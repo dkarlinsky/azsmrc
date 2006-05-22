@@ -1,21 +1,26 @@
-Changelog for Version: 0.9.3
+Changelog for Version: 0.9.5
 
 ***New Features***
 
-- File Selection on addDownload
-- Built In - Updater
-- SingleUserMode for all those who don't want to use the multiuser part
-- Clipboard Monitor for Torrent URLs
+- Displays Remote Drive Size
+- Remote Azureus Config (will be extended)
+- uploaded torrents can now be deleted locally
+- More than one connection can now be saved
+- Remote Info with remote Azureus Version, as well as remote Plugin version
+- Experiemental Azureus remote update
+- Individual torrent speeds can now be set
+- You can enable showing the Server Url in title bar now
+- FastMode: this will make AzSMRC more responsive at the cost of more bandwidth
+- You can create a SSL Certificate on the server now via AzSMRC
+- You can now drop Torrents on AzSMRC
 
 ***Changes***
 
-- Totally improved preferences Tab
-- You can disable AutoImport now
-- Added some more buttons to the Toolbar, like start, stop and remove
-- Added MenuBar
-- You can disable minimize to tray on close, this will close the program if you close the shell
+- The Tray Icon behaivior was changed to One-Click
+- Improved Clipboard monitor
 
 ***BugFixes***
 
-- Column share ratio can now be selected
+- Fixed the AutoUpdater
+- Fixed the timer not switching to tray mode when the main window was 'hidden' instead of disposed
 

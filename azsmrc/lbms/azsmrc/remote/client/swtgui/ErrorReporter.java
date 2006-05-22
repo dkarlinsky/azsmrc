@@ -4,6 +4,7 @@
 package lbms.azsmrc.remote.client.swtgui;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -52,20 +53,25 @@ public class ErrorReporter {
 	}
 
 	private void readErrorLog() {
-		FileReader fr = null;
-		File error = new File("error.log");
+		FileInputStream fis = null;
+		File error = new File(System.getProperty("user.dir")+System.getProperty("file.separator")+"error.log");
 		try {
 			if (error.exists() && error.isFile()) {
-				CharBuffer cb = CharBuffer.allocate((int)error.length());
-				 fr = new FileReader(error);
-				fr.read(cb);
-				errorLog = cb.toString();
+				StringBuffer sb = new StringBuffer((int)error.length());
+				fis = new FileInputStream(error);
+				for (int i=0;-1!=(i=fis.read());) {
+					sb.append((char)i);
+				}
+				errorLog = sb.toString();
+				System.out.println("Errorlog: "+errorLog);
+			} else {
+				System.out.println(error+" did not exist");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (fr != null) {
-				try {fr.close();} catch (IOException e1) {}
+			if (fis != null) {
+				try {fis.close();} catch (IOException e1) {}
 			}
 			if (error.exists()) error.delete();
 		}
