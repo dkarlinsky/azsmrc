@@ -12,6 +12,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.CharBuffer;
 
+import lbms.azsmrc.remote.client.RemoteInfo;
+
 import org.eclipse.swt.SWT;
 
 /**
@@ -26,7 +28,7 @@ public class ErrorReporter {
 	public String email = "";
 	public String additionalInfo = "";
 	public String systemInfo = "";
-	public boolean sendSystemInfo, init;
+	public boolean init;
 
 	public ErrorReporter () {
 		init();
@@ -40,9 +42,13 @@ public class ErrorReporter {
 	}
 
 	private void gatherSystemInfo() {
-		systemInfo  = "OS: "+System.getProperty("os.name")+"\n";
-		systemInfo += "JVM: "+System.getProperty( "java.version" ) +" "+ System.getProperty( "java.vendor" ) +"\n";
-		systemInfo += "SWT Version: "+SWT.getVersion()+" "+SWT.getPlatform();
+		RemoteInfo rInfo = RCMain.getRCMain().getClient().getRemoteInfo();
+		systemInfo  = "OS: "+System.getProperty("os.name")+"\n"
+					+ "JVM: "+System.getProperty( "java.version" ) +" "+ System.getProperty( "java.vendor" ) +"\n"
+		 			+ "SWT Version: "+SWT.getVersion()+" "+SWT.getPlatform()+"\n"
+		 			+ "AzSMRC Version: "+RCMain.getRCMain().getAzsmrcProperties().getProperty("version")+"\n"
+		 			+ "AzSMRC Plugin: "+rInfo.getPluginVersion()+"\n"
+		 			+ "Azureus Version: "+rInfo.getAzureusVersion();
 	}
 
 	private void readErrorLog() {
@@ -78,7 +84,7 @@ public class ErrorReporter {
 					conn.setDoOutput(true);
 					os = conn.getOutputStream();
 					OutputStreamWriter osw = new OutputStreamWriter(os);
-					String send = "error_log="+errorLog+"&email="+email+"&additional_info="+additionalInfo+"&system_info="+(sendSystemInfo?systemInfo:"");
+					String send = "error_log="+errorLog+"&email="+email+"&additional_info="+additionalInfo+"&system_info="+systemInfo;
 					System.out.println("Error Report: "+send);
 					osw.write(send);
 					osw.close();
@@ -138,6 +144,4 @@ public class ErrorReporter {
 	public String getSystemInfo() {
 		return systemInfo;
 	}
-
-
 }
