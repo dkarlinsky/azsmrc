@@ -96,7 +96,18 @@ public class OpenByFileDialog {
 		comp.setLayout(gridLayout);
 
 		// first line
-		Button open_file_button = new Button(comp, SWT.PUSH);
+
+		Composite buttonComp = new Composite(comp, SWT.NULL);
+		GridLayout gl = new GridLayout();
+		gl.numColumns = 2;
+		gl.marginHeight = 0;
+		gl.marginWidth = 0;
+		buttonComp.setLayout(gl);
+		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		gridData.horizontalSpan = 3;
+		buttonComp.setLayoutData(gridData);
+
+		Button open_file_button = new Button(buttonComp, SWT.PUSH);
 		open_file_button.setToolTipText(I18N.translate(PFX + "openfile.tooltip"));
 		open_file_button.setText(I18N.translate(PFX + "openfile.text"));
 		if(Utilities.isLinux())
@@ -166,8 +177,11 @@ public class OpenByFileDialog {
 			}
 		});
 
-		Button remove = new Button(comp, SWT.PUSH);
+		Button remove = new Button(buttonComp, SWT.PUSH);
 		remove.setText(I18N.translate(PFX + "remove.text"));
+		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		gridData.grabExcessHorizontalSpace = true;
+		remove.setLayoutData(gridData);
 		if(Utilities.isLinux())
 			remove.setImage(ImageRepository.getImage("toolbar_remove"));
 		remove.addSelectionListener(new SelectionListener() {
@@ -348,7 +362,7 @@ public class OpenByFileDialog {
 
 		Group detailsGroup = new Group(sash, SWT.NULL);
 		detailsGroup.setText(I18N.translate(PFX + "torrentdetail.group.text"));
-		GridLayout gl = new GridLayout();
+		gl = new GridLayout();
 		gl.numColumns = 1;
 		gl.marginHeight = 0;
 		gl.marginWidth = 0;
