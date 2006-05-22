@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
@@ -94,6 +95,7 @@ public class ErrorReporter {
 					System.out.println("Error Report: "+send);
 					osw.write(send);
 					osw.close();
+					conn.connect();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
