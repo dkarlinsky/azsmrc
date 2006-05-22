@@ -52,7 +52,7 @@ public class ErrorDialog {
 		final Display display = RCMain.getRCMain().getDisplay();
 		if (display == null) return;
 
-		final Shell shell = new Shell(display.getActiveShell());
+		final Shell shell = new Shell();
 		shell.setText(title);
 		if(!Utilities.isOSX){
 			shell.setImage(display.getSystemImage(SWT.ICON_ERROR));
