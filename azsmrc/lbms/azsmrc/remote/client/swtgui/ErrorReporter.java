@@ -41,6 +41,7 @@ public class ErrorReporter {
 
 	private void gatherSystemInfo() {
 		systemInfo  = "OS: "+System.getProperty("os.name")+"\n";
+		systemInfo += "JVM: "+System.getProperty( "java.version" ) +" "+ System.getProperty( "java.vendor" ) +"\n";
 		systemInfo += "SWT Version: "+SWT.getVersion()+" "+SWT.getPlatform();
 	}
 
