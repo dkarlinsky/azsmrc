@@ -39,6 +39,7 @@ import lbms.azsmrc.remote.client.swtgui.container.Container;
 import lbms.azsmrc.remote.client.swtgui.container.DownloadContainer;
 import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ConnectionDialog;
+import lbms.azsmrc.remote.client.swtgui.dialogs.ErrorDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.InputShell;
 import lbms.azsmrc.remote.client.swtgui.dialogs.MoveDataDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByFileDialog;
@@ -530,6 +531,9 @@ public class DownloadManagerShell {
 			public void handleEvent (Event e){
 				if(RCMain.getRCMain().connected())
 					RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
+				
+				ErrorDialog ed = new ErrorDialog("test","This is a test of the emergency broadcast system\nHad this been a real emergency you would all\nhave died by now");
+				ed.open();
 			}
 		});
 
