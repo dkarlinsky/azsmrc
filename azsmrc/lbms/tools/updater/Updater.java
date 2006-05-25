@@ -248,7 +248,7 @@ public class Updater {
 									result.remove(test);
 								}*/
 							}
-							Thread.sleep(50);
+							Thread.sleep(500);
 						}
 
 					} catch (InterruptedException e) {

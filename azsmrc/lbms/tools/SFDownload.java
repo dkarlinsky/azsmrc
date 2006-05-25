@@ -16,6 +16,7 @@ public class SFDownload extends Download {
 
 	private static Pattern mirrorPattern = Pattern.compile("<td><a href=\"[\\w/:.]+?\\?use_mirror=(\\w+)\"><b>Download</b></a></td>");
 	private List<URL> mirrors = new ArrayList<URL>();
+	private HTTPDownload currentDL;
 
 	/**
 	 * This listener is used to pass the underlying HTTPDownload
@@ -50,10 +51,10 @@ public class SFDownload extends Download {
 	}
 
 	public Download call() throws Exception {
-		HTTPDownload sfContent = new HTTPDownload(source);
+		currentDL = new HTTPDownload(source);
 		try {
 			callStateChanged(STATE_INITIALIZING);
-			sfContent.call();
+			currentDL.call();
 		} catch (Exception e1) {
 			e1.printStackTrace();
 			callStateChanged(STATE_FAILURE);
@@ -61,14 +62,14 @@ public class SFDownload extends Download {
 			failed = true;
 			throw e1;
 		}
-		if (sfContent.hasFailed() || !sfContent.hasFinished()) {
+		if (currentDL.hasFailed() || !currentDL.hasFinished()) {
 			callStateChanged(STATE_FAILURE);
 			failureReason = "Couldn't load mirrors";
 			failed = true;
 			System.out.println(failureReason);
 			throw new Exception ("SFDownload Error occured:"+failureReason);
 		}
-		Matcher sfMirror = mirrorPattern.matcher(sfContent.getBuffer());
+		Matcher sfMirror = mirrorPattern.matcher(currentDL.getBuffer());
 		String fileLocation = source.getPath();
 		//Find mirrors
 		while (sfMirror.find()) {
@@ -85,12 +86,18 @@ public class SFDownload extends Download {
 		for (URL x:mirrors) {
 			try {
 				//System.out.println("Trying: "+x.toExternalForm());
-				HTTPDownload file = new HTTPDownload(x,target);
-				file.setReferer(referer);
-				file.addDownloadListener(dlL);
-				file.call();
-				file.removeDownloadListener(dlL);
-				if (file.hasFailed() || !file.hasFinished()) continue;
+				if (abort) {
+					callStateChanged(STATE_ABORTED);
+					failed = true;
+					failureReason = "Aborted by User";
+					return this;
+				}
+				currentDL = new HTTPDownload(x,target);
+				currentDL.setReferer(referer);
+				currentDL.addDownloadListener(dlL);
+				currentDL.call();
+				currentDL.removeDownloadListener(dlL);
+				if (currentDL.hasFailed() || !currentDL.hasFinished()) continue;
 				else {
 					callStateChanged(STATE_FINISHED);
 					return this;
@@ -105,5 +112,14 @@ public class SFDownload extends Download {
 		failed = true;
 		System.out.println(failureReason);
 		throw new Exception (failureReason);
+	}
+
+	/* (non-Javadoc)
+	 * @see lbms.tools.Download#abortDownload()
+	 */
+	@Override
+	public void abortDownload() {
+		super.abortDownload();
+		if (currentDL != null) currentDL.abortDownload();
 	}
 }
