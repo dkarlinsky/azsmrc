@@ -26,8 +26,8 @@ public class ImageRepository {
 
 	public static void loadImages(Display display) {
 
-        //Splash Screen Pic
-        loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/AzSMRC_Splash.png","splash",255);
+		//Splash Screen Pic
+		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/AzSMRC_Splash.png","splash",255);
 
 
 		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/right_arrow.gif","right_arrow",255);
@@ -67,8 +67,8 @@ public class ImageRepository {
 		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/statusbar/connect_established.png","connect_established",255);
 		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/statusbar/decrypted_new.png","ssl_disabled",255);
 		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/statusbar/encrypted.png","ssl_enabled",255);
-        loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/statusbar/statusbar_down.png","statusbar_down",255);
-        loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/statusbar/statusbar_up.png","statusbar_up",255);
+		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/statusbar/statusbar_down.png","statusbar_down",255);
+		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/statusbar/statusbar_up.png","statusbar_up",255);
 
 		//Context menu icons
 		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/menu/stop.png","menu_stop",255);
@@ -88,27 +88,30 @@ public class ImageRepository {
 		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/refresh.png","refresh",255);
 		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/tool_pause.png","pause",255);
 		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/tool_resume.png","resume",255);
-        //loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/server.png","server",255);
-        loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/manage_users.png","manager_users",255);
-        loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/console.png","console",255);
+		//loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/server.png","server",255);
+		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/manage_users.png","manager_users",255);
+		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/console.png","console",255);
 
 		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/popup.png","popup",255);
-        loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/toolbar/queue_large.png","toolbar_queue",255);
-        loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/toolbar/remove_large.png","toolbar_remove",255);
-        loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/toolbar/stop_large.png","toolbar_stop",255);
+		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/toolbar/queue_large.png","toolbar_queue",255);
+		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/toolbar/remove_large.png","toolbar_remove",255);
+		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/toolbar/stop_large.png","toolbar_stop",255);
 
-        //paypal and amazon
-        loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/paypal.gif","paypal",255);
-        loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/amazon-com.png","amazon.com",255);
-        loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/amazon-de.png","amazon.de",255);
+		//paypal and amazon
+		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/paypal.gif","paypal",255);
+		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/amazon-com.png","amazon.com",255);
+		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/amazon-de.png","amazon.de",255);
 		//if needed
 		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/tool_delete.png","trashcan",255);
 
 
-        //Server Details toolbar icons
-        loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/serverIcons/user_add.png","add",255);
-        loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/serverIcons/user_delete.png","delete",255);
-        loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/serverIcons/folder_new.png","folder",255);
+		//Server Details toolbar icons
+		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/serverIcons/user_add.png","add",255);
+		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/serverIcons/user_delete.png","delete",255);
+		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/serverIcons/folder_new.png","folder",255);
+
+		//UpdateProgressDialog
+		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/progress_stop.png","progress_stop",255);
 
 	}
 

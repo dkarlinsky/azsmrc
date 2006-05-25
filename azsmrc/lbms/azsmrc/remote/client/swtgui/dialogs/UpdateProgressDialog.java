@@ -6,8 +6,9 @@ package lbms.azsmrc.remote.client.swtgui.dialogs;
 import java.util.ArrayList;
 import java.util.List;
 
-import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.internat.I18N;
+import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
+import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.tools.Download;
@@ -20,7 +21,10 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -45,14 +49,16 @@ public class UpdateProgressDialog {
 	private Composite parent;
 	private Label statusLabel, picLabel;
 	private Button close;
-    private Color ltGray;
-	
+	private Color ltGray;
+	private Cursor handCursor;
+
 	private UpdateProgressDialog (Download[] dls, Display d) {
 		display = d;
 		downloads = dls;
 	}
 
 	private void initDownloads () {
+		handCursor = new Cursor(display, SWT.CURSOR_HAND);
 		for (Download d:downloads) {
 			dcs.add(new DownloadContainer(d, parent));
 		}
@@ -61,8 +67,8 @@ public class UpdateProgressDialog {
 	private void createContents() {
 		//define the color
 		ltGray = new Color(display, new RGB(240,240,240));
-		
-		
+
+
 		final Shell shell = new Shell(display);
 		shell.setLayout(new GridLayout(2,false));
 		shell.setText(I18N.translate(PFX + "shell.text"));
@@ -86,7 +92,7 @@ public class UpdateProgressDialog {
 		gd.horizontalSpan = 2;
 		parent.setLayoutData(gd);
 		GridLayout gl = new GridLayout();
-		gl.verticalSpacing = 15;
+		gl.verticalSpacing = 10;
 		parent.setLayout(gl);
 		parent.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 
@@ -99,7 +105,7 @@ public class UpdateProgressDialog {
 			}
 		});
 
-		
+
 		close = new Button(shell, SWT.PUSH);
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		gd.horizontalSpan = 2;
@@ -108,20 +114,24 @@ public class UpdateProgressDialog {
 		close.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
 				if(shell != null && !shell.isDisposed())
-					shell.close();				
+					shell.close();
 				if(ltGray != null && !ltGray.isDisposed())
 					ltGray.dispose();
-			}			
+				if(handCursor != null && !handCursor.isDisposed())
+					handCursor.dispose();
+			}
 		});
-		
+
 		shell.addDisposeListener(new DisposeListener(){
 			public void widgetDisposed(DisposeEvent arg0) {
 				if(ltGray != null && !ltGray.isDisposed())
-					ltGray.dispose();				
-			}			
+					ltGray.dispose();
+				if(handCursor != null && !handCursor.isDisposed())
+					handCursor.dispose();
+			}
 		});
-		
-		
+
+
 		RCMain.getRCMain().getUpdater().addProgressListener(new UpdateProgressListener() {
 			/* (non-Javadoc)
 			 * @see lbms.tools.updater.UpdateProgressListener#stateChanged(int)
@@ -147,11 +157,11 @@ public class UpdateProgressDialog {
 				if(statusLabel != null && !statusLabel.isDisposed()){
 						statusLabel.setText(I18N.translate(PFX + "status." + intStat));
 				}
-				
+
 				if(intStat == UpdateProgressListener.STATE_FINISHED &&
 						close != null && !close.isDisposed())
 					close.setEnabled(true);
-				
+
 			}
 		});
 	}
@@ -180,7 +190,7 @@ public class UpdateProgressDialog {
 
 
 			self = new Composite (comp,SWT.NULL);
-			GridLayout gl = new GridLayout();
+			GridLayout gl = new GridLayout(2,false);
 			gl.marginTop = 10;
 			self.setLayout(gl);
 			GridData gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -192,14 +202,28 @@ public class UpdateProgressDialog {
 			pb.setLayoutData(gd);
 			pb.setBackground(ltGray);
 
+			final Label cancelButton = new Label(self,SWT.NONE);
+			cancelButton.setImage(ImageRepository.getImage("progress_stop"));
+			cancelButton.addMouseListener(new MouseAdapter() {
+				public void mouseUp(MouseEvent arg0) {
+					dl.abortDownload();
+					cancelButton.setEnabled(false);
+				}
+			});
+			cancelButton.setCursor(handCursor);
+			gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
+			cancelButton.setLayoutData(gd);
+			cancelButton.setBackground(ltGray);
+
 			final Label progressLabel = new Label (self,SWT.NONE);
 			gd = new GridData(GridData.FILL_HORIZONTAL);
+			gd.horizontalSpan = 2;
 			progressLabel.setLayoutData(gd);
 			progressLabel.setBackground(ltGray);
 
-
 			final Label urlLabel = new Label (self,SWT.NONE);
 			gd = new GridData(GridData.FILL_HORIZONTAL);
+			gd.horizontalSpan = 2;
 			urlLabel.setLayoutData(gd);
 			urlLabel.setBackground(ltGray);
 
