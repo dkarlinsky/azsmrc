@@ -16,7 +16,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -78,8 +77,7 @@ public class UpdateProgressDialog {
 		sc.setExpandHorizontal(true);
 		sc.addControlListener(new ControlAdapter() {
 			public void controlResized(ControlEvent e) {
-				Rectangle r = sc.getClientArea();
-				sc.setMinSize(parent.computeSize(r.width, SWT.DEFAULT));
+				sc.setMinSize(parent.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 			}
 		});
 
