@@ -12,6 +12,8 @@ import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.tools.Download;
 import lbms.tools.DownloadListener;
+import lbms.tools.updater.UpdateProgressListener;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
@@ -33,7 +35,7 @@ public class UpdateProgressDialog {
 	private Display display;
 	private Download[] downloads;
 	private List<DownloadContainer> dcs = new ArrayList<DownloadContainer>();
-	private Composite container, parent;
+	private Composite parent;
 	private Label statusLabel, picLabel;
 
 	private UpdateProgressDialog (Download[] dls, Display d) {
@@ -43,7 +45,7 @@ public class UpdateProgressDialog {
 
 	private void initDownloads () {
 		for (Download d:downloads) {
-			dcs.add(new DownloadContainer(d, container));
+			dcs.add(new DownloadContainer(d, parent));
 		}
 	}
 
@@ -56,13 +58,13 @@ public class UpdateProgressDialog {
 		picLabel.setImage(display.getSystemImage(SWT.ICON_INFORMATION));
 
 		statusLabel = new Label(shell,SWT.NULL);
-		setStatusLabel(0);
+		setStatusLabel(UpdateProgressListener.STATE_INITIALIZING);
 
 
 		final ScrolledComposite sc = new ScrolledComposite(shell, SWT.V_SCROLL | SWT.BORDER);
 		GridData gd = new GridData(GridData.FILL_BOTH);
-		gd.widthHint = 300;
-		gd.heightHint = 200;
+		gd.widthHint = 400;
+		gd.heightHint = 300;
 		gd.horizontalSpan = 2;
 		sc.setLayoutData(gd);
 
@@ -89,30 +91,15 @@ public class UpdateProgressDialog {
 
 	/**
 	 * Set the status label on the main dialog
-	 * 0 for installing
-	 * 1 for finished
-	 * 2 for error
-	 * @param intStat
+	 * @param intStat based on UpdateProgressListener
 	 */
 	public void setStatusLabel(final int intStat){
-		display.asyncExec(new Runnable(){
-
+		display.syncExec(new Runnable(){
 			public void run() {
 				if(statusLabel != null && !statusLabel.isDisposed()){
-					switch(intStat){
-					case 0:
-						statusLabel.setText(I18N.translate(PFX + "status.0"));
-						break;
-					case 1:
-						statusLabel.setText(I18N.translate(PFX + "status.1"));
-						break;
-					case 2:
-						statusLabel.setText(I18N.translate(PFX + "status.2"));
-					}
+						statusLabel.setText(I18N.translate(PFX + "status." + intStat));
 				}
-
 			}
-
 		});
 	}
 
@@ -180,10 +167,17 @@ public class UpdateProgressDialog {
 				}
 
 				public void updateLabel() {
-					progressLabel.setText(I18N.translate(PFX + ".dlstate."+lastState)+ " - "
-							+ DisplayFormatters.formatByteCountToBase10KBEtc(lastBytesRead)+" / "
-							+ DisplayFormatters.formatByteCountToBase10KBEtc(lastBytesTotal));
-				}
+					display.syncExec(new Runnable(){
+						public void run() {
+							if(progressLabel != null && !progressLabel.isDisposed()){
+								progressLabel.setText(I18N.translate(PFX + ".dlstate."+lastState)+ " - "
+										+ DisplayFormatters.formatByteCountToBase10KBEtc(lastBytesRead)+" / "
+										+ DisplayFormatters.formatByteCountToBase10KBEtc(lastBytesTotal));
+
+							}
+						}
+					});
+				}//End of UpdateLabel()
 			});
 		}
 	}
