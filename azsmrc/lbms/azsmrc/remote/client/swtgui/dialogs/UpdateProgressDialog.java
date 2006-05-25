@@ -1,24 +1,29 @@
 /**
- * 
+ *
  */
 package lbms.azsmrc.remote.client.swtgui.dialogs;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.tools.Download;
 import lbms.tools.DownloadListener;
-
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
+import org.eclipse.swt.widgets.Shell;
 
 /**
  * @author Damokles
@@ -29,7 +34,8 @@ public class UpdateProgressDialog {
 	private Display display;
 	private Download[] downloads;
 	private List<DownloadContainer> dcs = new ArrayList<DownloadContainer>();
-	private Composite container;
+	private Composite container, parent;
+	private Label statusLabel, picLabel;
 
 	private UpdateProgressDialog (Download[] dls, Display d) {
 		display = d;
@@ -43,7 +49,73 @@ public class UpdateProgressDialog {
 	}
 
 	private void createContents() {
-		//TODO omshaub
+		Shell shell = new Shell(display);
+		shell.setLayout(new GridLayout(2,false));
+		shell.setText(I18N.translate(PFX + "shell.text"));
+
+		picLabel = new Label(shell,SWT.NULL);
+		picLabel.setImage(display.getSystemImage(SWT.ICON_INFORMATION));
+
+		statusLabel = new Label(shell,SWT.NULL);
+		setStatusLabel(0);
+
+
+		final ScrolledComposite sc = new ScrolledComposite(shell, SWT.V_SCROLL | SWT.BORDER);
+		GridData gd = new GridData(GridData.FILL_BOTH);
+		gd.widthHint = 300;
+		gd.heightHint = 200;
+		gd.horizontalSpan = 2;
+		sc.setLayoutData(gd);
+
+		parent = new Composite(sc, SWT.NONE);
+		gd = new GridData(GridData.FILL_BOTH);
+		parent.setLayoutData(gd);
+		parent.setLayout(new GridLayout(1,false));
+		parent.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+
+		sc.setContent(parent);
+		sc.setExpandVertical(true);
+		sc.setExpandHorizontal(true);
+		sc.addControlListener(new ControlAdapter() {
+			public void controlResized(ControlEvent e) {
+				Rectangle r = sc.getClientArea();
+				sc.setMinSize(parent.computeSize(r.width, SWT.DEFAULT));
+			}
+		});
+
+
+
+		//open shell
+		GUI_Utilities.centerShellOpenAndFocus(shell);
+	}
+
+	/**
+	 * Set the status label on the main dialog
+	 * 0 for installing
+	 * 1 for finished
+	 * 2 for error
+	 * @param intStat
+	 */
+	public void setStatusLabel(final int intStat){
+		display.asyncExec(new Runnable(){
+
+			public void run() {
+				if(statusLabel != null && !statusLabel.isDisposed()){
+					switch(intStat){
+					case 0:
+						statusLabel.setText(I18N.translate(PFX + "status.0"));
+						break;
+					case 1:
+						statusLabel.setText(I18N.translate(PFX + "status.1"));
+						break;
+					case 2:
+						statusLabel.setText(I18N.translate(PFX + "status.2"));
+					}
+				}
+
+			}
+
+		});
 	}
 
 	public static UpdateProgressDialog initialize(Download[] dls) {
