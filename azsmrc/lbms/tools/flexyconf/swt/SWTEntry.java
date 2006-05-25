@@ -1,11 +1,13 @@
 package lbms.tools.flexyconf.swt;
 
+import lbms.tools.flexyconf.DisplayAdapterEntry;
+import lbms.tools.flexyconf.Entry;
+import lbms.tools.flexyconf.Option;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -16,9 +18,15 @@ import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.program.Program;
-import org.eclipse.swt.widgets.*;
-
-import lbms.tools.flexyconf.*;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Text;
 
 public class SWTEntry implements DisplayAdapterEntry {
 
@@ -166,6 +174,7 @@ public class SWTEntry implements DisplayAdapterEntry {
 	public void dispose() {
 		if (label != null && !label.isDisposed()) label.dispose();
 		if (control!=null && !control.isDisposed()) control.dispose();
+		entry.setDisplayAdapter(null);
 	}
 
 	public boolean isEnabled() {
@@ -180,14 +189,18 @@ public class SWTEntry implements DisplayAdapterEntry {
 
 	public void setEnabled(boolean e) {
 		try {
-			if (label != null) label.setEnabled(e);
-			if (control != null) control.setEnabled(e);
+			if (label != null && !label.isDisposed()) label.setEnabled(e);
+			if (control != null && !control.isDisposed()) control.setEnabled(e);
 		} catch (SWTException e1) {
 			e1.printStackTrace();
 		}
 	}
 
 	public void updateValue() {
+		if (control == null ||control.isDisposed()) { //if widget is already disposed remove the display adapter and return
+			dispose();
+			return;
+		}
 		if (entry.getType() == Entry.TYPE_LABEL || entry.getType() == Entry.TYPE_URL) {
 
 		} else if (entry.getType() == Entry.TYPE_BOOLEAN) {
