@@ -10,11 +10,11 @@ import java.net.URL;
 import java.util.Properties;
 
 import lbms.azsmrc.remote.client.Client;
+import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.shared.RemoteConstants;
-import lbms.tools.i18n.I18N;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;

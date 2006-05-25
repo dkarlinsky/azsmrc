@@ -2,13 +2,13 @@ package lbms.azsmrc.remote.client.swtgui.dialogs;
 
 import java.util.List;
 
+import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.container.Container;
 import lbms.azsmrc.remote.client.swtgui.container.DownloadContainer;
 import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
 import lbms.azsmrc.shared.RemoteConstants;
-import lbms.tools.i18n.I18N;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;

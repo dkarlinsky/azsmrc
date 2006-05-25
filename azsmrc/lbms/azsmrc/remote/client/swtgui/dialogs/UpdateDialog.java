@@ -3,9 +3,9 @@ package lbms.azsmrc.remote.client.swtgui.dialogs;
 
 import java.util.List;
 
+import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
-import lbms.tools.i18n.I18N;
 import lbms.tools.updater.Changelog;
 import lbms.tools.updater.Update;
 import lbms.tools.updater.UpdateFile;

@@ -14,6 +14,7 @@ import java.util.Map;
 import lbms.azsmrc.remote.client.Constants;
 import lbms.azsmrc.remote.client.Utilities;
 import lbms.azsmrc.remote.client.events.ClientUpdateListener;
+import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.ColorUtilities;
 import lbms.azsmrc.remote.client.swtgui.DownloadManagerShell;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
@@ -24,7 +25,6 @@ import lbms.azsmrc.remote.client.swtgui.container.AddTorrentContainer;
 import lbms.azsmrc.remote.client.torrent.TOTorrentException;
 import lbms.azsmrc.remote.client.torrent.TOTorrentFile;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
-import lbms.tools.i18n.I18N;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;

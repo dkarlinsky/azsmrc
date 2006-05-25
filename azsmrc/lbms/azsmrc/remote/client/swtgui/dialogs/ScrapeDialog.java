@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.HashMap;
 
+import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.ColorUtilities;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
@@ -19,7 +20,6 @@ import lbms.azsmrc.remote.client.torrent.scraper.ScrapeResult;
 import lbms.azsmrc.remote.client.torrent.scraper.Scraper;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.shared.EncodingUtil;
-import lbms.tools.i18n.I18N;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;

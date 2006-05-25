@@ -11,34 +11,34 @@ import java.util.Map;
 
 public class I18NTranslator {
 
-	private Map<String, String> defaultMessages = new HashMap<String, String>();
-	private Map<String, String> localizedMessages = new HashMap<String, String>();
+	private Map<String, String> messages = new HashMap<String, String>();
 
 	private boolean initialized, localized;
 
 	public void initialize(File defaultFile) throws IOException {
-		load (new BufferedReader(new FileReader(defaultFile)), defaultMessages);
+		messages.clear();
+		load (new BufferedReader(new FileReader(defaultFile)), messages);
 		initialized = true;
 	}
 
 	public void load (File localizedFile) throws IOException {
-		load (new BufferedReader(new FileReader(localizedFile)), localizedMessages);
+		load (new BufferedReader(new FileReader(localizedFile)), messages);
 		localized = true;
 	}
 
 	public void initialize(InputStream is) throws IOException {
-		load (new BufferedReader(new InputStreamReader(is)), defaultMessages);
+		messages.clear();
+		load (new BufferedReader(new InputStreamReader(is)), messages);
 		initialized = true;
 	}
 
 	public void load (InputStream is) throws IOException {
-		load (new BufferedReader(new InputStreamReader(is)), localizedMessages);
+		load (new BufferedReader(new InputStreamReader(is)), messages);
 		localized = true;
 	}
 
 	protected static void load (BufferedReader ir, Map<String,String> map) throws IOException {
 		try {
-			map.clear();
 			do {
 				String line = ir.readLine();
 				if (line == null) break; //EOF
@@ -54,15 +54,8 @@ public class I18NTranslator {
 	}
 
 	public String translate (String key) {
-		if (localized && localizedMessages.containsKey(key))
-			return localizedMessages.get(key);
-		else
-			return translateDefault(key);
-	}
-
-	public String translateDefault (String key) {
-		if (initialized && defaultMessages.containsKey(key))
-			return defaultMessages.get(key);
+		if (localized && messages.containsKey(key))
+			return messages.get(key);
 		else
 			return key;
 	}

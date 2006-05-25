@@ -16,9 +16,9 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
-import lbms.tools.i18n.I18N;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;

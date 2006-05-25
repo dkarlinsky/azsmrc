@@ -1,8 +1,10 @@
-package lbms.tools.i18n;
+package lbms.azsmrc.remote.client.internat;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+
+import lbms.tools.i18n.I18NTranslator;
 
 public class I18N {
 
@@ -28,10 +30,6 @@ public class I18N {
 
 	public static String translate (String key) {
 		return i18n.translate(key);
-	}
-
-	public static String translateDefault (String key) {
-		return i18n.translateDefault(key);
 	}
 
 	/**

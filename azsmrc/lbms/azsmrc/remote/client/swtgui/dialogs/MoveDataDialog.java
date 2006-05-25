@@ -21,10 +21,10 @@ import lbms.azsmrc.remote.client.Constants;
 import lbms.azsmrc.remote.client.Download;
 import lbms.azsmrc.remote.client.DownloadAdvancedStats;
 import lbms.azsmrc.remote.client.events.ClientUpdateListener;
+import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.container.Container;
-import lbms.tools.i18n.I18N;
 
 public class MoveDataDialog {
 

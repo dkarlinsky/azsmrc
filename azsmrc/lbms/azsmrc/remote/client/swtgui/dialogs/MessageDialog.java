@@ -10,11 +10,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.util.TimerEvent;
 import lbms.azsmrc.remote.client.util.TimerEventPerformer;
-import lbms.tools.i18n.I18N;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;

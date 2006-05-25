@@ -12,9 +12,9 @@ import java.util.List;
 
 import lbms.azsmrc.remote.client.RemoteUpdate;
 import lbms.azsmrc.remote.client.RemoteUpdateManager;
+import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
-import lbms.tools.i18n.I18N;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
