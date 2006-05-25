@@ -119,33 +119,46 @@ public class UpdateProgressDialog {
 		Download dl;
 		Composite comp;
 		Composite self;
-
+		Display locald;
+		
 		DownloadContainer (Download d, Composite cmp) {
 			dl = d;
 			comp = cmp;
-			self = new Composite (comp,SWT.NONE);
+			locald = cmp.getDisplay();
+			
+			self = new Composite (comp,SWT.NONE);			
 			GridLayout gl = new GridLayout();
+			gl.marginTop = 10;			
 			self.setLayout(gl);
-			gl.numColumns = 1;
+			GridData gd = new GridData(GridData.FILL_HORIZONTAL);	
+			self.setLayoutData(gd);
+			self.setBackground(locald.getSystemColor(SWT.COLOR_WHITE));
+			
+			
+			
+			
 
-
-			final ProgressBar pb = new ProgressBar(self,SWT.INDETERMINATE);
-			GridData gd = new GridData();
-			gd.horizontalAlignment = GridData.FILL_HORIZONTAL;
+			final ProgressBar pb = new ProgressBar(self,SWT.FLAT/*SWT.INDETERMINATE*/);
+			gd = new GridData(GridData.FILL_HORIZONTAL);			
 			pb.setLayoutData(gd);
+			pb.setBackground(locald.getSystemColor(SWT.COLOR_WHITE));
 
 			final Label progressLabel = new Label (self,SWT.NONE);
-			gd = new GridData();
-			gd.horizontalAlignment = GridData.FILL_HORIZONTAL;
+			gd = new GridData(GridData.FILL_HORIZONTAL);			
 			progressLabel.setLayoutData(gd);
-
+			progressLabel.setBackground(locald.getSystemColor(SWT.COLOR_WHITE));
+			
+			
 			final Label urlLabel = new Label (self,SWT.NONE);
-			gd = new GridData();
-			gd.horizontalAlignment = GridData.FILL_HORIZONTAL;
+			gd = new GridData(GridData.FILL_HORIZONTAL);			
 			urlLabel.setLayoutData(gd);
-
+			urlLabel.setBackground(locald.getSystemColor(SWT.COLOR_WHITE));
+			
 			urlLabel.setText(dl.getSource().toExternalForm());
 
+		
+			comp.layout();
+			
 			dl.addDownloadListener(new DownloadListener() {
 				long lastBytesRead;
 				long lastBytesTotal;
@@ -156,6 +169,17 @@ public class UpdateProgressDialog {
 				public void progress(long bytesRead, long bytesTotal) {
 					lastBytesRead = bytesRead;
 					lastBytesTotal = bytesTotal;
+					
+					display.asyncExec(new Runnable(){
+						public void run() {
+							if(pb != null && !pb.isDisposed()){								
+								pb.setMaximum((int)lastBytesTotal);
+								pb.setSelection((int)lastBytesRead);
+							}
+						}
+					});
+					
+					
 					updateLabel();
 				}
 				/* (non-Javadoc)
@@ -164,10 +188,12 @@ public class UpdateProgressDialog {
 				public void stateChanged(int oldState, int newState) {
 					lastState = newState;
 					updateLabel();
+					setStatusLabel(newState);
 				}
 
 				public void updateLabel() {
-					display.syncExec(new Runnable(){
+					if(display == null || display.isDisposed()) return;
+					display.asyncExec(new Runnable(){
 						public void run() {
 							if(progressLabel != null && !progressLabel.isDisposed()){
 								progressLabel.setText(I18N.translate(PFX + ".dlstate."+lastState)+ " - "
