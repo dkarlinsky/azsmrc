@@ -18,6 +18,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -41,6 +45,7 @@ public class UpdateProgressDialog {
 	private Composite parent;
 	private Label statusLabel, picLabel;
 	private Button close;
+    private Color ltGray;
 	
 	private UpdateProgressDialog (Download[] dls, Display d) {
 		display = d;
@@ -54,6 +59,10 @@ public class UpdateProgressDialog {
 	}
 
 	private void createContents() {
+		//define the color
+		ltGray = new Color(display, new RGB(240,240,240));
+		
+		
 		final Shell shell = new Shell(display);
 		shell.setLayout(new GridLayout(2,false));
 		shell.setText(I18N.translate(PFX + "shell.text"));
@@ -92,15 +101,26 @@ public class UpdateProgressDialog {
 
 		
 		close = new Button(shell, SWT.PUSH);
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
+		gd.horizontalSpan = 2;
 		close.setText(I18N.translate("global.close"));
 		close.setEnabled(false);
 		close.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
-				if(shell != null && !shell.isDisposed()){
-					shell.close();
-				}				
+				if(shell != null && !shell.isDisposed())
+					shell.close();				
+				if(ltGray != null && !ltGray.isDisposed())
+					ltGray.dispose();
 			}			
 		});
+		
+		shell.addDisposeListener(new DisposeListener(){
+			public void widgetDisposed(DisposeEvent arg0) {
+				if(ltGray != null && !ltGray.isDisposed())
+					ltGray.dispose();				
+			}			
+		});
+		
 		
 		RCMain.getRCMain().getUpdater().addProgressListener(new UpdateProgressListener() {
 			/* (non-Javadoc)
@@ -159,29 +179,29 @@ public class UpdateProgressDialog {
 			comp = cmp;
 
 
-			self = new Composite (comp,SWT.BORDER);
+			self = new Composite (comp,SWT.NULL);
 			GridLayout gl = new GridLayout();
 			gl.marginTop = 10;
 			self.setLayout(gl);
 			GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 			self.setLayoutData(gd);
-			
+			self.setBackground(ltGray);
 
 			final ProgressBar pb = new ProgressBar(self,SWT.FLAT);
 			gd = new GridData(GridData.FILL_HORIZONTAL);
 			pb.setLayoutData(gd);
-			
+			pb.setBackground(ltGray);
 
 			final Label progressLabel = new Label (self,SWT.NONE);
 			gd = new GridData(GridData.FILL_HORIZONTAL);
 			progressLabel.setLayoutData(gd);
-			
+			progressLabel.setBackground(ltGray);
 
 
 			final Label urlLabel = new Label (self,SWT.NONE);
 			gd = new GridData(GridData.FILL_HORIZONTAL);
 			urlLabel.setLayoutData(gd);
-			
+			urlLabel.setBackground(ltGray);
 
 			urlLabel.setText(dl.getSource().toExternalForm());
 
