@@ -65,6 +65,8 @@ public class HTTPDownload extends Download  {
 				is = new InflaterInputStream(is);
 			}
 			callStateChanged(STATE_DOWNLOADING);
+			long last = System.currentTimeMillis();
+			long now;
 
 			if (target != null) {
 				target.createNewFile();
@@ -83,7 +85,11 @@ public class HTTPDownload extends Download  {
 						}
 						os.write((char)r);
 						r = is.read();
-						callProgress(sis.getBytesRead(), contentLength);
+						now = System.currentTimeMillis();
+						if (sis.getBytesRead()%1024==0 || now-last>500) {
+							callProgress(sis.getBytesRead(), contentLength);
+							last = now;
+						}
 					}
 				} finally {
 					if (os != null)
@@ -144,7 +150,7 @@ public class HTTPDownload extends Download  {
 
 	/**
 	 * This needs to be set before the Download is executed
-	 * 
+	 *
 	 * @param referer the referer to set
 	 */
 	public void setReferer(String referer) {
@@ -160,7 +166,7 @@ public class HTTPDownload extends Download  {
 
 	/**
 	 * This needs to be set before the Download is executed
-	 * 
+	 *
 	 * @param userAgent the userAgent to set
 	 */
 	public void setUserAgent(String userAgent) {
