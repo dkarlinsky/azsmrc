@@ -56,9 +56,6 @@ public class Updater {
 		this.remoteUpdateFile = remoteUpdateFile;
 		this.currentUpdates = currentUpdates;
 		this.dir = dir;
-		tmpDir = new File(dir,"_Update");
-		tmpDir.mkdir();
-		tmpDir.deleteOnExit();
 	}
 
 	/**
@@ -156,6 +153,9 @@ public class Updater {
 
 	public void doUpdate() {
 		if (!updateAvailable) return;
+		tmpDir = new File(dir,"_Update");
+		tmpDir.mkdir();
+		tmpDir.deleteOnExit();
 		Thread t = new Thread (new Runnable() {
 			public void run() {
 				System.out.println("Updater: commencing update");
