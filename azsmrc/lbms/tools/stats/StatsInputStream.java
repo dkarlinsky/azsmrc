@@ -37,18 +37,17 @@ public class StatsInputStream extends InputStream {
 	@Override
 	public int read() throws IOException {
 		bytesRead++;
-		if ((bytesRead%1024)==0) {
-			long now = System.currentTimeMillis();
-			long diff = now-lastTime ;
-			if (diff>=1000) {
-				bytesPerSec = (long)((bytesRead-lastBytesRead)*(1000d/(diff)));
-				for (StatsStreamSpeedListener l:listeners) {
-					l.speedPerSec(bytesPerSec);
-				}
-				lastBytesRead = bytesRead;
-				lastTime = now;
+		long now = System.currentTimeMillis();
+		long diff = now-lastTime ;
+		if (diff>=500) {
+			bytesPerSec = (long)((bytesRead-lastBytesRead)*(1000d/(diff)));
+			for (StatsStreamSpeedListener l:listeners) {
+				l.speedPerSec(bytesPerSec);
 			}
+			lastBytesRead = bytesRead;
+			lastTime = now;
 		}
+
 		return is.read();
 	}
 

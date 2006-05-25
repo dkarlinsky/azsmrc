@@ -38,19 +38,16 @@ public class StatsOutputStream extends OutputStream {
 	public void write(int b) throws IOException {
 		os.write(b);
 		bytesWritten++;
-		if ((bytesWritten%1024)==0) {
-			long now = System.currentTimeMillis();
-			long diff = now-lastTime ;
-			if (diff>=1000) {
-				bytesPerSec = (long)((bytesWritten-lastBytesWritten)*(1000d/(diff)));
-				for (StatsStreamSpeedListener l:listeners) {
-					l.speedPerSec(bytesPerSec);
-				}
-				lastBytesWritten = bytesWritten;
-				lastTime = now;
+		long now = System.currentTimeMillis();
+		long diff = now-lastTime ;
+		if (diff>=500) {
+			bytesPerSec = (long)((bytesWritten-lastBytesWritten)*(1000d/(diff)));
+			for (StatsStreamSpeedListener l:listeners) {
+				l.speedPerSec(bytesPerSec);
 			}
+			lastBytesWritten = bytesWritten;
+			lastTime = now;
 		}
-
 	}
 
 	@Override
