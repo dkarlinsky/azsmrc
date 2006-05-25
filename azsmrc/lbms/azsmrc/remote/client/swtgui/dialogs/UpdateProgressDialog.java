@@ -83,6 +83,15 @@ public class UpdateProgressDialog {
 			}
 		});
 
+		RCMain.getRCMain().getUpdater().addProgressListener(new UpdateProgressListener() {
+			/* (non-Javadoc)
+			 * @see lbms.tools.updater.UpdateProgressListener#stateChanged(int)
+			 */
+			public void stateChanged(int state) {
+				setStatusLabel(state);
+			}
+		});
+
 
 
 		//open shell
@@ -119,46 +128,46 @@ public class UpdateProgressDialog {
 		Download dl;
 		Composite comp;
 		Composite self;
-		
-		
+
+
 		DownloadContainer (Download d, Composite cmp) {
 			dl = d;
 			comp = cmp;
-			
-			
-			self = new Composite (comp,SWT.NONE);			
+
+
+			self = new Composite (comp,SWT.NONE);
 			GridLayout gl = new GridLayout();
-			gl.marginTop = 10;			
+			gl.marginTop = 10;
 			self.setLayout(gl);
-			GridData gd = new GridData(GridData.FILL_HORIZONTAL);	
+			GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 			self.setLayoutData(gd);
 			self.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
-			
-			
-			
-			
+
+
+
+
 
 			final ProgressBar pb = new ProgressBar(self,SWT.FLAT);
-			gd = new GridData(GridData.FILL_HORIZONTAL);			
+			gd = new GridData(GridData.FILL_HORIZONTAL);
 			pb.setLayoutData(gd);
 			pb.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 
 			final Label progressLabel = new Label (self,SWT.NONE);
-			gd = new GridData(GridData.FILL_HORIZONTAL);			
+			gd = new GridData(GridData.FILL_HORIZONTAL);
 			progressLabel.setLayoutData(gd);
 			progressLabel.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
-			
-			
+
+
 			final Label urlLabel = new Label (self,SWT.NONE);
-			gd = new GridData(GridData.FILL_HORIZONTAL);			
+			gd = new GridData(GridData.FILL_HORIZONTAL);
 			urlLabel.setLayoutData(gd);
 			urlLabel.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
-			
+
 			urlLabel.setText(dl.getSource().toExternalForm());
 
-		
+
 			comp.layout();
-			
+
 			dl.addDownloadListener(new DownloadListener() {
 				long lastBytesRead;
 				long lastBytesTotal;
@@ -169,17 +178,17 @@ public class UpdateProgressDialog {
 				public void progress(long bytesRead, long bytesTotal) {
 					lastBytesRead = bytesRead;
 					lastBytesTotal = bytesTotal;
-					
+
 					display.asyncExec(new Runnable(){
 						public void run() {
-							if(pb != null && !pb.isDisposed()){								
+							if(pb != null && !pb.isDisposed()){
 								pb.setMaximum((int)lastBytesTotal);
 								pb.setSelection((int)lastBytesRead);
 							}
 						}
 					});
-					
-					
+
+
 					updateLabel();
 				}
 				/* (non-Javadoc)
@@ -188,7 +197,6 @@ public class UpdateProgressDialog {
 				public void stateChanged(int oldState, int newState) {
 					lastState = newState;
 					updateLabel();
-					setStatusLabel(newState);
 				}
 
 				public void updateLabel() {
