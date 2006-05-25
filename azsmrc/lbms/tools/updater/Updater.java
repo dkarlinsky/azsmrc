@@ -12,6 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,7 +37,8 @@ public class Updater {
 	private final static int THREAD_POOL_SIZE = 2;
 	ExecutorService threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE,new LowPriorityDeamonThread());
 
-	private List<UpdateListener> listeners = new ArrayList<UpdateListener>();
+	private List<UpdateListener> listeners = new Vector<UpdateListener>();
+	private List<UpdateProgressListener> progressListeners = new Vector<UpdateProgressListener>();
 
 	private URL remoteUpdateFile;
 	private File currentUpdates;
@@ -225,11 +227,13 @@ public class Updater {
 					}
 				}
 				callListenerInitializeUpdate(downloads.toArray(new Download[0]));
+				callProgressListenerStateChanged(UpdateProgressListener.STATE_INITIALIZING);
 				//Need to typecast here since java screws up
 				List<Callable<Download>> x = new ArrayList<Callable<Download>>(downloads);
 				if (downloads.size()!=0) {
 					System.out.println("Updater: Downloading: "+x.size());
 					try {
+						callProgressListenerStateChanged(UpdateProgressListener.STATE_DOWNLOADING);
 						List<Future<Download>> result = threadPool.invokeAll(x);
 						boolean check = true;
 						while (check) {
@@ -261,45 +265,48 @@ public class Updater {
 						}
 					}
 
-					if (!failed) //if all files for the update are present
-					for (UpdateFile u:files) {
-						File localTmp = new File(tmpDir,u.getPath()+u.getName());
-						File localLoc = new File(dir,u.getPath()+u.getName());
-						if (localTmp.exists()) {
-							try {
-								String localHash = CryptoTools.formatByte(CryptoTools.messageDigestFile(localTmp.getAbsolutePath(), "SHA-1"));
-								if (!localHash.equalsIgnoreCase(u.getHash())) {
-									failed = true;
-									lastError = "File "+u.getName()+" failed Hash check";
-									callListenerUpdateError(lastError);
-									localTmp.delete();
-									continue;
-								}
-								if (u.isArchive()) {
-									if (u.getName().endsWith(".gz")) {
-										ArchiveTools.unpackGZipFile(localTmp, dir);
-									} else if (u.getName().endsWith(".zip")){
-										ArchiveTools.unpackZip(localTmp, dir);
+					if (!failed) { //if all files for the update are present
+						callProgressListenerStateChanged(UpdateProgressListener.STATE_INSTALLING);
+						for (UpdateFile u:files) {
+							File localTmp = new File(tmpDir,u.getPath()+u.getName());
+							File localLoc = new File(dir,u.getPath()+u.getName());
+							if (localTmp.exists()) {
+								try {
+									String localHash = CryptoTools.formatByte(CryptoTools.messageDigestFile(localTmp.getAbsolutePath(), "SHA-1"));
+									if (!localHash.equalsIgnoreCase(u.getHash())) {
+										failed = true;
+										lastError = "File "+u.getName()+" failed Hash check";
+										callListenerUpdateError(lastError);
+										localTmp.delete();
+										continue;
 									}
-									localTmp.delete(); //Delete the Archive after unpack
-								} else {
-									localTmp.renameTo(localLoc);
+									if (u.isArchive()) {
+										if (u.getName().endsWith(".gz")) {
+											ArchiveTools.unpackGZipFile(localTmp, dir);
+										} else if (u.getName().endsWith(".zip")){
+											ArchiveTools.unpackZip(localTmp, dir);
+										}
+										localTmp.delete(); //Delete the Archive after unpack
+									} else {
+										localTmp.renameTo(localLoc);
+									}
+								} catch (Exception e) {
+									failed = true;
+									lastError = e.getMessage();
+									e.printStackTrace();
+									callListenerException(e);
 								}
-							} catch (Exception e) {
+							} else if (!localLoc.exists()) {
 								failed = true;
-								lastError = e.getMessage();
-								e.printStackTrace();
-								callListenerException(e);
+								lastError = "File doesn't exist"+localTmp.getAbsolutePath();
+								callListenerUpdateError(lastError);
 							}
-						} else if (!localLoc.exists()) {
-							failed = true;
-							lastError = "File doesn't exist"+localTmp.getAbsolutePath();
-							callListenerUpdateError(lastError);
 						}
 					}
 				}
 				if (failed) {
 					callListenerUpdateFailed(lastError);
+					callProgressListenerStateChanged(UpdateProgressListener.STATE_ERROR);
 				} else {
 					if (currentUpdates != null) {
 						OutputStream os = null;
@@ -321,6 +328,7 @@ public class Updater {
 								} catch (IOException e) {}
 						}
 					}
+					callProgressListenerStateChanged(UpdateProgressListener.STATE_FINISHED);
 					callListenerUpdateFinished();
 				}
 			}
@@ -403,11 +411,25 @@ public class Updater {
 		}
 	}
 
+	private void callProgressListenerStateChanged (int newState) {
+		for (UpdateProgressListener l:progressListeners) {
+			l.stateChanged(newState);
+		}
+	}
+
 	public void addListener (UpdateListener l) {
 		listeners.add(l);
 	}
 
 	public void removeListener (UpdateListener l) {
 		listeners.remove(l);
+	}
+
+	public void addProgressListener (UpdateProgressListener l) {
+		progressListeners.add(l);
+	}
+
+	public void removeProgressListener (UpdateProgressListener l) {
+		progressListeners.remove(l);
 	}
 }
