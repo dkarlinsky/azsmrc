@@ -429,16 +429,20 @@ public class RCMain implements Launchable {
 		debugLogger.addHandler(consoleHandler);
 
 		System.out.println("Loading I18N.");
-		InputStream langIs = RCMain.class.getClassLoader().getResourceAsStream("lbms/azsmrc/remote/client/internat/default.lang");
-		if (langIs != null) {
-			try {
-				I18N.initialize(langIs);
-				if (I18N.isInitialized()) {
-					System.out.println("I18N initialized.");
-				}
-			} catch (IOException e1) {
-				e1.printStackTrace();
+		try {
+			I18N.setDefault("lbms/azsmrc/remote/client/internat/default.lang");
+			if (properties.getProperty("language") != null) {
+				I18N.setLocalized("lbms/azsmrc/remote/client/internat/"+properties.getProperty("language")+".lang");
 			}
+			I18N.reload();
+			if (I18N.isInitialized()) {
+				System.out.println("I18N initialized.");
+			}
+			if (I18N.isLocalized()) {
+				System.out.println("I18N localized.");
+			}
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
 
 		try {
