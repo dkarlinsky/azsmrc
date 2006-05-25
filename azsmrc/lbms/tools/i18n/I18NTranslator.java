@@ -19,6 +19,7 @@ public class I18NTranslator {
 		messages.clear();
 		load (new BufferedReader(new FileReader(defaultFile)), messages);
 		initialized = true;
+		localized = false;
 	}
 
 	public void load (File localizedFile) throws IOException {
@@ -30,6 +31,7 @@ public class I18NTranslator {
 		messages.clear();
 		load (new BufferedReader(new InputStreamReader(is)), messages);
 		initialized = true;
+		localized = false;
 	}
 
 	public void load (InputStream is) throws IOException {
