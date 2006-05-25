@@ -148,7 +148,10 @@ public class OpenByFileDialog {
 							lastDir = container.getFilePath();
 							RCMain.getRCMain().getProperties().setProperty("Last.Directory", lastDir);
 							RCMain.getRCMain().saveConfig();
-							filesTable.setSelection(item);
+
+							//SWT 3.2 specific call
+							if(SWT.getVersion() > 3200)
+								filesTable.setSelection(item);
 						}
 					} catch (UnsupportedEncodingException e1) {
 						e1.printStackTrace();
