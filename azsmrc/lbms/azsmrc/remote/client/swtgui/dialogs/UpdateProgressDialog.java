@@ -71,7 +71,9 @@ public class UpdateProgressDialog {
 		parent = new Composite(sc, SWT.NONE);
 		gd = new GridData(GridData.FILL_BOTH);
 		parent.setLayoutData(gd);
-		parent.setLayout(new GridLayout(1,false));
+		GridLayout gl = new GridLayout();
+		gl.verticalSpacing = 15;
+		parent.setLayout(gl);
 		parent.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 
 		sc.setContent(parent);
@@ -135,38 +137,34 @@ public class UpdateProgressDialog {
 			comp = cmp;
 
 
-			self = new Composite (comp,SWT.NONE);
+			self = new Composite (comp,SWT.BORDER);
 			GridLayout gl = new GridLayout();
 			gl.marginTop = 10;
 			self.setLayout(gl);
 			GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 			self.setLayoutData(gd);
-			self.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
-
-
-
-
+			
 
 			final ProgressBar pb = new ProgressBar(self,SWT.FLAT);
 			gd = new GridData(GridData.FILL_HORIZONTAL);
 			pb.setLayoutData(gd);
-			pb.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+			
 
 			final Label progressLabel = new Label (self,SWT.NONE);
 			gd = new GridData(GridData.FILL_HORIZONTAL);
 			progressLabel.setLayoutData(gd);
-			progressLabel.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+			
 
 
 			final Label urlLabel = new Label (self,SWT.NONE);
 			gd = new GridData(GridData.FILL_HORIZONTAL);
 			urlLabel.setLayoutData(gd);
-			urlLabel.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+			
 
 			urlLabel.setText(dl.getSource().toExternalForm());
 
-
 			comp.layout();
+			comp.getParent().layout();
 
 			dl.addDownloadListener(new DownloadListener() {
 				long lastBytesRead;
