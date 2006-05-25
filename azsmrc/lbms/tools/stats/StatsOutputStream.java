@@ -41,7 +41,7 @@ public class StatsOutputStream extends OutputStream {
 		long now = System.currentTimeMillis();
 		long diff = now-lastTime ;
 		if (diff>=500) {
-			bytesPerSec = (long)((bytesWritten-lastBytesWritten)*(1000d/(diff)));
+			bytesPerSec = (long)((bytesWritten-lastBytesWritten)*(500d/(diff)));
 			for (StatsStreamSpeedListener l:listeners) {
 				l.speedPerSec(bytesPerSec);
 			}

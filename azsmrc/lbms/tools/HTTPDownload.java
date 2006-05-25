@@ -86,7 +86,7 @@ public class HTTPDownload extends Download  {
 						os.write((char)r);
 						r = is.read();
 						now = System.currentTimeMillis();
-						if (sis.getBytesRead()%1024==0 || now-last>500) {
+						if (now-last>=500) {
 							callProgress(sis.getBytesRead(), contentLength);
 							last = now;
 						}
@@ -108,9 +108,15 @@ public class HTTPDownload extends Download  {
 					}
 					buffer.append((char)r);
 					r = is.read();
-					callProgress(sis.getBytesRead(), contentLength);
+					now = System.currentTimeMillis();
+					if (now-last>=500) {
+						callProgress(sis.getBytesRead(), contentLength);
+						last = now;
+					}
 				}
 			}
+			//finally call again
+			callProgress(sis.getBytesRead(), contentLength);
 			if (contentLength>0 && target != null && !(gzip || deflate) && target.length() != contentLength) {
 				failed = true;
 				callStateChanged(STATE_FAILURE);

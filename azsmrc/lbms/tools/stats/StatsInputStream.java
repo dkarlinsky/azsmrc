@@ -40,7 +40,7 @@ public class StatsInputStream extends InputStream {
 		long now = System.currentTimeMillis();
 		long diff = now-lastTime ;
 		if (diff>=500) {
-			bytesPerSec = (long)((bytesRead-lastBytesRead)*(1000d/(diff)));
+			bytesPerSec = (long)((bytesRead-lastBytesRead)*(500d/(diff)));
 			for (StatsStreamSpeedListener l:listeners) {
 				l.speedPerSec(bytesPerSec);
 			}

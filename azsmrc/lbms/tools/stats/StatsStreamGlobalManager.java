@@ -29,7 +29,7 @@ public class StatsStreamGlobalManager {
 		oList.remove(os);
 	}
 
-	public static long getKbpsUpload () {
+	public static long getBpsUpload () {
 		long result = 0;
 		for (StatsOutputStream sos:oList) {
 			result += sos.getBytesPerSec();
@@ -37,7 +37,7 @@ public class StatsStreamGlobalManager {
 		return result;
 	}
 
-	public static long getKbpsDownload () {
+	public static long getBpsDownload () {
 		long result = 0;
 		for (StatsInputStream sis:iList) {
 			result += sis.getBytesPerSec();
