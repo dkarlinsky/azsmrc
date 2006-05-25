@@ -11,8 +11,12 @@ import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
+import lbms.azsmrc.remote.client.util.TimerEvent;
+import lbms.azsmrc.remote.client.util.TimerEventPerformer;
+import lbms.azsmrc.remote.client.util.TimerEventPeriodic;
 import lbms.tools.Download;
 import lbms.tools.DownloadListener;
+import lbms.tools.stats.StatsStreamGlobalManager;
 import lbms.tools.updater.UpdateProgressListener;
 
 import org.eclipse.swt.SWT;
@@ -47,10 +51,11 @@ public class UpdateProgressDialog {
 	private Download[] downloads;
 	private List<DownloadContainer> dcs = new ArrayList<DownloadContainer>();
 	private Composite parent;
-	private Label statusLabel, picLabel;
+	private Label statusLabel, picLabel, speedLabel;
 	private Button close;
 	private Color ltGray;
 	private Cursor handCursor;
+	private TimerEventPeriodic speedUpdateTimer;
 
 	private UpdateProgressDialog (Download[] dls, Display d) {
 		display = d;
@@ -105,6 +110,29 @@ public class UpdateProgressDialog {
 			}
 		});
 
+		speedLabel = new Label(shell,SWT.NONE);
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		gd.horizontalSpan = 2;
+		speedLabel.setLayoutData(gd);
+		speedLabel.setText(I18N.translate(PFX+"speedPerSec"));
+
+		speedUpdateTimer = RCMain.getRCMain().getMainTimer().addPeriodicEvent(500, new TimerEventPerformer() {
+			String label = I18N.translate(PFX+"speedPerSec");
+			public void perform(TimerEvent event) {
+				display.asyncExec(new Runnable () {
+					public void run() {
+						if(speedLabel != null && !speedLabel.isDisposed()) {
+							speedLabel.setText(label+" "
+									+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(
+											StatsStreamGlobalManager.getBpsDownload()));
+							//TODO Marc figure out why the text is not updated correctly
+						} else {
+							speedUpdateTimer.cancel();
+						}
+					}
+				});
+			}
+		});
 
 		close = new Button(shell, SWT.PUSH);
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
@@ -119,6 +147,7 @@ public class UpdateProgressDialog {
 					ltGray.dispose();
 				if(handCursor != null && !handCursor.isDisposed())
 					handCursor.dispose();
+				speedUpdateTimer.cancel();
 			}
 		});
 
@@ -138,6 +167,9 @@ public class UpdateProgressDialog {
 			 */
 			public void stateChanged(int state) {
 				setStatusLabel(state);
+				if (state == UpdateProgressListener.STATE_FINISHED
+					|| state == UpdateProgressListener.STATE_ERROR)
+					speedUpdateTimer.cancel();
 			}
 		});
 
@@ -268,7 +300,7 @@ public class UpdateProgressDialog {
 					display.asyncExec(new Runnable(){
 						public void run() {
 							if(progressLabel != null && !progressLabel.isDisposed()){
-								progressLabel.setText(I18N.translate(PFX + ".dlstate."+lastState)+ " - "
+								progressLabel.setText(I18N.translate(PFX + "dlstate."+lastState)+ " - "
 										+ DisplayFormatters.formatByteCountToBase10KBEtc(lastBytesRead)+" / "
 										+ DisplayFormatters.formatByteCountToBase10KBEtc(lastBytesTotal));
 
