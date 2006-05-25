@@ -161,6 +161,7 @@ public class Updater {
 				System.out.println("Updater: commencing update");
 				List<Download> downloads = new ArrayList<Download>();
 				List<UpdateFile> files = choosenUpdate.getFileList();
+				List<UpdateFile> filesToDL = new Vector<UpdateFile>();
 				for (UpdateFile u:files) {
 					try {
 						URL remoteLoc;
@@ -206,6 +207,7 @@ public class Updater {
 							}
 							if (exist) continue; // all Files inside the archive exist so we don't need to download it.
 						}
+						filesToDL.add(u);
 						Download dl;
 						switch (u.getType()) {
 						case UpdateFile.TYPE_NORMAL:
@@ -255,7 +257,7 @@ public class Updater {
 					}
 
 					//check if all files for the update are present
-					for (UpdateFile u:files) {
+					for (UpdateFile u:filesToDL) {
 						File localTmp = new File(tmpDir,u.getPath()+u.getName());
 						File localLoc = new File(dir,u.getPath()+u.getName());
 						if (!(localTmp.exists() || localLoc.exists())) {
@@ -267,7 +269,7 @@ public class Updater {
 
 					if (!failed) { //if all files for the update are present
 						callProgressListenerStateChanged(UpdateProgressListener.STATE_INSTALLING);
-						for (UpdateFile u:files) {
+						for (UpdateFile u:filesToDL) {
 							File localTmp = new File(tmpDir,u.getPath()+u.getName());
 							File localLoc = new File(dir,u.getPath()+u.getName());
 							if (localTmp.exists()) {
