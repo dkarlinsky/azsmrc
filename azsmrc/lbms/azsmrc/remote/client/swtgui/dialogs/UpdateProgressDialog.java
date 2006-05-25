@@ -20,6 +20,7 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -37,7 +38,8 @@ public class UpdateProgressDialog {
 	private List<DownloadContainer> dcs = new ArrayList<DownloadContainer>();
 	private Composite parent;
 	private Label statusLabel, picLabel;
-
+	private Button close;
+	
 	private UpdateProgressDialog (Download[] dls, Display d) {
 		display = d;
 		downloads = dls;
@@ -70,6 +72,7 @@ public class UpdateProgressDialog {
 
 		parent = new Composite(sc, SWT.NONE);
 		gd = new GridData(GridData.FILL_BOTH);
+		gd.horizontalSpan = 2;
 		parent.setLayoutData(gd);
 		GridLayout gl = new GridLayout();
 		gl.verticalSpacing = 15;
@@ -85,6 +88,11 @@ public class UpdateProgressDialog {
 			}
 		});
 
+		
+		close = new Button(shell, SWT.PUSH);
+		close.setText(I18N.translate("global.close"));
+		close.setEnabled(false);
+		
 		RCMain.getRCMain().getUpdater().addProgressListener(new UpdateProgressListener() {
 			/* (non-Javadoc)
 			 * @see lbms.tools.updater.UpdateProgressListener#stateChanged(int)
@@ -110,6 +118,11 @@ public class UpdateProgressDialog {
 				if(statusLabel != null && !statusLabel.isDisposed()){
 						statusLabel.setText(I18N.translate(PFX + "status." + intStat));
 				}
+				
+				if(intStat == UpdateProgressListener.STATE_FINISHED &&
+						close != null && !close.isDisposed())
+					close.setEnabled(true);
+				
 			}
 		});
 	}
