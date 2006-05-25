@@ -23,7 +23,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 
@@ -52,7 +54,7 @@ public class UpdateProgressDialog {
 	}
 
 	private void createContents() {
-		Shell shell = new Shell(display);
+		final Shell shell = new Shell(display);
 		shell.setLayout(new GridLayout(2,false));
 		shell.setText(I18N.translate(PFX + "shell.text"));
 
@@ -92,6 +94,13 @@ public class UpdateProgressDialog {
 		close = new Button(shell, SWT.PUSH);
 		close.setText(I18N.translate("global.close"));
 		close.setEnabled(false);
+		close.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				if(shell != null && !shell.isDisposed()){
+					shell.close();
+				}				
+			}			
+		});
 		
 		RCMain.getRCMain().getUpdater().addProgressListener(new UpdateProgressListener() {
 			/* (non-Javadoc)
