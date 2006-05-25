@@ -119,12 +119,12 @@ public class UpdateProgressDialog {
 		Download dl;
 		Composite comp;
 		Composite self;
-		Display locald;
+		
 		
 		DownloadContainer (Download d, Composite cmp) {
 			dl = d;
 			comp = cmp;
-			locald = cmp.getDisplay();
+			
 			
 			self = new Composite (comp,SWT.NONE);			
 			GridLayout gl = new GridLayout();
@@ -132,27 +132,27 @@ public class UpdateProgressDialog {
 			self.setLayout(gl);
 			GridData gd = new GridData(GridData.FILL_HORIZONTAL);	
 			self.setLayoutData(gd);
-			self.setBackground(locald.getSystemColor(SWT.COLOR_WHITE));
+			self.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 			
 			
 			
 			
 
-			final ProgressBar pb = new ProgressBar(self,SWT.FLAT/*SWT.INDETERMINATE*/);
+			final ProgressBar pb = new ProgressBar(self,SWT.FLAT);
 			gd = new GridData(GridData.FILL_HORIZONTAL);			
 			pb.setLayoutData(gd);
-			pb.setBackground(locald.getSystemColor(SWT.COLOR_WHITE));
+			pb.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 
 			final Label progressLabel = new Label (self,SWT.NONE);
 			gd = new GridData(GridData.FILL_HORIZONTAL);			
 			progressLabel.setLayoutData(gd);
-			progressLabel.setBackground(locald.getSystemColor(SWT.COLOR_WHITE));
+			progressLabel.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 			
 			
 			final Label urlLabel = new Label (self,SWT.NONE);
 			gd = new GridData(GridData.FILL_HORIZONTAL);			
 			urlLabel.setLayoutData(gd);
-			urlLabel.setBackground(locald.getSystemColor(SWT.COLOR_WHITE));
+			urlLabel.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 			
 			urlLabel.setText(dl.getSource().toExternalForm());
 
