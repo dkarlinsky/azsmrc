@@ -54,6 +54,7 @@ import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByFileDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByURLDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ServerUpdateDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.UpdateDialog;
+import lbms.azsmrc.remote.client.swtgui.dialogs.UpdateProgressDialog;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.remote.client.util.FileUtil;
 import lbms.azsmrc.remote.client.util.Timer;
@@ -677,8 +678,7 @@ public class RCMain implements Launchable {
 				normalLogger.info("Update Error: "+error);
 			}
 			public void initializeUpdate(lbms.tools.Download[] dls) {
-				// TODO Add the Progressmonitor stuff
-
+				UpdateProgressDialog.initialize(dls);
 			}
 		});
 		if (Boolean.parseBoolean(properties.getProperty("update.autocheck", "true"))) {
