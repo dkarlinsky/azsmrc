@@ -54,7 +54,7 @@ public class I18NTranslator {
 	}
 
 	public String translate (String key) {
-		if (localized && messages.containsKey(key))
+		if (messages.containsKey(key))
 			return messages.get(key);
 		else
 			return key;
