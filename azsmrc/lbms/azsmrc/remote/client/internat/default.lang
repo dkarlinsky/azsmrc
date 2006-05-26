@@ -202,6 +202,7 @@ dialog.updatedialog.releasetype.beta=Beta Release
 dialog.updatedialog.releasetype.maintenance=Maintenance Release
 dialog.updatedialog.releasetype.stable=Stable Release
 dialog.updateprogressdialog.shell.text=Update Progress
+dialog.updateprogressdialog.speedPerSec=Overall Speed:
 dialog.updateprogressdialog.status.-1=Status:  Error
 dialog.updateprogressdialog.status.0=Status:  Initializing
 dialog.updateprogressdialog.status.1=Status:  Downloading
