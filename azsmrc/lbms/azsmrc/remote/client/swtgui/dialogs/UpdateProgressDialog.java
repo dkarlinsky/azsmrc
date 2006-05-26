@@ -54,7 +54,7 @@ public class UpdateProgressDialog {
 	private List<DownloadContainer> dcs = new ArrayList<DownloadContainer>();
 	private Composite parent;
 	private Label statusLabel, picLabel, speedLabel;
-	private Button close;
+	private Button close, cancel;
 	private Color ltGray;
 	private Cursor handCursor;
 	private TimerEventPeriodic speedUpdateTimer;
@@ -122,7 +122,7 @@ public class UpdateProgressDialog {
 		speedUpdateTimer = RCMain.getRCMain().getMainTimer().addPeriodicEvent(500, new TimerEventPerformer() {
 			String label = I18N.translate(PFX+"speedPerSec");
 			public void perform(TimerEvent event) {
-				display.syncExec(new Runnable () {
+				display.asyncExec(new Runnable () {
 					public void run() {
 						if(speedLabel != null && !speedLabel.isDisposed()) {
 							speedLabel.setText(label+" "
@@ -137,9 +137,21 @@ public class UpdateProgressDialog {
 			}
 		});
 
+		cancel = new Button(shell, SWT.PUSH);
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		cancel.setLayoutData(gd);
+		cancel.setText(I18N.translate("global.cancel"));
+		cancel.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event e){
+				//TODO Leonard.. put here whatever is necessary to cancel all downloads
+			}
+		});
+
 		close = new Button(shell, SWT.PUSH);
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
-		gd.horizontalSpan = 2;
+		gd.grabExcessHorizontalSpace = true;
+		gd.horizontalSpan = 1;
+		close.setLayoutData(gd);
 		close.setText(I18N.translate("global.close"));
 		close.setEnabled(false);
 		close.addListener(SWT.Selection, new Listener(){
