@@ -49,7 +49,7 @@ public class Updater {
 	private UpdateList remoteUpdateList;
 	private Update choosenUpdate;
 	private boolean updateAvailable = false;
-	private boolean failed = false;
+	private boolean failed = false, abort = false;
 	private String lastError = "";
 
 	public Updater (URL remoteUpdateFile, File currentUpdates, File dir) {
@@ -153,6 +153,7 @@ public class Updater {
 
 	public void doUpdate() {
 		if (!updateAvailable) return;
+		abort = false;
 		tmpDir = new File(dir,"_Update");
 		tmpDir.mkdir();
 		tmpDir.deleteOnExit();
@@ -164,6 +165,12 @@ public class Updater {
 				List<UpdateFile> filesToDL = new Vector<UpdateFile>();
 				for (UpdateFile u:files) {
 					try {
+						if (abort) {
+							failed = true;
+							lastError = "Aborted by User";
+							callProgressListenerStateChanged(UpdateProgressListener.STATE_ABORTED);
+							break;
+						}
 						URL remoteLoc;
 						if (u.getUrl() != null && u.getUrl().length() != 0) {
 							remoteLoc = new URL(u.getUrl());
@@ -228,11 +235,13 @@ public class Updater {
 						e.printStackTrace();
 					}
 				}
-				callListenerInitializeUpdate(downloads.toArray(new Download[0]));
-				callProgressListenerStateChanged(UpdateProgressListener.STATE_INITIALIZING);
-				//Need to typecast here since java screws up
+				if (!abort) {
+					callListenerInitializeUpdate(downloads.toArray(new Download[0]));
+					callProgressListenerStateChanged(UpdateProgressListener.STATE_INITIALIZING);
+				}
+				//HACK Need to typecast here since java screws up
 				List<Callable<Download>> x = new ArrayList<Callable<Download>>(downloads);
-				if (downloads.size()!=0) {
+				if (downloads.size()!=0 && !abort) {
 					System.out.println("Updater: Downloading: "+x.size());
 					try {
 						callProgressListenerStateChanged(UpdateProgressListener.STATE_DOWNLOADING);
@@ -240,7 +249,14 @@ public class Updater {
 						boolean check = true;
 						while (check) {
 							check = false;
-
+							if (abort) {
+								for (Download d:downloads)
+									d.abortDownload();
+								failed = true;
+								lastError = "Aborted by User";
+								callProgressListenerStateChanged(UpdateProgressListener.STATE_ABORTED);
+								break;
+							} else
 							for (Future<Download> test:result) {
 								if (!test.isDone()) check = true;
 								/*else {
@@ -257,6 +273,7 @@ public class Updater {
 					}
 
 					//check if all files for the update are present
+					if (!abort)
 					for (UpdateFile u:filesToDL) {
 						File localTmp = new File(tmpDir,u.getPath()+u.getName());
 						File localLoc = new File(dir,u.getPath()+u.getName());
@@ -267,7 +284,7 @@ public class Updater {
 						}
 					}
 
-					if (!failed) { //if all files for the update are present
+					if (!failed && !abort) { //if all files for the update are present
 						callProgressListenerStateChanged(UpdateProgressListener.STATE_INSTALLING);
 						for (UpdateFile u:filesToDL) {
 							File localTmp = new File(tmpDir,u.getPath()+u.getName());
@@ -306,7 +323,7 @@ public class Updater {
 						}
 					}
 				}
-				if (failed) {
+				if (failed || abort) {
 					callListenerUpdateFailed(lastError);
 					callProgressListenerStateChanged(UpdateProgressListener.STATE_ERROR);
 				} else {
@@ -338,6 +355,10 @@ public class Updater {
 		t.setPriority(Thread.MIN_PRIORITY);
 		t.setDaemon(true);
 		t.start();
+	}
+
+	public void abortUpdate() {
+		abort = true;
 	}
 
 
