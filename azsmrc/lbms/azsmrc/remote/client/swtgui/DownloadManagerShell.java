@@ -2325,7 +2325,7 @@ public class DownloadManagerShell {
 		itemUpSpeedManual.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				InputShell is = new InputShell(
-						"Set Download Speed","Enter a number in kb/s to change download to:");
+						"Set Upload Speed","Enter a number in kb/s to change upload to:");
 
 				String sReturn = is.open();
 				if (sReturn == null)
