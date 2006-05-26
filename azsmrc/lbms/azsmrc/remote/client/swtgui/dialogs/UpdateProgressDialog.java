@@ -29,6 +29,8 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -111,7 +113,8 @@ public class UpdateProgressDialog {
 		});
 
 		speedLabel = new Label(shell,SWT.NONE);
-		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL);
+		gd.grabExcessHorizontalSpace = true;
 		gd.horizontalSpan = 2;
 		speedLabel.setLayoutData(gd);
 		speedLabel.setText(I18N.translate(PFX+"speedPerSec"));
@@ -119,13 +122,13 @@ public class UpdateProgressDialog {
 		speedUpdateTimer = RCMain.getRCMain().getMainTimer().addPeriodicEvent(500, new TimerEventPerformer() {
 			String label = I18N.translate(PFX+"speedPerSec");
 			public void perform(TimerEvent event) {
-				display.asyncExec(new Runnable () {
+				display.syncExec(new Runnable () {
 					public void run() {
 						if(speedLabel != null && !speedLabel.isDisposed()) {
 							speedLabel.setText(label+" "
 									+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(
 											StatsStreamGlobalManager.getBpsDownload()));
-							//TODO Marc figure out why the text is not updated correctly
+
 						} else {
 							speedUpdateTimer.cancel();
 						}
@@ -235,9 +238,19 @@ public class UpdateProgressDialog {
 			nameLabel.setLayoutData(gd);
 			nameLabel.setBackground(ltGray);
 			nameLabel.setText(dl.getSource().getFile().substring(dl.getSource().getFile().lastIndexOf('/')+1));
-			//TODO Make this BOLD
+			//Set it bold
+			Font initialFont = nameLabel.getFont();
+			FontData[] fontData = initialFont.getFontData();
+			for (int i = 0; i < fontData.length; i++) {
+				fontData[i].setStyle(SWT.BOLD);
+				fontData[i].setHeight(fontData[i].getHeight() + 2);
+			}
+			Font newFont = new Font(RCMain.getRCMain().getDisplay(), fontData);
+			nameLabel.setFont(newFont);
+			newFont.dispose();
 
-			final ProgressBar pb = new ProgressBar(self,SWT.FLAT);
+
+			final ProgressBar pb = new ProgressBar(self,SWT.SMOOTH);
 			gd = new GridData(GridData.FILL_HORIZONTAL);
 			pb.setLayoutData(gd);
 			pb.setBackground(ltGray);
