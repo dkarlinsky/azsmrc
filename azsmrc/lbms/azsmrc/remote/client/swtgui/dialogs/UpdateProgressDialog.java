@@ -229,6 +229,14 @@ public class UpdateProgressDialog {
 			self.setLayoutData(gd);
 			self.setBackground(ltGray);
 
+			final Label nameLabel = new Label (self,SWT.NONE);
+			gd = new GridData(GridData.FILL_HORIZONTAL);
+			gd.horizontalSpan = 2;
+			nameLabel.setLayoutData(gd);
+			nameLabel.setBackground(ltGray);
+			nameLabel.setText(dl.getSource().getFile().substring(dl.getSource().getFile().lastIndexOf('/')+1));
+			//TODO Make this BOLD
+
 			final ProgressBar pb = new ProgressBar(self,SWT.FLAT);
 			gd = new GridData(GridData.FILL_HORIZONTAL);
 			pb.setLayoutData(gd);
@@ -238,8 +246,10 @@ public class UpdateProgressDialog {
 			cancelButton.setImage(ImageRepository.getImage("progress_stop"));
 			cancelButton.addMouseListener(new MouseAdapter() {
 				public void mouseUp(MouseEvent arg0) {
-					dl.abortDownload();
-					cancelButton.setEnabled(false);
+					if (cancelButton.isEnabled()) {
+						dl.abortDownload();
+						cancelButton.setEnabled(false);
+					}
 				}
 			});
 			cancelButton.setCursor(handCursor);
@@ -275,16 +285,6 @@ public class UpdateProgressDialog {
 					lastBytesRead = bytesRead;
 					lastBytesTotal = bytesTotal;
 
-					display.asyncExec(new Runnable(){
-						public void run() {
-							if(pb != null && !pb.isDisposed()){
-								pb.setMaximum((int)lastBytesTotal);
-								pb.setSelection((int)lastBytesRead);
-							}
-						}
-					});
-
-
 					updateLabel();
 				}
 				/* (non-Javadoc)
@@ -293,6 +293,15 @@ public class UpdateProgressDialog {
 				public void stateChanged(int oldState, int newState) {
 					lastState = newState;
 					updateLabel();
+					if (newState == Download.STATE_FINISHED
+							|| newState == Download.STATE_FAILURE
+							|| newState == Download.STATE_ABORTED) {
+						display.asyncExec(new Runnable(){
+							public void run() {
+								cancelButton.setEnabled(false);
+							}
+						});
+					}
 				}
 
 				public void updateLabel() {
@@ -303,7 +312,10 @@ public class UpdateProgressDialog {
 								progressLabel.setText(I18N.translate(PFX + "dlstate."+lastState)+ " - "
 										+ DisplayFormatters.formatByteCountToBase10KBEtc(lastBytesRead)+" / "
 										+ DisplayFormatters.formatByteCountToBase10KBEtc(lastBytesTotal));
-
+							}
+							if(pb != null && !pb.isDisposed()){
+								pb.setMaximum((int)lastBytesTotal);
+								pb.setSelection((int)lastBytesRead);
 							}
 						}
 					});
