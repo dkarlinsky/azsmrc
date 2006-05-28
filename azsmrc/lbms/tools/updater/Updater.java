@@ -16,16 +16,15 @@ import java.util.Vector;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import lbms.tools.ArchiveTools;
 import lbms.tools.CryptoTools;
 import lbms.tools.Download;
 import lbms.tools.HTTPDownload;
 import lbms.tools.LowPriorityDeamonThread;
 import lbms.tools.SFDownload;
-import lbms.tools.ArchiveTools;
 
 import org.jdom.Document;
 import org.jdom.JDOMException;
@@ -51,6 +50,8 @@ public class Updater {
 	private boolean updateAvailable = false;
 	private boolean failed = false, abort = false;
 	private String lastError = "";
+
+	private List<Download> downloads = new Vector<Download>(); //needs to be synchronized
 
 	public Updater (URL remoteUpdateFile, File currentUpdates, File dir) {
 		this.remoteUpdateFile = remoteUpdateFile;
@@ -160,7 +161,6 @@ public class Updater {
 		Thread t = new Thread (new Runnable() {
 			public void run() {
 				System.out.println("Updater: commencing update");
-				List<Download> downloads = new ArrayList<Download>();
 				List<UpdateFile> files = choosenUpdate.getFileList();
 				List<UpdateFile> filesToDL = new Vector<UpdateFile>();
 				for (UpdateFile u:files) {
@@ -245,28 +245,7 @@ public class Updater {
 					System.out.println("Updater: Downloading: "+x.size());
 					try {
 						callProgressListenerStateChanged(UpdateProgressListener.STATE_DOWNLOADING);
-						List<Future<Download>> result = threadPool.invokeAll(x);
-						boolean check = true;
-						while (check) {
-							check = false;
-							if (abort) {
-								for (Download d:downloads)
-									d.abortDownload();
-								failed = true;
-								lastError = "Aborted by User";
-								callProgressListenerStateChanged(UpdateProgressListener.STATE_ABORTED);
-								break;
-							} else
-							for (Future<Download> test:result) {
-								if (!test.isDone()) check = true;
-								/*else {
-									System.out.println("Updater: Remaining: "+result.size()+"/"+x.size());
-									result.remove(test);
-								}*/
-							}
-							Thread.sleep(500);
-						}
-
+						threadPool.invokeAll(x);
 					} catch (InterruptedException e) {
 						callListenerException(e);
 						e.printStackTrace();
@@ -325,7 +304,10 @@ public class Updater {
 				}
 				if (failed || abort) {
 					callListenerUpdateFailed(lastError);
-					callProgressListenerStateChanged(UpdateProgressListener.STATE_ERROR);
+					if (abort)
+						callProgressListenerStateChanged(UpdateProgressListener.STATE_ABORTED);
+					else
+						callProgressListenerStateChanged(UpdateProgressListener.STATE_ERROR);
 				} else {
 					if (currentUpdates != null) {
 						OutputStream os = null;
@@ -359,6 +341,9 @@ public class Updater {
 
 	public void abortUpdate() {
 		abort = true;
+		if (downloads != null && downloads.size() > 0)
+			for (Download d: downloads)
+				d.abortDownload();
 	}
 
 

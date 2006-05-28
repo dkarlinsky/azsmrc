@@ -27,6 +27,8 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
@@ -141,11 +143,13 @@ public class UpdateProgressDialog {
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		cancel.setLayoutData(gd);
 		cancel.setText(I18N.translate("global.cancel"));
-		cancel.addListener(SWT.Selection, new Listener(){
-			public void handleEvent(Event e){
+		cancel.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
 				RCMain.getRCMain().getUpdater().abortUpdate();
 			}
 		});
+
 
 		close = new Button(shell, SWT.PUSH);
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
@@ -205,9 +209,11 @@ public class UpdateProgressDialog {
 						statusLabel.setText(I18N.translate(PFX + "status." + intStat));
 				}
 
-				if(intStat == UpdateProgressListener.STATE_FINISHED &&
-						close != null && !close.isDisposed())
-					close.setEnabled(true);
+				if(intStat == UpdateProgressListener.STATE_FINISHED
+						|| intStat == UpdateProgressListener.STATE_ABORTED
+						|| intStat == UpdateProgressListener.STATE_ERROR)
+					if (close != null && !close.isDisposed())
+						close.setEnabled(true);
 
 			}
 		});
