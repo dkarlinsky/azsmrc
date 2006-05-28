@@ -143,7 +143,7 @@ public class UpdateProgressDialog {
 		cancel.setText(I18N.translate("global.cancel"));
 		cancel.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e){
-				//TODO Leonard.. put here whatever is necessary to cancel all downloads
+				RCMain.getRCMain().getUpdater().abortUpdate();
 			}
 		});
 
