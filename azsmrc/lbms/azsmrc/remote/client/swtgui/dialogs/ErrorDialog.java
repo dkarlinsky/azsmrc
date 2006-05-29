@@ -1,5 +1,9 @@
 package lbms.azsmrc.remote.client.swtgui.dialogs;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+
 import lbms.azsmrc.remote.client.Utilities;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.ErrorReporter;
@@ -154,7 +158,7 @@ public class ErrorDialog {
 
 
 		Composite panel = new Composite(shell, SWT.NULL);
-		panel.setLayout(new GridLayout(3,false));
+		panel.setLayout(new GridLayout(4,false));
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		panel.setLayoutData(gridData);
 
@@ -195,6 +199,26 @@ public class ErrorDialog {
 					e.printStackTrace();
 				}
 			}
+		});
+		
+		final Button copyToClip = new Button(panel, SWT.PUSH);
+		copyToClip.setText(I18N.translate(PFX + "copyToClip_button.text"));
+		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		copyToClip.setLayoutData(gridData);
+		
+		copyToClip.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				try{
+					if(additionalInfoText != null)
+						er.setAdditionalInfo(additionalInfoText.getText());
+					final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();					
+					clipboard.setContents(new StringSelection(er.getFormattedReport()),null);
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+				
+			}
+			
 		});
 
 		final Button cancel = new Button(panel, SWT.PUSH);
