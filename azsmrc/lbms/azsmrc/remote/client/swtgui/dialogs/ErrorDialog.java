@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -68,6 +69,11 @@ public class ErrorDialog {
 						}
 					});
 				} else {
+					MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION | SWT.OK);
+					messageBox.setText(I18N.translate("global.error"));
+					messageBox.setMessage(I18N.translate(PFX + "errorbox.message"));
+					messageBox.open();
+					return;
 					//TODO omschaub make a popup and inform the user that it was not possible
 					//to report to the server and he should use the mail instead
 				}
