@@ -141,6 +141,10 @@ public class ErrorReporter {
 		}
 	}
 
+	public String getFormatedReport() {
+		return "System Info:\n"+systemInfo+"\n\nAdditional Info:\n"+additionalInfo+"\n\nStackTrace:\n"+errorLog;
+	}
+
 	/**
 	 * @return the additionalInfo
 	 */
