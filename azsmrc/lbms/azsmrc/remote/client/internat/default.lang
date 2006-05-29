@@ -18,6 +18,7 @@ dialog.connectiondialog.use_https.label=Use secure https protocol to connect to 
 dialog.connectiondialog.username.label=Username:
 dialog.errordialog.additionalInfoLabel.text=Please describe what happened to produce this error
 dialog.errordialog.detailsLabel.text=Error Details
+dialog.errordialog.email_button.text=Send By Email
 dialog.errordialog.errorbox.message=There was an error sending the report to the server, please try the send by email button.
 dialog.errordialog.errorlogLabel.text=Error Log
 dialog.errordialog.infoLabel.text=Please consider sending this information.  This helps us find the source of the problem and you will\nget an improved AzSMRC.\nNo information is sent besides that which is shown here.\nInformation sent to http://azsmrc.sourceforge.net\n\n
