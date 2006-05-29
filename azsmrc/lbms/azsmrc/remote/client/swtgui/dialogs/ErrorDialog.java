@@ -69,11 +69,15 @@ public class ErrorDialog {
 						}
 					});
 				} else {
-					MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION | SWT.OK);
-					messageBox.setText(I18N.translate("global.error"));
-					messageBox.setMessage(I18N.translate(PFX + "errorbox.message"));
-					messageBox.open();
-					return;
+					display.asyncExec(new Runnable() {
+						public void run() {
+							MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION | SWT.OK);
+							messageBox.setText(I18N.translate("global.error"));
+							messageBox.setMessage(I18N.translate(PFX + "errorbox.message"));
+							messageBox.open();
+							return;
+						}
+					});					
 				}
 			}
 		});
