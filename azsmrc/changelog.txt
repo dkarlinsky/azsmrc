@@ -1,26 +1,12 @@
-Changelog for Version: 0.9.5
+Changelog for Version: 0.9.6
 
 ***New Features***
 
-- Displays Remote Drive Size
-- Remote Azureus Config (will be extended)
-- uploaded torrents can now be deleted locally
-- More than one connection can now be saved
-- Remote Info with remote Azureus Version, as well as remote Plugin version
-- Experiemental Azureus remote update
-- Individual torrent speeds can now be set
-- You can enable showing the Server Url in title bar now
-- FastMode: this will make AzSMRC more responsive at the cost of more bandwidth
-- You can create a SSL Certificate on the server now via AzSMRC
-- You can now drop Torrents on AzSMRC
-
-***Changes***
-
-- The Tray Icon behaivior was changed to One-Click
-- Improved Clipboard monitor
+- Automatic ErrorReporter
+- Graphical Updater
 
 ***BugFixes***
 
-- Fixed the AutoUpdater
-- Fixed the timer not switching to tray mode when the main window was 'hidden' instead of disposed
+- fixed crash in Azureus Remote Configuration
+- fixed crash in AddByFile
 
