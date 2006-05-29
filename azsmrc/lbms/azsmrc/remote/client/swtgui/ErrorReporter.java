@@ -5,18 +5,22 @@ package lbms.azsmrc.remote.client.swtgui;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.CharBuffer;
+import java.net.URLEncoder;
+import java.util.List;
+import java.util.Vector;
 
 import lbms.azsmrc.remote.client.RemoteInfo;
+import lbms.azsmrc.shared.RemoteConstants;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.program.Program;
 
 /**
  * @author Damokles
@@ -26,11 +30,13 @@ public class ErrorReporter {
 
 	public final static String REPORT_URL = "http://azsmrc.sourceforge.net/reportError.php";
 
-	public String errorLog = "";
-	public String email = "";
-	public String additionalInfo = "";
-	public String systemInfo = "";
-	public boolean init;
+	private String errorLog = "";
+	private String email = "";
+	private String additionalInfo = "";
+	private String systemInfo = "";
+	private boolean init;
+
+	private List<ErrorReporterListener> listener = new Vector<ErrorReporterListener>();
 
 	public ErrorReporter () {
 		init();
@@ -84,31 +90,55 @@ public class ErrorReporter {
 	public void sendToServer () {
 		Thread t = new Thread (new Runnable() {
 			public void run() {
-				OutputStream os = null;
-				try {
-					URL url = new URL (REPORT_URL);
-					URLConnection conn = url.openConnection();
-					conn.setDoOutput(true);
-					os = conn.getOutputStream();
-					OutputStreamWriter osw = new OutputStreamWriter(os);
-					String send = "error_log="+errorLog+"&email="+email+"&additional_info="+additionalInfo+"&system_info="+systemInfo;
-					System.out.println("Error Report: "+send);
-					osw.write(send);
-					osw.close();
-					conn.connect();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				finally {
-					if (os!=null) {
-						try {os.close();} catch (IOException e) {}
+				boolean submitted = false;
+				for (int i=0;i<3;i++) {
+					OutputStream os = null;
+					InputStream is = null;
+					try {
+						URL url = new URL (REPORT_URL);
+						URLConnection conn = url.openConnection();
+						conn.setDoOutput(true);
+						conn.setDoInput(true);
+						os = conn.getOutputStream();
+						OutputStreamWriter osw = new OutputStreamWriter(os);
+						String send = "error_log="+errorLog+"&email="+email+"&additional_info="+additionalInfo+"&system_info="+systemInfo;
+						System.out.println("Error Report: "+send);
+						osw.write(send);
+						osw.close();
+						conn.connect();
+						is = conn.getInputStream();
+						if ("OK".equalsIgnoreCase(""+(char)is.read()+(char)is.read())) {
+							submitted = true;
+							break;
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
+					finally {
+						if (os!=null) {
+							try {os.close();} catch (IOException e) {}
+						}
+						if (is!=null) {
+							try {is.close();} catch (IOException e) {}
+						}
+					}
+				}
+				for (ErrorReporterListener l:listener) {
+					l.errorSubmitted(submitted);
 				}
 			}
 		});
 		t.setDaemon(true);
 		t.setPriority(Thread.MIN_PRIORITY);
 		t.start();
+	}
+
+	public void sendPerEMail () {
+		try {
+			Program.launch(("mailto:azsmrc-devs@list.sourceforge.net?subject=AzSMRC+ErrorReport&body="+URLEncoder.encode("System Info:\n"+systemInfo+"\n\nAdditional Info:\n"+additionalInfo+"\n\nStackTrace:\n"+errorLog,RemoteConstants.DEFAULT_ENCODING)).replace('+', ' '));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -151,5 +181,13 @@ public class ErrorReporter {
 	 */
 	public String getSystemInfo() {
 		return systemInfo;
+	}
+
+	public void addListener (ErrorReporterListener l) {
+		listener.add(l);
+	}
+
+	public void removeListener (ErrorReporterListener l) {
+		listener.remove(l);
 	}
 }

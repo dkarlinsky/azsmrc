@@ -3,6 +3,7 @@ package lbms.azsmrc.remote.client.swtgui.dialogs;
 import lbms.azsmrc.remote.client.Utilities;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.ErrorReporter;
+import lbms.azsmrc.remote.client.swtgui.ErrorReporterListener;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 
@@ -57,6 +58,21 @@ public class ErrorDialog {
 		if(!Utilities.isOSX){
 			shell.setImage(display.getSystemImage(SWT.ICON_ERROR));
 		}
+
+		er.addListener(new ErrorReporterListener() {
+			public void errorSubmitted(boolean submitted) {
+				if (submitted) {
+					display.asyncExec(new Runnable() {
+						public void run() {
+							shell.dispose();
+						}
+					});
+				} else {
+					//TODO omschaub make a popup and inform the user that it was not possible
+					//to report to the server and he should use the mail instead
+				}
+			}
+		});
 
 		GridLayout layout = new GridLayout(1,false);
 		shell.setLayout(layout);
@@ -135,7 +151,7 @@ public class ErrorDialog {
 		panel.setLayoutData(gridData);
 
 
-		Button ok = new Button(panel, SWT.PUSH);
+		final Button ok = new Button(panel, SWT.PUSH);
 		ok.setText(I18N.translate(I18N.translate(PFX + "send_button.text")));
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		ok.setLayoutData(gridData);
@@ -148,6 +164,24 @@ public class ErrorDialog {
 					if(additionalInfoText != null)
 						er.setAdditionalInfo(additionalInfoText.getText());
 					er.sendToServer();
+					ok.setEnabled(false);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+		final Button btnEmail = new Button(panel, SWT.PUSH);
+		btnEmail.setText(I18N.translate(I18N.translate(PFX + "email_button.text")));
+		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		btnEmail.setLayoutData(gridData);
+
+		btnEmail.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event event) {
+				try {
+					if(additionalInfoText != null)
+						er.setAdditionalInfo(additionalInfoText.getText());
+					er.sendPerEMail();
 					shell.dispose();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -155,11 +189,10 @@ public class ErrorDialog {
 			}
 		});
 
-		Button cancel = new Button(panel, SWT.PUSH);
+		final Button cancel = new Button(panel, SWT.PUSH);
 		cancel.setText(I18N.translate("global.close"));
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		gridData.grabExcessHorizontalSpace = true;
-		gridData.horizontalSpan = 2;
 		cancel.setLayoutData(gridData);
 		cancel.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event event) {
