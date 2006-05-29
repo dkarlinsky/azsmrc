@@ -74,8 +74,6 @@ public class ErrorDialog {
 					messageBox.setMessage(I18N.translate(PFX + "errorbox.message"));
 					messageBox.open();
 					return;
-					//TODO omschaub make a popup and inform the user that it was not possible
-					//to report to the server and he should use the mail instead
 				}
 			}
 		});
