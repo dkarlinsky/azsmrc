@@ -8,7 +8,6 @@
       <Feature>Graphical Updater</Feature>
     </Changelog>
     <Files>
-      <File name="AzSMRC_0.9.6.jar" version="0.9.6" url="http://prdownloads.sourceforge.net/azsmrc/AzSMRC_0.9.5.jar" hash="45cc5fecfd2bb8ad55477414363b1a32199cfd" type="2" size="1555577" />
       <File name="clientLibraries.zip" version="1.0" url="http://prdownloads.sourceforge.net/azsmrc/clientLibraries.zip" hash="cffac64429174b5adc11f775a34974ceb5b7c96e" isArchive="true" type="2" size="194216">
         <File name="jdom_1.0.jar" version="1.0" hash="a2ac1cd690ab4c80defe7f9bce14d35934c35cec" isInArchive="true" type="0" size="153253" />
         <File name="launch.properties" version="0" hash="b481ffdefe4a9297c185ef4804d22424a1fdf49" isInArchive="true" type="0" size="52" />
@@ -16,6 +15,7 @@
         <File name="commons-codec_1.3.jar" version="1.3" hash="fd32786786e2adb664d5ecc965da47629dca14ba" isInArchive="true" type="0" size="46725" />
       </File>
       <File name="Readme.txt" version="0.9.6" hash="524ed92d124d3888ae261adbfbb737bf7bce4725" type="1" size="5471" />
+      <File name="AzSMRC_0.9.6.jar" version="0.9.6" url="http://prdownloads.sourceforge.net/azsmrc/AzSMRC_0.9.6.jar" hash="afd717fbd3ff67d91c16c32d12be7742fbcf6" type="2" size="1556806" />
     </Files>
   </Update>
 </Updates>
