@@ -728,6 +728,7 @@ public class MainWindow {
 						try{
 							saveTrans = false;
 							I18NTools.writeToFile(currentI18NDefaultFile, defaultMap);
+							isSaved = true;
 						} catch (IOException e1) {
 							MessageBox mb4 = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
 							mb4.setText("Save Error");
@@ -745,6 +746,7 @@ public class MainWindow {
 							try{
 								saveTrans = false;
 								I18NTools.writeToFile(currentI18NDefaultFile, defaultMap);
+								isSaved = true;
 							} catch (IOException e1) {
 								MessageBox mb4 = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
 								mb4.setText("Save Error");
