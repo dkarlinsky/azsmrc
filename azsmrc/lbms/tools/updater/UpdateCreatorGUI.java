@@ -184,8 +184,44 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
         try {
             {
                 {
-                    jTabbedPane1 = new JTabbedPane();
-                    getContentPane().add(jTabbedPane1, BorderLayout.CENTER);
+                    JPanel JpanelMain = new JPanel();
+                    getContentPane().add(JpanelMain, BorderLayout.CENTER);
+                    JpanelMain.setPreferredSize(new java.awt.Dimension(805, 500));
+                    JpanelMain.setSize(805, 450);
+					//START >>  updateCombo
+					updateComboModel = new DefaultComboBoxModel();
+					updateComboModel.addElement("Not Selected Yet");
+
+					updateCombo = new JComboBox();
+					JpanelMain.add(updateCombo);
+					updateCombo.setModel(updateComboModel);
+					updateCombo.addItemListener(new ItemListener() {
+						public void itemStateChanged(ItemEvent arg0) {
+							if (updateComboModel.getSize() <= 1)
+								return;
+							Version tempVer = (Version) updateComboModel
+								.getSelectedItem();
+							if (tempVer == null)
+								return;
+							Iterator it = updateCreator.getUpdateList()
+								.getUpdateSet().iterator();
+							while (it.hasNext()) {
+								Update nextUpdate = (Update) it.next();
+								if (nextUpdate.getVersion().compareTo(tempVer) == 0) {
+									updateCreator.setCurrentUpdate(nextUpdate);
+									update = nextUpdate;
+									loadUpdate(update);
+									return;
+								}
+							}
+						}
+					});
+					//END <<  updateCombo
+
+
+                	jTabbedPane1 = new JTabbedPane();
+                	JpanelMain.add(jTabbedPane1);
+                    //getContentPane().add(jTabbedPane1, BorderLayout.CENTER);
                     jTabbedPane1.setPreferredSize(new java.awt.Dimension(805, 424));
                     jTabbedPane1.setSize(805, 450);
 
@@ -610,32 +646,6 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 
 
                     }
-                    //START >>  updateCombo
-                    updateComboModel = new DefaultComboBoxModel();
-                    updateComboModel.addElement("Not Selected Yet");
-
-                    updateCombo = new JComboBox();
-                    jPanel2.add(updateCombo, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
-                    updateCombo.setModel(updateComboModel);
-                    updateCombo.addItemListener(new ItemListener() {
-                        public void itemStateChanged(ItemEvent arg0) {
-                            if(updateComboModel.getSize() <=1) return;
-                            Version tempVer = (Version) updateComboModel.getSelectedItem();
-                            if(tempVer == null) return;
-                            Iterator it = updateCreator.getUpdateList().getUpdateSet().iterator();
-                            while(it.hasNext()){
-                                Update nextUpdate = (Update) it.next();
-                                if(nextUpdate.getVersion().compareTo(tempVer) == 0){
-                                    updateCreator.setCurrentUpdate(nextUpdate);
-                                    update = nextUpdate;
-                                    loadUpdate(update);
-                                    return;
-                                }
-                            }
-                        }
-                    });
-                    //END <<  updateCombo
-
 
                     //START >>  addUpdate
                     addUpdate = new JButton();
@@ -689,7 +699,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
 
                     jTabbedPane1.addTab("Files", null, jPanel1, null);
                     jPanel1.setLayout(jPanel1Layout);
-                    jPanel1.setPreferredSize(new java.awt.Dimension(644, 415));
+                    jPanel1.setPreferredSize(new java.awt.Dimension(800, 452));
                     {
                         detailsPanel = new JPanel();
                         GridBagLayout detailsPanelLayout = new GridBagLayout();
@@ -1468,7 +1478,7 @@ public class UpdateCreatorGUI extends javax.swing.JFrame {
             //Turn off everything!
             setEnabledAll(false);
 
-            this.setSize(813, 475);
+            this.setSize(813, 496);
             {
                 jMenuBar1 = new JMenuBar();
                 setJMenuBar(jMenuBar1);
