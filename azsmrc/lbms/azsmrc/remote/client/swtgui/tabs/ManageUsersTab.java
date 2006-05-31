@@ -35,6 +35,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -58,7 +59,7 @@ public class ManageUsersTab {
 	//I18N prefix
 	public static final String PFX = "tab.manageuserstab.";
 
-	public ManageUsersTab(CTabFolder parentTab){
+	private ManageUsersTab(CTabFolder parentTab){
 		final CTabItem detailsTab = new CTabItem(parentTab, SWT.CLOSE);
 		detailsTab.setText(I18N.translate(PFX + "tab.text"));
 
@@ -1181,5 +1182,23 @@ public class ManageUsersTab {
 	}
 
 
+	public static void open(final CTabFolder parentTab){
+		Display display = RCMain.getRCMain().getDisplay();
+		if(display == null) return;
+		display.asyncExec(new Runnable(){
+			public void run() {
+				CTabItem[] tabs = parentTab.getItems();
+				for(CTabItem tab:tabs){
+					if(tab.getText().equalsIgnoreCase(I18N.translate(PFX + "tab.text"))){
+						parentTab.setSelection(tab);
+						return;
+					}
+				}
+				new ManageUsersTab(parentTab);
+
+			}
+
+		});
+	}
 
 }//EOF

@@ -855,15 +855,7 @@ public class DownloadManagerShell {
 		manage_users.setToolTipText("Manage Users");
 		manage_users.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
-
-				CTabItem[] tabs = tabFolder.getItems();
-				for(CTabItem tab:tabs){
-					if(tab.getText().equalsIgnoreCase("Manage Users")){
-						tabFolder.setSelection(tab);
-						return;
-					}
-				}
-				new ManageUsersTab(tabFolder);
+				ManageUsersTab.open(tabFolder);
 			}
 		});
 
