@@ -10,6 +10,7 @@ import java.util.Map;
 
 import lbms.azsmrc.remote.client.Constants;
 import lbms.azsmrc.remote.client.events.ClientUpdateListener;
+import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.remote.client.util.TimerEvent;
@@ -48,11 +49,13 @@ public class ServerDetailsTab {
 	private Composite parent;
 
 
+	//I18N prefix
+	public static final String PFX = "tab.serverdetailstab.";
 
 	public ServerDetailsTab(CTabFolder parentTab){
 
 		final CTabItem detailsTab = new CTabItem(parentTab, SWT.CLOSE);
-		detailsTab.setText("Server Details");
+		detailsTab.setText(I18N.translate(PFX + "tab.text"));
 
 
 		parent = new Composite(parentTab, SWT.NONE);
@@ -64,7 +67,7 @@ public class ServerDetailsTab {
 		parent.setLayoutData(gridData);
 
 		details1 = new Group(parent,SWT.NULL);
-		details1.setText("Server Details");
+		details1.setText(I18N.translate(PFX + "details1.group.text"));
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = 2;
 		gridLayout.horizontalSpacing = 30;
@@ -74,14 +77,14 @@ public class ServerDetailsTab {
 
 		//Server Name
 		Label nameL = new Label(details1, SWT.NULL);
-		nameL.setText("Server Name:");
+		nameL.setText(I18N.translate(PFX + "details1.servername.text"));
 
 		Label name = new Label(details1,SWT.NULL);
 		name.setText(RCMain.getRCMain().getClient().getServer().getHost().toString());
 
 		//port
 		Label portL = new Label(details1,SWT.NULL);
-		portL.setText("Port:");
+		portL.setText(I18N.translate(PFX + "details1.port.text"));
 
 		Label port = new Label(details1, SWT.NULL);
 		port.setText(String.valueOf(RCMain.getRCMain().getClient().getServer().getPort()));
@@ -89,7 +92,7 @@ public class ServerDetailsTab {
 
 		//Protocol
 		Label protocolL = new Label(details1,SWT.NULL);
-		protocolL.setText("Protocol:");
+		protocolL.setText(I18N.translate(PFX + "details1.protocol.text"));
 
 		Label protocol = new Label(details1,SWT.NULL);
 		protocol.setText(RCMain.getRCMain().getClient().getServer().getProtocol());
@@ -97,21 +100,21 @@ public class ServerDetailsTab {
 
 		//Connected User
 		Label userL = new Label(details1,SWT.NULL);
-		userL.setText("Connected as:");
+		userL.setText(I18N.translate(PFX + "details1.user.text"));
 
 		Label user = new Label(details1, SWT.NULL);
 		user.setText(RCMain.getRCMain().getClient().getUsername());
 
 		//Azureus Version
 		Label azVerL = new Label(details1, SWT.NULL);
-		azVerL.setText("Azureus Version:");
+		azVerL.setText(I18N.translate(PFX + "details1.azureus_version.text"));
 
 		azVer = new Label(details1,SWT.NULL);
 		azVer.setText(RCMain.getRCMain().getClient().getRemoteInfo().getAzureusVersion());
 
 		//Plugin Version
 		Label plVerL = new Label(details1, SWT.NULL);
-		plVerL.setText("AzSMRC Plugin Version:");
+		plVerL.setText(I18N.translate(PFX + "details1.azsmrc_plugin_version.text"));
 
 		plVer = new Label(details1, SWT.NULL);
 		plVer.setText(RCMain.getRCMain().getClient().getRemoteInfo().getPluginVersion());
@@ -120,7 +123,7 @@ public class ServerDetailsTab {
 
 
 		details2 = new Group(parent,SWT.NULL);
-		details2.setText("Connection Details");
+		details2.setText(I18N.translate(PFX + "details2.group.text"));
 		gridLayout = new GridLayout();
 		gridLayout.numColumns = 2;
 		gridLayout.horizontalSpacing = 30;
@@ -132,21 +135,21 @@ public class ServerDetailsTab {
 
 		//Total download
 		Label totalDownL = new Label(details2,SWT.NULL);
-		totalDownL.setText("Total Received:");
+		totalDownL.setText(I18N.translate(PFX + "details2.total_received.text"));
 
 		totalDown = new Label(details2, SWT.NULL);
 		totalDown.setText(DisplayFormatters.formatByteCountToBase10KBEtc(StatsStreamGlobalManager.getTotalDownload()));
 
 		//Total upload
 		Label totalUpL = new Label(details2,SWT.NULL);
-		totalUpL.setText("Total Sent:");
+		totalUpL.setText(I18N.translate(PFX + "details2.total_sent.text"));
 
 		totalUp = new Label(details2, SWT.NULL);
 		totalUp.setText(DisplayFormatters.formatByteCountToBase10KBEtc(StatsStreamGlobalManager.getTotalUpload()));
 
 		//-------Details 3
 		details3 = new Group(parent,SWT.NULL);
-		details3.setText("Server Drive Information");
+		details3.setText(I18N.translate(PFX + "details3.group.text"));
 		gridLayout = new GridLayout();
 		gridLayout.numColumns = 3;
 		gridLayout.horizontalSpacing = 30;
@@ -159,26 +162,26 @@ public class ServerDetailsTab {
 
 		//save.dir is the default save dir
 		Label saveDirL = new Label(details3,SWT.NULL);
-		saveDirL.setText("Default Save Directory:");
+		saveDirL.setText(I18N.translate(PFX + "details3.default_save_dir.text"));
 
 		saveDir = new Label(details3,SWT.NULL);
-		saveDir.setText("Not Received Yet");
+		saveDir.setText(I18N.translate(PFX + "not_received_yet.text"));
 
 		saveDirSize = new Label(details3, SWT.NULL);
-		saveDirSize.setText("Not Received Yet");
+		saveDirSize.setText(I18N.translate(PFX + "not_received_yet.text"));
 
 		//destination.dir is the user dir
 		Label destDirL = new Label(details3,SWT.NULL);
-		destDirL.setText("User Directory:");
+		destDirL.setText(I18N.translate(PFX + "details3.user_dir.text"));
 
 		destDir = new Label(details3,SWT.NULL);
-		destDir.setText("Not Received Yet");
+		destDir.setText(I18N.translate(PFX + "not_received_yet.text"));
 
 		destDirSize = new Label(details3, SWT.NULL);
-		destDirSize.setText("Not Received Yet");
+		destDirSize.setText(I18N.translate(PFX + "not_received_yet.text"));
 
 		Button updateDriveInfo = new Button(details3,SWT.PUSH);
-		updateDriveInfo.setText("Update Drive Information");
+		updateDriveInfo.setText(I18N.translate(PFX + "details3.updateDriveInfo_button.text"));
 		updateDriveInfo.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
 				RCMain.getRCMain().getClient().getRemoteInfo().refreshDriveInfo();
@@ -192,13 +195,13 @@ public class ServerDetailsTab {
 		//Button to restart server
 
 		Button restartB = new Button(parent, SWT.PUSH);
-		restartB.setText("Restart Server");
+		restartB.setText(I18N.translate(PFX + "restartServer_button.text"));
 		restartB.addListener(SWT.Selection, new Listener(){
 
 			public void handleEvent(Event arg0) {
 				MessageBox messageBox = new MessageBox(RCMain.getRCMain().getDisplay().getActiveShell(), SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
-				messageBox.setText("Restart Azureus");
-				messageBox.setMessage("Are you sure?");
+				messageBox.setText(I18N.translate(PFX + "restartServer_button.messageBox.title"));
+				messageBox.setMessage(I18N.translate(PFX + "restartServer_button.messageBox.message"));
 				int response = messageBox.open();
 				switch (response){
 				case SWT.OK:
@@ -267,12 +270,12 @@ public class ServerDetailsTab {
 
 								if(driveMap.containsKey("save.dir") && driveMap.containsKey("save.dir.path")){
 									saveDir.setText(driveMap.get("save.dir.path"));
-									saveDirSize.setText(DisplayFormatters.formatKBCountToBase10KBEtc(Long.parseLong(driveMap.get("save.dir"))) + " Free");
+									saveDirSize.setText(DisplayFormatters.formatKBCountToBase10KBEtc(Long.parseLong(driveMap.get("save.dir"))) + " " + I18N.translate(PFX + "details3.free.text"));
 								}
 
 								if(driveMap.containsKey("destination.dir") && driveMap.containsKey("destination.dir.path")){
 									destDir.setText(driveMap.get("destination.dir.path"));
-									destDirSize.setText(DisplayFormatters.formatKBCountToBase10KBEtc(Long.parseLong(driveMap.get("destination.dir"))) + " Free");
+									destDirSize.setText(DisplayFormatters.formatKBCountToBase10KBEtc(Long.parseLong(driveMap.get("destination.dir"))) + " " + I18N.translate(PFX + "details3.free.text"));
 								}
 
 								//redraw the group
