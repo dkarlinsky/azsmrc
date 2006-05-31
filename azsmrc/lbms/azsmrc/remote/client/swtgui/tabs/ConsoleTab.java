@@ -855,15 +855,18 @@ public class ConsoleTab {
 	}
 
 
-	public static void open(final CTabFolder parentTab){
+	public static void open(final CTabFolder parentTab, final boolean bIsFocused){
 		Display display = RCMain.getRCMain().getDisplay();
 		if(display == null) return;
-		display.asyncExec(new Runnable(){
+		display.syncExec(new Runnable(){
 			public void run() {
 				CTabItem[] tabs = parentTab.getItems();
 				for(CTabItem tab:tabs){
 					if(tab.getText().equalsIgnoreCase(I18N.translate(PFX + "tab.text"))){
-						parentTab.setSelection(tab);
+						if(bIsFocused)
+							parentTab.setSelection(tab);
+						else
+							parentTab.setSelection(tabs[0]);
 						return;
 					}
 				}

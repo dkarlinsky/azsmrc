@@ -409,7 +409,7 @@ public class DownloadManagerShell {
 		menuConsole.setAccelerator(SWT.CTRL + 'C');
 		menuConsole.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e){
-				ConsoleTab.open(tabFolder);
+				ConsoleTab.open(tabFolder, true);
 			}
 		});
 
@@ -859,7 +859,7 @@ public class DownloadManagerShell {
 		console.setToolTipText("Open Console");
 		console.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e){
-				ConsoleTab.open(tabFolder);
+				ConsoleTab.open(tabFolder, true);
 			}
 		});
 
@@ -1683,7 +1683,7 @@ public class DownloadManagerShell {
 
 		//check to see if the console is auto open and open it up if it is
 		if(Boolean.parseBoolean(properties.getProperty("auto_console", "false")))
-			ConsoleTab.open(tabFolder);
+			ConsoleTab.open(tabFolder, false);
 
 
 		tabFolder.setSelection(myTorrents);
