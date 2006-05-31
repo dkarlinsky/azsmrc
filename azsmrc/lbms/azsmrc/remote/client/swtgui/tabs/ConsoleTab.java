@@ -866,7 +866,10 @@ public class ConsoleTab {
 						if(bIsFocused)
 							parentTab.setSelection(tab);
 						else
-							parentTab.setSelection(tabs[0]);
+							if(tabs.length > 0)
+								parentTab.setSelection(tabs[0]);
+							else
+								parentTab.setSelection(tab);
 						return;
 					}
 				}
