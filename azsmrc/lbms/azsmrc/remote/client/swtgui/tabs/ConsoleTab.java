@@ -121,7 +121,7 @@ public class ConsoleTab {
 	};
 
 
-	public ConsoleTab(CTabFolder parentTab){
+	private ConsoleTab(CTabFolder parentTab){
 		final CTabItem detailsTab = new CTabItem(parentTab, SWT.CLOSE);
 		detailsTab.setText(I18N.translate(PFX + "tab.text"));
 		normalLogger = RCMain.getRCMain().getNormalLogger();
@@ -133,8 +133,8 @@ public class ConsoleTab {
 		bShowNormal = Boolean.parseBoolean(props.getProperty("logger.normal.show", "true"));
 		normalLevel = Level.parse(props.getProperty("logger.normal.level", "FINE"));
 		debugLevel = Level.parse(props.getProperty("logger.debug.level", "FINE"));
-        PREFERRED_LINES = Integer.parseInt(props.getProperty("console_lines","250"));
-        MAX_LINES = 512 + PREFERRED_LINES;
+		PREFERRED_LINES = Integer.parseInt(props.getProperty("console_lines","250"));
+		MAX_LINES = 512 + PREFERRED_LINES;
 
 		if (bShowNormal)	normalLogger.addHandler(normalConsoleHandler);
 		if (bShowDebug) 	debugLogger.addHandler(debugConsoleHandler);
@@ -192,7 +192,7 @@ public class ConsoleTab {
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
 		layout.verticalSpacing = 1;
-        layout.numColumns = 2;
+		layout.numColumns = 2;
 		cLeft.setLayout(layout);
 		gd = new GridData(SWT.TOP, SWT.LEAD, false, false);
 		cLeft.setLayoutData(gd);
@@ -200,7 +200,7 @@ public class ConsoleTab {
 		Button buttonPause = new Button(cLeft, SWT.CHECK);
 		buttonPause.setText(I18N.translate(PFX + "buttonPause.text"));
 		gd = new GridData();
-        gd.horizontalSpan = 2;
+		gd.horizontalSpan = 2;
 		buttonPause.setLayoutData(gd);
 		buttonPause.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -209,21 +209,21 @@ public class ConsoleTab {
 				Button btn = (Button) e.widget;
 				bPaused = btn.getSelection();
 				if (bPaused) {
-                    try{
-                        normalLogger.removeHandler(normalConsoleHandler);
-                        debugLogger.removeHandler(debugConsoleHandler);
-                    }catch (Exception notToUse){}
+					try{
+						normalLogger.removeHandler(normalConsoleHandler);
+						debugLogger.removeHandler(debugConsoleHandler);
+					}catch (Exception notToUse){}
 				}else{
-                    if (bShowNormal)    normalLogger.addHandler(normalConsoleHandler);
-                    if (bShowDebug)     debugLogger.addHandler(debugConsoleHandler);
-                }
+					if (bShowNormal)    normalLogger.addHandler(normalConsoleHandler);
+					if (bShowDebug)     debugLogger.addHandler(debugConsoleHandler);
+				}
 			}
 		});
 
 		buttonAutoScroll = new Button(cLeft, SWT.CHECK);
 		buttonAutoScroll.setText(I18N.translate(PFX + "buttonAutoScroll.text"));
 		gd = new GridData();
-        gd.horizontalSpan = 2;
+		gd.horizontalSpan = 2;
 		buttonAutoScroll.setLayoutData(gd);
 		buttonAutoScroll.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -236,46 +236,46 @@ public class ConsoleTab {
 		buttonAutoScroll.setSelection(true);
 
 
-        //preferred lines in history of console
-        Composite cLines = new Composite(cLeft,SWT.NULL);
-        gridLayout = new GridLayout();
-        gridLayout.numColumns = 2;
-        gridLayout.marginHeight = 0;
-        gridLayout.marginWidth = 0;
-        cLines.setLayout(gridLayout);
-        gd = new GridData();
-        gd.horizontalSpan = 2;
-        cLines.setLayoutData(gd);
+		//preferred lines in history of console
+		Composite cLines = new Composite(cLeft,SWT.NULL);
+		gridLayout = new GridLayout();
+		gridLayout.numColumns = 2;
+		gridLayout.marginHeight = 0;
+		gridLayout.marginWidth = 0;
+		cLines.setLayout(gridLayout);
+		gd = new GridData();
+		gd.horizontalSpan = 2;
+		cLines.setLayoutData(gd);
 
 
-        Label Lhistory = new Label(cLines,SWT.NULL);
-        Lhistory.setText(I18N.translate(PFX + "labelHistory.text"));
+		Label Lhistory = new Label(cLines,SWT.NULL);
+		Lhistory.setText(I18N.translate(PFX + "labelHistory.text"));
 
-        final Spinner spin = new Spinner(cLines,SWT.BORDER);
-        spin.setMaximum(10000);
-        spin.setMinimum(250);
-        spin.setIncrement(10);
-        spin.setPageIncrement(100);
-        spin.setSelection(PREFERRED_LINES);
-        spin.addModifyListener(new ModifyListener(){
-            public void modifyText(ModifyEvent arg0) {
-                int size = spin.getSelection();
-                if(size > 10000)
-                    size = 10000;
-                else if(size < 250)
-                    size = 250;
+		final Spinner spin = new Spinner(cLines,SWT.BORDER);
+		spin.setMaximum(10000);
+		spin.setMinimum(250);
+		spin.setIncrement(10);
+		spin.setPageIncrement(100);
+		spin.setSelection(PREFERRED_LINES);
+		spin.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent arg0) {
+				int size = spin.getSelection();
+				if(size > 10000)
+					size = 10000;
+				else if(size < 250)
+					size = 250;
 
-                props.setProperty("console_lines", String.valueOf(size));
-                RCMain.getRCMain().saveConfig();
+				props.setProperty("console_lines", String.valueOf(size));
+				RCMain.getRCMain().saveConfig();
 
-                PREFERRED_LINES = size;
-                MAX_LINES = 512 + PREFERRED_LINES;
-            }
-        });
+				PREFERRED_LINES = size;
+				MAX_LINES = 512 + PREFERRED_LINES;
+			}
+		});
 
 
 
-        //Button clear
+		//Button clear
 		Button buttonClear = new Button(cLeft, SWT.PUSH);
 		buttonClear.setText(I18N.translate("global.clear"));
 		gd = new GridData();
@@ -286,120 +286,120 @@ public class ConsoleTab {
 			}
 		});
 
-        Button writeToFile = new Button(cLeft, SWT.PUSH);
-        writeToFile.setText(I18N.translate(PFX + "writeToFile_button.text"));
-        gd = new GridData();
-        writeToFile.setLayoutData(gd);
-        writeToFile.addListener(SWT.Selection, new Listener() {
-            public void handleEvent (Event e){
-                try{
-                    if(consoleText.getCharCount() == 0){
-                        MessageBox messageBox = new MessageBox(cLeft.getShell(), SWT.ICON_ERROR | SWT.OK);
-                        messageBox.setText(I18N.translate(PFX + "writeToFile.messagebox.title"));
-                        messageBox.setMessage(I18N.translate(PFX + "writeToFile.messagebox.message"));
-                        messageBox.open();
-                        return;
-                    }
+		Button writeToFile = new Button(cLeft, SWT.PUSH);
+		writeToFile.setText(I18N.translate(PFX + "writeToFile_button.text"));
+		gd = new GridData();
+		writeToFile.setLayoutData(gd);
+		writeToFile.addListener(SWT.Selection, new Listener() {
+			public void handleEvent (Event e){
+				try{
+					if(consoleText.getCharCount() == 0){
+						MessageBox messageBox = new MessageBox(cLeft.getShell(), SWT.ICON_ERROR | SWT.OK);
+						messageBox.setText(I18N.translate(PFX + "writeToFile.messagebox.title"));
+						messageBox.setMessage(I18N.translate(PFX + "writeToFile.messagebox.message"));
+						messageBox.open();
+						return;
+					}
 
-                    FileDialog fileDialog = new FileDialog(cLeft.getShell(), SWT.SAVE);
-                    fileDialog.setText(I18N.translate(PFX + "writeToFile.filedialog.title"));
-                    String[] filterExtensions = {"*.txt","*.log","*.*"};
-                    fileDialog.setFilterExtensions(filterExtensions);
-                    if(defaultPath != null)
-                        fileDialog.setFilterPath(defaultPath);
-                    String selectedFile = fileDialog.open();
-                    if(selectedFile != null){
-                        final File fileToSave = new File(selectedFile);
+					FileDialog fileDialog = new FileDialog(cLeft.getShell(), SWT.SAVE);
+					fileDialog.setText(I18N.translate(PFX + "writeToFile.filedialog.title"));
+					String[] filterExtensions = {"*.txt","*.log","*.*"};
+					fileDialog.setFilterExtensions(filterExtensions);
+					if(defaultPath != null)
+						fileDialog.setFilterPath(defaultPath);
+					String selectedFile = fileDialog.open();
+					if(selectedFile != null){
+						final File fileToSave = new File(selectedFile);
 
-                        defaultPath = fileToSave.getParent();
-                        if(fileToSave.exists()){
-                            if(!fileToSave.canWrite()){
-                                MessageBox messageBox = new MessageBox(cLeft.getShell(), SWT.ICON_ERROR | SWT.OK);
-                                messageBox.setText(I18N.translate("global.error"));
-                                messageBox.setMessage(I18N.translate(PFX + "writeToFile.error.text"));
-                                messageBox.open();
-                                return;
-                            }
+						defaultPath = fileToSave.getParent();
+						if(fileToSave.exists()){
+							if(!fileToSave.canWrite()){
+								MessageBox messageBox = new MessageBox(cLeft.getShell(), SWT.ICON_ERROR | SWT.OK);
+								messageBox.setText(I18N.translate("global.error"));
+								messageBox.setMessage(I18N.translate(PFX + "writeToFile.error.text"));
+								messageBox.open();
+								return;
+							}
 
-                            final Shell shell = new Shell(SWT.DIALOG_TRIM);
-                            shell.setLayout(new GridLayout(3,false));
-                            shell.setText(I18N.translate(PFX + "writeToFile.filedialog.duplicatemessage.title"));
-                            Label message = new Label(shell,SWT.NULL);
-                            message.setText(I18N.translate(PFX + "writeToFile.filedialog.duplicatemessage.message"));
-                            GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
-                            gridData.horizontalSpan = 3;
-                            message.setLayoutData(gridData);
+							final Shell shell = new Shell(SWT.DIALOG_TRIM);
+							shell.setLayout(new GridLayout(3,false));
+							shell.setText(I18N.translate(PFX + "writeToFile.filedialog.duplicatemessage.title"));
+							Label message = new Label(shell,SWT.NULL);
+							message.setText(I18N.translate(PFX + "writeToFile.filedialog.duplicatemessage.message"));
+							GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+							gridData.horizontalSpan = 3;
+							message.setLayoutData(gridData);
 
-                            Button overwrite = new Button(shell,SWT.PUSH);
-                            overwrite.setText(I18N.translate(PFX + "writeToFile.filedialog.duplicatemessage.button.overwrite"));
-                            overwrite.addListener(SWT.Selection, new Listener(){
-                                public void handleEvent(Event e)
-                                {
-                                    shell.close();
-                                    shell.dispose();
-                                    writeToLog(consoleText,fileToSave,false);
-                                }
-                            });
+							Button overwrite = new Button(shell,SWT.PUSH);
+							overwrite.setText(I18N.translate(PFX + "writeToFile.filedialog.duplicatemessage.button.overwrite"));
+							overwrite.addListener(SWT.Selection, new Listener(){
+								public void handleEvent(Event e)
+								{
+									shell.close();
+									shell.dispose();
+									writeToLog(consoleText,fileToSave,false);
+								}
+							});
 
-                            gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
-                            overwrite.setLayoutData(gridData);
-
-
-                            Button append = new Button(shell,SWT.PUSH);
-                            append.setText(I18N.translate(PFX + "writeToFile.filedialog.duplicatemessage.button.append"));
-                            append.addListener(SWT.Selection, new Listener(){
-                                public void handleEvent(Event e)
-                                {
-                                    shell.close();
-                                    shell.dispose();
-                                    writeToLog(consoleText,fileToSave,true);
-                                }
-                            });
-
-                            Button cancel = new Button(shell,SWT.PUSH);
-                            cancel.setText(I18N.translate("global.cancel"));
-                            cancel.addListener(SWT.Selection, new Listener(){
-                                public void handleEvent(Event e)
-                                {
-                                    shell.close();
-                                    shell.dispose();
-                                }
-                            });
-
-                            gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
-                            cancel.setLayoutData(gridData);
-                            overwrite.addKeyListener(new KeyListener() {
-                                public void keyPressed(KeyEvent e) {
-                                }
-                                public void keyReleased (KeyEvent e) {
-                                    if (e.character == SWT.ESC){
-                                        shell.close();
-                                        shell.dispose();
-                                    }
-
-                                }
-                            });
+							gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
+							overwrite.setLayoutData(gridData);
 
 
-                            GUI_Utilities.centerShellandOpen(shell);
-                        }else{
-                            fileToSave.createNewFile();
-                            writeToLog(consoleText,fileToSave,true);
-                        }
+							Button append = new Button(shell,SWT.PUSH);
+							append.setText(I18N.translate(PFX + "writeToFile.filedialog.duplicatemessage.button.append"));
+							append.addListener(SWT.Selection, new Listener(){
+								public void handleEvent(Event e)
+								{
+									shell.close();
+									shell.dispose();
+									writeToLog(consoleText,fileToSave,true);
+								}
+							});
+
+							Button cancel = new Button(shell,SWT.PUSH);
+							cancel.setText(I18N.translate("global.cancel"));
+							cancel.addListener(SWT.Selection, new Listener(){
+								public void handleEvent(Event e)
+								{
+									shell.close();
+									shell.dispose();
+								}
+							});
+
+							gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
+							cancel.setLayoutData(gridData);
+							overwrite.addKeyListener(new KeyListener() {
+								public void keyPressed(KeyEvent e) {
+								}
+								public void keyReleased (KeyEvent e) {
+									if (e.character == SWT.ESC){
+										shell.close();
+										shell.dispose();
+									}
+
+								}
+							});
 
 
-                    }
+							GUI_Utilities.centerShellandOpen(shell);
+						}else{
+							fileToSave.createNewFile();
+							writeToLog(consoleText,fileToSave,true);
+						}
 
 
-                }catch (Exception f){
-                    f.printStackTrace();
-                    MessageBox messageBox = new MessageBox(cLeft.getShell(), SWT.ICON_ERROR | SWT.OK);
-                    messageBox.setText(I18N.translate("global.error"));
-                    messageBox.setMessage(I18N.translate(PFX + "writeToFile.filedialog.duplicatemessage.message"));
-                    messageBox.open();
-                }
-            }
-        });
+					}
+
+
+				}catch (Exception f){
+					f.printStackTrace();
+					MessageBox messageBox = new MessageBox(cLeft.getShell(), SWT.ICON_ERROR | SWT.OK);
+					messageBox.setText(I18N.translate("global.error"));
+					messageBox.setMessage(I18N.translate(PFX + "writeToFile.filedialog.duplicatemessage.message"));
+					messageBox.open();
+				}
+			}
+		});
 
 
 
@@ -425,8 +425,8 @@ public class ConsoleTab {
 					return;
 				Button btn = (Button) e.widget;
 				bShowDebug = btn.getSelection();
-                props.setProperty("logger.debug.show", bShowDebug ? "true" : "false");
-                RCMain.getRCMain().saveConfig();
+				props.setProperty("logger.debug.show", bShowDebug ? "true" : "false");
+				RCMain.getRCMain().saveConfig();
 			}
 		});
 		buttonShowDebug.setSelection(bShowDebug);
@@ -441,8 +441,8 @@ public class ConsoleTab {
 					return;
 				Button btn = (Button) e.widget;
 				bShowNormal = btn.getSelection();
-                props.setProperty("logger.normal.show", bShowNormal ? "true" : "false");
-                RCMain.getRCMain().saveConfig();
+				props.setProperty("logger.normal.show", bShowNormal ? "true" : "false");
+				RCMain.getRCMain().saveConfig();
 			}
 		});
 		buttonShowNormal.setSelection(bShowNormal);
@@ -460,141 +460,141 @@ public class ConsoleTab {
 		cEnd.setText(I18N.translate(PFX + "cEnd.group.text"));
 
 		Label debuglabel = new Label(cEnd,SWT.NULL);
-        debuglabel.setText(I18N.translate(PFX + "cEnd.debuglabel.text"));
-        gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.horizontalSpan = 2;
-        debuglabel.setLayoutData(gd);
+		debuglabel.setText(I18N.translate(PFX + "cEnd.debuglabel.text"));
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
+		debuglabel.setLayoutData(gd);
 
 
-        final Combo debugCombo = new Combo(cEnd, SWT.DROP_DOWN | SWT.READ_ONLY);
-        debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.7"));
-        debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.6"));
-        debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.5"));
-        debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.4"));
-        debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.3"));
-        debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.2"));
-        debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.1"));
-        debugCombo.select(levelToInteger(debugLevel));
-        debugCombo.addSelectionListener(new SelectionListener(){
-            public void widgetSelected(SelectionEvent arg0) {
-                debugLevel = integerToLevel(debugCombo.getSelectionIndex());
-                props.setProperty("logger.debug.level", debugLevel.toString());
-                RCMain.getRCMain().saveConfig();
-            }
-            public void widgetDefaultSelected(SelectionEvent arg0) {
-            }
+		final Combo debugCombo = new Combo(cEnd, SWT.DROP_DOWN | SWT.READ_ONLY);
+		debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.7"));
+		debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.6"));
+		debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.5"));
+		debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.4"));
+		debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.3"));
+		debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.2"));
+		debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.1"));
+		debugCombo.select(levelToInteger(debugLevel));
+		debugCombo.addSelectionListener(new SelectionListener(){
+			public void widgetSelected(SelectionEvent arg0) {
+				debugLevel = integerToLevel(debugCombo.getSelectionIndex());
+				props.setProperty("logger.debug.level", debugLevel.toString());
+				RCMain.getRCMain().saveConfig();
+			}
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+			}
 
-        });
+		});
 
-        final Label debugColor = new Label(cEnd, SWT.BORDER);
-        gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
-        gd.horizontalSpan = 1;
-        gd.widthHint = 20;
-        debugColor.setLayoutData(gd);
-        debugColor.setToolTipText(I18N.translate(PFX + "choose.color.label"));
-        debugColor.setCursor(RCMain.getRCMain().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
-        debugColor.setBackground(
-        		new Color(RCMain.getRCMain().getDisplay(),
-        				GUI_Utilities.getRGB(
-        						RCMain.getRCMain().getProperties().getProperty("debug.color", "r192g192b192")
-        				)
-        		)
-        );
+		final Label debugColor = new Label(cEnd, SWT.BORDER);
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
+		gd.horizontalSpan = 1;
+		gd.widthHint = 20;
+		debugColor.setLayoutData(gd);
+		debugColor.setToolTipText(I18N.translate(PFX + "choose.color.label"));
+		debugColor.setCursor(RCMain.getRCMain().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+		debugColor.setBackground(
+				new Color(RCMain.getRCMain().getDisplay(),
+						GUI_Utilities.getRGB(
+								RCMain.getRCMain().getProperties().getProperty("debug.color", "r192g192b192")
+						)
+				)
+		);
 
-        debugColor.addMouseListener(new MouseListener(){
+		debugColor.addMouseListener(new MouseListener(){
 
 			public void mouseDoubleClick(MouseEvent arg0) {
 				RCMain.getRCMain().getProperties().setProperty("debug.color",
 						GUI_Utilities.colorChooserDialog(
 								GUI_Utilities.getRGB(
-		        						RCMain.getRCMain().getProperties().getProperty("debug.color", "r192g192b192")
+										RCMain.getRCMain().getProperties().getProperty("debug.color", "r192g192b192")
 								)
 						)
 				);
 				RCMain.getRCMain().saveConfig();
 				debugColor.setBackground(
-		        		new Color(RCMain.getRCMain().getDisplay(),
-		        				GUI_Utilities.getRGB(
-		        						RCMain.getRCMain().getProperties().getProperty("debug.color", "r192g192b192")
-		        				)
-		        		)
-		        );
+						new Color(RCMain.getRCMain().getDisplay(),
+								GUI_Utilities.getRGB(
+										RCMain.getRCMain().getProperties().getProperty("debug.color", "r192g192b192")
+								)
+						)
+				);
 
 			}
 			public void mouseDown(MouseEvent arg0) {}
 			public void mouseUp(MouseEvent arg0) {}
-        });
+		});
 
 
-        Label normallabel = new Label(cEnd,SWT.NULL);
-        normallabel.setText(I18N.translate(PFX + "cEnd.normalLabel.text"));
-        gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.horizontalSpan = 2;
-        normallabel.setLayoutData(gd);
+		Label normallabel = new Label(cEnd,SWT.NULL);
+		normallabel.setText(I18N.translate(PFX + "cEnd.normalLabel.text"));
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
+		normallabel.setLayoutData(gd);
 
-        final Combo normalCombo = new Combo(cEnd, SWT.DROP_DOWN | SWT.READ_ONLY);
-        normalCombo.add(I18N.translate(PFX + "cEnd.combo.text.7"));
-        normalCombo.add(I18N.translate(PFX + "cEnd.combo.text.6"));
-        normalCombo.add(I18N.translate(PFX + "cEnd.combo.text.5"));
-        normalCombo.add(I18N.translate(PFX + "cEnd.combo.text.4"));
-        normalCombo.add(I18N.translate(PFX + "cEnd.combo.text.3"));
-        normalCombo.add(I18N.translate(PFX + "cEnd.combo.text.2"));
-        normalCombo.add(I18N.translate(PFX + "cEnd.combo.text.1"));
-        normalCombo.select(levelToInteger(normalLevel));
-        normalCombo.addSelectionListener(new SelectionListener(){
-            public void widgetSelected(SelectionEvent arg0) {
-                normalLevel = integerToLevel(normalCombo.getSelectionIndex());
-                props.setProperty("logger.normal.level", normalLevel.toString());
-                RCMain.getRCMain().saveConfig();
-            }
-            public void widgetDefaultSelected(SelectionEvent arg0) {
-            }
+		final Combo normalCombo = new Combo(cEnd, SWT.DROP_DOWN | SWT.READ_ONLY);
+		normalCombo.add(I18N.translate(PFX + "cEnd.combo.text.7"));
+		normalCombo.add(I18N.translate(PFX + "cEnd.combo.text.6"));
+		normalCombo.add(I18N.translate(PFX + "cEnd.combo.text.5"));
+		normalCombo.add(I18N.translate(PFX + "cEnd.combo.text.4"));
+		normalCombo.add(I18N.translate(PFX + "cEnd.combo.text.3"));
+		normalCombo.add(I18N.translate(PFX + "cEnd.combo.text.2"));
+		normalCombo.add(I18N.translate(PFX + "cEnd.combo.text.1"));
+		normalCombo.select(levelToInteger(normalLevel));
+		normalCombo.addSelectionListener(new SelectionListener(){
+			public void widgetSelected(SelectionEvent arg0) {
+				normalLevel = integerToLevel(normalCombo.getSelectionIndex());
+				props.setProperty("logger.normal.level", normalLevel.toString());
+				RCMain.getRCMain().saveConfig();
+			}
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+			}
 
-        });
+		});
 
 
-        final Label normalColor = new Label(cEnd, SWT.BORDER);
-        gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
-        gd.horizontalSpan = 1;
-        gd.widthHint = 20;
-        normalColor.setLayoutData(gd);
-        normalColor.setToolTipText(I18N.translate(PFX + "choose.color.label"));
-        normalColor.setCursor(RCMain.getRCMain().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
-        normalColor.setBackground(
-        		new Color(RCMain.getRCMain().getDisplay(),
-        				GUI_Utilities.getRGB(
-        						RCMain.getRCMain().getProperties().getProperty("normal.color", "r000g255b000")
-        				)
-        		)
-        );
+		final Label normalColor = new Label(cEnd, SWT.BORDER);
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
+		gd.horizontalSpan = 1;
+		gd.widthHint = 20;
+		normalColor.setLayoutData(gd);
+		normalColor.setToolTipText(I18N.translate(PFX + "choose.color.label"));
+		normalColor.setCursor(RCMain.getRCMain().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+		normalColor.setBackground(
+				new Color(RCMain.getRCMain().getDisplay(),
+						GUI_Utilities.getRGB(
+								RCMain.getRCMain().getProperties().getProperty("normal.color", "r000g255b000")
+						)
+				)
+		);
 
-        normalColor.addMouseListener(new MouseListener(){
+		normalColor.addMouseListener(new MouseListener(){
 
 			public void mouseDoubleClick(MouseEvent arg0) {
 				RCMain.getRCMain().getProperties().setProperty("normal.color",
 						GUI_Utilities.colorChooserDialog(
 								GUI_Utilities.getRGB(
-		        						RCMain.getRCMain().getProperties().getProperty("normal.color", "r000g255b000")
+										RCMain.getRCMain().getProperties().getProperty("normal.color", "r000g255b000")
 								)
 						)
 				);
 				RCMain.getRCMain().saveConfig();
 				normalColor.setBackground(
-		        		new Color(RCMain.getRCMain().getDisplay(),
-		        				GUI_Utilities.getRGB(
-		        						RCMain.getRCMain().getProperties().getProperty("normal.color", "r000g255b000")
-		        				)
-		        		)
-		        );
+						new Color(RCMain.getRCMain().getDisplay(),
+								GUI_Utilities.getRGB(
+										RCMain.getRCMain().getProperties().getProperty("normal.color", "r000g255b000")
+								)
+						)
+				);
 
 			}
 			public void mouseDown(MouseEvent arg0) {}
 			public void mouseUp(MouseEvent arg0) {}
-        });
+		});
 
 
-        //new major color group
-        Group gAlert = new Group(panel, SWT.NULL);
+		//new major color group
+		Group gAlert = new Group(panel, SWT.NULL);
 		layout = new GridLayout();
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
@@ -610,42 +610,42 @@ public class ConsoleTab {
 
 		final Label warning = new Label(gAlert,SWT.BORDER);
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
-        gd.horizontalSpan = 1;
-        gd.widthHint = 20;
-        warning.setLayoutData(gd);
-        warning.setToolTipText(I18N.translate(PFX + "choose.color.label"));
-        warning.setCursor(RCMain.getRCMain().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
-        warning.setBackground(
-        		new Color(RCMain.getRCMain().getDisplay(),
-        				GUI_Utilities.getRGB(
-        						RCMain.getRCMain().getProperties().getProperty("warning.color", "r255g255b000")
-        				)
-        		)
-        );
+		gd.horizontalSpan = 1;
+		gd.widthHint = 20;
+		warning.setLayoutData(gd);
+		warning.setToolTipText(I18N.translate(PFX + "choose.color.label"));
+		warning.setCursor(RCMain.getRCMain().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+		warning.setBackground(
+				new Color(RCMain.getRCMain().getDisplay(),
+						GUI_Utilities.getRGB(
+								RCMain.getRCMain().getProperties().getProperty("warning.color", "r255g255b000")
+						)
+				)
+		);
 
-        warning.addMouseListener(new MouseListener(){
+		warning.addMouseListener(new MouseListener(){
 
 			public void mouseDoubleClick(MouseEvent arg0) {
 				RCMain.getRCMain().getProperties().setProperty("warning.color",
 						GUI_Utilities.colorChooserDialog(
 								GUI_Utilities.getRGB(
-		        						RCMain.getRCMain().getProperties().getProperty("warning.color", "r255g255b000")
+										RCMain.getRCMain().getProperties().getProperty("warning.color", "r255g255b000")
 								)
 						)
 				);
 				RCMain.getRCMain().saveConfig();
 				warning.setBackground(
-		        		new Color(RCMain.getRCMain().getDisplay(),
-		        				GUI_Utilities.getRGB(
-		        						RCMain.getRCMain().getProperties().getProperty("warning.color", "r255g255b000")
-		        				)
-		        		)
-		        );
+						new Color(RCMain.getRCMain().getDisplay(),
+								GUI_Utilities.getRGB(
+										RCMain.getRCMain().getProperties().getProperty("warning.color", "r255g255b000")
+								)
+						)
+				);
 
 			}
 			public void mouseDown(MouseEvent arg0) {}
 			public void mouseUp(MouseEvent arg0) {}
-        });
+		});
 
 
 		Label severeL = new Label(gAlert,SWT.NULL);
@@ -653,42 +653,42 @@ public class ConsoleTab {
 
 		final Label severe = new Label(gAlert,SWT.BORDER);
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
-        gd.horizontalSpan = 1;
-        gd.widthHint = 20;
-        severe.setLayoutData(gd);
-        severe.setToolTipText(I18N.translate(PFX + "choose.color.label"));
-        severe.setCursor(RCMain.getRCMain().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
-        severe.setBackground(
-        		new Color(RCMain.getRCMain().getDisplay(),
-        				GUI_Utilities.getRGB(
-        						RCMain.getRCMain().getProperties().getProperty("severe.color", "r255g000b000")
-        				)
-        		)
-        );
+		gd.horizontalSpan = 1;
+		gd.widthHint = 20;
+		severe.setLayoutData(gd);
+		severe.setToolTipText(I18N.translate(PFX + "choose.color.label"));
+		severe.setCursor(RCMain.getRCMain().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+		severe.setBackground(
+				new Color(RCMain.getRCMain().getDisplay(),
+						GUI_Utilities.getRGB(
+								RCMain.getRCMain().getProperties().getProperty("severe.color", "r255g000b000")
+						)
+				)
+		);
 
-        severe.addMouseListener(new MouseListener(){
+		severe.addMouseListener(new MouseListener(){
 
 			public void mouseDoubleClick(MouseEvent arg0) {
 				RCMain.getRCMain().getProperties().setProperty("severe.color",
 						GUI_Utilities.colorChooserDialog(
 								GUI_Utilities.getRGB(
-		        						RCMain.getRCMain().getProperties().getProperty("severe.color", "r255g000b000")
+										RCMain.getRCMain().getProperties().getProperty("severe.color", "r255g000b000")
 								)
 						)
 				);
 				RCMain.getRCMain().saveConfig();
 				severe.setBackground(
-		        		new Color(RCMain.getRCMain().getDisplay(),
-		        				GUI_Utilities.getRGB(
-		        						RCMain.getRCMain().getProperties().getProperty("severe.color", "r255g000b000")
-		        				)
-		        		)
-		        );
+						new Color(RCMain.getRCMain().getDisplay(),
+								GUI_Utilities.getRGB(
+										RCMain.getRCMain().getProperties().getProperty("severe.color", "r255g000b000")
+								)
+						)
+				);
 
 			}
 			public void mouseDown(MouseEvent arg0) {}
 			public void mouseUp(MouseEvent arg0) {}
-        });
+		});
 
 
 
@@ -723,7 +723,7 @@ public class ConsoleTab {
 
 					try{
 						if(consoleText == null || consoleText.isDisposed()) return;
-                        int nbLinesBefore = consoleText.getLineCount();
+						int nbLinesBefore = consoleText.getLineCount();
 						if (nbLinesBefore > MAX_LINES)
 							consoleText.replaceTextRange(0, consoleText
 									.getOffsetAtLine(PREFERRED_LINES), "");
@@ -744,35 +744,35 @@ public class ConsoleTab {
 						if(record.getLevel().intValue() == Level.WARNING.intValue())
 							consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
 									- nbLinesBefore, new Color(RCMain.getRCMain().getDisplay(),
-					        				GUI_Utilities.getRGB(
-					        						RCMain.getRCMain().getProperties().getProperty("warning.color", "r255g255b000")
-					        				)
-					        		)
+											GUI_Utilities.getRGB(
+													RCMain.getRCMain().getProperties().getProperty("warning.color", "r255g255b000")
+											)
+									)
 							);
-                        else if(record.getLevel().intValue() == Level.SEVERE.intValue())
-                        	consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
+						else if(record.getLevel().intValue() == Level.SEVERE.intValue())
+							consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
 									- nbLinesBefore, new Color(RCMain.getRCMain().getDisplay(),
-					        				GUI_Utilities.getRGB(
-					        						RCMain.getRCMain().getProperties().getProperty("severe.color", "r255g000b000")
-					        				)
-					        		)
-                        	);
-                        else if(record.getLoggerName().equalsIgnoreCase("lbms.azsmrc.debug"))
-                        	consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
+											GUI_Utilities.getRGB(
+													RCMain.getRCMain().getProperties().getProperty("severe.color", "r255g000b000")
+											)
+									)
+							);
+						else if(record.getLoggerName().equalsIgnoreCase("lbms.azsmrc.debug"))
+							consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
 									- nbLinesBefore, new Color(RCMain.getRCMain().getDisplay(),
-					        				GUI_Utilities.getRGB(
-					        						RCMain.getRCMain().getProperties().getProperty("debug.color", "r192g192b192")
-					        				)
-					        		)
-                        	);
-                        else if(record.getLoggerName().equalsIgnoreCase("lbms.azsmrc.normal"))
-                        	consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
+											GUI_Utilities.getRGB(
+													RCMain.getRCMain().getProperties().getProperty("debug.color", "r192g192b192")
+											)
+									)
+							);
+						else if(record.getLoggerName().equalsIgnoreCase("lbms.azsmrc.normal"))
+							consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
 									- nbLinesBefore, new Color(RCMain.getRCMain().getDisplay(),
-					        				GUI_Utilities.getRGB(
-					        						RCMain.getRCMain().getProperties().getProperty("normal.color", "r000g255b000")
-					        				)
-					        		)
-                        	);
+											GUI_Utilities.getRGB(
+													RCMain.getRCMain().getProperties().getProperty("normal.color", "r000g255b000")
+											)
+									)
+							);
 
 
 						if (bAutoScroll)
@@ -790,69 +790,88 @@ public class ConsoleTab {
 		}
 
 
-    }
+	}
 
-    private int levelToInteger(Level level){
-        int value = 3;
-        int test = level.intValue();
-        if(test == Level.SEVERE.intValue())
-            value = 6;
-        else if(test == Level.WARNING.intValue())
-            value = 5;
-        else if(test == Level.INFO.intValue())
-            value = 4;
-        else if(test == Level.CONFIG.intValue())
-            value = 3;
-        else if(test == Level.FINE.intValue())
-            value = 2;
-        else if(test == Level.FINER.intValue())
-            value = 1;
-        else if(test == Level.FINEST.intValue())
-            value = 0;
-        return value;
-    }
+	private int levelToInteger(Level level){
+		int value = 3;
+		int test = level.intValue();
+		if(test == Level.SEVERE.intValue())
+			value = 6;
+		else if(test == Level.WARNING.intValue())
+			value = 5;
+		else if(test == Level.INFO.intValue())
+			value = 4;
+		else if(test == Level.CONFIG.intValue())
+			value = 3;
+		else if(test == Level.FINE.intValue())
+			value = 2;
+		else if(test == Level.FINER.intValue())
+			value = 1;
+		else if(test == Level.FINEST.intValue())
+			value = 0;
+		return value;
+	}
 
-    private Level integerToLevel(int test){
-        Level level = Level.FINE;
+	private Level integerToLevel(int test){
+		Level level = Level.FINE;
 
-        if(test == 6)
-            level = Level.SEVERE;
-        else if(test == 5)
-            level = Level.WARNING;
-        else if(test == 4)
-            level = Level.INFO;
-        else if(test == 3)
-            level = Level.CONFIG;
-        else if(test == 2)
-            level = Level.FINE;
-        else if(test == 1)
-            level = Level.FINER;
-        else if(test == 0)
-            level = Level.FINEST;
-        return level;
-    }
+		if(test == 6)
+			level = Level.SEVERE;
+		else if(test == 5)
+			level = Level.WARNING;
+		else if(test == 4)
+			level = Level.INFO;
+		else if(test == 3)
+			level = Level.CONFIG;
+		else if(test == 2)
+			level = Level.FINE;
+		else if(test == 1)
+			level = Level.FINER;
+		else if(test == 0)
+			level = Level.FINEST;
+		return level;
+	}
 
-    /**
-     * Utility to write the log file
-     * @param StyledText
-     * @param File logFile
-     * @param boolean append (true to append to the file, false to overwrite it)
-     */
-    private void writeToLog(final StyledText styledText, final File logFile, final boolean append){
-        if(styledText == null)
-            return;
+	/**
+	 * Utility to write the log file
+	 * @param StyledText
+	 * @param File logFile
+	 * @param boolean append (true to append to the file, false to overwrite it)
+	 */
+	private void writeToLog(final StyledText styledText, final File logFile, final boolean append){
+		if(styledText == null)
+			return;
 
-        //set up the writer
-        try{
+		//set up the writer
+		try{
 
-            BufferedWriter bufWriter = new BufferedWriter(new FileWriter(logFile, append));
-            bufWriter.write(styledText.getText());
-            bufWriter.close();
+			BufferedWriter bufWriter = new BufferedWriter(new FileWriter(logFile, append));
+			bufWriter.write(styledText.getText());
+			bufWriter.close();
 
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-    }
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
 
+
+	public static void open(final CTabFolder parentTab){
+		Display display = RCMain.getRCMain().getDisplay();
+		if(display == null) return;
+		display.asyncExec(new Runnable(){
+			public void run() {
+				CTabItem[] tabs = parentTab.getItems();
+				for(CTabItem tab:tabs){
+					if(tab.getText().equalsIgnoreCase(I18N.translate(PFX + "tab.text"))){
+						parentTab.setSelection(tab);
+						return;
+					}
+				}
+				new ConsoleTab(parentTab);
+
+			}
+
+		});
+	}
 
 }//EOF

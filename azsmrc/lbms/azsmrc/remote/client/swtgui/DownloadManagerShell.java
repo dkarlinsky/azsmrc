@@ -161,7 +161,7 @@ public class DownloadManagerShell {
 	private ToolItem stopTorrent, queueTorrent, removeTorrent;
 	private MenuItem menuLogin,menuLogout,menuQuickconnect, menuRestartAzureus;
 	private MenuItem menuServerDetails, menuServerUpdate, menuAddByFile, menuAddbyURL;
-	public ConsoleTab consoleTab;
+
 
 	//status bar labels
 	private CLabel statusBarText;
@@ -409,14 +409,7 @@ public class DownloadManagerShell {
 		menuConsole.setAccelerator(SWT.CTRL + 'C');
 		menuConsole.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e){
-				CTabItem[] tabs = tabFolder.getItems();
-				for(CTabItem tab:tabs){
-					if(tab.getText().equalsIgnoreCase("Console")){
-						tabFolder.setSelection(tab);
-						return;
-					}
-				}
-				consoleTab = new ConsoleTab(tabFolder);
+				ConsoleTab.open(tabFolder);
 			}
 		});
 
@@ -866,14 +859,7 @@ public class DownloadManagerShell {
 		console.setToolTipText("Open Console");
 		console.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e){
-				CTabItem[] tabs = tabFolder.getItems();
-				for(CTabItem tab:tabs){
-					if(tab.getText().equalsIgnoreCase("Console")){
-						tabFolder.setSelection(tab);
-						return;
-					}
-				}
-				consoleTab = new ConsoleTab(tabFolder);
+				ConsoleTab.open(tabFolder);
 			}
 		});
 
@@ -1697,7 +1683,7 @@ public class DownloadManagerShell {
 
 		//check to see if the console is auto open and open it up if it is
 		if(Boolean.parseBoolean(properties.getProperty("auto_console", "false")))
-			new ConsoleTab(tabFolder);
+			ConsoleTab.open(tabFolder);
 
 
 		tabFolder.setSelection(myTorrents);
