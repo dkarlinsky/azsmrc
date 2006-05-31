@@ -39,7 +39,6 @@ import lbms.azsmrc.remote.client.swtgui.container.Container;
 import lbms.azsmrc.remote.client.swtgui.container.DownloadContainer;
 import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ConnectionDialog;
-import lbms.azsmrc.remote.client.swtgui.dialogs.ErrorDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.InputShell;
 import lbms.azsmrc.remote.client.swtgui.dialogs.MoveDataDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByFileDialog;
