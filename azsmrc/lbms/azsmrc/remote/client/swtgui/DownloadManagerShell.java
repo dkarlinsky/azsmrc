@@ -350,14 +350,7 @@ public class DownloadManagerShell {
 		menuServerDetails.setText("&Server Details");
 		menuServerDetails.addListener(SWT.Selection,new Listener(){
 			public void handleEvent(Event e){
-				CTabItem[] tabs = tabFolder.getItems();
-				for(CTabItem tab:tabs){
-					if(tab.getText().equalsIgnoreCase("Server Details")){
-						tabFolder.setSelection(tab);
-						return;
-					}
-				}
-				new ServerDetailsTab(tabFolder);
+				ServerDetailsTab.open(tabFolder);
 			}
 		});
 		menuServerUpdate = new MenuItem(remoteSubmenu, SWT.PUSH);
