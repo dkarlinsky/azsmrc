@@ -1,4 +1,3 @@
- tab.consoletab.cEnd.debugCombo.text.3=3 - Show Info and above
 dialog.connectiondialog.connect.messagebox.message.fillall=Please fill out all of the information.
 dialog.connectiondialog.connect.messagebox.message.portrange=Port given is out of range.  Please provide a port number between 1 and 65000.
 dialog.connectiondialog.connect.messagebox.message.validURL=The server URL is not valid.  Please fix.
@@ -237,6 +236,7 @@ tab.consoletab.cEnd.combo.text.4=4 - Show Config and above
 tab.consoletab.cEnd.combo.text.5=5 - Show Fine and above
 tab.consoletab.cEnd.combo.text.6=6 - Show Finer and above
 tab.consoletab.cEnd.combo.text.7=7 - Show Finest and above (shows most)
+tab.consoletab.cEnd.debugCombo.text.3=3 - Show Info and above
 tab.consoletab.cEnd.debuglabel.text=Debug Log Level:
 tab.consoletab.cEnd.group.text=Filter amount shown in the console
 tab.consoletab.cEnd.normalLabel.text=Normal Log Level:
