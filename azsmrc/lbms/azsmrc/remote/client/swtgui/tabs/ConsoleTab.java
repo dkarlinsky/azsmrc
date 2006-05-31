@@ -413,10 +413,10 @@ public class ConsoleTab {
 		cMiddle.setLayout(layout);
 		gd = new GridData(GridData.VERTICAL_ALIGN_FILL);
 		cMiddle.setLayoutData(gd);
-		cMiddle.setText("Log Filters");
+		cMiddle.setText(I18N.translate(PFX + "cMiddle.group.text"));
 
 		Button buttonShowDebug = new Button(cMiddle, SWT.CHECK);
-		buttonShowDebug.setText("Show Debug Log");
+		buttonShowDebug.setText(I18N.translate(PFX + "cMiddle.buttonShowDebug.text"));
 		gd = new GridData();
 		buttonShowDebug.setLayoutData(gd);
 		buttonShowDebug.addSelectionListener(new SelectionAdapter() {
@@ -432,7 +432,7 @@ public class ConsoleTab {
 		buttonShowDebug.setSelection(bShowDebug);
 
 		Button buttonShowNormal = new Button(cMiddle, SWT.CHECK);
-		buttonShowNormal.setText("Show Normal Log");
+		buttonShowNormal.setText(I18N.translate(PFX + "cMiddle.buttonShowNormal.text"));
 		gd = new GridData();
 		buttonShowNormal.setLayoutData(gd);
 		buttonShowNormal.addSelectionListener(new SelectionAdapter() {
@@ -457,23 +457,23 @@ public class ConsoleTab {
 		cEnd.setLayout(layout);
 		gd = new GridData(SWT.TOP, SWT.LEAD, false, false);
 		cEnd.setLayoutData(gd);
-		cEnd.setText("Filter amount shown in the console");
+		cEnd.setText(I18N.translate(PFX + "cEnd.group.text"));
 
 		Label debuglabel = new Label(cEnd,SWT.NULL);
-        debuglabel.setText("Debug Log Level:");
+        debuglabel.setText(I18N.translate(PFX + "cEnd.debuglabel.text"));
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
         debuglabel.setLayoutData(gd);
 
 
         final Combo debugCombo = new Combo(cEnd, SWT.DROP_DOWN | SWT.READ_ONLY);
-        debugCombo.add("7 - Show Finest and above (shows most)");
-        debugCombo.add("6 - Show Finer and above");
-        debugCombo.add("5 - Show Fine and above");
-        debugCombo.add("4 - Show Config and above");
-        debugCombo.add("3 - Show Info and above");
-        debugCombo.add("2 - Show Warnings and above");
-        debugCombo.add("1 - Show only SEVERE (shows least)");
+        debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.7"));
+        debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.6"));
+        debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.5"));
+        debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.4"));
+        debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.3"));
+        debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.2"));
+        debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.1"));
         debugCombo.select(levelToInteger(debugLevel));
         debugCombo.addSelectionListener(new SelectionListener(){
             public void widgetSelected(SelectionEvent arg0) {
@@ -491,7 +491,7 @@ public class ConsoleTab {
         gd.horizontalSpan = 1;
         gd.widthHint = 20;
         debugColor.setLayoutData(gd);
-        debugColor.setToolTipText("Double click to choose color");
+        debugColor.setToolTipText(I18N.translate(PFX + "choose.color.label"));
         debugColor.setCursor(RCMain.getRCMain().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
         debugColor.setBackground(
         		new Color(RCMain.getRCMain().getDisplay(),
@@ -527,19 +527,19 @@ public class ConsoleTab {
 
 
         Label normallabel = new Label(cEnd,SWT.NULL);
-        normallabel.setText("Normal Log Level:");
+        normallabel.setText(I18N.translate(PFX + "cEnd.normalLabel.text"));
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
         normallabel.setLayoutData(gd);
 
         final Combo normalCombo = new Combo(cEnd, SWT.DROP_DOWN | SWT.READ_ONLY);
-        normalCombo.add("7 - Show Finest and above (shows most)");
-        normalCombo.add("6 - Show Finer and above");
-        normalCombo.add("5 - Show Fine and above");
-        normalCombo.add("4 - Show Config and above");
-        normalCombo.add("3 - Show Info and above");
-        normalCombo.add("2 - Show Warnings and above");
-        normalCombo.add("1 - Show only SEVERE (shows least)");
+        normalCombo.add(I18N.translate(PFX + "cEnd.combo.text.7"));
+        normalCombo.add(I18N.translate(PFX + "cEnd.combo.text.6"));
+        normalCombo.add(I18N.translate(PFX + "cEnd.combo.text.5"));
+        normalCombo.add(I18N.translate(PFX + "cEnd.combo.text.4"));
+        normalCombo.add(I18N.translate(PFX + "cEnd.combo.text.3"));
+        normalCombo.add(I18N.translate(PFX + "cEnd.combo.text.2"));
+        normalCombo.add(I18N.translate(PFX + "cEnd.combo.text.1"));
         normalCombo.select(levelToInteger(normalLevel));
         normalCombo.addSelectionListener(new SelectionListener(){
             public void widgetSelected(SelectionEvent arg0) {
@@ -558,7 +558,7 @@ public class ConsoleTab {
         gd.horizontalSpan = 1;
         gd.widthHint = 20;
         normalColor.setLayoutData(gd);
-        normalColor.setToolTipText("Double click to choose color");
+        normalColor.setToolTipText(I18N.translate(PFX + "choose.color.label"));
         normalColor.setCursor(RCMain.getRCMain().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
         normalColor.setBackground(
         		new Color(RCMain.getRCMain().getDisplay(),
@@ -603,17 +603,17 @@ public class ConsoleTab {
 		gAlert.setLayout(layout);
 		gd = new GridData(GridData.VERTICAL_ALIGN_FILL);
 		gAlert.setLayoutData(gd);
-		gAlert.setText("Alert Color Settings");
+		gAlert.setText(I18N.translate(PFX + "gAlert.group.text"));
 
 		Label warningL = new Label(gAlert,SWT.NULL);
-		warningL.setText("Warning:");
+		warningL.setText(I18N.translate(PFX + "gAlert.warning.text"));
 
 		final Label warning = new Label(gAlert,SWT.BORDER);
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
         gd.horizontalSpan = 1;
         gd.widthHint = 20;
         warning.setLayoutData(gd);
-        warning.setToolTipText("Double click to choose color");
+        warning.setToolTipText(I18N.translate(PFX + "choose.color.label"));
         warning.setCursor(RCMain.getRCMain().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
         warning.setBackground(
         		new Color(RCMain.getRCMain().getDisplay(),
@@ -649,14 +649,14 @@ public class ConsoleTab {
 
 
 		Label severeL = new Label(gAlert,SWT.NULL);
-		severeL.setText("Severe:");
+		severeL.setText(I18N.translate(PFX + "gAlert.severe.text"));
 
 		final Label severe = new Label(gAlert,SWT.BORDER);
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
         gd.horizontalSpan = 1;
         gd.widthHint = 20;
         severe.setLayoutData(gd);
-        severe.setToolTipText("Double click to choose color");
+        severe.setToolTipText(I18N.translate(PFX + "choose.color.label"));
         severe.setCursor(RCMain.getRCMain().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
         severe.setBackground(
         		new Color(RCMain.getRCMain().getDisplay(),
