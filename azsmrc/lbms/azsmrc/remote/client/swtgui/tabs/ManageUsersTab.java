@@ -18,6 +18,7 @@ import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.shared.DuplicatedUserException;
 import lbms.azsmrc.shared.RemoteConstants;
+import lbms.azsmrc.shared.UserNotFoundException;
 
 
 
@@ -452,7 +453,7 @@ public class ManageUsersTab {
 				combo_text.setText(I18N.translate(PFX + "addnewuserShell.userType.text"));
 
 				final Combo combo = new Combo(backup_composite, SWT.DROP_DOWN | SWT.READ_ONLY);
-				combo.add(PFX + "usertable.user");
+				combo.add(I18N.translate(PFX + "usertable.user"));
 				combo.add(I18N.translate(PFX + "usertable.administrator"));
 
 				combo.select(0);
@@ -867,7 +868,7 @@ public class ManageUsersTab {
 		addNew_thread.run();
 	}
 
-	public void editUserInfo(final String user, final boolean isAdmin){
+	public void editUserInfo(final String userN, final boolean isAdmin){
 		final Thread editUser_thread = new Thread() {
 			public void run() {
 				if(RCMain.getRCMain().getDisplay()==null && RCMain.getRCMain().getDisplay().isDisposed())
@@ -875,7 +876,14 @@ public class ManageUsersTab {
 				RCMain.getRCMain().getDisplay().asyncExec( new Runnable() {
 					public void run() {
 						//Shell Initialize
-
+						User user = null;
+						try {
+							user = userManager.getUser(userN);
+						} catch (UserNotFoundException e1) {
+							//TODO Marc your turf
+							e1.printStackTrace();
+							return;
+						}
 						final Shell shell = new Shell(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 						if(!Utilities.isOSX)
 							shell.setImage(ImageRepository.getImage("plus"));
@@ -911,7 +919,7 @@ public class ManageUsersTab {
 						gridData.horizontalSpan = 2;
 						gridData.widthHint = 100;
 						userName.setLayoutData( gridData);
-						userName.setText(user);
+						userName.setText(user.getUsername());
 
 
 
@@ -930,20 +938,12 @@ public class ManageUsersTab {
 						combo.add(I18N.translate(PFX + "tab.manageuserstab.usertable.user"));
 						combo.add(I18N.translate(PFX + "tab.manageuserstab.usertable.administrator"));
 
+						//TODO
+						if(user.checkAccess(RemoteConstants.RIGHTS_ADMIN))
+							combo.select(1);
+						else
+							combo.select(0);
 
-						/*                      try {
-							if(Plugin.getXMLConfig().getUser(user).checkAccess(User.RIGHTS_ADMIN))
-								combo.select(1);
-							else
-								combo.select(0);
-						} catch (UserNotFoundException e2) {
-							MessageBox mb = new MessageBox(FireFrogMain.getFFM().getDisplay().getActiveShell(),SWT.ICON_ERROR);
-							mb.setText("Error");
-							mb.setMessage("Plugin is reporting a 'User Not Found' error.  \n Possible error in your plugin config file. \nPlease Check your settings and try again.");
-							mb.open();
-							Plugin.addToLog(e2.getMessage());
-							e2.printStackTrace();
-						}*/
 
 						if(!isAdmin){
 
@@ -977,17 +977,10 @@ public class ManageUsersTab {
 						gridData.horizontalSpan = 2;
 						gridData.widthHint = 250;
 						outputDir.setLayoutData(gridData);
-						/*try {
-							outputDir.setText(Plugin.getXMLConfig().getUser(user).getOutputDir());
-						} catch (UserNotFoundException e2) {
-							MessageBox mb = new MessageBox(FireFrogMain.getFFM().getDisplay().getActiveShell(),SWT.ICON_ERROR);
-							mb.setText("Error");
-							mb.setMessage("Plugin is reporting a 'User Not Found' error.  \n Possible error in your plugin config file. \nPlease Check your settings and try again.");
-							mb.open();
-							Plugin.addToLog(e2.getMessage());
-							e2.printStackTrace();
-						}
-						 */
+//						TODO
+						outputDir.setText(user.getOutputDir());
+
+
 						/*                      //icon for output directory
 						Label outputDir_icon = new Label(output_comp, SWT.NONE);
 						gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
@@ -1036,16 +1029,9 @@ public class ManageUsersTab {
 						gridData.horizontalSpan = 2;
 						gridData.widthHint = 250;
 						importDir.setLayoutData(gridData);
-						/*                      try {
-							importDir.setText(Plugin.getXMLConfig().getUser(user).getAutoImportDir());
-						} catch (UserNotFoundException e2) {
-							MessageBox mb = new MessageBox(FireFrogMain.getFFM().getDisplay().getActiveShell(),SWT.ICON_ERROR);
-							mb.setText("Error");
-							mb.setMessage("Plugin is reporting a 'User Not Found' error.  \n Possible error in your plugin config file. \nPlease Check your settings and try again.");
-							mb.open();
-							Plugin.addToLog(e2.getMessage());
-							e2.printStackTrace();
-						}*/
+						//TODO
+						importDir.setText(user.getAutoImportDir());
+
 
 						/*                      //icon for output directory
 						Label importDir_icon = new Label(importDir_comp, SWT.NONE);
@@ -1083,6 +1069,7 @@ public class ManageUsersTab {
 						gridData.horizontalSpan = 1;
 						commit.setLayoutData( gridData);
 						commit.setText(I18N.translate("global.accept"));
+						final User u = user;
 						commit.addListener(SWT.Selection, new Listener() {
 							public void handleEvent(Event e) {
 								if(userName.getText().equalsIgnoreCase("")      ||
@@ -1093,46 +1080,16 @@ public class ManageUsersTab {
 									mb.setMessage(I18N.translate(PFX + "editUserShell.error1.message"));
 									mb.open();
 									return;
+								} else {
+									RCMain.getRCMain().getClient().transactionStart();
+									if (!u.getAutoImportDir().equals(importDir.getText()))
+										u.setAutoImportDir(importDir.getText());
+									if (!u.getOutputDir().equals(outputDir.getText()))
+										u.setOutputDir(outputDir.getText());
+									//TODO rights
+									RCMain.getRCMain().getClient().transactionCommit();
 								}
-
-
-
-								//add the user to the XMLConfig file
-								/*try {
-										if(!user.equalsIgnoreCase(userName.getText())){
-											Plugin.getXMLConfig().changeUsername(user,userName.getText());
-										}
-
-										Plugin.getXMLConfig().saveConfigFile();
-
-										User currentUser = Plugin.getXMLConfig().getUser(userName.getText());
-
-
-										currentUser.setOutputDir(outputDir.getText());
-										currentUser.setAutoImportDir(importDir.getText());
-
-										if(combo.getSelectionIndex() != 0)
-											currentUser.setRight(User.RIGHTS_ADMIN);
-
-
-										Plugin.getXMLConfig().saveConfigFile();
-									} catch (IOException e1) {
-										Plugin.addToLog(e1.toString());
-									} catch (UserNotFoundException e2) {
-										MessageBox mb = new MessageBox(FireFrogMain.getFFM().getDisplay().getActiveShell(),SWT.ICON_ERROR);
-										mb.setText("Error");
-										mb.setMessage("Plugin is reporting a 'User Not Found' error.  \n Possible error in your plugin config file. \nPlease Check your settings and try again.");
-										mb.open();
-										Plugin.addToLog(e2.getMessage());
-										e2.printStackTrace();
-									}*/
-
-								//destroy the shell
 								shell.dispose();
-
-								//redraw the userTable
-								//GUIMain.redrawTable();
-
 							}
 
 						});
