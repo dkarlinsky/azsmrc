@@ -59,13 +59,14 @@ import org.eclipse.swt.widgets.ToolItem;
 public class ManageUsersTab {
 	private Table userTable;
 	private UserManager userManager;
+	private CTabItem manageUsersTab;
 
 	//I18N prefix
 	public static final String PFX = "tab.manageuserstab.";
 
 	private ManageUsersTab(CTabFolder parentTab){
-		final CTabItem detailsTab = new CTabItem(parentTab, SWT.CLOSE);
-		detailsTab.setText(I18N.translate(PFX + "tab.text"));
+		manageUsersTab = new CTabItem(parentTab, SWT.CLOSE);
+		manageUsersTab.setText(I18N.translate(PFX + "tab.text"));
 
 		userManager = RCMain.getRCMain().getClient().getUserManager();
 		userManager.update();
@@ -109,7 +110,7 @@ public class ManageUsersTab {
 		RCMain.getRCMain().getClient().addClientUpdateListener(cul);
 
 		//Listen for when tab is closed and make sure to remove the client update listener
-		detailsTab.addDisposeListener(new DisposeListener(){
+		manageUsersTab.addDisposeListener(new DisposeListener(){
 			public void widgetDisposed(DisposeEvent arg0) {
 				RCMain.getRCMain().getClient().removeClientUpdateListener(cul);
 			}
@@ -117,8 +118,8 @@ public class ManageUsersTab {
 
 
 
-		detailsTab.setControl(parent);
-		parentTab.setSelection(detailsTab);
+		manageUsersTab.setControl(parent);
+		parentTab.setSelection(manageUsersTab);
 	}
 
 	public void open(Composite composite){
@@ -781,13 +782,9 @@ public class ManageUsersTab {
 									mb.open();
 
 									RCMain.getRCMain().disconnect();
-									if(RCMain.getRCMain().getMainWindow() != null){
-										RCMain.getRCMain().getMainWindow().setLogInOutButtons(false);
-										RCMain.getRCMain().getMainWindow().setSSLStatusBar(false, false);
-										RCMain.getRCMain().getMainWindow().setConnectionStatusBar(0);
-									}
-									RCMain.getRCMain().setTrayIcon(0);
+									RCMain.getRCMain().getMainWindow().setGUItoLoggedOut();
 									shell.dispose();
+									manageUsersTab.dispose();
 								}
 							}catch (UserNotFoundException e2) {
 								e2.printStackTrace();

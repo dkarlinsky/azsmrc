@@ -116,12 +116,7 @@ public class NormalUserDialog {
 					mb.open();
 
 					RCMain.getRCMain().disconnect();
-					if(RCMain.getRCMain().getMainWindow() != null){
-						RCMain.getRCMain().getMainWindow().setLogInOutButtons(false);
-						RCMain.getRCMain().getMainWindow().setSSLStatusBar(false, false);
-						RCMain.getRCMain().getMainWindow().setConnectionStatusBar(0);
-					}
-					RCMain.getRCMain().setTrayIcon(0);
+					RCMain.getRCMain().getMainWindow().setGUItoLoggedOut();
 					shell.dispose();
 
 

@@ -2447,6 +2447,30 @@ public class DownloadManagerShell {
 
 
 	/**
+	 * Sets the GUI components to a completely logged out state
+	 */
+	public void setGUItoLoggedOut(){
+		final Display display = RCMain.getRCMain().getDisplay();
+		if(display == null || display.isDisposed()) return;
+		display.asyncExec(new Runnable(){
+			public void run() {
+				if(DOWNLOAD_MANAGER_SHELL != null){
+					setLogInOutButtons(false);
+					setSSLStatusBar(false, false);
+					setConnectionStatusBar(0);
+					setStatusBarText("Disconnected", SWT.COLOR_RED);
+					downloadsTable.removeAll();
+					seedsTable.removeAll();
+					downloadsMap.clear();
+					seedsMap.clear();
+				}
+				RCMain.getRCMain().setTrayIcon(0);
+			}
+		});
+	}
+
+
+	/**
 	 * sets the status bar text alert area given String text and SWT.COLOR_*
 	 * @param text
 	 * @param color
