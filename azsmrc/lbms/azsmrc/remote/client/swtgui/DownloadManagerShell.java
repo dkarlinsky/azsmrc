@@ -1341,6 +1341,12 @@ public class DownloadManagerShell {
 		"[N/S] = Data not yet received from server");
 
 		connectionStatusIcon = new CLabelPadding(statusbarComp,borderFlag);
+		connectionStatusIcon.addListener(SWT.MouseDoubleClick, new Listener(){
+			public void handleEvent(Event arg0) {
+				if(RCMain.getRCMain().connected())
+					ServerDetailsTab.open(tabFolder);
+			}
+		});
 		setConnectionStatusBar(0);
 
 
@@ -1348,6 +1354,12 @@ public class DownloadManagerShell {
 		sslStatusIcon.setImage(ImageRepository.getImage("ssl_disabled"));
 		sslStatusIcon.setToolTipText("SSL Disabled");
 		sslStatusIcon.setEnabled(false);
+		sslStatusIcon.addListener(SWT.MouseDoubleClick, new Listener(){
+			public void handleEvent(Event arg0) {
+				if(RCMain.getRCMain().connected())
+					ServerDetailsTab.open(tabFolder);
+			}
+		});
 
 		setSSLStatusBar(false,false);
 
@@ -1727,7 +1739,7 @@ public class DownloadManagerShell {
 					}
 					else if(connection == 2){
 						connectionStatusIcon.setImage(ImageRepository.getImage("connect_established"));
-						connectionStatusIcon.setToolTipText("Connected to server");
+						connectionStatusIcon.setToolTipText("Connected to server\nDouble-Click for Server Details");
 					}
 				} catch (SWTException e) {
 					e.printStackTrace();
@@ -1745,7 +1757,7 @@ public class DownloadManagerShell {
 						try {
 							sslStatusIcon.setEnabled(true);
 							sslStatusIcon.setImage(ImageRepository.getImage("ssl_enabled"));
-							sslStatusIcon.setToolTipText("SSL Enabled");
+							sslStatusIcon.setToolTipText("SSL Enabled\nDouble-Click for Server Details");
 						} catch (SWTException e) {
 							e.printStackTrace();
 						}
@@ -1758,7 +1770,7 @@ public class DownloadManagerShell {
 						try {
 							sslStatusIcon.setEnabled(true);
 							sslStatusIcon.setImage(ImageRepository.getImage("ssl_disabled"));
-							sslStatusIcon.setToolTipText("SSL Disabled");
+							sslStatusIcon.setToolTipText("SSL Disabled\nDouble-Click for Server Details");
 						} catch (SWTException e) {
 							e.printStackTrace();
 						}
