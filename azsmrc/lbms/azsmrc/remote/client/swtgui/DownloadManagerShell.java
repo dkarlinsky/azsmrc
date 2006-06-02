@@ -321,15 +321,7 @@ public class DownloadManagerShell {
 		menuAddByFile.setText("Send Torrent &File to Server");
 		menuAddByFile.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e){
-				Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
-				for(int i = 0; i < shells.length; i++){
-					if(shells[i].getText().equalsIgnoreCase("Send Torrent File to Server")){
-						shells[i].setActive();
-						shells[i].setFocus();
-						return;
-					}
-				}
-				new OpenByFileDialog(RCMain.getRCMain().getDisplay());
+				OpenByFileDialog.open(RCMain.getRCMain().getDisplay());
 			}
 		});
 
@@ -531,15 +523,7 @@ public class DownloadManagerShell {
 		addTorrent_by_file.setToolTipText("Add a torrent from a local file");
 		addTorrent_by_file.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
-				Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
-				for(int i = 0; i < shells.length; i++){
-					if(shells[i].getText().equalsIgnoreCase("Send Torrent File to Server")){
-						shells[i].setActive();
-						shells[i].setFocus();
-						return;
-					}
-				}
-				new OpenByFileDialog(RCMain.getRCMain().getDisplay());
+				OpenByFileDialog.open(RCMain.getRCMain().getDisplay());
 			}
 		});
 
@@ -3217,7 +3201,7 @@ public class DownloadManagerShell {
 				}
 			}
 			if (files.size()>0) {
-				new OpenByFileDialog (RCMain.getRCMain().getDisplay(), files.toArray(new String[0]));
+				OpenByFileDialog.open(RCMain.getRCMain().getDisplay(), files.toArray(new String[0]));
 			}
 		}
 	}

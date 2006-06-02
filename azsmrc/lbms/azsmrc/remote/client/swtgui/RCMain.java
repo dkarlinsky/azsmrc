@@ -348,7 +348,7 @@ public class RCMain implements Launchable {
 		addByFile.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				new OpenByFileDialog(display);
+				OpenByFileDialog.open(display);
 			}
 		});
 

@@ -76,7 +76,7 @@ public class OpenByFileDialog {
 	//I18N prefix
 	public static final String PFX = "dialog.openbyfiledialog.";
 
-	public OpenByFileDialog(Display display, final String[] filenames) {
+	private OpenByFileDialog(Display display, final String[] filenames) {
 		//pull last dir if available
 		lastDir =  RCMain.getRCMain().getProperties().getProperty("Last.Directory");
 
@@ -527,9 +527,36 @@ public class OpenByFileDialog {
 
 	}
 
-	public OpenByFileDialog(Display display) {
-		new OpenByFileDialog(display, null);
+
+	/**
+	 * public open method without a string
+	 * 
+	 */
+	public static void open(Display display){
+		if(display == null) return;
+		Shell[] shells = display.getShells();
+		for(Shell shell:shells){
+			if(shell.getText().equalsIgnoreCase(I18N.translate(PFX + "shell.text"))){
+				shell.setActive();
+				return;
+			}
+		}
+		new OpenByFileDialog(display,null);
 	}
+
+	public static void open(Display display, String[] fileNames){
+		if(display == null) return;
+		Shell[] shells = display.getShells();
+		for(Shell shell:shells){
+			if(shell.getText().equalsIgnoreCase(I18N.translate(PFX + "shell.text"))){
+				shell.setActive();
+				return;
+			}
+		}
+		new OpenByFileDialog(display, fileNames);
+	}
+
+
 
 	private void createDragDrop(final Table parent) {
 		try {
