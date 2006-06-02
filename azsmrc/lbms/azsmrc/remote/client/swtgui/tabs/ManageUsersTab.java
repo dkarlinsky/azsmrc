@@ -119,7 +119,7 @@ public class ManageUsersTab {
 	}
 
 	public void open(Composite composite){
-		final boolean isAdmin = true;
+
 		//------------UserTable and it's toolbar-----------\\
 
 		//Group for both the toolbar and the usertable
@@ -287,7 +287,7 @@ public class ManageUsersTab {
 			public void handleEvent (Event e){
 				TableItem[] items = userTable.getSelection();
 				if(items.length == 1){
-					editUserInfo(items[0].getText(0),isAdmin);
+					editUserInfo(items[0].getText(0));
 				}
 			}
 		});
@@ -310,16 +310,8 @@ public class ManageUsersTab {
 
 				TableItem[] item = userTable.getSelection();
 				if(item.length == 1){
-					if(!isAdmin && item[0].getText(0).equalsIgnoreCase(RCMain.getRCMain().getClient().getUsername())){
-						changePassword.setEnabled(true);
-						editUser.setEnabled(true);
-					}else if(isAdmin){
-						changePassword.setEnabled(true);
-						editUser.setEnabled(true);
-					}
-
-
-
+					changePassword.setEnabled(true);
+					editUser.setEnabled(true);
 				}
 
 
@@ -837,7 +829,7 @@ public class ManageUsersTab {
 
 	}
 
-	public void editUserInfo(final String userN, final boolean isAdmin){
+	public void editUserInfo(final String userN){
 		if(RCMain.getRCMain().getDisplay()==null && RCMain.getRCMain().getDisplay().isDisposed())
 			return;
 		RCMain.getRCMain().getDisplay().asyncExec( new Runnable() {
@@ -908,11 +900,6 @@ public class ManageUsersTab {
 					combo.select(1);
 				else
 					combo.select(0);
-
-
-				if(!isAdmin){
-					combo.setEnabled(false);
-				}
 
 
 				//---------Directory stuff ------------\\
