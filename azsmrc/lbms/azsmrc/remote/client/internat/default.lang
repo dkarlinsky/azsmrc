@@ -212,6 +212,7 @@ dialog.updatedialog.infoLabel.line4=\nTotal Update Size:
 dialog.updatedialog.releasetype.beta=Beta Release
 dialog.updatedialog.releasetype.maintenance=Maintenance Release
 dialog.updatedialog.releasetype.stable=Stable Release
+dialog.updatedialog.shell.text=AzSMRC Updates Available
 dialog.updateprogressdialog.dlstate.-1=Failed
 dialog.updateprogressdialog.dlstate.-2=User Aborted
 dialog.updateprogressdialog.dlstate.0=Downloading

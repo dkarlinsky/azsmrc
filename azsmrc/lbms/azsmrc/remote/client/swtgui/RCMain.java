@@ -652,7 +652,7 @@ public class RCMain implements Launchable {
 				}else{
 					display.asyncExec(new Runnable() {
 						public void run() {
-							new UpdateDialog(display,update,updater);
+							UpdateDialog.open(display,update,updater);
 						}
 					});
 
