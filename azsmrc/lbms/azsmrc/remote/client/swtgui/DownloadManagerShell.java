@@ -41,6 +41,7 @@ import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ConnectionDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.InputShell;
 import lbms.azsmrc.remote.client.swtgui.dialogs.MoveDataDialog;
+import lbms.azsmrc.remote.client.swtgui.dialogs.NormalUserDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByFileDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByURLDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ScrapeDialog;
@@ -841,7 +842,11 @@ public class DownloadManagerShell {
 		manage_users.setToolTipText("Manage Users");
 		manage_users.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
-				ManageUsersTab.open(tabFolder);
+				User user = RCMain.getRCMain().getClient().getUserManager().getActiveUser();
+				if(user.checkAccess(RemoteConstants.RIGHTS_ADMIN))
+					ManageUsersTab.open(tabFolder);
+				else
+					NormalUserDialog.open(user.getUsername());
 			}
 		});
 
@@ -1859,16 +1864,7 @@ public class DownloadManagerShell {
 						addTorrent_by_url.setEnabled(true);
 						pauseAll.setEnabled(true);
 						resumeAll.setEnabled(true);
-						User user = RCMain.getRCMain().getClient().getUserManager().getActiveUser();
-						if(user == null){
-							manage_users.setEnabled(false);
-						}else{
-							if(user.checkAccess(RemoteConstants.RIGHTS_ADMIN))
-								manage_users.setEnabled(true);
-							else
-								manage_users.setEnabled(false);
-						}
-
+						manage_users.setEnabled(true);
 
 					}else{
 						login.setEnabled(true);
