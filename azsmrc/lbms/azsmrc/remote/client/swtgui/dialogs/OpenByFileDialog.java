@@ -409,8 +409,7 @@ public class OpenByFileDialog {
 
 					TableItem item = (TableItem) event.item;
 					int place = detailsTable.indexOf(item);
-					AddTorrentContainer container = (AddTorrentContainer) filesTable
-							.getSelection()[0].getData();
+					AddTorrentContainer container = (AddTorrentContainer) item.getData();
 					if (item.getChecked()) {
 						container.setFileProperty(place, 1);
 					} else
