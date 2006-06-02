@@ -9,6 +9,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -28,54 +29,54 @@ import lbms.azsmrc.remote.client.swtgui.container.Container;
 
 public class MoveDataDialog {
 
-    private Download download;
-    private DownloadAdvancedStats das;
+	private Download download;
+	private DownloadAdvancedStats das;
 	private Label tDir;
 	private Group gName;
 
 	//I18N prefix
 	public static final String PFX = "dialog.movedatadialog.";
 
-	public MoveDataDialog(Container container){
+	private MoveDataDialog(Container container){
 		download = container.getDownload();
-        das = download.getAdvancedStats();
+		das = download.getAdvancedStats();
 
-        if(!das._isLoaded()){
-            das.load();
-        }
+		if(!das._isLoaded()){
+			das.load();
+		}
 
-        //The Client update listener
-        final ClientUpdateListener cul = new ClientUpdateListener(){
+		//The Client update listener
+		final ClientUpdateListener cul = new ClientUpdateListener(){
 
-            public void update(long updateSwitches) {
+			public void update(long updateSwitches) {
 
-                if((updateSwitches & Constants.UPDATE_ADVANCED_STATS) != 0){
-                    das = download.getAdvancedStats();
-                    RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
+				if((updateSwitches & Constants.UPDATE_ADVANCED_STATS) != 0){
+					das = download.getAdvancedStats();
+					RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
 						public void run() {
 							tDir.setText(das.getSaveDir());
 							gName.layout();
 
 						}
-                    });
-                }
+					});
+				}
 
-            }
-        };
+			}
+		};
 
-        //Add the CUL to the Client
-        RCMain.getRCMain().getClient().addClientUpdateListener(cul);
+		//Add the CUL to the Client
+		RCMain.getRCMain().getClient().addClientUpdateListener(cul);
 
 		final Shell shell = new Shell(RCMain.getRCMain().getDisplay());
 		shell.setText(I18N.translate(PFX + "shell.text"));
 		shell.setLayout(new GridLayout(1,false));
 
-        //Listen for when tab is closed and make sure to remove the client update listener
-        shell.addDisposeListener(new DisposeListener(){
-            public void widgetDisposed(DisposeEvent arg0) {
-                RCMain.getRCMain().getClient().removeClientUpdateListener(cul);
-            }
-        });
+		//Listen for when tab is closed and make sure to remove the client update listener
+		shell.addDisposeListener(new DisposeListener(){
+			public void widgetDisposed(DisposeEvent arg0) {
+				RCMain.getRCMain().getClient().removeClientUpdateListener(cul);
+			}
+		});
 
 
 		//Main Composite on shell
@@ -190,7 +191,29 @@ public class MoveDataDialog {
 
 		//Center Shell and open
 		shell.pack();
-        GUI_Utilities.centerShellandOpen(shell);
+		GUI_Utilities.centerShellandOpen(shell);
+
+	}
+
+	public static void open(final Container container){
+		Display display = RCMain.getRCMain().getDisplay();
+		if(display == null) return;
+		display.asyncExec(new Runnable(){
+			public void run() {
+				Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
+				for(int i = 0; i < shells.length; i++){
+					if(shells[i].getText().equalsIgnoreCase(I18N.translate(PFX + "shell.text"))){
+						shells[i].setActive();
+						shells[i].setFocus();
+						return;
+					}
+				}
+				new MoveDataDialog(container);
+
+			}
+
+		});
+
 
 	}
 }

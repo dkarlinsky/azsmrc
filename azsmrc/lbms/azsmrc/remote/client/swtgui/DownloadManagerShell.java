@@ -2310,7 +2310,7 @@ public class DownloadManagerShell {
 
 					for(TableItem item : items){
 						Container container = (Container)item.getData();
-						new MoveDataDialog(container);
+						MoveDataDialog.open(container);
 					}
 
 				}
