@@ -406,10 +406,9 @@ public class OpenByFileDialog {
 		detailsTable.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event event) {
 				if (event.detail == SWT.CHECK) {
-
 					TableItem item = (TableItem) event.item;
 					int place = detailsTable.indexOf(item);
-					AddTorrentContainer container = (AddTorrentContainer) item.getData();
+					AddTorrentContainer container = (AddTorrentContainer) filesTable.getSelection()[0].getData();
 					if (item.getChecked()) {
 						container.setFileProperty(place, 1);
 					} else
@@ -722,7 +721,7 @@ public class OpenByFileDialog {
 		long totalSizeAdj = totalSize / 1024l;
 		if(driveMap.containsKey("save.dir") && driveMap.containsKey("save.dir.path")){
 			long saveDirFree = Long.parseLong(driveMap.get("save.dir"));
-			System.out.println(saveDirFree +  " | " + (1024l*1024l*2l) + " | " + totalSizeAdj +  " | " + (saveDirFree - totalSizeAdj));
+			//System.out.println(saveDirFree +  " | " + (1024l*1024l*2l) + " | " + totalSizeAdj +  " | " + (saveDirFree - totalSizeAdj));
 			if((saveDirFree - totalSizeAdj) > (1024l * 1024l * 2l/*2 GB */) ){
 				totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
 			}else if((saveDirFree - totalSizeAdj) > (1024l * 20l /*20 MB */)){
