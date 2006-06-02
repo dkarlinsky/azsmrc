@@ -656,486 +656,389 @@ public class ManageUsersTab {
 
 
 	public void changePassword(final String user){
-		final Thread addNew_thread = new Thread() {
+		if(RCMain.getRCMain().getDisplay()==null && RCMain.getRCMain().getDisplay().isDisposed())
+			return;
+		RCMain.getRCMain().getDisplay().asyncExec( new Runnable() {
 			public void run() {
-				if(RCMain.getRCMain().getDisplay()==null && RCMain.getRCMain().getDisplay().isDisposed())
-					return;
-				RCMain.getRCMain().getDisplay().asyncExec( new Runnable() {
-					public void run() {
-						//Shell Initialize
+				//Shell Initialize
 
-						final Shell shell = new Shell(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-						if(!Utilities.isOSX)
-							shell.setImage(ImageRepository.getImage("plus"));
+				final Shell shell = new Shell(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+				if(!Utilities.isOSX)
+					shell.setImage(ImageRepository.getImage("plus"));
 
-						//Grid Layout
-						GridLayout layout = new GridLayout();
-						layout.numColumns = 1;
-						shell.setLayout(layout);
+				//Grid Layout
+				GridLayout layout = new GridLayout();
+				layout.numColumns = 1;
+				shell.setLayout(layout);
 
-						//composite for shell
-						Composite backup_composite = new Composite(shell,SWT.NULL);
+				//composite for shell
+				Composite backup_composite = new Composite(shell,SWT.NULL);
 
-						//Grid Layout
-						layout = new GridLayout();
-						layout.numColumns = 3;
-						backup_composite.setLayout(layout);
+				//Grid Layout
+				layout = new GridLayout();
+				layout.numColumns = 3;
+				backup_composite.setLayout(layout);
 
-						//shell title
-						shell.setText(I18N.translate(PFX + "changePasswordShell.shell.text"));
+				//shell title
+				shell.setText(I18N.translate(PFX + "changePasswordShell.shell.text"));
 
 
-						//User Name Label
-						Label nameLabel = new Label(backup_composite, SWT.NONE);
-						GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
-						gridData.horizontalSpan = 1;
-						nameLabel.setLayoutData( gridData );
-						nameLabel.setText(I18N.translate(PFX + "changePasswordShell.usertochange.text") + " ");
+				//User Name Label
+				Label nameLabel = new Label(backup_composite, SWT.NONE);
+				GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+				gridData.horizontalSpan = 1;
+				nameLabel.setLayoutData( gridData );
+				nameLabel.setText(I18N.translate(PFX + "changePasswordShell.usertochange.text") + " ");
 
 
-						//User Name Input field
-						final Label userName = new Label(backup_composite,SWT.NONE);
-						gridData = new GridData(GridData.FILL_HORIZONTAL);
-						gridData.horizontalSpan = 2;
-						userName.setLayoutData( gridData);
-						userName.setText(user);
+				//User Name Input field
+				final Label userName = new Label(backup_composite,SWT.NONE);
+				gridData = new GridData(GridData.FILL_HORIZONTAL);
+				gridData.horizontalSpan = 2;
+				userName.setLayoutData( gridData);
+				userName.setText(user);
 
 
-						//Password Label
-						Label oldPasswordLabel = new Label(backup_composite, SWT.NONE);
-						gridData = new GridData(GridData.FILL_HORIZONTAL);
-						gridData.horizontalSpan = 1;
-						oldPasswordLabel.setLayoutData( gridData );
-						oldPasswordLabel.setText(I18N.translate(PFX + "changePasswordShell.oldPassword.text"));
+				//Password Label
+				Label passwordLabel = new Label(backup_composite, SWT.NONE);
+				gridData = new GridData(GridData.FILL_HORIZONTAL);
+				gridData.horizontalSpan = 1;
+				passwordLabel.setLayoutData( gridData );
+				passwordLabel.setText(I18N.translate(PFX + "changePasswordShell.newPassword.text"));
 
 
-						//User Name Input field
-						final Text oldPassword = new Text(backup_composite,SWT.BORDER | SWT.PASSWORD);
-						gridData = new GridData(GridData.FILL_HORIZONTAL);
-						gridData.horizontalSpan = 2;
-						gridData.widthHint = 100;
-						oldPassword.setLayoutData( gridData);
+				//User Name Input field
+				final Text password = new Text(backup_composite,SWT.BORDER | SWT.PASSWORD);
+				gridData = new GridData(GridData.FILL_HORIZONTAL);
+				gridData.horizontalSpan = 2;
+				gridData.widthHint = 100;
+				password.setLayoutData( gridData);
+
+				//User Name Label
+				Label verify_text = new Label(backup_composite, SWT.NONE);
+				gridData = new GridData(GridData.FILL_HORIZONTAL);
+				gridData.horizontalSpan = 1;
+				verify_text.setLayoutData( gridData );
+				verify_text.setText(I18N.translate(PFX + "changePasswordShell.verify_newPassword.text"));
 
 
+				//User Name Input field
+				final Text verify = new Text(backup_composite,SWT.BORDER | SWT.PASSWORD);
+				gridData = new GridData(GridData.FILL_HORIZONTAL);
+				gridData.horizontalSpan = 2;
+				gridData.widthHint = 100;
+				verify.setLayoutData( gridData);
 
-						//Password Label
-						Label passwordLabel = new Label(backup_composite, SWT.NONE);
-						gridData = new GridData(GridData.FILL_HORIZONTAL);
-						gridData.horizontalSpan = 1;
-						passwordLabel.setLayoutData( gridData );
-						passwordLabel.setText(I18N.translate(PFX + "changePasswordShell.newPassword.text"));
+				//Button for Accept
+				Button commit = new Button(backup_composite, SWT.PUSH);
+				gridData = new GridData(GridData.CENTER);
+				gridData.horizontalSpan = 1;
+				commit.setLayoutData( gridData);
+				commit.setText(I18N.translate("global.accept"));
+				commit.addListener(SWT.Selection, new Listener() {
+					public void handleEvent(Event e) {
+						if(password.getText().equalsIgnoreCase("") ||
+								verify.getText().equalsIgnoreCase("")){
+
+							MessageBox mb = new MessageBox(RCMain.getRCMain().getDisplay().getActiveShell(),SWT.ICON_ERROR);
+							mb.setText(I18N.translate("global.error"));
+							mb.setMessage(I18N.translate(PFX + "changePasswordShell.error1.message"));
+							mb.open();
+							return;
+						}
 
 
-						//User Name Input field
-						final Text password = new Text(backup_composite,SWT.BORDER | SWT.PASSWORD);
-						gridData = new GridData(GridData.FILL_HORIZONTAL);
-						gridData.horizontalSpan = 2;
-						gridData.widthHint = 100;
-						password.setLayoutData( gridData);
+						if(password.getText().equalsIgnoreCase(verify.getText())){
+							//Everything is a go, so commit the change in the passwords
+							try {
+								userManager.getUser(user).setPassword(password.getText());
 
-						//User Name Label
-						Label verify_text = new Label(backup_composite, SWT.NONE);
-						gridData = new GridData(GridData.FILL_HORIZONTAL);
-						gridData.horizontalSpan = 1;
-						verify_text.setLayoutData( gridData );
-						verify_text.setText(I18N.translate(PFX + "changePasswordShell.verify_newPassword.text"));
-
-
-						//User Name Input field
-						final Text verify = new Text(backup_composite,SWT.BORDER | SWT.PASSWORD);
-						gridData = new GridData(GridData.FILL_HORIZONTAL);
-						gridData.horizontalSpan = 2;
-						gridData.widthHint = 100;
-						verify.setLayoutData( gridData);
-
-						//Button for Accept
-						Button commit = new Button(backup_composite, SWT.PUSH);
-						gridData = new GridData(GridData.CENTER);
-						gridData.horizontalSpan = 1;
-						commit.setLayoutData( gridData);
-						commit.setText(I18N.translate("global.accept"));
-						commit.addListener(SWT.Selection, new Listener() {
-							public void handleEvent(Event e) {
-								if(password.getText().equalsIgnoreCase("") ||
-										verify.getText().equalsIgnoreCase("") ||
-										oldPassword.getText().equalsIgnoreCase("")){
-
-									MessageBox mb = new MessageBox(RCMain.getRCMain().getDisplay().getActiveShell(),SWT.ICON_ERROR);
-									mb.setText(I18N.translate("global.error"));
-									mb.setMessage(I18N.translate(PFX + "changePasswordShell.error1.message"));
+								if(userManager.getUser(user).equals(userManager.getActiveUser())){
+									MessageBox mb = new MessageBox(RCMain.getRCMain().getDisplay().getActiveShell(),SWT.ICON_INFORMATION);
+									mb.setText(I18N.translate(PFX + "changePasswordShell.activeuser_conflict.title"));
+									mb.setMessage(I18N.translate(PFX + "changePasswordShell.activeuser_conflict.message"));
 									mb.open();
-									return;
-								}
 
-								//TODO Veryify password
-
-								/*
-
-								try {
-									if(!Plugin.getXMLConfig().getUser(user).verifyPassword(oldPassword.getText())){
-										MessageBox mb = new MessageBox(FireFrogMain.getFFM().getDisplay().getActiveShell(),SWT.ICON_ERROR);
-										mb.setText("Error");
-										mb.setMessage("Old password is not correct.");
-										mb.open();
-										oldPassword.setText("");
-										return;
+									RCMain.getRCMain().disconnect();
+									if(RCMain.getRCMain().getMainWindow() != null){
+										RCMain.getRCMain().getMainWindow().setLogInOutButtons(false);
+										RCMain.getRCMain().getMainWindow().setSSLStatusBar(false, false);
+										RCMain.getRCMain().getMainWindow().setConnectionStatusBar(0);
 									}
-								} catch (UserNotFoundException e2) {
-									e2.printStackTrace();
-									MessageBox mb = new MessageBox(FireFrogMain.getFFM().getDisplay().getActiveShell(),SWT.ICON_ERROR);
-									mb.setText("Error");
-									mb.setMessage("Plugin is reporting a 'User Not Found' error.  \n Possible error in your plugin config file. \nPlease Check your settings and try again.");
-									mb.open();
-									return;
-								}
-								 */
-
-								if(password.getText().equalsIgnoreCase(verify.getText())){
-									//TODO add the user to the XMLConfig file
-									/*try {
-										Plugin.getXMLConfig().getUser(user).setPassword(password.getText());
-										Plugin.getXMLConfig().saveConfigFile();
-									} catch (IOException e1) {
-										e1.printStackTrace();
-									} catch (UserNotFoundException e2) {
-										MessageBox mb = new MessageBox(FireFrogMain.getFFM().getDisplay().getActiveShell(),SWT.ICON_ERROR);
-										mb.setText("Error");
-										mb.setMessage("Plugin is reporting a 'User Not Found' error.  \n Possible error in your plugin config file. \nPlease Check your settings and try again.");
-										mb.open();
-
-									}*/
-
-									//destroy the shell
+									RCMain.getRCMain().setTrayIcon(0);
 									shell.dispose();
-
-									//redraw the userTable
-									//GUIMain.redrawTable();
-
-								}else{
-									MessageBox mb = new MessageBox(RCMain.getRCMain().getDisplay().getActiveShell(),SWT.ICON_ERROR);
-									mb.setText(I18N.translate("global.error"));
-									mb.setMessage(I18N.translate(PFX + "changePasswordShell.error2.message"));
-									mb.open();
-									password.setText("");
-									verify.setText("");
-									return;
+									redrawTable();
 								}
-
-							}
-						});
-
-
-						//Button for Cancel
-						Button cancel = new Button(backup_composite, SWT.PUSH);
-						gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
-						gridData.horizontalSpan = 2;
-						cancel.setLayoutData( gridData);
-						cancel.setText(I18N.translate("global.cancel"));
-						cancel.addListener(SWT.Selection, new Listener() {
-							public void handleEvent(Event e) {
+							}catch (UserNotFoundException e2) {
+								e2.printStackTrace();
+								MessageBox mb = new MessageBox(RCMain.getRCMain().getDisplay().getActiveShell(),SWT.ICON_ERROR);
+								mb.setText(I18N.translate("global.error"));
+								mb.setMessage(I18N.translate(PFX + "changePasswordShell.error4.message"));
+								mb.open();
 								shell.dispose();
-							}
-						});
-
-
-						//Key Listener so that the user can just use ESC to cancel
-						//in the beginning if they did not want to do this
-						userName.addKeyListener(new KeyListener() {
-							public void keyPressed(KeyEvent e) {
-								//Empty
+								redrawTable();
 							}
 
-							public void keyReleased (KeyEvent e) {
-								switch (e.character){
-								case SWT.ESC:
+							//destroy the shell
+							shell.dispose();
 
-									shell.dispose();
-									break;
+							//redraw the userTable
+							redrawTable();
 
-								}
-							}
-						});
-
-						//pack and open shell
-						GUI_Utilities.centerShellandOpen(shell);
+						}else{
+							MessageBox mb = new MessageBox(RCMain.getRCMain().getDisplay().getActiveShell(),SWT.ICON_ERROR);
+							mb.setText(I18N.translate("global.error"));
+							mb.setMessage(I18N.translate(PFX + "changePasswordShell.error2.message"));
+							mb.open();
+							password.setText("");
+							verify.setText("");
+							return;
+						}
 
 					}
 				});
-			}
-		};
 
-		addNew_thread.setDaemon(true);
-		addNew_thread.run();
+
+				//Button for Cancel
+				Button cancel = new Button(backup_composite, SWT.PUSH);
+				gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
+				gridData.horizontalSpan = 2;
+				cancel.setLayoutData( gridData);
+				cancel.setText(I18N.translate("global.cancel"));
+				cancel.addListener(SWT.Selection, new Listener() {
+					public void handleEvent(Event e) {
+						shell.dispose();
+					}
+				});
+
+
+				//Key Listener so that the user can just use ESC to cancel
+				//in the beginning if they did not want to do this
+				userName.addKeyListener(new KeyListener() {
+					public void keyPressed(KeyEvent e) {
+						//Empty
+					}
+
+					public void keyReleased (KeyEvent e) {
+						switch (e.character){
+						case SWT.ESC:
+
+							shell.dispose();
+							break;
+
+						}
+					}
+				});
+
+				//pack and open shell
+				GUI_Utilities.centerShellandOpen(shell);
+
+			}
+		});
+
 	}
 
 	public void editUserInfo(final String userN, final boolean isAdmin){
-		final Thread editUser_thread = new Thread() {
+		if(RCMain.getRCMain().getDisplay()==null && RCMain.getRCMain().getDisplay().isDisposed())
+			return;
+		RCMain.getRCMain().getDisplay().asyncExec( new Runnable() {
 			public void run() {
-				if(RCMain.getRCMain().getDisplay()==null && RCMain.getRCMain().getDisplay().isDisposed())
+				//Shell Initialize
+				User user = null;
+				try {
+					user = userManager.getUser(userN);
+				} catch (UserNotFoundException e1) {
+					MessageBox mb = new MessageBox(RCMain.getRCMain().getDisplay().getActiveShell(),SWT.ICON_ERROR);
+					mb.setText(I18N.translate("global.error"));
+					mb.setMessage(I18N.translate(PFX + "editUserShell.error2.message"));
+					mb.open();
+					e1.printStackTrace();
 					return;
-				RCMain.getRCMain().getDisplay().asyncExec( new Runnable() {
-					public void run() {
-						//Shell Initialize
-						User user = null;
-						try {
-							user = userManager.getUser(userN);
-						} catch (UserNotFoundException e1) {
-							//TODO Marc your turf
-							e1.printStackTrace();
+				}
+				final Shell shell = new Shell(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+				if(!Utilities.isOSX)
+					shell.setImage(ImageRepository.getImage("plus"));
+
+				//Grid Layout
+				GridLayout layout = new GridLayout();
+				layout.numColumns = 1;
+				shell.setLayout(layout);
+
+				//composite for shell
+				Composite backup_composite = new Composite(shell,SWT.NULL);
+
+				//Grid Layout
+				layout = new GridLayout();
+				layout.numColumns = 3;
+				backup_composite.setLayout(layout);
+
+				//shell title
+				shell.setText(I18N.translate(PFX + "editUserShell.shell.text"));
+
+
+				//User Name Label
+				Label nameLabel = new Label(backup_composite, SWT.NONE);
+				GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+				gridData.horizontalSpan = 1;
+				nameLabel.setLayoutData( gridData );
+				nameLabel.setText(I18N.translate(PFX + "editUserShell.userName.text"));
+
+
+				//User Name Input field
+				final Text userName = new Text(backup_composite,SWT.BORDER);
+				gridData = new GridData(GridData.FILL_HORIZONTAL);
+				gridData.horizontalSpan = 2;
+				gridData.widthHint = 100;
+				userName.setLayoutData( gridData);
+				userName.setText(user.getUsername());
+
+				//Combo Stuff
+
+				//combo Label
+				Label combo_text = new Label(backup_composite, SWT.NONE);
+				gridData = new GridData(GridData.FILL_HORIZONTAL);
+				gridData.horizontalSpan = 1;
+				combo_text.setLayoutData( gridData );
+				combo_text.setText(I18N.translate(PFX + "editUserShell.userType.text"));
+
+				final Combo combo = new Combo(backup_composite, SWT.DROP_DOWN | SWT.READ_ONLY);
+				combo.add(I18N.translate(PFX + "usertable.user"));
+				combo.add(I18N.translate(PFX + "usertable.administrator"));
+
+				if(user.checkAccess(RemoteConstants.RIGHTS_ADMIN))
+					combo.select(1);
+				else
+					combo.select(0);
+
+
+				if(!isAdmin){
+					combo.setEnabled(false);
+				}
+
+
+				//---------Directory stuff ------------\\
+
+
+				//output directory
+				Label outputDir_text = new Label(backup_composite, SWT.NONE);
+				gridData = new GridData(GridData.FILL_HORIZONTAL);
+				gridData.horizontalSpan = 3;
+				outputDir_text.setLayoutData( gridData );
+				outputDir_text.setText(I18N.translate(PFX + "editUserShell.outputDir.text"));
+
+				//comp for directory input
+				Composite output_comp = new Composite(backup_composite,SWT.NONE);
+				output_comp.setLayout(new GridLayout(3,false));
+
+				gridData = new GridData(GridData.FILL_HORIZONTAL);
+				gridData.horizontalSpan = 3;
+				output_comp.setLayoutData(gridData);
+
+
+
+				//output directory input field
+				final Text outputDir = new Text(output_comp,SWT.BORDER);
+				gridData = new GridData(GridData.FILL_HORIZONTAL);
+				gridData.horizontalSpan = 2;
+				gridData.widthHint = 250;
+				outputDir.setLayoutData(gridData);
+				outputDir.setText(user.getOutputDir());
+
+				//auto import directory
+				Label importDir_text = new Label(backup_composite, SWT.NONE);
+				gridData = new GridData(GridData.FILL_HORIZONTAL);
+				gridData.horizontalSpan = 3;
+				importDir_text.setLayoutData( gridData );
+				importDir_text.setText(I18N.translate(PFX + "editUserShell.inputDir.text"));
+
+				//comp for directory input
+				Composite importDir_comp = new Composite(backup_composite,SWT.NONE);
+				importDir_comp.setLayout(new GridLayout(3,false));
+
+				gridData = new GridData(GridData.FILL_HORIZONTAL);
+				gridData.horizontalSpan = 3;
+				importDir_comp.setLayoutData(gridData);
+
+
+
+				//output directory input field
+				final Text importDir = new Text(importDir_comp,SWT.BORDER);
+				gridData = new GridData(GridData.FILL_HORIZONTAL);
+				gridData.horizontalSpan = 2;
+				gridData.widthHint = 250;
+				importDir.setLayoutData(gridData);
+				importDir.setText(user.getAutoImportDir());
+
+				//Button for Accept
+				Button commit = new Button(backup_composite, SWT.PUSH);
+				gridData = new GridData(GridData.CENTER);
+				gridData.horizontalSpan = 1;
+				commit.setLayoutData( gridData);
+				commit.setText(I18N.translate("global.accept"));
+				final User u = user;
+				commit.addListener(SWT.Selection, new Listener() {
+					public void handleEvent(Event e) {
+						if(userName.getText().equalsIgnoreCase("")      ||
+								outputDir.getText().equalsIgnoreCase("")||
+								importDir.getText().equalsIgnoreCase("")){
+							MessageBox mb = new MessageBox(RCMain.getRCMain().getDisplay().getActiveShell(),SWT.ICON_ERROR);
+							mb.setText(I18N.translate("global.error"));
+							mb.setMessage(I18N.translate(PFX + "editUserShell.error1.message"));
+							mb.open();
 							return;
+						} else {
+							RCMain.getRCMain().getClient().transactionStart();
+							if (!u.getAutoImportDir().equals(importDir.getText()))
+								u.setAutoImportDir(importDir.getText());
+							if (!u.getOutputDir().equals(outputDir.getText()))
+								u.setOutputDir(outputDir.getText());
+							//TODO rights
+							RCMain.getRCMain().getClient().transactionCommit();
 						}
-						final Shell shell = new Shell(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-						if(!Utilities.isOSX)
-							shell.setImage(ImageRepository.getImage("plus"));
+						shell.dispose();
+						redrawTable();
+					}
 
-						//Grid Layout
-						GridLayout layout = new GridLayout();
-						layout.numColumns = 1;
-						shell.setLayout(layout);
-
-						//composite for shell
-						Composite backup_composite = new Composite(shell,SWT.NULL);
-
-						//Grid Layout
-						layout = new GridLayout();
-						layout.numColumns = 3;
-						backup_composite.setLayout(layout);
-
-						//shell title
-						shell.setText(I18N.translate(PFX + "editUserShell.shell.text"));
+				});
 
 
-						//User Name Label
-						Label nameLabel = new Label(backup_composite, SWT.NONE);
-						GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
-						gridData.horizontalSpan = 1;
-						nameLabel.setLayoutData( gridData );
-						nameLabel.setText(I18N.translate(PFX + "editUserShell.userName.text"));
-
-
-						//User Name Input field
-						final Text userName = new Text(backup_composite,SWT.BORDER);
-						gridData = new GridData(GridData.FILL_HORIZONTAL);
-						gridData.horizontalSpan = 2;
-						gridData.widthHint = 100;
-						userName.setLayoutData( gridData);
-						userName.setText(user.getUsername());
-
-
-
-
-
-						//Combo Stuff
-
-						//combo Label
-						Label combo_text = new Label(backup_composite, SWT.NONE);
-						gridData = new GridData(GridData.FILL_HORIZONTAL);
-						gridData.horizontalSpan = 1;
-						combo_text.setLayoutData( gridData );
-						combo_text.setText(I18N.translate(PFX + "editUserShell.userType.text"));
-
-						final Combo combo = new Combo(backup_composite, SWT.DROP_DOWN | SWT.READ_ONLY);
-						combo.add(I18N.translate(PFX + "tab.manageuserstab.usertable.user"));
-						combo.add(I18N.translate(PFX + "tab.manageuserstab.usertable.administrator"));
-
-						//TODO
-						if(user.checkAccess(RemoteConstants.RIGHTS_ADMIN))
-							combo.select(1);
-						else
-							combo.select(0);
-
-
-						if(!isAdmin){
-
-							combo.setEnabled(false);
-						}
-
-
-						//---------Directory stuff ------------\\
-
-
-						//output directory
-						Label outputDir_text = new Label(backup_composite, SWT.NONE);
-						gridData = new GridData(GridData.FILL_HORIZONTAL);
-						gridData.horizontalSpan = 3;
-						outputDir_text.setLayoutData( gridData );
-						outputDir_text.setText(I18N.translate(PFX + "editUserShell.outputDir.text"));
-
-						//comp for directory input
-						Composite output_comp = new Composite(backup_composite,SWT.NONE);
-						output_comp.setLayout(new GridLayout(3,false));
-
-						gridData = new GridData(GridData.FILL_HORIZONTAL);
-						gridData.horizontalSpan = 3;
-						output_comp.setLayoutData(gridData);
-
-
-
-						//output directory input field
-						final Text outputDir = new Text(output_comp,SWT.BORDER);
-						gridData = new GridData(GridData.FILL_HORIZONTAL);
-						gridData.horizontalSpan = 2;
-						gridData.widthHint = 250;
-						outputDir.setLayoutData(gridData);
-//						TODO
-						outputDir.setText(user.getOutputDir());
-
-
-						/*                      //icon for output directory
-						Label outputDir_icon = new Label(output_comp, SWT.NONE);
-						gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
-						gridData.horizontalSpan = 1;
-						outputDir_icon.setLayoutData( gridData );
-						outputDir_icon.setToolTipText("Click to choose directory");
-						outputDir_icon.setImage(ImageRepository.getImage("folder"));
-						outputDir_icon.addListener(SWT.MouseDown, new Listener() {
-							public void handleEvent(Event e) {
-								DirectoryDialog dirDialog = new DirectoryDialog(shell);
-								dirDialog.setText("Please Choose Output Directory");
-								dirDialog.setFilterPath(System.getProperty("user.dir"));
-								String selectedDir = dirDialog.open();
-
-								//need to check if selected dir has files and if so, does it have a comments dir
-								if(selectedDir == null){
-									return;
-								}else{
-									outputDir.setText(selectedDir);
-								}
-
-
-							}
-						});*/
-
-						//auto import directory
-						Label importDir_text = new Label(backup_composite, SWT.NONE);
-						gridData = new GridData(GridData.FILL_HORIZONTAL);
-						gridData.horizontalSpan = 3;
-						importDir_text.setLayoutData( gridData );
-						importDir_text.setText(I18N.translate(PFX + "editUserShell.inputDir.text"));
-
-						//comp for directory input
-						Composite importDir_comp = new Composite(backup_composite,SWT.NONE);
-						importDir_comp.setLayout(new GridLayout(3,false));
-
-						gridData = new GridData(GridData.FILL_HORIZONTAL);
-						gridData.horizontalSpan = 3;
-						importDir_comp.setLayoutData(gridData);
-
-
-
-						//output directory input field
-						final Text importDir = new Text(importDir_comp,SWT.BORDER);
-						gridData = new GridData(GridData.FILL_HORIZONTAL);
-						gridData.horizontalSpan = 2;
-						gridData.widthHint = 250;
-						importDir.setLayoutData(gridData);
-						//TODO
-						importDir.setText(user.getAutoImportDir());
-
-
-						/*                      //icon for output directory
-						Label importDir_icon = new Label(importDir_comp, SWT.NONE);
-						gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
-						gridData.horizontalSpan = 1;
-						importDir_icon.setLayoutData( gridData );
-						importDir_icon.setToolTipText("Click to choose directory");
-						importDir_icon.setImage(ImageRepository.getImage("folder"));
-						importDir_icon.addListener(SWT.MouseDown, new Listener() {
-							public void handleEvent(Event e) {
-								DirectoryDialog dirDialog = new DirectoryDialog(shell);
-								dirDialog.setText("Please Choose Automatic Import Directory");
-								dirDialog.setFilterPath(System.getProperty("user.dir"));
-								String selectedDir = dirDialog.open();
-								File selectedDir_file = new File(selectedDir);
-								//need to check if selected dir has files and if so, does it have a comments dir
-								if(selectedDir == null){
-									return;
-								}else if(!selectedDir_file.exists() || !selectedDir_file.isDirectory()){
-									MessageBox mb = new MessageBox(FireFrogMain.getFFM().getDisplay().getActiveShell(),SWT.ICON_ERROR);
-									mb.setText("Error");
-									mb.setMessage("Selected Directory does not exist, please choose a valid directory.");
-									mb.open();
-								}else{
-									importDir.setText(selectedDir);
-								}
-
-
-							}
-						});*/
-
-						//Button for Accept
-						Button commit = new Button(backup_composite, SWT.PUSH);
-						gridData = new GridData(GridData.CENTER);
-						gridData.horizontalSpan = 1;
-						commit.setLayoutData( gridData);
-						commit.setText(I18N.translate("global.accept"));
-						final User u = user;
-						commit.addListener(SWT.Selection, new Listener() {
-							public void handleEvent(Event e) {
-								if(userName.getText().equalsIgnoreCase("")      ||
-										outputDir.getText().equalsIgnoreCase("")||
-										importDir.getText().equalsIgnoreCase("")){
-									MessageBox mb = new MessageBox(RCMain.getRCMain().getDisplay().getActiveShell(),SWT.ICON_ERROR);
-									mb.setText(I18N.translate("global.error"));
-									mb.setMessage(I18N.translate(PFX + "editUserShell.error1.message"));
-									mb.open();
-									return;
-								} else {
-									RCMain.getRCMain().getClient().transactionStart();
-									if (!u.getAutoImportDir().equals(importDir.getText()))
-										u.setAutoImportDir(importDir.getText());
-									if (!u.getOutputDir().equals(outputDir.getText()))
-										u.setOutputDir(outputDir.getText());
-									//TODO rights
-									RCMain.getRCMain().getClient().transactionCommit();
-								}
-								shell.dispose();
-							}
-
-						});
-
-
-						//Button for Cancel
-						Button cancel = new Button(backup_composite, SWT.PUSH);
-						gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
-						gridData.horizontalSpan = 2;
-						cancel.setLayoutData( gridData);
-						cancel.setText(I18N.translate("global.cancel"));
-						cancel.addListener(SWT.Selection, new Listener() {
-							public void handleEvent(Event e) {
-								shell.dispose();
-							}
-						});
-
-
-						//Key Listener so that the user can just use ESC to cancel
-						//in the beginning if they did not want to do this
-						userName.addKeyListener(new KeyListener() {
-							public void keyPressed(KeyEvent e) {
-								//Empty
-							}
-
-							public void keyReleased (KeyEvent e) {
-								switch (e.character){
-								case SWT.ESC:
-
-									shell.dispose();
-									break;
-
-								}
-							}
-						});
-
-						//pack and open shell
-						GUI_Utilities.centerShellandOpen(shell);
-
+				//Button for Cancel
+				Button cancel = new Button(backup_composite, SWT.PUSH);
+				gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
+				gridData.horizontalSpan = 2;
+				cancel.setLayoutData( gridData);
+				cancel.setText(I18N.translate("global.cancel"));
+				cancel.addListener(SWT.Selection, new Listener() {
+					public void handleEvent(Event e) {
+						shell.dispose();
 					}
 				});
-			}
-		};
 
-		editUser_thread.setDaemon(true);
-		editUser_thread.run();
+
+				//Key Listener so that the user can just use ESC to cancel
+				//in the beginning if they did not want to do this
+				userName.addKeyListener(new KeyListener() {
+					public void keyPressed(KeyEvent e) {
+						//Empty
+					}
+
+					public void keyReleased (KeyEvent e) {
+						switch (e.character){
+						case SWT.ESC:
+
+							shell.dispose();
+							break;
+
+						}
+					}
+				});
+
+				//pack and open shell
+				GUI_Utilities.centerShellandOpen(shell);
+
+			}
+		});
+
 	}
 
 
