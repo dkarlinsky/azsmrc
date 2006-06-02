@@ -272,17 +272,7 @@ public class DownloadManagerShell {
 		menuLogout.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				RCMain.getRCMain().disconnect();
-				setLogInOutButtons(false);
-				DOWNLOAD_MANAGER_SHELL.setText(TITLE);
-				RCMain.getRCMain().setTrayIcon(0);
-				downloadsMap.clear();
-				seedsMap.clear();
-				downloadsTable.removeAll();
-				seedsTable.removeAll();
-				Control[] children_downloads = downloadsTable.getChildren();
-				for(Control child:children_downloads) child.dispose();
-				Control[] children_seeds = seedsTable.getChildren();
-				for(Control child:children_seeds) child.dispose();
+				setGUItoLoggedOut();;
 			}
 		});
 
@@ -485,17 +475,7 @@ public class DownloadManagerShell {
 		logout.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				RCMain.getRCMain().disconnect();
-				setLogInOutButtons(false);
-				DOWNLOAD_MANAGER_SHELL.setText(TITLE);
-				RCMain.getRCMain().setTrayIcon(0);
-				downloadsMap.clear();
-				seedsMap.clear();
-				downloadsTable.removeAll();
-				seedsTable.removeAll();
-				Control[] children_downloads = downloadsTable.getChildren();
-				for(Control child:children_downloads) child.dispose();
-				Control[] children_seeds = seedsTable.getChildren();
-				for(Control child:children_seeds) child.dispose();
+				setGUItoLoggedOut();
 			}
 		});
 
@@ -2443,10 +2423,16 @@ public class DownloadManagerShell {
 					setSSLStatusBar(false, false);
 					setConnectionStatusBar(0);
 					setStatusBarText("Disconnected", SWT.COLOR_RED);
-					downloadsTable.removeAll();
-					seedsTable.removeAll();
+					setLogInOutButtons(false);
+					DOWNLOAD_MANAGER_SHELL.setText(TITLE);
 					downloadsMap.clear();
 					seedsMap.clear();
+					downloadsTable.removeAll();
+					seedsTable.removeAll();
+					Control[] children_downloads = downloadsTable.getChildren();
+					for(Control child:children_downloads) child.dispose();
+					Control[] children_seeds = seedsTable.getChildren();
+					for(Control child:children_seeds) child.dispose();
 				}
 				RCMain.getRCMain().setTrayIcon(0);
 			}
