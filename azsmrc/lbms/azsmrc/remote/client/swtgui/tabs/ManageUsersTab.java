@@ -991,7 +991,15 @@ public class ManageUsersTab {
 								u.setAutoImportDir(importDir.getText());
 							if (!u.getOutputDir().equals(outputDir.getText()))
 								u.setOutputDir(outputDir.getText());
-							//TODO rights
+							switch(combo.getSelectionIndex()){
+							case(0):
+								//TODO Leonard.. we need to have a RIGHTS_NORMAL.. where is it?
+								//or a remove rights feature that removes admin rights
+								u.setRights(0);
+							case(1):
+								u.setRights(RemoteConstants.RIGHTS_ADMIN);
+							}
+
 							RCMain.getRCMain().getClient().transactionCommit();
 						}
 						shell.dispose();
