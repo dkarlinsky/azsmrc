@@ -767,7 +767,6 @@ public class ManageUsersTab {
 									}
 									RCMain.getRCMain().setTrayIcon(0);
 									shell.dispose();
-									redrawTable();
 								}
 							}catch (UserNotFoundException e2) {
 								e2.printStackTrace();
