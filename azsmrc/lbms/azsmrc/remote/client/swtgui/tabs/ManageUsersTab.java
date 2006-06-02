@@ -31,6 +31,9 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -264,6 +267,32 @@ public class ManageUsersTab {
 
 			}
 		});
+
+		userTable.addMouseListener(new MouseAdapter() {
+			public void mouseDoubleClick(MouseEvent e) {
+				if(e.button == 1) {
+					if(userTable.getItem(new Point(e.x,e.y))==null){
+						userTable.deselectAll();
+					}else{
+						TableItem[] items = userTable.getSelection();
+						if(items.length == 1){
+							editUserInfo(items[0].getText(0));
+						}
+					}
+				}
+			}
+		});
+
+		userTable.addMouseListener(new MouseAdapter() {
+			public void mouseDown(MouseEvent e) {
+				if(e.button == 1) {
+					if(userTable.getItem(new Point(e.x,e.y))==null){
+						userTable.deselectAll();
+					}
+				}
+			}
+		});
+
 
 		//popup menu for userTable
 		Menu popupmenu_table = new Menu(userTable);
