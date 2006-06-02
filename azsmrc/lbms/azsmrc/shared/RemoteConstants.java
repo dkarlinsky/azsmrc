@@ -72,7 +72,7 @@ public class RemoteConstants {
 	public static final int PARAMETER_BOOLEAN	= 3;
 	public static final int PARAMETER_FLOAT		= 4;
 
-	//User Righs
+	//User Rights
 	public static final int RIGHTS_ADMIN = 1;
 	public static final int RIGHTS_FORCESTART = 1<<1;
 
