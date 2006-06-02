@@ -47,7 +47,7 @@ public class ServerUpdateDialog {
 
 		//Comp on shell
 		Composite comp = new Composite(shell,SWT.NULL);
-		GridData gridData = new GridData(GridData.GRAB_HORIZONTAL);
+		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		comp.setLayoutData(gridData);
 
 		GridLayout gridLayout = new GridLayout();
