@@ -928,6 +928,8 @@ public class RCMain implements Launchable {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (RuntimeException e) {
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -945,49 +947,53 @@ public class RCMain implements Launchable {
 
 			public void flavorsChanged(FlavorEvent event) {
 				if(connect && Boolean.parseBoolean(properties.getProperty("auto_clipboard",Utilities.isLinux()? "false" : "true"))){
-					Transferable contents = clipboard.getContents(this);
-					if ( ( contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor) ) {
-						try {
-							final String string = ((String) contents.getTransferData(DataFlavor.stringFlavor)).trim();
-							if(!string.contains("torrent") && !string.contains("magnet")) return;
-							boolean valid = false;
+					try {
+						Transferable contents = clipboard.getContents(this);
+						if ( ( contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor) ) {
+							try {
+								final String string = ((String) contents.getTransferData(DataFlavor.stringFlavor)).trim();
+								if(!string.contains("torrent") && !string.contains("magnet")) return;
+								boolean valid = false;
 
-							if (magnetPattern.matcher(string).find()) {
-								valid = true;
-							} else {
-								try {
-									new URL(string);
+								if (magnetPattern.matcher(string).find()) {
 									valid = true;
-								} catch (MalformedURLException e) {}
+								} else {
+									try {
+										new URL(string);
+										valid = true;
+									} catch (MalformedURLException e) {}
+								}
+								if (valid) {
+									clipboard.setContents(emptyTransfer,null); //clear Transfer
+									display.asyncExec(new Runnable(){
+										public void run() {
+											OpenByURLDialog.openWithURL(string);
+										}
+									});
+								} else {
+									System.out.println("Not Valid URL: "+ string);
+								}
+							} catch(Exception e) {
+								//Just a regular string.. so ignore
+								e.printStackTrace();
 							}
-							if (valid) {
-								clipboard.setContents(emptyTransfer,null); //clear Transfer
-								display.asyncExec(new Runnable(){
-									public void run() {
-										OpenByURLDialog.openWithURL(string);
-									}
-								});
-							} else {
-								System.out.println("Not Valid URL: "+ string);
+
+						} else if(( contents != null) && contents.isDataFlavorSupported(DataFlavor.javaFileListFlavor)){
+							try{
+								List list = (List) contents.getTransferData(DataFlavor.javaFileListFlavor);
+								Iterator iter = list.iterator();
+								while(iter.hasNext()){
+									File file = (File) iter.next();
+									debugLogger.fine("*******FILE****" + file.getPath());
+								}
+
+							}catch(Exception e){
+								e.printStackTrace();
 							}
-						} catch(Exception e) {
-							//Just a regular string.. so ignore
-							e.printStackTrace();
+
 						}
-
-					} else if(( contents != null) && contents.isDataFlavorSupported(DataFlavor.javaFileListFlavor)){
-						try{
-							List list = (List) contents.getTransferData(DataFlavor.javaFileListFlavor);
-							Iterator iter = list.iterator();
-							while(iter.hasNext()){
-								File file = (File) iter.next();
-								debugLogger.fine("*******FILE****" + file.getPath());
-							}
-
-						}catch(Exception e){
-							e.printStackTrace();
-						}
-
+					} catch (RuntimeException e) {
+						e.printStackTrace();
 					}
 				}
 
