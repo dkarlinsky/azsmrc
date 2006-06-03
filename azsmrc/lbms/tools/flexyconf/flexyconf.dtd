@@ -1,0 +1,34 @@
+<?xml encoding="UTF-8"?>
+
+<!ELEMENT FlexyConfiguration (Section)>
+<!ATTLIST FlexyConfiguration
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT Section (Entry|Section|Group)*>
+<!ATTLIST Section
+  xmlns CDATA #FIXED ''
+  index CDATA #REQUIRED
+  label CDATA #REQUIRED>
+
+<!ELEMENT Group (Entry)+>
+<!ATTLIST Group
+  xmlns CDATA #FIXED ''
+  index CDATA #REQUIRED
+  label CDATA #REQUIRED>
+
+<!ELEMENT Entry (Option)*>
+<!ATTLIST Entry
+  xmlns CDATA #FIXED ''
+  dependsOn CDATA #IMPLIED
+  index CDATA #REQUIRED
+  key CDATA #REQUIRED
+  label CDATA #REQUIRED
+  type (integer|long|float|double|boolean|string|label|url) #REQUIRED
+  validate  #IMPLIED>
+
+<!ELEMENT Option EMPTY>
+<!ATTLIST Option
+  xmlns CDATA #FIXED ''
+  index CDATA #REQUIRED
+  label CDATA #REQUIRED
+  value CDATA #REQUIRED>
