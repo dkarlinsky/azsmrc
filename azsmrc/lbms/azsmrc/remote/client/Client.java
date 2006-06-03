@@ -66,6 +66,8 @@ public class Client {
 	private int failedConnections;
 	private Logger debug;
 
+	private int listTransferOptions;
+
 	private DownloadManagerImpl downloadManager;
 	private UserManagerImpl userManager;
 	private ResponseManager responseManager;
@@ -164,6 +166,14 @@ public class Client {
 				Element statElement = getSendElement();
 				statElement.setAttribute("switch", "globalStats");
 				request.addContent(statElement);
+
+				if (listTransferOptions != 0) {
+					Element listTransferElement = getSendElement();
+					listTransferElement.setAttribute("switch", "listTransfers");
+					listTransferElement.setAttribute("options", Integer.toString(listTransferOptions));
+					request.addContent(listTransferElement);
+					listTransferOptions = 0;
+				}
 
 				Element item = transactionQueue.poll();
 				while (item != null) {
@@ -306,10 +316,10 @@ public class Client {
 	}
 
 	public void sendListTransfers(int options) {
-		Element sendElement = getSendElement();
-		sendElement.setAttribute("switch", "listTransfers");
-		sendElement.setAttribute("options", Integer.toString(options));
-		enqueue(sendElement);
+		//to prevent stacking of list requests
+		//listTransferOptions will be used to store the options
+		listTransferOptions |= options;
+		send();
 	}
 
 	public void sendAddDownload(String url, String username, String password, String fileLocation) {
