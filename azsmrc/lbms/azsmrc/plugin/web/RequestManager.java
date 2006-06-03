@@ -400,8 +400,15 @@ public class RequestManager {
 		addHandler("addDownload", new RequestHandler() {
 			public boolean handleRequest(final Element xmlRequest, Element response,final User user) throws IOException {
 				String location = xmlRequest.getAttributeValue("location");
+				File file_location = null;
+				if (xmlRequest.getAttributeValue("fileLocation") != null)
+					file_location = new File (xmlRequest.getAttributeValue("fileLocation"));
+				if (file_location != null && !file_location.exists()) {
+					file_location = null;
+				}
 				if (location.equalsIgnoreCase("URL")) {
 					final String url = xmlRequest.getAttributeValue("url");
+					final File file = file_location;
 					new Thread(new Runnable (){
 						public void run() {
 							try {
@@ -414,7 +421,7 @@ public class RequestManager {
 									newTorrent = torrentManager.getURLDownloader(new URL(url),username,password).download();
 								else
 									newTorrent = torrentManager.getURLDownloader(new URL(url)).download();
-								Download dl = Plugin.getPluginInterface().getDownloadManager().addDownload(newTorrent);
+								Download dl = Plugin.getPluginInterface().getDownloadManager().addDownload(newTorrent,null,file);
 								user.addDownload(dl);
 								try {
 									Plugin.getXMLConfig().saveConfigFile();
@@ -470,7 +477,7 @@ public class RequestManager {
 							System.out.println("AzSMRC addDL downloadControlList.size:" +downloadControlList.size());
 						}
 
-						Download dl = Plugin.getPluginInterface().getDownloadManager().addDownload(newTorrent);
+						Download dl = Plugin.getPluginInterface().getDownloadManager().addDownload(newTorrent, null, file_location);
 
 						user.addDownload(dl);
 						Plugin.getXMLConfig().saveConfigFile();

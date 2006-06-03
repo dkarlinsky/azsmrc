@@ -161,9 +161,9 @@ public class OpenByURLDialog {
 						messageBox.open();
 						return;
 					}else
-						RCMain.getRCMain().getClient().sendAddDownload(url, username_text.getText(), password_text.getText());
+						RCMain.getRCMain().getClient().getDownloadManager().addDownload(url, username_text.getText(), password_text.getText(), null, null);
 				}else{
-					RCMain.getRCMain().getClient().sendAddDownload(url);
+					RCMain.getRCMain().getClient().getDownloadManager().addDownload(url);
 
 				}
 				shell.close();

@@ -30,8 +30,8 @@ public interface
 DownloadManager
 {
 	/**
-	 * add a torrent from a file. This will prompt the user for download location etc. if required
-	 * This is an async operation so no Download returned
+	 * add a torrent from a file. 
+	 * 
 	 * @param torrent_file
 	 */
 	public void
@@ -39,26 +39,86 @@ DownloadManager
 		File 	torrent_file );
 
 	/**
-	 * add a torrent from a URL. This will prompt the user for download location etc. if required
-	 * This is an async operation so no Download returned
-	 * @param url
+	 * add a torrent from a file and select which files should be downloaded.
+	 * 
+	 * fileSelection is an array consisting of 1 and 0, for every file in the torrent
+	 * there has to be either 1 or 0. They have to be in the same order as the torrent
+	 * specifies.
+	 * 
+	 * @param torrent_file local torrent file
+	 * @param fileSelection the array selects the downloads 1 is download 0 is DND 
 	 */
 	public void
 	addDownload(
-		URL		url );
+		File 	torrent_file,
+		final int[] fileSelection );
 
 	/**
-	 * add a torrent from a URL. This will prompt the user for download location etc. if required
-	 * This is an async operation so no Download returned
-	 * @param url
-	 * @param referer
-	 * @throws DownloadException
-	 *
+	 * add a torrent from a file and specify save dir
+	 * @param torrent_file local torrent file
+	 * @param fileLocation file save location; null -> default will be used
 	 */
 	public void
 	addDownload(
-		final URL	url,
-		final URL 	referer);
+		File 	torrent_file,
+		final String fileLocation );
+
+	/**
+	 * add a torrent from a file and select which files should be downloaded and specify save dir.
+	 * 
+	 * fileSelection is an array consisting of 1 and 0, for every file in the torrent
+	 * there has to be either 1 or 0. They have to be in the same order as the torrent
+	 * specifies.
+	 * 
+	 * @param torrent_file local torrent file
+	 * @param fileSelection the array selects the downloads 1 is download 0 is DND 
+	 * @param fileLocation file save location; null -> default will be used
+	 */
+	public void
+	addDownload(
+		File 	torrent_file,
+		final int[] fileSelection,
+		final String fileLocation );
+
+	/**
+	 * This will add a Download via an URL.
+	 * 
+	 * @param url TorrentURL
+	 */
+	public void
+	addDownload(
+		String		url );
+
+	/**
+	 * add a Download via an URL.
+	 * 
+	 * @param url TorrentURL
+	 * @param fileLocation file save location; null -> default will be used
+	 */
+	public void
+	addDownload(
+		String		url,
+		final String fileLocation );
+
+
+	/**
+	 * add a Download via an URL.
+	 * 
+	 * You can specify username/password and referer if requiered.
+	 * 
+	 * @param url TorrentURL
+	 * @param username maybe null
+	 * @param password maybe null
+	 * @param referer maybe null
+	 * @param fileLocation file save location; null -> default will be used
+	 */
+	public void
+	addDownload(
+		final String url,
+		final String username,
+		final String password,
+		final URL 	referer,
+		final String fileLocation );
 
 	/**
 	 * Gets the download for a particular torrent, returns null if not found

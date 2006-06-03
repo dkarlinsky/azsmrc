@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import lbms.azsmrc.remote.client.Client;
 import lbms.azsmrc.remote.client.Download;
 import lbms.azsmrc.remote.client.DownloadManager;
 import lbms.azsmrc.remote.client.events.DownloadManagerListener;
@@ -22,20 +23,59 @@ public class DownloadManagerImpl implements DownloadManager {
 
 	private Map<String, DownloadImpl> downloads = Collections.synchronizedMap( new TreeMap<String, DownloadImpl>() );
 	private List<DownloadManagerListener> listeners =Collections.synchronizedList( new ArrayList<DownloadManagerListener>() );
+	private Client client;
 
+	public DownloadManagerImpl (Client client) {
+		this.client = client;
+	}
+
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.DownloadManager#addDownload(java.io.File)
+	 */
 	public void addDownload(File torrent_file) {
-		// TODO Auto-generated method stub
-
+		client.sendAddDownload(torrent_file, null, null);
 	}
 
-	public void addDownload(URL url) {
-		// TODO Auto-generated method stub
-
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.DownloadManager#addDownload(java.io.File, int[])
+	 */
+	public void addDownload(File torrent_file, int[] fileSelection) {
+		client.sendAddDownload(torrent_file, fileSelection, null);
 	}
 
-	public void addDownload(URL url, URL referer) {
-		// TODO Auto-generated method stub
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.DownloadManager#addDownload(java.io.File, int[], java.lang.String)
+	 */
+	public void addDownload(File torrent_file, int[] fileSelection, String fileLocation) {
+		client.sendAddDownload(torrent_file, fileSelection, fileLocation);
+	}
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.DownloadManager#addDownload(java.io.File, java.lang.String)
+	 */
 
+	public void addDownload(File torrent_file, String fileLocation) {
+		client.sendAddDownload(torrent_file, null, fileLocation);
+	}
+
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.DownloadManager#addDownload(java.net.URL)
+	 */
+	public void addDownload(String url) {
+		client.sendAddDownload(url, null, null, null);
+	}
+
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.DownloadManager#addDownload(java.net.URL, java.lang.String)
+	 */
+	public void addDownload(String url, String fileLocation) {
+		client.sendAddDownload(url, null, null, fileLocation);
+
+	}
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.DownloadManager#addDownload(java.net.URL, java.lang.String, java.lang.String, java.net.URL, java.lang.String)
+	 */
+	public void addDownload(String url, String username, String password, URL referer, String fileLocation) {
+		client.sendAddDownload(url, username, password, fileLocation);
 	}
 
 	public Download getDownload(String hash) {

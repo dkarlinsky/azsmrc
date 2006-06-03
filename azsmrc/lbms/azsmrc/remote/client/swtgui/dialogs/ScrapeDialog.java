@@ -158,10 +158,10 @@ public class ScrapeDialog {
 						TableItem item = new TableItem(torrentTable,SWT.NULL);
 						item.setText(0,atc.getName());
 
-			            //Shade every other one
-			            if(torrentTable.indexOf(item)%2!=0){
-			            	item.setBackground(ColorUtilities.getBackgroundColor());
-			            }
+						//Shade every other one
+						if(torrentTable.indexOf(item)%2!=0){
+							item.setBackground(ColorUtilities.getBackgroundColor());
+						}
 
 						//open its tab
 						torrentTabOpen(tabFolder,map.get(atc.getName()));
@@ -353,12 +353,12 @@ public class ScrapeDialog {
 			public void handleEvent(Event arg0) {
 				if(RCMain.getRCMain().connected()){
 					if(atc.isWholeFileSent()){
-                    	RCMain.getRCMain().getClient().sendAddDownload(atc.getTorrentFile());
-                    }else{
-                    	int[] props = atc.getFileProperties();
-                        //Main add to Azureus
-                        RCMain.getRCMain().getClient().sendAddDownload(atc.getTorrentFile(), props);
-                    }
+						RCMain.getRCMain().getClient().getDownloadManager().addDownload(atc.getTorrentFile());
+					}else{
+						int[] props = atc.getFileProperties();
+						//Main add to Azureus
+						RCMain.getRCMain().getClient().getDownloadManager().addDownload(atc.getTorrentFile(), props);
+					}
 					if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("delete.on.send", "false"))){
 						if(!atc.deleteFile()){
 							MessageBox messageBox = new MessageBox(shell,
@@ -598,44 +598,44 @@ public class ScrapeDialog {
 		ftSize.setWidth(100);
 
 		TOTorrentFile[] files = atc.getFiles();
-        int[] properties = atc.getFileProperties();
-        for (int i = 0; i < files.length; i++) {
-            final TableItem detailItem = new TableItem(filesTable,SWT.NULL);
-            String name = files[i].getRelativePath();
+		int[] properties = atc.getFileProperties();
+		for (int i = 0; i < files.length; i++) {
+			final TableItem detailItem = new TableItem(filesTable,SWT.NULL);
+			String name = files[i].getRelativePath();
 
-            if (name == null || name.length() == 0 || name.equalsIgnoreCase("")) {
-                name = "Error Decoding Name";
-            }
+			if (name == null || name.length() == 0 || name.equalsIgnoreCase("")) {
+				name = "Error Decoding Name";
+			}
 
-            if (properties != null && properties[i] == 1) {
-                detailItem.setChecked(true);
-            }
-            detailItem.setText(1, name);
-            detailItem.setText(2, DisplayFormatters
-                    .formatByteCountToBase10KBEtc(files[i].getLength()));
+			if (properties != null && properties[i] == 1) {
+				detailItem.setChecked(true);
+			}
+			detailItem.setText(1, name);
+			detailItem.setText(2, DisplayFormatters
+					.formatByteCountToBase10KBEtc(files[i].getLength()));
 
 
-            //Shade every other one
-            if(filesTable.indexOf(detailItem)%2!=0){
-            	detailItem.setBackground(ColorUtilities.getBackgroundColor());
-            }
-        }
+			//Shade every other one
+			if(filesTable.indexOf(detailItem)%2!=0){
+				detailItem.setBackground(ColorUtilities.getBackgroundColor());
+			}
+		}
 
-        //Listener for table DND selection
-        filesTable.addListener(SWT.Selection, new Listener() {
-            public void handleEvent(Event event) {
-                if (event.detail == SWT.CHECK) {
-                    TableItem item = (TableItem) event.item;
-                    int place = filesTable.indexOf(item);
+		//Listener for table DND selection
+		filesTable.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event event) {
+				if (event.detail == SWT.CHECK) {
+					TableItem item = (TableItem) event.item;
+					int place = filesTable.indexOf(item);
 
-                    if (item.getChecked()) {
-                        atc.setFileProperty(place, 1);
-                    } else
-                        atc.setFileProperty(place, 0);
-                }
+					if (item.getChecked()) {
+						atc.setFileProperty(place, 1);
+					} else
+						atc.setFileProperty(place, 0);
+				}
 
-            }
-        });
+			}
+		});
 
 
 		//Listener for the Scrape button

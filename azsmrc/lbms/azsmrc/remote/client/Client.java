@@ -93,7 +93,7 @@ public class Client {
 	}
 
 	private void init() {
-		downloadManager = new DownloadManagerImpl();
+		downloadManager = new DownloadManagerImpl(this);
 		responseManager = new ResponseManager(this);
 		userManager 	= new UserManagerImpl(this);
 		remoteInfo		= new RemoteInfoImpl(this);
@@ -312,11 +312,7 @@ public class Client {
 		enqueue(sendElement);
 	}
 
-	public void sendAddDownload(String url) {
-		sendAddDownload(url, null, null);
-	}
-
-	public void sendAddDownload(String url, String username, String password) {
+	public void sendAddDownload(String url, String username, String password, String fileLocation) {
 		Element sendElement = getSendElement();
 		sendElement.setAttribute("switch", "addDownload");
 		sendElement.setAttribute("location", "URL");
@@ -325,19 +321,21 @@ public class Client {
 			sendElement.setAttribute("username", username);
 			sendElement.setAttribute("password", password);
 		}
+		if (fileLocation != null) {
+			sendElement.setAttribute("fileLocation", fileLocation);
+		}
 		enqueue(sendElement);
 	}
 
-	public void sendAddDownload(File torrentFile) {
-		sendAddDownload(torrentFile, null);
-	}
-
-	public void sendAddDownload(File torrentFile, int[] fileOptions) {
+	public void sendAddDownload(File torrentFile, int[] fileOptions, String fileLocation) {
 		Element sendElement = getSendElement();
 		sendElement.setAttribute("switch", "addDownload");
 		sendElement.setAttribute("location", "XML");
 		if (fileOptions != null) {
 			sendElement.setAttribute("fileOptions", EncodingUtil.IntArrayToString(fileOptions));
+		}
+		if (fileLocation != null) {
+			sendElement.setAttribute("fileLocation", fileLocation);
 		}
 		try {
 			sendElement.addContent(loadTorrentToXML(torrentFile));

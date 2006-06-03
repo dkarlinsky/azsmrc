@@ -468,11 +468,11 @@ public class OpenByFileDialog {
 						//Check to see if the whole file is sent and if so, just add it normally
 						//else send it with the properties int[]
 						if(container.isWholeFileSent()){
-							RCMain.getRCMain().getClient().sendAddDownload(container.getTorrentFile());
+							RCMain.getRCMain().getClient().getDownloadManager().addDownload(container.getTorrentFile());
 						}else{
 							int[] props = container.getFileProperties();
 							//Main add to Azureus
-							RCMain.getRCMain().getClient().sendAddDownload(container.getTorrentFile(), props);
+							RCMain.getRCMain().getClient().getDownloadManager().addDownload(container.getTorrentFile(), props);
 						}
 
 						if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("delete.on.send", "false"))){
