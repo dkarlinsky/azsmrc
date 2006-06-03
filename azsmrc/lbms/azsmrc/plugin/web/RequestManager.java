@@ -1068,10 +1068,10 @@ public class RequestManager {
 					} catch (DataConversionException e) {
 						e.printStackTrace();
 					}
+					response.setAttribute("switch", "getAzParameter");
+					return handlerList.get("getAzParameter").handleRequest(xmlRequest, response, user); //TODO Hack
 				}
-				response.setAttribute("switch", "getAzParameter");
-				return handlerList.get("getAzParameter").handleRequest(xmlRequest, response, user); //TODO Hack
-
+				return false;
 			}
 		});
 		addHandler("getAzParameter", new RequestHandler() {
@@ -1104,8 +1104,9 @@ public class RequestManager {
 						e.printStackTrace();
 						response.setAttribute("type",Integer.toString(RemoteConstants.PARAMETER_NOT_FOUND));
 					}
+					return true;
 				}
-				return true;
+				return false;
 			}
 		});
 		addHandler("setPluginParameter", new RequestHandler() {
@@ -1131,9 +1132,10 @@ public class RequestManager {
 					} catch (DataConversionException e) {
 						e.printStackTrace();
 					}
+					response.setAttribute("switch", "getPluginParameter");
+					return handlerList.get("getPluginParameter").handleRequest(xmlRequest, response, user); //TODO Hack
 				}
-				response.setAttribute("switch", "getPluginParameter");
-				return handlerList.get("getPluginParameter").handleRequest(xmlRequest, response, user); //TODO Hack
+				return false;
 			}
 		});
 		addHandler("getPluginParameter", new RequestHandler() {
@@ -1171,8 +1173,9 @@ public class RequestManager {
 						e.printStackTrace();
 						response.setAttribute("type",Integer.toString(RemoteConstants.PARAMETER_NOT_FOUND));
 					}
+					return true;
 				}
-				return true;
+				return false;
 			}
 		});
 		addHandler("setCoreParameter", new RequestHandler() {
@@ -1197,9 +1200,10 @@ public class RequestManager {
 					} catch (DataConversionException e) {
 						e.printStackTrace();
 					}
+					response.setAttribute("switch", "getCoreParameter");
+					return handlerList.get("getCoreParameter").handleRequest(xmlRequest, response, user); //TODO Hack
 				}
-				response.setAttribute("switch", "getCoreParameter");
-				return handlerList.get("getCoreParameter").handleRequest(xmlRequest, response, user); //TODO Hack
+				return false;
 
 			}
 		});
@@ -1232,8 +1236,9 @@ public class RequestManager {
 						e.printStackTrace();
 						response.setAttribute("type",Integer.toString(RemoteConstants.PARAMETER_NOT_FOUND));
 					}
+					return true;
 				}
-				return true;
+				return false;
 			}
 		});
 		addHandler("restartAzureus", new RequestHandler() {
