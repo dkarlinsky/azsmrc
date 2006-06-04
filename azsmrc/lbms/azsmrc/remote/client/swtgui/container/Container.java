@@ -3,7 +3,10 @@ package lbms.azsmrc.remote.client.swtgui.container;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import lbms.azsmrc.remote.client.Download;
 import lbms.azsmrc.remote.client.DownloadStats;
@@ -58,6 +61,7 @@ public abstract class Container implements Comparable<Container> {
 	protected Image progBarImage;
 
 	private static List<Integer> totalTableColumns = new ArrayList<Integer>();
+	private static Map<Integer,Comparator<Container>> comparatorCollection = new HashMap<Integer, Comparator<Container>>();
 
 	static {
 		totalTableColumns.add(RemoteConstants.ST_HEALTH);
@@ -81,6 +85,103 @@ public abstract class Container implements Comparable<Container> {
 		totalTableColumns.add(RemoteConstants.ST_TOTAL_AVG);
 		totalTableColumns.add(RemoteConstants.ST_LIMIT_UP);
 		totalTableColumns.add(RemoteConstants.ST_LIMIT_DOWN);
+
+		comparatorCollection.put(RemoteConstants.ST_POSITION, new Comparator<Container>() {
+			/* (non-Javadoc)
+			 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+			 */
+			public int compare(Container o1, Container o2) {
+				return o1.compareTo(o2);
+			}
+		});
+		comparatorCollection.put(RemoteConstants.ST_NAME, new Comparator<Container>() {
+			/* (non-Javadoc)
+			 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+			 */
+			public int compare(Container o1, Container o2) {
+				return o1.dl.getName().compareToIgnoreCase(o2.dl.getName());
+			}
+		});
+		comparatorCollection.put(RemoteConstants.ST_COMPLETITION, new Comparator<Container>() {
+			/* (non-Javadoc)
+			 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+			 */
+			public int compare(Container o1, Container o2) {
+				return o1.dl.getStats().getCompleted()-o2.dl.getStats().getCompleted();
+			}
+		});
+		comparatorCollection.put(RemoteConstants.ST_AVAILABILITY, new Comparator<Container>() {
+			/* (non-Javadoc)
+			 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+			 */
+			public int compare(Container o1, Container o2) {
+				return (int)(o1.dl.getStats().getAvailability()-o2.dl.getStats().getAvailability());
+			}
+		});
+		comparatorCollection.put(RemoteConstants.ST_DOWNLOAD_AVG, new Comparator<Container>() {
+			/* (non-Javadoc)
+			 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+			 */
+			public int compare(Container o1, Container o2) {
+				return (int)(o1.dl.getStats().getDownloadAverage()-o2.dl.getStats().getDownloadAverage());
+			}
+		});
+		comparatorCollection.put(RemoteConstants.ST_UPLOAD_AVG, new Comparator<Container>() {
+			/* (non-Javadoc)
+			 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+			 */
+			public int compare(Container o1, Container o2) {
+				return (int)(o1.dl.getStats().getUploadAverage()-o2.dl.getStats().getUploadAverage());
+			}
+		});
+		comparatorCollection.put(RemoteConstants.ST_UPLOADED, new Comparator<Container>() {
+			/* (non-Javadoc)
+			 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+			 */
+			public int compare(Container o1, Container o2) {
+				return (int)(o1.dl.getStats().getUploaded()-o2.dl.getStats().getUploaded());
+			}
+		});
+		comparatorCollection.put(RemoteConstants.ST_DOWNLOADED, new Comparator<Container>() {
+			/* (non-Javadoc)
+			 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+			 */
+			public int compare(Container o1, Container o2) {
+				return (int)(o1.dl.getStats().getDownloaded()-o2.dl.getStats().getDownloaded());
+			}
+		});
+		comparatorCollection.put(RemoteConstants.ST_ALL_LEECHER, new Comparator<Container>() {
+			/* (non-Javadoc)
+			 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+			 */
+			public int compare(Container o1, Container o2) {
+				return (o1.dl.getLeecher()-o2.dl.getLeecher());
+			}
+		});
+		comparatorCollection.put(RemoteConstants.ST_ALL_SEEDS, new Comparator<Container>() {
+			/* (non-Javadoc)
+			 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+			 */
+			public int compare(Container o1, Container o2) {
+				return (o1.dl.getSeeds()-o2.dl.getSeeds());
+			}
+		});
+		comparatorCollection.put(RemoteConstants.ST_DISCARDED, new Comparator<Container>() {
+			/* (non-Javadoc)
+			 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+			 */
+			public int compare(Container o1, Container o2) {
+				return (int)(o1.dl.getDiscarded()-o2.dl.getDiscarded());
+			}
+		});
+		comparatorCollection.put(RemoteConstants.ST_SHARE, new Comparator<Container>() {
+			/* (non-Javadoc)
+			 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+			 */
+			public int compare(Container o1, Container o2) {
+				return (o1.dl.getStats().getShareRatio()-o2.dl.getStats().getShareRatio());
+			}
+		});
 	}
 
 
