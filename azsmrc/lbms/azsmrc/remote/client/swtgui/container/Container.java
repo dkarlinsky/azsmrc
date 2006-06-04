@@ -525,10 +525,12 @@ public abstract class Container implements Comparable<Container> {
 		});
 	}
 
-
-
 	public static List<Integer> getTotalColumns() {
 		return totalTableColumns;
+	}
+
+	public static Map<Integer,Comparator<Container>> getComparators() {
+		return comparatorCollection;
 	}
 
 	/**

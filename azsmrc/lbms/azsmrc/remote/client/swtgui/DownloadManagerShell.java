@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -1105,6 +1106,7 @@ public class DownloadManagerShell {
 		gridData = new GridData(GridData.FILL_BOTH);
 		downloadsTable.setLayoutData(gridData);
 		downloadsTable.setHeaderVisible(true);
+		downloadsTable.setData("comparator", Container.getComparators().get(RemoteConstants.ST_POSITION));
 
 		createTableColumns(downloadsTable, DownloadContainer.getColumns());
 
@@ -1200,6 +1202,7 @@ public class DownloadManagerShell {
 		gridData = new GridData(GridData.FILL_BOTH);
 		seedsTable.setLayoutData(gridData);
 		seedsTable.setHeaderVisible(true);
+		seedsTable.setData("comparator", Container.getComparators().get(RemoteConstants.ST_POSITION));
 
 		createTableColumns(seedsTable, SeedContainer.getColumns());
 
@@ -2523,6 +2526,8 @@ public class DownloadManagerShell {
 		RCMain.getRCMain().getDisplay().syncExec(new Runnable(){
 			public void run() {
 				TableItem[] items = table.getItems();
+				Comparator<Container> comp = (Comparator<Container>)table.getData("comparator");
+				if (comp == null) return;
 				int minimum;
 				for (int i = 0; i < items.length - 1; i++) {
 					minimum = i; /* current minimum */
@@ -2530,7 +2535,7 @@ public class DownloadManagerShell {
 					Container cMinimum = (Container)items[minimum].getData();
 					for (int j = i + 1; j < items.length; j++) {
 						Container cJ = (Container)items[j].getData();
-						int result = cMinimum.compareTo(cJ);
+						int result = comp.compare(cMinimum, cJ);
 						if (result > 0) {
 							/* new minimum */
 							cMinimum = cJ;
@@ -2553,11 +2558,13 @@ public class DownloadManagerShell {
 
 	public int findInsertionPosition(Container insertItem, Table table) {
 		TableItem[] items = table.getItems();
+		Comparator<Container> comp = (Comparator<Container>)table.getData("comparator");
+		if (comp == null) return items.length;
 		int pos = 0;
 		boolean found = false;
 		for (int j = 0; j < items.length; j++) {
 			Container cJ = (Container)items[j].getData();
-			int result = insertItem.compareTo(cJ);
+			int result = comp.compare(insertItem, cJ);
 			pos = j;
 			if (result < 0)	{
 				found = true;
