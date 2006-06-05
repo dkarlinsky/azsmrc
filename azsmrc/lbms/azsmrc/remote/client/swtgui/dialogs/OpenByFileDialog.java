@@ -36,6 +36,8 @@ import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellEvent;
@@ -55,6 +57,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
 
 public class OpenByFileDialog {
 
@@ -68,8 +71,12 @@ public class OpenByFileDialog {
 
 	private Label saveDir, saveDirSize, destDir, destDirSize;
 
+	private Text saveTo;
+
 	private Map<String, AddTorrentContainer> tMap = new HashMap<String, AddTorrentContainer>();
 	private Map<String,String> driveMap = new HashMap<String,String>();
+
+	private AddTorrentContainer activeATC;
 
 	//private int drag_drop_line_start = -1;
 
@@ -382,6 +389,21 @@ public class OpenByFileDialog {
 		gridData.grabExcessVerticalSpace = true;
 		detailsGroup.setLayoutData(gridData);
 
+		Label saveToLabel = new Label(detailsGroup, SWT.NULL);
+		saveToLabel.setText(I18N.translate(PFX + "torrentdetail.saveToLabel.text"));
+
+		saveTo = new Text(detailsGroup, SWT.BORDER | SWT.SINGLE);
+		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		saveTo.setLayoutData(gridData);
+		saveTo.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent event) {
+				if(activeATC != null){
+					activeATC.setSaveToDirectory(saveTo.getText());
+				}
+			}
+		});
+
+
 		// detailsTAble for each torrent
 		detailsTable = new Table(detailsGroup, SWT.BORDER | SWT.V_SCROLL
 				| SWT.H_SCROLL | SWT.CHECK | SWT.MULTI);
@@ -468,11 +490,17 @@ public class OpenByFileDialog {
 						//Check to see if the whole file is sent and if so, just add it normally
 						//else send it with the properties int[]
 						if(container.isWholeFileSent()){
-							RCMain.getRCMain().getClient().getDownloadManager().addDownload(container.getTorrentFile());
+							if(container.getSaveToDirectory().equalsIgnoreCase(""))
+								RCMain.getRCMain().getClient().getDownloadManager().addDownload(container.getTorrentFile());
+							else
+								RCMain.getRCMain().getClient().getDownloadManager().addDownload(container.getTorrentFile(), container.getSaveToDirectory());
 						}else{
 							int[] props = container.getFileProperties();
 							//Main add to Azureus
-							RCMain.getRCMain().getClient().getDownloadManager().addDownload(container.getTorrentFile(), props);
+							if(container.getSaveToDirectory().equalsIgnoreCase(""))
+								RCMain.getRCMain().getClient().getDownloadManager().addDownload(container.getTorrentFile(), props);
+							else
+								RCMain.getRCMain().getClient().getDownloadManager().addDownload(container.getTorrentFile(), props, container.getSaveToDirectory());
 						}
 
 						if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("delete.on.send", "false"))){
@@ -680,9 +708,9 @@ public class OpenByFileDialog {
 	public void generateDetails(String tName) {
 		if (tMap.containsKey(tName)) {
 			detailsTable.removeAll();
-			final AddTorrentContainer container = tMap.get(tName);
-			TOTorrentFile[] files = container.getFiles();
-			int[] properties = container.getFileProperties();
+			activeATC = tMap.get(tName);
+			TOTorrentFile[] files = activeATC.getFiles();
+			int[] properties = activeATC.getFileProperties();
 			for (int i = 0; i < files.length; i++) {
 				final TableItem detailItem = new TableItem(detailsTable,
 						SWT.NULL);
@@ -703,6 +731,14 @@ public class OpenByFileDialog {
 					detailItem.setBackground(ColorUtilities.getBackgroundColor());
 				}
 			}
+
+			//add in the custom directory if there is one
+			if(!activeATC.getSaveToDirectory().equalsIgnoreCase("")){
+				saveTo.setText(activeATC.getSaveToDirectory());
+			}else if(driveMap.containsKey("save.dir.path")){
+				saveTo.setText(driveMap.get("save.dir.path"));
+			}else
+				saveTo.setText("");
 
 		}else{
 			System.out.println("Error... " + tName + " not in map!");
