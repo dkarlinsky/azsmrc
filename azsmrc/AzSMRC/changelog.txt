@@ -1,0 +1,12 @@
+Changelog for Version: 0.9.6
+
+***New Features***
+
+- Automatic ErrorReporter
+- Graphical Updater
+
+***BugFixes***
+
+- fixed crash in Azureus Remote Configuration
+- fixed crash in AddByFile
+
