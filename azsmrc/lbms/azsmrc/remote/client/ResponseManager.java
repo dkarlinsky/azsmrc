@@ -87,7 +87,8 @@ public class ResponseManager {
 			exists = false;
 		}
 		// Download Attributes
-		dl.implSetName(dle.getAttributeValue("name"));
+		if (dle.getAttributeValue("name") != null)
+			dl.implSetName(dle.getAttributeValue("name"));
 		dl.implSetForceStart(Boolean.parseBoolean(dle.getAttributeValue("forceStart")));
 		try {
 			dl.implSetPosition(dle.getAttribute("position").getIntValue());

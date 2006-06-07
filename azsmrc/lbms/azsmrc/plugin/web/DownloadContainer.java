@@ -48,7 +48,10 @@ public class DownloadContainer {
 		setDlStats();
 	}
 	public Element updateAndGetDiff () {
-		if (_new) return fullUpdate();
+		if (_new) {
+			_new = false;
+			return fullUpdate();
+		}
 		DownloadStats ds = dl.getStats();
 		Element dle = new Element ("Transfer");
 

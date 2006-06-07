@@ -215,4 +215,15 @@ DownloadManager
 	 */
 	public void
 	clear();
+
+	/**
+	 * Will request an update from the Az Server.
+	 * 
+	 * It uses smart updating, only the differences
+	 * since the last call are updated. If you want a
+	 * full update set full = true;
+	 * @param full whether do a full update or not 
+	 */
+	public void
+	update (boolean full);
 }

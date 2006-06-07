@@ -762,7 +762,7 @@ public class RCMain implements Launchable {
 				new TimerEventPerformer() {
 				public void perform(TimerEvent event) {
 					debugLogger.finest("Timer: GUI mode");
-					client.sendListTransfers(Integer.parseInt(properties.getProperty("transfer_states",Integer.toString(RemoteConstants.ST_ALL))));
+					client.getDownloadManager().update(false);
 				}
 			});
 		}

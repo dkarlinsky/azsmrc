@@ -172,6 +172,13 @@ public class DownloadManagerImpl implements DownloadManager {
 		downloads.clear();
 	}
 
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.DownloadManager#update(boolean)
+	 */
+	public void update(boolean full) {
+		client.sendUpdateDownloads(full);
+	}
+
 	//-------------------------------------------//
 
 	public DownloadImpl manGetDownload (String hash) {
