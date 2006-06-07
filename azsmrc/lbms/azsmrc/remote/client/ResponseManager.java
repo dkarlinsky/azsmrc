@@ -206,6 +206,16 @@ public class ResponseManager {
 				return Constants.UPDATE_LIST_TRANSFERS;
 			}
 		});
+		addHandler("updateDownloads", new ResponseHandler() {
+			public long handleRequest(Element xmlResponse) throws IOException {
+				Element root = xmlResponse.getChild("Transfers");
+				List<Element> transfers = root.getChildren("Transfer");
+				for (Element t:transfers) {
+					updateDownload(t);
+				}
+				return Constants.UPDATE_LIST_TRANSFERS;
+			}
+		});
 		addHandler("getAdvancedStats", new ResponseHandler() {
 			public long handleRequest(Element xmlResponse) throws IOException {
 				Element advStats = xmlResponse.getChild("AdvancedStats");

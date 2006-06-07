@@ -42,6 +42,9 @@ public class XMLConfig {
 
 	private double configVersion = 0.6;
 
+	private User[] emptyUserArray = new User[0];
+	private String[] emptyStringArray = new String [0];
+
 	/**
 	 * Prevent direct instantation
 	 */
@@ -214,7 +217,7 @@ public class XMLConfig {
 	 * @return A list of Usernames
 	 */
 	public String[] getUserList() {
-		String[] list = userList.keySet().toArray(new String[] {});
+		String[] list = userList.keySet().toArray(emptyStringArray);
 		Arrays.sort(list);
 		return list;
 	}
@@ -225,7 +228,7 @@ public class XMLConfig {
 	 * @return Array with all Users
 	 */
 	public User[] getUsers () {
-		return userList.values().toArray(new User[] {});
+		return userList.values().toArray(emptyUserArray);
 	}
 
 	/**
@@ -312,7 +315,7 @@ public class XMLConfig {
 			if (userList.get(key).hasDownload(dl))
 				temp.add(userList.get(key));
 		}
-		return temp.toArray(new User[] {});
+		return temp.toArray(emptyUserArray);
 	}
 
 	public void removeInvalidDownloadsFromUsers (Download[] dls) {

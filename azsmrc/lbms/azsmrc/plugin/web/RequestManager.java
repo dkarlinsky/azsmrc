@@ -72,6 +72,7 @@ public class RequestManager {
 	private Map<String,RequestHandler> handlerList = new HashMap<String, RequestHandler>();
 	private static RequestManager instance = new RequestManager();
 	private Map<String, Integer[]> downloadControlList = new HashMap<String, Integer[]>();
+	private DownloadContainerManager dcm;
 
 	private boolean restart = false;
 
@@ -84,6 +85,7 @@ public class RequestManager {
 
 	public void initialize (PluginInterface pi) {
 		System.out.println("AzSMRC: adding DownloadWillBeAddedListener");
+		dcm = new DownloadContainerManager(pi.getDownloadManager());
 		pi.getDownloadManager().addDownloadWillBeAddedListener(new DownloadWillBeAddedListener() {
 			public void initialised(Download dl) {
 				String hash = EncodingUtil.encode(dl.getTorrent().getHash());
@@ -397,14 +399,29 @@ public class RequestManager {
 				return true;
 			}
 		});
+		addHandler("updateDownloads", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException{
+				//response.setAttribute("switch", "listTransfers");
+				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
+				boolean fullUpdate = Boolean.parseBoolean(xmlRequest.getAttributeValue("fullUpate"));
+				if (singleUser) {
+					response.addContent(dcm.updateDownload(fullUpdate));
+				} else {
+					response.addContent(dcm.updateDownloadsFromUser(user, fullUpdate));
+				}
+				return true;
+			}
+		});
 		addHandler("addDownload", new RequestHandler() {
 			public boolean handleRequest(final Element xmlRequest, Element response,final User user) throws IOException {
 				String location = xmlRequest.getAttributeValue("location");
 				File file_location = null;
-				if (xmlRequest.getAttributeValue("fileLocation") != null)
-					file_location = new File (xmlRequest.getAttributeValue("fileLocation"));
-				if (file_location != null && !file_location.exists()) {
-					file_location = null;
+				if (user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+					if (xmlRequest.getAttributeValue("fileLocation") != null)
+						file_location = new File (xmlRequest.getAttributeValue("fileLocation"));
+					if (file_location != null && !file_location.exists()) {
+						file_location = null;
+					}
 				}
 				if (location.equalsIgnoreCase("URL")) {
 					final String url = xmlRequest.getAttributeValue("url");

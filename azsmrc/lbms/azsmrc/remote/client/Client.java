@@ -66,7 +66,10 @@ public class Client {
 	private int failedConnections;
 	private Logger debug;
 
+	//special send variables
 	private int listTransferOptions;
+	private boolean updateDownloads;
+	private boolean updateDownloadsFull;
 
 	private DownloadManagerImpl downloadManager;
 	private UserManagerImpl userManager;
@@ -163,6 +166,8 @@ public class Client {
 				request.setAttribute("version", Double.toString(RemoteConstants.CURRENT_VERSION));
 				reqDoc.addContent(request);
 
+				//special Elements that are used often but only have one return
+				//this is used to prevent stacking
 				Element statElement = getSendElement();
 				statElement.setAttribute("switch", "globalStats");
 				request.addContent(statElement);
@@ -173,6 +178,15 @@ public class Client {
 					listTransferElement.setAttribute("options", Integer.toString(listTransferOptions));
 					request.addContent(listTransferElement);
 					listTransferOptions = 0;
+				}
+
+				if (updateDownloads) {
+					Element listTransferElement = getSendElement();
+					listTransferElement.setAttribute("switch", "updateDownloads");
+					listTransferElement.setAttribute("fullUpdate",Boolean.toString(updateDownloadsFull));
+					request.addContent(listTransferElement);
+					updateDownloads = false;
+					updateDownloadsFull = false;
 				}
 
 				Element item = transactionQueue.poll();
@@ -319,6 +333,12 @@ public class Client {
 		//to prevent stacking of list requests
 		//listTransferOptions will be used to store the options
 		listTransferOptions |= options;
+		send();
+	}
+
+	public void sendUpdateDownloads (boolean fullUpdate) {
+		updateDownloads = true;
+		if (fullUpdate) updateDownloadsFull = true;
 		send();
 	}
 
