@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import lbms.azsmrc.shared.UserNotFoundException;
 
+import org.gudy.azureus2.core3.config.COConfigurationManager;
 import org.gudy.azureus2.plugins.disk.DiskManagerFileInfo;
 import org.gudy.azureus2.plugins.download.Download;
 import org.gudy.azureus2.plugins.download.DownloadException;
@@ -30,6 +31,7 @@ public class MultiUserDownloadListener implements org.gudy.azureus2.plugins.down
 			final boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 			if (cat != null) {
 				try {
+					if (!download.getSavePath().equals(COConfigurationManager.getStringParameter("Default save path"))) return;//not in standart save path
 					if (cat.equalsIgnoreCase(MultiUser.SHARED_CAT_NAME) ) { //Multiple owner
 						DiskManagerFileInfo[] fileInfo = download.getDiskManagerFileInfo();
 						final File[] files = new File[fileInfo.length];
