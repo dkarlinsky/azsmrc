@@ -250,11 +250,11 @@ public class Client {
 						is = sis;
 					}
 					try {
-						System.out.println("\nRequest ("+DisplayFormatters.formatByteCountToBase10KBEtc(sos.getBytesWritten())+"):");
+						debug.finest("\nRequest ("+DisplayFormatters.formatByteCountToBase10KBEtc(sos.getBytesWritten())+"):");
 						new XMLOutputter(Format.getPrettyFormat()).output(req, System.out);		//Request
 						SAXBuilder builder = new SAXBuilder();
 						Document xmlDom = builder.build(is);
-						System.out.println("\nResponse ("+DisplayFormatters.formatByteCountToBase10KBEtc(sis.getBytesRead())+" "+(System.currentTimeMillis()-startTime) +"msec):");
+						debug.finest("\nResponse ("+DisplayFormatters.formatByteCountToBase10KBEtc(sis.getBytesRead())+" "+(System.currentTimeMillis()-startTime) +"msec):");
 						new XMLOutputter(Format.getPrettyFormat()).output(xmlDom, System.out);	//Response
 						System.out.println();
 						responseManager.handleResponse(xmlDom);
@@ -268,7 +268,7 @@ public class Client {
 				} catch (SSLException e) {
 					if ( i == 0 ){
 						if ( SESecurityManager.getSingleton().installServerCertificates( server ) != null ){
-							System.out.println("Installing Certificate");
+							debug.fine("Installing Certificate");
 							continue;	// retry with new certificate
 						}
 					}
