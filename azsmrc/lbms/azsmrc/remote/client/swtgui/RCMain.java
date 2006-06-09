@@ -55,6 +55,9 @@ import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByURLDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ServerUpdateDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.UpdateDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.UpdateProgressDialog;
+import lbms.azsmrc.remote.client.swtgui.sound.Sound;
+import lbms.azsmrc.remote.client.swtgui.sound.SoundException;
+import lbms.azsmrc.remote.client.swtgui.sound.SoundManager;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.remote.client.util.FileUtil;
 import lbms.azsmrc.remote.client.util.Timer;
@@ -388,6 +391,18 @@ public class RCMain implements Launchable {
 			}  finally {
 				if (fin!=null) try { fin.close(); } catch (IOException e) {}
 			}
+		} else {
+			InputStream is = null;
+			try {
+				is = RCMain.class.getClassLoader().getResourceAsStream("default.cfg");
+				properties.loadFromXML(is);
+				is.close();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} finally {
+				if (is!=null) try { is.close(); } catch (IOException e) {}
+			}
 		}
 		azsmrcProperties = new Properties();
 		{
@@ -559,7 +574,7 @@ public class RCMain implements Launchable {
 					if (mainWindow != null) {
 						mainWindow.setStatusBarText("Download Finished: "+event.getAttributeValue("name"), SWT.COLOR_DARK_GREEN);
 					}
-
+					SoundManager.playSound(Sound.DOWNLOADING_FINISHED);
 					MessageDialog.message(display,"Download Finished",event.getAttributeValue("name"));
 					if (event.getAttributeValue("duration") != null)
 						normalLogger.info("Download Finished: "+event.getAttributeValue("name")+"\n"
@@ -696,6 +711,8 @@ public class RCMain implements Launchable {
 				properties.setProperty("update.lastcheck",Long.toString(System.currentTimeMillis()));
 			}
 		}
+		System.out.println("Loading Sounds.");
+		loadSounds();
 		System.out.println("Creating Timer.");
 		timer = new Timer("Main Timer",5);
 		System.out.println("Finished Startup.");
@@ -925,6 +942,34 @@ public class RCMain implements Launchable {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+			}
+		}
+	}
+
+	public void loadSounds() {
+		if (Boolean.parseBoolean(properties.getProperty("deactivateSounds", "false"))) return;
+		loadSound(Sound.ERROR, 					properties.getProperty("sound.Error"));
+		loadSound(Sound.DOWNLOAD_ADDED, 		properties.getProperty("sound.DownloadAdded"));
+		loadSound(Sound.DOWNLOADING_FINISHED,	properties.getProperty("sound.DownloadingFinished"));
+		loadSound(Sound.SEEDING_FINISHED,		properties.getProperty("sound.SeedingFinished"));
+	}
+
+	public void unLoadSounds() {
+		SoundManager.unLoad(Sound.ERROR);
+		SoundManager.unLoad(Sound.DOWNLOAD_ADDED);
+		SoundManager.unLoad(Sound.DOWNLOADING_FINISHED);
+		SoundManager.unLoad(Sound.SEEDING_FINISHED);
+	}
+
+	private void loadSound (Sound key, String snd) {
+		if (snd == null || snd.equals("")) return;
+		File sndFile = new File (snd);
+		if (sndFile.exists() && sndFile.canRead()) {
+			SoundManager.unLoad(key);
+			try {
+				SoundManager.load(key, sndFile);
+			} catch (SoundException e) {
+				e.printStackTrace();
 			}
 		}
 	}
