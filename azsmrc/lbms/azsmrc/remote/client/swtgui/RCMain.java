@@ -277,6 +277,12 @@ public class RCMain implements Launchable {
 		if (!connect) connectDisconnectMenuItem.setText("Connect");
 		else connectDisconnectMenuItem.setText("Disconnect");
 
+		final MenuItem silentItem = new MenuItem(menu, SWT.CHECK);
+		silentItem.setText("Silent Mode");
+
+		final MenuItem disablePopupItem = new MenuItem(menu, SWT.CHECK);
+		disablePopupItem.setText("Disable Popups");
+
 		final MenuItem closeMenuItem = new MenuItem(menu, SWT.PUSH);
 		closeMenuItem.setText("Close");
 
@@ -338,6 +344,8 @@ public class RCMain implements Launchable {
 					connectDisconnectMenuItem.setText("Disconnect");
 					addMenuItem.setEnabled(true);
 				}
+				silentItem.setSelection(SoundManager.isSilent());
+				disablePopupItem.setSelection(!Boolean.parseBoolean(properties.getProperty("popups_enabled")));
 			}
 		});
 
@@ -352,6 +360,20 @@ public class RCMain implements Launchable {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				OpenByFileDialog.open(display);
+			}
+		});
+
+		silentItem.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				SoundManager.setSilentMode(silentItem.getSelection());
+			}
+		});
+
+		disablePopupItem.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				properties.setProperty("popups_enabled", Boolean.toString(silentItem.getSelection()));
 			}
 		});
 
@@ -461,7 +483,7 @@ public class RCMain implements Launchable {
 			e1.printStackTrace();
 		}
 
-		try {
+		/*try {
 			FileHandler fh = new FileHandler(USER_DIR+FSEP+"debug.log",1024*1024,2,true);
 			fh.setLevel(Level.parse(properties.getProperty("debugLevel", "WARNING")));
 			debugLogger.addHandler(fh);
@@ -471,7 +493,7 @@ public class RCMain implements Launchable {
 		} catch (IOException e1) {
 			debugLogger.log(Level.WARNING, e1.getMessage(), e1);
 			e1.printStackTrace();
-		}
+		}*/
 
 		SESecurityManager.getSingleton().addSecurityListner(new SESecurityManagerListener() {
 			public boolean trustCertificate(String ressource, X509Certificate x509_cert) {

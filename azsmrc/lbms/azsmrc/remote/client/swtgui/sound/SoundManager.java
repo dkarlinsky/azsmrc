@@ -27,6 +27,7 @@ public class SoundManager {
 	private ArrayBlockingQueue<Clip> soundQueue = new ArrayBlockingQueue<Clip>(3);
 	private Thread soundPlayerThread;
 	private static SoundManager instance = new SoundManager();
+	private boolean silentMode = false;
 
 	private SoundManager () {
 		soundPlayerThread = new Thread(new Runnable() {
@@ -55,7 +56,8 @@ public class SoundManager {
 
 
 	public static void playSound (Sound snd) {
-		if (instance.soundBank.containsKey(snd)) {
+
+		if (!instance.silentMode && instance.soundBank.containsKey(snd)) {
 			if (instance.soundQueue.offer(instance.soundBank.get(snd))) {
 				System.out.println("Added to Play Queue: "+snd);
 			}
@@ -88,5 +90,13 @@ public class SoundManager {
 			c.stop();
 			c.close();
 		}
+	}
+
+	public static void setSilentMode(boolean silent) {
+		instance.silentMode = silent;
+	}
+
+	public static boolean isSilent() {
+		return instance.silentMode;
 	}
 }
