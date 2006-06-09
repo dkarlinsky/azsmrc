@@ -492,7 +492,7 @@ public class DownloadManagerShell {
 		refresh.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				if(RCMain.getRCMain().connected())
-					RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
+					RCMain.getRCMain().getClient().getDownloadManager().update(true);
 			}
 		});
 
@@ -3121,11 +3121,10 @@ public class DownloadManagerShell {
 	 *
 	 */
 	public void initializeConnection(){
-		setRequestedItems();
 		if (RCMain.getRCMain().connected()) {
 			Client client = RCMain.getRCMain().getClient();
 			client.transactionStart();
-			client.sendListTransfers(RemoteConstants.ST_ALL);
+			client.getDownloadManager().update(true);
 			client.getUserManager().update();
 
 			//Pull the remote info
@@ -3241,7 +3240,7 @@ public class DownloadManagerShell {
 									System.out.println("Moving " + container.getDownload().getName()+ " From position " + (drag_drop_line_start +1) + " to " + (drag_drop_line_end+1));
 									container.getDownload().moveTo(drag_drop_line_end+1);
 									if(RCMain.getRCMain().connected())
-										RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
+										RCMain.getRCMain().getClient().getDownloadManager().update(false);
 								}
 							}
 						}else{
@@ -3252,7 +3251,7 @@ public class DownloadManagerShell {
 									System.out.println("Moving " + container.getDownload().getName()+ " From position " + (drag_drop_line_start +1) + " to " + (drag_drop_line_end+1));
 									container.getDownload().moveTo(drag_drop_line_end+1);
 									if(RCMain.getRCMain().connected())
-										RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
+										RCMain.getRCMain().getClient().getDownloadManager().update(false);
 								}
 							}
 						}

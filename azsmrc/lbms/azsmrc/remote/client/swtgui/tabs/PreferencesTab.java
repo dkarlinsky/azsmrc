@@ -654,7 +654,6 @@ public class PreferencesTab {
 
 		}
 
-		RCMain.getRCMain().getClient().sendListTransfers(RemoteConstants.ST_ALL);
 		composite.layout();
 	}
 

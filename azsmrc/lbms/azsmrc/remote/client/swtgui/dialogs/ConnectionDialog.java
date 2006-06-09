@@ -394,7 +394,7 @@ public class ConnectionDialog {
 				client.setServer(url);
 				client.setUsername(username);
 				client.setPassword(password);
-				client.sendListTransfers(remoteConstants);
+				client.getDownloadManager().update(false);
 				RCMain.getRCMain().connect(true);
 
 				//once connection is established.. send for all the right data
