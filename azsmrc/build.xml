@@ -78,6 +78,7 @@
 			<include name="lbms/tools/flexyconf/**/*" />
 			<fileset dir="${root.dir}">
 				<filename name="azsmrc.properties" />
+				<filename name="default.cfg" />
 			</fileset>
 		</jar>
 		<echo message="Creating launcher.jar..." />
