@@ -240,6 +240,7 @@ public class Client {
 					gos = new GZIPOutputStream(sos);
 					new XMLOutputter().output(req, gos);
 					gos.close();
+					long startTime = System.currentTimeMillis();
 					connection.connect();
 					String gzip = connection.getHeaderField("Content-encoding");
 					StatsInputStream sis = new StatsInputStream(connection.getInputStream());
@@ -253,7 +254,7 @@ public class Client {
 						new XMLOutputter(Format.getPrettyFormat()).output(req, System.out);		//Request
 						SAXBuilder builder = new SAXBuilder();
 						Document xmlDom = builder.build(is);
-						System.out.println("\nResponse ("+DisplayFormatters.formatByteCountToBase10KBEtc(sis.getBytesRead())+"):");
+						System.out.println("\nResponse ("+DisplayFormatters.formatByteCountToBase10KBEtc(sis.getBytesRead())+" "+(System.currentTimeMillis()-startTime) +"msec):");
 						new XMLOutputter(Format.getPrettyFormat()).output(xmlDom, System.out);	//Response
 						System.out.println();
 						responseManager.handleResponse(xmlDom);
