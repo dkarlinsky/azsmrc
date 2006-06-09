@@ -805,8 +805,26 @@ public class RCMain implements Launchable {
 	}
 
 	public void openMainWindow(){
-			mainWindow = new DownloadManagerShell();
+		try{
+			Shell dms_shell = getMainWindow().getShell();
+			if(dms_shell.getMinimized()){
+				dms_shell.setMinimized(false);
+				dms_shell.setVisible(true);
+
+			} else{
+				dms_shell.setMinimized(true);
+				dms_shell.setVisible(false);
+			}
+		}catch(Exception e1){
+			if (mainWindow == null) {
+				mainWindow = new DownloadManagerShell();
+			}
 			mainWindow.open();
+			return;
+		}
+
+		/*mainWindow = new DownloadManagerShell();
+			mainWindow.open();*/
 	}
 
 	public Timer getMainTimer () {

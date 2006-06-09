@@ -44,7 +44,7 @@ public class DownloadContainer extends Container {
 
 
 	public void update(boolean bForce) {
-		super.update(bForce);
+		//super.update(bForce);
 		updateData(tableColumns, bForce);
 	}
 

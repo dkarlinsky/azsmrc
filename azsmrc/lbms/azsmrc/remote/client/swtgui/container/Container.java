@@ -155,7 +155,11 @@ public abstract class Container implements Comparable<Container> {
 			 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 			 */
 			public int compare(Container o1, Container o2) {
-				return (o1.dl.getLeecher()-o2.dl.getLeecher());
+				int value = o1.dl.getLeecher()-o2.dl.getLeecher();
+				if(value == 0)
+					return (o1.dl.getTotalLeecher() - o2.dl.getTotalLeecher());
+				else
+					return (value);
 			}
 		});
 		comparatorCollection.put(RemoteConstants.ST_ALL_SEEDS, new Comparator<Container>() {
@@ -163,7 +167,11 @@ public abstract class Container implements Comparable<Container> {
 			 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 			 */
 			public int compare(Container o1, Container o2) {
-				return (o1.dl.getSeeds()-o2.dl.getSeeds());
+				int value = o1.dl.getSeeds() - o2.dl.getSeeds();
+				if( value == 0)
+					return (o1.dl.getTotalSeeds() - o2.dl.getTotalSeeds());
+				else
+					return (value);
 			}
 		});
 		comparatorCollection.put(RemoteConstants.ST_DISCARDED, new Comparator<Container>() {
@@ -200,7 +208,7 @@ public abstract class Container implements Comparable<Container> {
 				try {
 					item = new TableItem(parent,SWT.NULL);
 					generateHealthImages(false);
-					update(true);
+					//update(true);
 				} catch (SWTException e) {
 					e.printStackTrace();
 				}
@@ -217,7 +225,7 @@ public abstract class Container implements Comparable<Container> {
 		}
 	}
 
-	public void addToTable (final Table parent, final int style, int position) {
+	/*	public void addToTable (final Table parent, final int style, int position) {
 		if (item != null) return;
 		 final Display display = RCMain.getRCMain().getDisplay();
 		 display.syncExec(new Runnable(){
@@ -225,13 +233,24 @@ public abstract class Container implements Comparable<Container> {
 				 try {
 					 item = new TableItem(parent,SWT.NULL);
 					 generateHealthImages(false);
-					 update(true);
+					 //update(true);
 				 } catch (SWTException e) {
 					 e.printStackTrace();
 				 }
 			 }
 
 		 });
+	}*/
+
+	public void setTableItem (TableItem item){
+		this.item = item;
+		this.item.setData(Container.this);
+		generateHealthImages(false);
+		//update(true);
+	}
+
+	public TableItem getTableItem(){
+		return item;
 	}
 
 	public int compareTo(Container o) {
@@ -240,22 +259,23 @@ public abstract class Container implements Comparable<Container> {
 		} else return dl.getPosition()-o.dl.getPosition();
 	}
 
-	public void update(final boolean bForce) {
-
+	/*	public void update(final boolean bForce) {
 		final Display display = RCMain.getRCMain().getDisplay();
 		if(display == null || display.isDisposed()) return;
 		display.syncExec(new Runnable(){
 			public void run() {
 				try {
-					item.setData(Container.this);
+					if(item != null)
+						item.setData(Container.this);
 				} catch (SWTException e) {
 					e.printStackTrace();
 				}
 			}
 		});
-	}
+	}*/
 
 	public void updateData(final List<Integer> tableColumns, final boolean bForce) {
+		if(item == null) return;
 		final Display display = RCMain.getRCMain().getDisplay();
 		if(display == null || display.isDisposed()) return;
 		display.syncExec(new Runnable(){
@@ -268,7 +288,10 @@ public abstract class Container implements Comparable<Container> {
 					if (tableColumns.contains(RemoteConstants.ST_COMPLETITION)) {
 						int newPercentage = dl.getStats().getCompleted();
 						if(progBar == null) progBar = new CustomProgressBar();
-						if((progBarImage == null || (oldPercentage != -1 && oldPercentage != newPercentage)) || bForce){
+						if((progBarImage == null
+								|| (oldPercentage != -1 && oldPercentage != newPercentage))
+								|| item.getImage(tableColumns.indexOf(RemoteConstants.ST_COMPLETITION)) == null
+								|| bForce){
 							if (progBarImage != null) progBarImage.dispose();
 							progBarImage = progBar.paintProgressBar(item,tableColumns.indexOf(RemoteConstants.ST_COMPLETITION),
 									rowWidth,
@@ -286,7 +309,9 @@ public abstract class Container implements Comparable<Container> {
 					//Availability
 					if (tableColumns.contains(RemoteConstants.ST_AVAILABILITY)) {
 						float avail = ds.getAvailability();
-						if(oldAvail != avail || bForce){
+						if(oldAvail != avail
+								|| !item.getText(tableColumns.indexOf(RemoteConstants.ST_AVAILABILITY)).equals(df.format(avail))
+								|| bForce){
 							if(avail < 0)
 								item.setText(tableColumns.indexOf(RemoteConstants.ST_AVAILABILITY), "N/A");
 							else
@@ -316,7 +341,9 @@ public abstract class Container implements Comparable<Container> {
 					//position
 					if (tableColumns.contains(RemoteConstants.ST_POSITION)) {
 						int position = dl.getPosition();
-						if(oldPosition != position || bForce)
+						if(oldPosition != position
+								|| !item.getText(tableColumns.indexOf(RemoteConstants.ST_POSITION)).equals(position)
+								|| bForce)
 							item.setText(tableColumns.indexOf(RemoteConstants.ST_POSITION), Integer.toString(position));
 						oldPosition = position;
 					}
@@ -324,7 +351,9 @@ public abstract class Container implements Comparable<Container> {
 					// name
 					if (tableColumns.contains(RemoteConstants.ST_NAME)) {
 						String name = dl.getName();
-						if(!oldName.equalsIgnoreCase(name) || bForce)
+						if(!oldName.equalsIgnoreCase(name)
+								|| !item.getText(tableColumns.indexOf(RemoteConstants.ST_NAME)).equals(name)
+								|| bForce)
 							item.setText(tableColumns.indexOf(RemoteConstants.ST_NAME), name);
 						oldName = name;
 					}
@@ -332,14 +361,18 @@ public abstract class Container implements Comparable<Container> {
 					//down speed
 					if (tableColumns.contains(RemoteConstants.ST_DOWNLOAD_AVG)) {
 						Long downloadAverage = ds.getDownloadAverage();
-						if(oldDownloadAverage != downloadAverage || bForce)
+						if(oldDownloadAverage != downloadAverage
+								|| !item.getText(tableColumns.indexOf(RemoteConstants.ST_DOWNLOAD_AVG)).equals(DisplayFormatters.formatByteCountToBase10KBEtcPerSec(downloadAverage))
+								|| bForce)
 							item.setText(tableColumns.indexOf(RemoteConstants.ST_DOWNLOAD_AVG), DisplayFormatters.formatByteCountToBase10KBEtcPerSec(downloadAverage));
 						oldDownloadAverage = downloadAverage;
 					}
 					//up speed
 					if (tableColumns.contains(RemoteConstants.ST_UPLOAD_AVG)) {
 						Long uploadAverage = ds.getUploadAverage();
-						if(oldUploadAverage != uploadAverage || bForce)
+						if(oldUploadAverage != uploadAverage
+								|| !item.getText(tableColumns.indexOf(RemoteConstants.ST_UPLOAD_AVG)).equals(DisplayFormatters.formatByteCountToBase10KBEtcPerSec(uploadAverage))
+								|| bForce)
 							item.setText(tableColumns.indexOf(RemoteConstants.ST_UPLOAD_AVG), DisplayFormatters.formatByteCountToBase10KBEtcPerSec(uploadAverage));
 						oldUploadAverage = uploadAverage;
 					}
@@ -347,7 +380,10 @@ public abstract class Container implements Comparable<Container> {
 					if (tableColumns.contains(RemoteConstants.ST_ALL_SEEDS)) {
 						int seeds = dl.getTotalSeeds();
 						int conSeeds = dl.getSeeds();
-						if(oldSeeds != seeds || oldConSeeds != conSeeds || bForce){
+						if(oldSeeds != seeds
+								|| oldConSeeds != conSeeds
+								|| item.getText(tableColumns.indexOf(RemoteConstants.ST_ALL_SEEDS)).equalsIgnoreCase("")
+								|| bForce){
 							if(seeds<0)
 								seeds = 0;
 							item.setText(tableColumns.indexOf(RemoteConstants.ST_ALL_SEEDS), conSeeds + " (" + seeds+ ")");
@@ -359,7 +395,10 @@ public abstract class Container implements Comparable<Container> {
 					if (tableColumns.contains(RemoteConstants.ST_ALL_LEECHER)) {
 						int leechers = dl.getTotalLeecher();
 						int conLeechers = dl.getLeecher();
-						if(oldLeechers != leechers || oldConLeechers != conLeechers || bForce){
+						if(oldLeechers != leechers
+								|| oldConLeechers != conLeechers
+								|| item.getText(tableColumns.indexOf(RemoteConstants.ST_ALL_LEECHER)).equalsIgnoreCase("")
+								|| bForce){
 							if(leechers < 0)
 								leechers = 0;
 							item.setText(tableColumns.indexOf(RemoteConstants.ST_ALL_LEECHER), conLeechers + " (" + leechers + ")");
@@ -370,7 +409,9 @@ public abstract class Container implements Comparable<Container> {
 					//Amount Uploaded
 					if (tableColumns.contains(RemoteConstants.ST_UPLOADED)) {
 						Long uploaded = ds.getUploaded();
-						if(oldUploaded != uploaded || bForce)
+						if(oldUploaded != uploaded
+								|| item.getText(tableColumns.indexOf(RemoteConstants.ST_UPLOADED)).equalsIgnoreCase("")
+								|| bForce)
 							item.setText(tableColumns.indexOf(RemoteConstants.ST_UPLOADED),DisplayFormatters.formatByteCountToBase10KBEtc(uploaded));
 						oldUploaded = uploaded;
 					}
@@ -378,7 +419,9 @@ public abstract class Container implements Comparable<Container> {
 					//Amount Downloaded
 					if (tableColumns.contains(RemoteConstants.ST_DOWNLOADED)) {
 						Long downloaded = ds.getDownloaded();
-						if(oldDownloaded != downloaded || bForce)
+						if(oldDownloaded != downloaded
+								|| item.getText(tableColumns.indexOf(RemoteConstants.ST_DOWNLOADED)).equalsIgnoreCase("")
+								|| bForce)
 							item.setText(tableColumns.indexOf(RemoteConstants.ST_DOWNLOADED),DisplayFormatters.formatByteCountToBase10KBEtc(downloaded));
 						oldDownloaded = downloaded;
 					}
@@ -386,7 +429,9 @@ public abstract class Container implements Comparable<Container> {
 					//ETA
 					if (tableColumns.contains(RemoteConstants.ST_ETA)) {
 						String eta = ds.getETA();
-						if(!oldETA.equalsIgnoreCase(eta) || bForce)
+						if(!oldETA.equalsIgnoreCase(eta)
+								|| item.getText(tableColumns.indexOf(RemoteConstants.ST_ETA)).equalsIgnoreCase("")
+								|| bForce)
 							item.setText(tableColumns.indexOf(RemoteConstants.ST_ETA),eta);
 						oldETA = eta;
 					}
@@ -395,7 +440,9 @@ public abstract class Container implements Comparable<Container> {
 					//Status
 					if (tableColumns.contains(RemoteConstants.ST_STATUS)) {
 						String status = ds.getStatus();
-						if(!oldStatus.equalsIgnoreCase(status) || bForce)
+						if(!oldStatus.equalsIgnoreCase(status)
+								|| item.getText(tableColumns.indexOf(RemoteConstants.ST_STATUS)).equalsIgnoreCase("")
+								|| bForce)
 							item.setText(tableColumns.indexOf(RemoteConstants.ST_STATUS),status);
 						oldStatus = status;
 					}
@@ -403,7 +450,9 @@ public abstract class Container implements Comparable<Container> {
 					//Tracker Status
 					if (tableColumns.contains(RemoteConstants.ST_TRACKER)) {
 						String trackerStatus = ds.getTrackerStatus();
-						if(!oldTrackerStatus.equalsIgnoreCase(trackerStatus) || bForce)
+						if(!oldTrackerStatus.equalsIgnoreCase(trackerStatus)
+								|| item.getText(tableColumns.indexOf(RemoteConstants.ST_TRACKER)).equalsIgnoreCase("")
+								|| bForce)
 							item.setText(tableColumns.indexOf(RemoteConstants.ST_TRACKER),trackerStatus);
 						oldTrackerStatus = trackerStatus;
 					}
@@ -411,7 +460,9 @@ public abstract class Container implements Comparable<Container> {
 					//Download Limit
 					if (tableColumns.contains(RemoteConstants.ST_LIMIT_DOWN)) {
 						int rate = dl.getMaximumDownloadKBPerSecond();
-						if(oldDownloadRate != rate || bForce){
+						if(oldDownloadRate != rate
+								|| item.getText(tableColumns.indexOf(RemoteConstants.ST_LIMIT_DOWN)).equalsIgnoreCase("")
+								|| bForce){
 							if(rate <= 0)
 								item.setText(tableColumns.indexOf(RemoteConstants.ST_LIMIT_DOWN),"Maximum");
 							else
@@ -424,7 +475,9 @@ public abstract class Container implements Comparable<Container> {
 					//Upload Limit
 					if (tableColumns.contains(RemoteConstants.ST_LIMIT_UP)) {
 						int rate = dl.getUploadRateLimitBytesPerSecond();
-						if(oldUploadRate != rate || bForce){
+						if(oldUploadRate != rate
+								|| item.getText(tableColumns.indexOf(RemoteConstants.ST_LIMIT_UP)).equalsIgnoreCase("")
+								|| bForce){
 							if(rate <= 0)
 								item.setText(tableColumns.indexOf(RemoteConstants.ST_LIMIT_UP),"Maximum");
 							else
@@ -436,7 +489,9 @@ public abstract class Container implements Comparable<Container> {
 					//Discarded
 					if (tableColumns.contains(RemoteConstants.ST_DISCARDED)) {
 						Long discarded = dl.getDiscarded();
-						if(oldDiscarded != discarded || bForce)
+						if(oldDiscarded != discarded
+								|| item.getText(tableColumns.indexOf(RemoteConstants.ST_DISCARDED)).equalsIgnoreCase("")
+								|| bForce)
 							item.setText(tableColumns.indexOf(RemoteConstants.ST_DISCARDED),DisplayFormatters.formatByteCountToBase10KBEtc(discarded));
 						oldDiscarded = discarded;
 					}
@@ -444,7 +499,9 @@ public abstract class Container implements Comparable<Container> {
 					//Size
 					if (tableColumns.contains(RemoteConstants.ST_SIZE)) {
 						Long size = dl.getSize();
-						if(oldSize != size || bForce)
+						if(oldSize != size
+								|| item.getText(tableColumns.indexOf(RemoteConstants.ST_SIZE)).equalsIgnoreCase("")
+								|| bForce)
 							item.setText(tableColumns.indexOf(RemoteConstants.ST_SIZE),DisplayFormatters.formatByteCountToBase10KBEtc(size));
 						oldSize = size;
 					}
@@ -452,7 +509,9 @@ public abstract class Container implements Comparable<Container> {
 					//Elapsed Time
 					if (tableColumns.contains(RemoteConstants.ST_ELAPSED_TIME)) {
 						String elapsedTime = ds.getElapsedTime();
-						if(!oldElapsedTime.equalsIgnoreCase(elapsedTime) || bForce)
+						if(!oldElapsedTime.equalsIgnoreCase(elapsedTime)
+								|| item.getText(tableColumns.indexOf(RemoteConstants.ST_ELAPSED_TIME)).equalsIgnoreCase("")
+								|| bForce)
 							item.setText(tableColumns.indexOf(RemoteConstants.ST_ELAPSED_TIME),elapsedTime);
 						oldElapsedTime = elapsedTime;
 					}
@@ -460,7 +519,9 @@ public abstract class Container implements Comparable<Container> {
 					//Swarm Speed
 					if (tableColumns.contains(RemoteConstants.ST_TOTAL_AVG)) {
 						Long totalAverage = ds.getTotalAverage();
-						if(oldTotalAverage != totalAverage || bForce)
+						if(oldTotalAverage != totalAverage
+								|| item.getText(tableColumns.indexOf(RemoteConstants.ST_TOTAL_AVG)).equalsIgnoreCase("")
+								|| bForce)
 							item.setText(tableColumns.indexOf(RemoteConstants.ST_TOTAL_AVG),DisplayFormatters.formatByteCountToBase10KBEtc(totalAverage)+"/s");
 						oldTotalAverage = totalAverage;
 					}
@@ -469,7 +530,9 @@ public abstract class Container implements Comparable<Container> {
 					//Share Ratio
 					if (tableColumns.contains(RemoteConstants.ST_SHARE)) {
 						float ratio = (ds.getShareRatio()/1000f);
-						if(oldShareRatio != ratio || bForce){
+						if(oldShareRatio != ratio
+								|| item.getText(tableColumns.indexOf(RemoteConstants.ST_SHARE)).equalsIgnoreCase("")
+								|| bForce){
 							int shareIndex = tableColumns.indexOf(RemoteConstants.ST_SHARE);
 							item.setText(shareIndex,df.format(ratio));
 							if(ratio < 0.5)
@@ -492,7 +555,7 @@ public abstract class Container implements Comparable<Container> {
 			}
 		});
 	}
-
+	/*
 	public void changePosition (final int newPos, final Table parent) {
 		Display display = RCMain.getRCMain().getDisplay();
 		display.asyncExec(new Runnable(){
@@ -502,7 +565,7 @@ public abstract class Container implements Comparable<Container> {
 						item.getParent().remove(item.getParent().indexOf(item));
 					item = new TableItem(parent,SWT.NULL,newPos);
 					item.setData(Container.this);
-					update(true);
+					//update(true);
 				} catch (SWTException e) {
 					e.printStackTrace();
 				}
@@ -523,7 +586,7 @@ public abstract class Container implements Comparable<Container> {
 				}
 			}
 		});
-	}
+	}*/
 
 	public static List<Integer> getTotalColumns() {
 		return totalTableColumns;
