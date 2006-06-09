@@ -183,7 +183,8 @@ public class Client {
 				if (updateDownloads) {
 					Element listTransferElement = getSendElement();
 					listTransferElement.setAttribute("switch", "updateDownloads");
-					listTransferElement.setAttribute("fullUpdate",Boolean.toString(updateDownloadsFull));
+					if (updateDownloadsFull)
+						listTransferElement.setAttribute("fullUpdate",Boolean.toString(updateDownloadsFull));
 					request.addContent(listTransferElement);
 					updateDownloads = false;
 					updateDownloadsFull = false;
