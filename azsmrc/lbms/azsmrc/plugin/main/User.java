@@ -189,6 +189,7 @@ public class User extends lbms.azsmrc.shared.User {
 		event.setAttribute("type", Integer.toString(RemoteConstants.EV_DL_FINISHED));
 		event.setAttribute("name", dl.getName());
 		event.setAttribute("hash", getDlHash(dl));
+		event.setAttribute("duration", Long.toString(dl.getStats().getSecondsDownloading()));
 		removeDownload(dl);
 		eventQueue.offer(event);
 	}

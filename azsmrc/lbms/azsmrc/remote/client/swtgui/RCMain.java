@@ -561,7 +561,11 @@ public class RCMain implements Launchable {
 					}
 
 					MessageDialog.message(display,"Download Finished",event.getAttributeValue("name"));
-					normalLogger.info("Download Finished: "+event.getAttributeValue("name"));
+					if (event.getAttributeValue("duration") != null)
+						normalLogger.info("Download Finished: "+event.getAttributeValue("name")+"\n"
+											+"Finished in: "+DisplayFormatters.formatTime(Long.parseLong(event.getAttributeValue("duration"))*1000));
+					else
+						normalLogger.info("Download Finished: "+event.getAttributeValue("name"));
 					break;
 
 				case RemoteConstants.EV_DL_EXCEPTION:
