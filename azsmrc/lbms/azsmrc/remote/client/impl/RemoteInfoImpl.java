@@ -4,6 +4,10 @@ import java.util.Map;
 
 import lbms.azsmrc.remote.client.Client;
 import lbms.azsmrc.remote.client.RemoteInfo;
+import lbms.azsmrc.remote.client.internat.I18N;
+import lbms.azsmrc.remote.client.swtgui.RCMain;
+import lbms.azsmrc.remote.client.swtgui.dialogs.MessageDialog;
+import lbms.tools.updater.Version;
 
 public class RemoteInfoImpl implements RemoteInfo {
 
@@ -18,10 +22,12 @@ public class RemoteInfoImpl implements RemoteInfo {
 	}
 
 	public String getAzureusVersion() {
+		load();
 		return azureusVersion;
 	}
 
 	public String getPluginVersion() {
+		load();
 		return pluginVersion;
 	}
 
@@ -29,7 +35,6 @@ public class RemoteInfoImpl implements RemoteInfo {
 	 * @param azureusVersion The azureusVersion to set.
 	 */
 	public void setAzureusVersion(String azureusVersion) {
-		load();
 		this.azureusVersion = azureusVersion;
 	}
 
@@ -37,7 +42,9 @@ public class RemoteInfoImpl implements RemoteInfo {
 	 * @param pluginVersion The pluginVersion to set.
 	 */
 	public void setPluginVersion(String pluginVersion) {
-		load();
+		Version min = new Version(RCMain.getRCMain().getAzsmrcProperties().getProperty("minPluginVersion"));
+		Version plugin = new Version (pluginVersion);
+		if (min.compareTo(plugin)>0) MessageDialog.warning(RCMain.getRCMain().getDisplay(), I18N.translate("popup.minversion.title"), I18N.translate("popup.minversion.text")+min);
 		this.pluginVersion = pluginVersion;
 	}
 
