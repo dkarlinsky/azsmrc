@@ -1151,7 +1151,8 @@ public class DownloadManagerShell {
 				if(!Boolean.parseBoolean((String)downloadsTable.getData("sort")))
 					data = Collections.reverseOrder(data);
 
-				Arrays.sort(downloadsArray, data);
+				if(downloadsArray.length > 1)
+					Arrays.sort(downloadsArray, data);
 
 				TableItem item = (TableItem) event.item;
 				int index = downloadsTable.indexOf(item);
@@ -1159,7 +1160,8 @@ public class DownloadManagerShell {
 				//System.out.println("Table count: " + downloadsTable.getItemCount() + " Index: " + index + " | downloadsArray: " + downloadsArray.length + " | downloadsMap: " + downloadsMap.size());
 				DownloadContainer container = (DownloadContainer) downloadsArray[index];
 				container.setTableItem(item);
-				container.update(true);
+				if(container.getTableItem() != null)
+					container.update(true);
 			}
 		});
 
@@ -1372,7 +1374,7 @@ public class DownloadManagerShell {
 		createDragDrop(seedsTable);
 
 		Properties properties = RCMain.getRCMain().getProperties();
-		if(properties.containsKey("sash0_weight")){
+		if(properties.containsKey("sash0_weight") && properties.containsKey("sash1_weight")){
 			sash.setWeights(new int[] {Integer.parseInt((String)properties.get("sash0_weight")),
 					Integer.parseInt((String)properties.get("sash1_weight"))});
 
