@@ -642,35 +642,25 @@ public class DownloadManagerShell {
 		queueTorrent.setToolTipText("Queue Torrent(s)");
 		queueTorrent.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
-				if(downloadsTable.isFocusControl()){
-					TableItem[] items = downloadsTable.getSelection();
-					if(items.length == 0) return;
+				TableItem[] items;
+				if(downloadsTable.isFocusControl())
+					items = downloadsTable.getSelection();
+				else
+					items = seedsTable.getSelection();
+				if(items.length == 0) return;
 
-					RCMain.getRCMain().getClient().transactionStart();
+				RCMain.getRCMain().getClient().transactionStart();
 
-					for(TableItem item : items){
-						Container container = (Container)item.getData();
-						container.getDownload().stopAndQueue();
-					}
-
-					RCMain.getRCMain().getClient().transactionCommit();
-					//Reset Buttons
-					setToolBarTorrentIcons(false,true,true);
-				}else{
-					TableItem[] items = seedsTable.getSelection();
-					if(items.length == 0) return;
-
-					RCMain.getRCMain().getClient().transactionStart();
-
-					for(TableItem item : items){
-						Container container = (Container)item.getData();
-						container.getDownload().stopAndQueue();
-					}
-
-					RCMain.getRCMain().getClient().transactionCommit();
-					//Reset Buttons
-					setToolBarTorrentIcons(false,true,true);
+				for(TableItem item : items){
+					Container container = (Container)item.getData();
+					Download dl = container.getDownload();
+					if(dl.getState() != Download.ST_QUEUED)
+						dl.stopAndQueue();
 				}
+
+				RCMain.getRCMain().getClient().transactionCommit();
+				//Reset Buttons
+				setToolBarTorrentIcons(false,true,true);
 			}
 		});
 
@@ -680,35 +670,24 @@ public class DownloadManagerShell {
 		stopTorrent.setToolTipText("Stop Torrent(s)");
 		stopTorrent.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
-				if(downloadsTable.isFocusControl()){
-					TableItem[] items = downloadsTable.getSelection();
-					if(items.length == 0) return;
+				TableItem[] items;
+				if(downloadsTable.isFocusControl())
+					items = downloadsTable.getSelection();
+				else
+					items = seedsTable.getSelection();
+				if(items.length == 0) return;
+				RCMain.getRCMain().getClient().transactionStart();
 
-					RCMain.getRCMain().getClient().transactionStart();
-
-					for(TableItem item : items){
-						Container container = (Container)item.getData();
-						container.getDownload().stop();
-					}
-
-					RCMain.getRCMain().getClient().transactionCommit();
-					//Reset the Toobar Buttons
-					setToolBarTorrentIcons(true,false,true);
-				}else{
-					TableItem[] items = seedsTable.getSelection();
-					if(items.length == 0) return;
-
-					RCMain.getRCMain().getClient().transactionStart();
-
-					for(TableItem item : items){
-						Container container = (Container)item.getData();
-						container.getDownload().stop();
-					}
-
-					RCMain.getRCMain().getClient().transactionCommit();
-					//Reset the Toobar buttons
-					setToolBarTorrentIcons(true,false,true);
+				for(TableItem item : items){
+					Container container = (Container)item.getData();
+					Download dl = container.getDownload();
+					if(dl.getState() != Download.ST_STOPPED)
+						dl.stop();
 				}
+
+				RCMain.getRCMain().getClient().transactionCommit();
+				//Reset the Toobar Buttons
+				setToolBarTorrentIcons(true,false,true);
 			}
 		});
 
@@ -722,49 +701,29 @@ public class DownloadManagerShell {
 		removeTorrent.setToolTipText("Remove Torrent(s)");
 		removeTorrent.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
-				if(downloadsTable.isFocusControl()){
-					TableItem[] items = downloadsTable.getSelection();
-					if(items.length == 0) return;
+				TableItem[] items;
+				if(downloadsTable.isFocusControl())
+					items = downloadsTable.getSelection();
+				else
+					items = seedsTable.getSelection();
+				if(items.length == 0) return;
+				RCMain.getRCMain().getClient().transactionStart();
 
-					RCMain.getRCMain().getClient().transactionStart();
-
-					for(TableItem item : items){
-						Container container = (Container)item.getData();
-						container.getDownload().remove();
-						//container.removeFromTable();
-						if(seedsMap.containsKey(container.getDownload().getHash())){
-							seedsMap.remove(container.getDownload().getHash());
-							seedsArray = seedsMap.values().toArray(new Container[] {});
-							redrawTables(false);
-						}else if(downloadsMap.containsKey(container.getDownload().getHash())){
-							downloadsMap.remove(container.getDownload().getHash());
-							downloadsArray = downloadsMap.values().toArray(emptyArray);
-							redrawTables(false);
-						}
+				for(TableItem item : items){
+					Container container = (Container)item.getData();
+					container.getDownload().remove();
+					//container.removeFromTable();
+					if(seedsMap.containsKey(container.getDownload().getHash())){
+						seedsMap.remove(container.getDownload().getHash());
+						seedsArray = seedsMap.values().toArray(new Container[] {});
+						redrawTables(false);
+					}else if(downloadsMap.containsKey(container.getDownload().getHash())){
+						downloadsMap.remove(container.getDownload().getHash());
+						downloadsArray = downloadsMap.values().toArray(emptyArray);
+						redrawTables(false);
 					}
-					RCMain.getRCMain().getClient().transactionCommit();
-
-				}else{
-					TableItem[] items = seedsTable.getSelection();
-					if(items.length == 0) return;
-					RCMain.getRCMain().getClient().transactionStart();
-
-					for(TableItem item : items){
-						Container container = (Container)item.getData();
-						container.getDownload().remove();
-						//container.removeFromTable();
-						if(seedsMap.containsKey(container.getDownload().getHash())){
-							seedsMap.remove(container.getDownload().getHash());
-							seedsArray = seedsMap.values().toArray(emptyArray);
-							redrawTables(false);
-						}else if(downloadsMap.containsKey(container.getDownload().getHash())){
-							downloadsMap.remove(container.getDownload().getHash());
-							downloadsArray = downloadsMap.values().toArray(emptyArray);
-							redrawTables(false);
-						}
-					}
-					RCMain.getRCMain().getClient().transactionCommit();
 				}
+				RCMain.getRCMain().getClient().transactionCommit();
 			}
 		});
 
