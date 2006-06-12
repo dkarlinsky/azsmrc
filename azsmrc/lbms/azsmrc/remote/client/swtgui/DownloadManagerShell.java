@@ -1146,7 +1146,7 @@ public class DownloadManagerShell {
 					downloadsArray = downloadsMap.values().toArray(emptyArray);
 				if(downloadsArray.length == 0)
 					return;
-				Comparator data = (Comparator) downloadsTable.getData("comparator");
+				Comparator<Container> data = (Comparator<Container>) downloadsTable.getData("comparator");
 
 				if(!Boolean.parseBoolean((String)downloadsTable.getData("sort")))
 					data = Collections.reverseOrder(data);
@@ -1202,7 +1202,7 @@ public class DownloadManagerShell {
 				}else if(items.length > 1){
 					//Multiple selection here
 					setTorrentMoveButtons(false,false,false,false);
-					setToolBarTorrentIcons(false,false,false);
+					setToolBarTorrentIcons(true,true,true);
 
 				}
 
@@ -1270,13 +1270,13 @@ public class DownloadManagerShell {
 		//Listeners for seedsTable
 
 		seedsTable.addListener(SWT.SetData, new Listener(){
-			@SuppressWarnings("unchecked")
+
 			public void handleEvent(Event event) {
 				if(seedsArray.length != seedsMap.size())
 					seedsArray = seedsMap.values().toArray(emptyArray);
 				if(seedsArray.length == 0)return;
 
-				Comparator data = (Comparator) seedsTable.getData("comparator");
+				Comparator<Container> data = (Comparator<Container>) seedsTable.getData("comparator");
 
 
 				if(!Boolean.parseBoolean((String)seedsTable.getData("sort")))
@@ -1323,7 +1323,7 @@ public class DownloadManagerShell {
 				}else if(items.length > 1){
 					//Multiple selection here
 					setTorrentMoveButtons(false,false,false,false);
-					setToolBarTorrentIcons(false,false,false);
+					setToolBarTorrentIcons(true,true,true);
 
 				}
 
@@ -1985,7 +1985,7 @@ public class DownloadManagerShell {
 		for(Container dc : downloadsArray){
 			dc.deleteTableItem();
 		}
-		
+
 		downloadsTable.clearAll();
 
 		TableColumn[] columns_seeds = seedsTable.getColumns();
