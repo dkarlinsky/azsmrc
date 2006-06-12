@@ -22,12 +22,12 @@ public class RemoteInfoImpl implements RemoteInfo {
 	}
 
 	public String getAzureusVersion() {
-		load();
+		//load();
 		return azureusVersion;
 	}
 
 	public String getPluginVersion() {
-		load();
+		//load();
 		return pluginVersion;
 	}
 
