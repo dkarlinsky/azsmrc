@@ -12,7 +12,7 @@ import lbms.azsmrc.remote.client.events.DownloadListener;
 
 public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 
-	private String name;
+	private String name = "";
 	private String hash;
 	private boolean forceStart = false;
 	private int state, position, uploadLimit = -1,downloadLimit = -1, seeds,leecher, totalSeeds,totalLeecher;

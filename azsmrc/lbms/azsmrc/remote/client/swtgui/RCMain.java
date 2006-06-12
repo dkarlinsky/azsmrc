@@ -177,10 +177,10 @@ public class RCMain implements Launchable {
 				connect = false;
 			} else if (Boolean.parseBoolean(properties.getProperty("auto_open", "true"))) {
 				updateTimer(true);
-				client.sendGetGlobalStats();
+				client.getDownloadManager().update(true);
 			} else {
 				updateTimer(false);
-				client.sendGetGlobalStats();
+				client.getDownloadManager().update(true);
 			}
 		}
 		File error = new File(System.getProperty("user.dir")+System.getProperty("file.separator")+"error.log");
@@ -777,6 +777,7 @@ public class RCMain implements Launchable {
 		debugLogger.finer("Connect!");
 		connect = true;
 		/*client.sendGetPluginsFlexyConf();*/
+		client.getDownloadManager().update(true);
 		updateTimer(open);
 	}
 

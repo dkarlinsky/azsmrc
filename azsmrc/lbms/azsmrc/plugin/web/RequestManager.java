@@ -403,7 +403,7 @@ public class RequestManager {
 			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException{
 				//response.setAttribute("switch", "listTransfers");
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
-				boolean fullUpdate = Boolean.parseBoolean(xmlRequest.getAttributeValue("fullUpate"));
+				boolean fullUpdate = Boolean.parseBoolean(xmlRequest.getAttributeValue("fullUpdate"));
 				if (singleUser) {
 					response.addContent(dcm.updateDownload(fullUpdate));
 				} else {
