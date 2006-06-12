@@ -1979,16 +1979,29 @@ public class DownloadManagerShell {
 			column.dispose();
 		}
 		createTableColumns(downloadsTable, DownloadContainer.getColumns());
-		downloadsMap.clear();
-		downloadsArray = downloadsMap.values().toArray(emptyArray);
+		if(downloadsArray.length != downloadsMap.size())
+			downloadsArray = downloadsMap.values().toArray(emptyArray);
+
+		for(Container dc : downloadsArray){
+			dc.deleteTableItem();
+		}
+		
+		downloadsTable.clearAll();
 
 		TableColumn[] columns_seeds = seedsTable.getColumns();
 		for(TableColumn column:columns_seeds){
 			column.dispose();
 		}
 		createTableColumns(seedsTable, SeedContainer.getColumns());
-		seedsMap.clear();
-		seedsArray = seedsMap.values().toArray(emptyArray);
+		if(seedsArray.length != seedsMap.size())
+			seedsArray = seedsMap.values().toArray(emptyArray);
+
+		for(Container sc : seedsArray){
+			sc.deleteTableItem();
+		}
+		seedsTable.clearAll();
+		//seedsMap.clear();
+		//seedsArray = seedsMap.values().toArray(emptyArray);
 
 		//Be sure to save down the column widths
 		RCMain.getRCMain().getMainWindow().saveColumnWidthsToPreferencesFile();
