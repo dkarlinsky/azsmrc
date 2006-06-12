@@ -253,6 +253,11 @@ public abstract class Container implements Comparable<Container> {
 		return item;
 	}
 
+	public void deleteTableItem(){
+		item.dispose();
+		item = null;
+	}
+
 	public int compareTo(Container o) {
 		if (dl.getPosition()==o.dl.getPosition()) {
 			return dl.getName().compareToIgnoreCase(o.dl.getName());
