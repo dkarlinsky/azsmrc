@@ -2520,8 +2520,9 @@ public class DownloadManagerShell {
 					setLogInOutButtons(false);
 					DOWNLOAD_MANAGER_SHELL.setText(TITLE);
 					downloadsMap.clear();
-					downloadsArray = downloadsMap.values().toArray(emptyArray);
+					downloadsArray = emptyArray;
 					seedsMap.clear();
+					seedsArray = emptyArray;
 					downloadsTable.removeAll();
 					seedsTable.removeAll();
 					Control[] children_downloads = downloadsTable.getChildren();
