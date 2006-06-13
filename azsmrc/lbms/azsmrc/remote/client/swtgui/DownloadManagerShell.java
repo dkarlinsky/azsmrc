@@ -2694,7 +2694,7 @@ public class DownloadManagerShell {
 				position.addListener(SWT.Selection, getSortListener(table,RemoteConstants.ST_POSITION));
 				position.addControlListener(resizeListener);
 				if(SWT.getVersion() > 3220){
-					table.setSortDirection(SWT.DOWN);
+					table.setSortDirection(SWT.UP);
 					table.setSortColumn(position);
 				}
 				break;
@@ -2978,7 +2978,7 @@ public class DownloadManagerShell {
 					table.setData("sort",Boolean.toString(false));
 					if(SWT.getVersion() > 3220){
 						TableColumn col = (TableColumn)e.widget;
-						table.setSortDirection(SWT.UP);
+						table.setSortDirection(SWT.DOWN);
 						table.setSortColumn(col);
 					}
 
@@ -2986,7 +2986,7 @@ public class DownloadManagerShell {
 					table.setData("sort",Boolean.toString(true));
 					if(SWT.getVersion() > 3220){
 						TableColumn col = (TableColumn)e.widget;
-						table.setSortDirection(SWT.DOWN);
+						table.setSortDirection(SWT.UP);
 						table.setSortColumn(col);
 					}
 				}
