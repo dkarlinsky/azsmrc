@@ -10,11 +10,9 @@
 		</Section>
 		<Section label="mainWindow" index="1">
 			<Entry key="language" label="mainWindow.language" type="string" index="0">
-				<Option Value="en_EN" Label="English" index="0"/>
-				<Option Value="de_DE" Label="Deutsch" index="1"/>
+				<Option value="en_EN" label="English" index="0"/>
+				<Option value="de_DE" label="Deutsch" index="1"/>
 			</Entry>
 		</Section>
-
-
 	</Section>
 </FlexyConfiguration>
