@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlexyConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="../../../../../tools/flexyconf/flexyconf.xsd">
+	<Section label="mainLabel" index="0">
+		<Section label="connection" index="0">
+			<Entry key="auto_connect" label="connection.autoconnect" type="boolean" index="0"/>
+			<Entry key="client.fastmode" label="connection.fastmode" type="boolean" index="1"/>
+			<Entry key="connection_interval_open" label="connection.connection_interval_open" type="integer" index="2" validate="3000..65535"/>
+			<Entry key="connection_interval_closed" label="connection.connection_interval_closed" type="integer" index="3" validate="3000..65535"/>
+		</Section>
+		<Section label="mainWindow" index="1">
+			<Entry key="language" label="mainWindow.language" type="string" index="0">
+				<Option Value="en_EN" Label="English" index="0"/>
+				<Option Value="de_DE" Label="Deutsch" index="1"/>
+			</Entry>
+		</Section>
+
+
+	</Section>
+</FlexyConfiguration>

@@ -12,6 +12,7 @@ import java.util.Properties;
 import lbms.azsmrc.remote.client.Client;
 import lbms.azsmrc.remote.client.Utilities;
 import lbms.azsmrc.remote.client.events.ParameterListener;
+import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.dialogs.SSLCertWizard;
 import lbms.azsmrc.shared.RemoteConstants;
@@ -63,6 +64,7 @@ public class PreferencesTab {
 	private Composite cOptions;
 	private ScrolledComposite sc;
 	private Properties properties;
+	private Properties defaultProperties;
 
 	private ParameterListener pl;
 	private FlexyConfiguration fc;
@@ -82,6 +84,9 @@ public class PreferencesTab {
 		}
 	};
 
+	//Main I18N PFX
+	public static final String PFX = "tab.preferencestab.";
+
 	private boolean bModified = false;
 
 	public PreferencesTab(final CTabFolder parentTab){
@@ -89,6 +94,22 @@ public class PreferencesTab {
 
 		//Open properties for reading and saving
 		properties = RCMain.getRCMain().getProperties();
+
+		defaultProperties = new Properties();
+
+		InputStream is = null;
+		try {
+			is = RCMain.class.getClassLoader().getResourceAsStream("default.cfg");
+			defaultProperties.loadFromXML(is);
+			is.close();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} finally {
+			if (is!=null) try { is.close(); } catch (IOException e) {}
+		}
+
+
 
 
 		final CTabItem prefsTab = new CTabItem(parentTab, SWT.CLOSE);
@@ -288,7 +309,12 @@ public class PreferencesTab {
 		prefsTab.setControl(parent);
 		parentTab.setSelection(prefsTab);
 
-		initAzFlexyConf();
+		initAzSMRCFlexyConf();
+
+		if(RCMain.getRCMain().connected()
+				&& RCMain.getRCMain().getClient().getUserManager().getActiveUser().checkAccess(RemoteConstants.RIGHTS_ADMIN))
+			initAzFlexyConf();
+
 	}
 
 
@@ -885,8 +911,76 @@ public class PreferencesTab {
 		}
 	}
 
+
 	private void closeAzFlexyConf() {
 		RCMain.getRCMain().getClient().removeParameterListener(azParam);
 	}
 
-}
+	private void initAzSMRCFlexyConf() {
+		System.out.println("Trying to initialize AzSMRC Config");
+		try {
+			InputStream fcIs = this.getClass().getClassLoader().getResourceAsStream("lbms/azsmrc/remote/client/swtgui/flexyconf/AzSMRCPreferences.xml");
+			fc = FlexyConfiguration.readFromStream(fcIs, "Azsmrc");
+
+			final FCInterface fci = fc.getFCInterface();
+
+			fci.setI18NProvider(new I18NProvider() {
+				public String translate(String key) {
+					return I18N.translate(PFX + key);
+				}
+			});
+
+			fci.setContentProvider(new ContentProvider() {
+
+				public String getDefaultValue(String key, int type) {
+					System.out.println("AzSMRC *DEFAULT* Conf Get Def: "+key+" type: "+ type );
+					String v = defaultProperties.getProperty(key);
+					if (v==null) {
+
+						switch (type) {
+						case Entry.TYPE_STRING:
+							return "No Default Found";
+						case Entry.TYPE_BOOLEAN:
+							return "false";
+						default:
+							return "0";
+						}
+					}
+					else return v;
+				}
+				public String getValue(String key, int type) {
+					System.out.println("AzSMRC Conf Get: "+key+" type: "+type );
+					String v = properties.getProperty(key);
+					if (v==null) {
+						switch (type) {
+						case Entry.TYPE_STRING:
+							return "Loading Preferences...";
+						case Entry.TYPE_BOOLEAN:
+							return "false";
+						default:
+							return "0";
+						}
+					}
+					else return v;
+				}
+
+				public void setValue(String key, String value, int type) {
+					System.out.println("AzSMRC Conf Set: "+key+" value: "+value+" type: "+type);
+					properties.setProperty(key, value);
+					RCMain.getRCMain().saveConfig();
+				}
+			});
+
+			fc.getRootSection().initAll();
+			fcm = new SWTMenu(fc,menuTree,cOptions);
+			fcm.addAsSubItem();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+
+
+}//EOF
