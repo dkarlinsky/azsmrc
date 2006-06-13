@@ -2693,8 +2693,10 @@ public class DownloadManagerShell {
 				}
 				position.addListener(SWT.Selection, getSortListener(table,RemoteConstants.ST_POSITION));
 				position.addControlListener(resizeListener);
-				//table.setSortColumn(position);
-				//table.setSortDirection(SWT.UP);
+				if(SWT.getVersion() > 3220){
+					table.setSortDirection(SWT.DOWN);
+					table.setSortColumn(position);
+				}
 				break;
 
 			case RemoteConstants.ST_HEALTH:
@@ -2972,10 +2974,22 @@ public class DownloadManagerShell {
 		Listener sortListener = new Listener() {
 			public void handleEvent(Event e) {
 				table.setData("comparator", Container.getComparators().get(column));
-				if(Boolean.parseBoolean((String)table.getData("sort")))
+				if(Boolean.parseBoolean((String)table.getData("sort"))){
 					table.setData("sort",Boolean.toString(false));
-				else
+					if(SWT.getVersion() > 3220){
+						TableColumn col = (TableColumn)e.widget;
+						table.setSortDirection(SWT.UP);
+						table.setSortColumn(col);
+					}
+
+				}else{
 					table.setData("sort",Boolean.toString(true));
+					if(SWT.getVersion() > 3220){
+						TableColumn col = (TableColumn)e.widget;
+						table.setSortDirection(SWT.DOWN);
+						table.setSortColumn(col);
+					}
+				}
 				redrawTables(true);
 			}
 		};
