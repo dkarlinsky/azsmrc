@@ -21,11 +21,12 @@ public class SWTGroup implements DisplayAdapterGroup {
 		try {
 			this.group = g;
 			this.comp = parent;
-			new Label(parent,SWT.NULL);
+			//new Label(parent,SWT.NULL);
 			swtGroup = new org.eclipse.swt.widgets.Group(parent, SWT.NULL);
 			swtGroup.setLayout(new GridLayout(2,false));
 			swtGroup.setText(group.getLabel());
-			GridData gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+			GridData gd = new GridData(GridData.VERTICAL_ALIGN_END);
+			gd.verticalIndent = 10;
 			gd.horizontalSpan = 2;
 			swtGroup.setLayoutData(gd);
 
@@ -33,8 +34,9 @@ public class SWTGroup implements DisplayAdapterGroup {
 			for (Entry e:entries) {
 				new SWTEntry(e,swtGroup);
 			}
+			
 			group.init();
-			swtGroup.layout();			
+			swtGroup.layout();
 		} catch (SWTException e) {
 			e.printStackTrace();
 		}
