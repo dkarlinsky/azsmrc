@@ -5,14 +5,34 @@
 		<Section label="connection" index="0">
 			<Entry key="auto_connect" label="connection.autoconnect" type="boolean" index="0"/>
 			<Entry key="client.fastmode" label="connection.fastmode" type="boolean" index="1"/>
-			<Entry key="connection_interval_open" label="connection.connection_interval_open" type="integer" index="2" validate="3000..65535"/>
-			<Entry key="connection_interval_closed" label="connection.connection_interval_closed" type="integer" index="3" validate="3000..65535"/>
+			<Entry key="connection_interval_open" label="connection.connection_interval_open" type="integer" index="2" validate="3000..300000"/>
+			<Entry key="connection_interval_closed" label="connection.connection_interval_closed" type="integer" index="3" validate="3000..300000"/>
 		</Section>
 		<Section label="mainWindow" index="1">
 			<Entry key="language" label="mainWindow.language" type="string" index="0">
-				<Option value="en_EN" label="English" index="0"/>
-				<Option value="de_DE" label="Deutsch" index="1"/>
+				<Option value="en_EN" label="language.English" index="0"/>
+				<!--  Open up later when German is there
+				<Option value="de_DE" label="language.Deutsch" index="1"/>
+				-->
 			</Entry>
+			<Entry key="auto_open" label="mainWindow.autoOpen" type="boolean" index="1"/>
+			<Entry key="confirm.exit" label="mainWindow.confirmExit" type="boolean" index="2"/>
+			<Entry key="auto_console" label="mainWindow.autoConsole" type="boolean" index="3"/>
+			<Entry key="mainwindow.showHost" label="mainWindow.showHost" type="boolean" index="4"/>
+			<Group label="mainWindow.trayGroup" index="5">
+				<Entry key="tray.minimize" label="mainWindow.trayMinimize" type="boolean" index="0"/>
+					<Entry key="tray.exit" label="mainWindow.trayExit" type="boolean" index="1"/>
+			</Group>
+		</Section>
+		<Section label="miscellaneous" index="2">
+			<Entry key="popups_enabled" label="miscellaneous.popupsEnabled" type="boolean" index="0"/>
+			<Entry key="show_splash" label="miscellaneous.showSplash" type="boolean" index="1"/>
+			<Entry key="auto_clipboard" label="miscellaneous.autoClipboard" type="boolean" index="2"/>
+		</Section>
+		<Section label="update" index="3">
+			<Entry key="update.beta" label="update.updateBeta" type="boolean" index="0"/>
+			<Entry key="update.autocheck" label="update.updateAutoCheck" type="boolean" index="1"/>
+			<Entry key="update.autoupdate" label="update.updateAutoUpdate" type="boolean" index="2"/>
 		</Section>
 	</Section>
 </FlexyConfiguration>

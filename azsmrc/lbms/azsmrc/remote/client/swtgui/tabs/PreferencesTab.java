@@ -10,7 +10,8 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import lbms.azsmrc.remote.client.Client;
-import lbms.azsmrc.remote.client.Utilities;
+import lbms.azsmrc.remote.client.User;
+
 import lbms.azsmrc.remote.client.events.ParameterListener;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
@@ -38,7 +39,6 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -46,20 +46,16 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
 public class PreferencesTab {
 
 	private Label pluginLabel;
-	private Text updateIntervalOpen_Text, updateIntervalClosed_Text;
-	private Button fastMode,autoOpen, autoConnect, autoUpdateCheck, autoUpdate;
-	private Combo langCombo;
-	private Button trayMinimize, trayExit, showSplash, popupsEnabled;
-	private Button autoClipboard, autoConsole, showHost, exitConfirm;
-	private Button updateBeta, singleUser;
+	private Button singleUser;
 	private Tree menuTree;
+
+	private TreeItem tiPlugin;
 
 	private Composite cOptions;
 	private ScrolledComposite sc;
@@ -113,7 +109,7 @@ public class PreferencesTab {
 
 
 		final CTabItem prefsTab = new CTabItem(parentTab, SWT.CLOSE);
-		prefsTab.setText("Preferences");
+		prefsTab.setText(I18N.translate(PFX + "tab.text"));
 
 
 
@@ -184,7 +180,7 @@ public class PreferencesTab {
 		gridData.horizontalSpan = 1;
 		menuTree.setLayoutData(gridData);
 
-		final TreeItem tiConnection = new TreeItem(menuTree,SWT.NULL);
+/*		final TreeItem tiConnection = new TreeItem(menuTree,SWT.NULL);
 		tiConnection.setText("Connection");
 
 		final TreeItem tiMainWindow = new TreeItem(menuTree,SWT.NULL);
@@ -194,15 +190,14 @@ public class PreferencesTab {
 		tiMisc.setText("Miscellaneous");
 
 		final TreeItem tiUpdate = new TreeItem(menuTree,SWT.NULL);
-		tiUpdate.setText("Update");
+		tiUpdate.setText("Update");*/
 
-		final TreeItem tiPlugin = new TreeItem(menuTree,SWT.NULL);
-		tiPlugin.setText("Plugin Settings");
+
 
 		menuTree.addListener(SWT.Selection, new Listener(){
 
 			public void handleEvent(Event event) {
-				if(bModified){
+/*				if(bModified){
 					MessageBox box = new MessageBox(parent.getShell(),SWT.OK | SWT.CANCEL);
 					box.setText("Usaved Changes");
 					box.setMessage("You have made modifications to these settings\n" +
@@ -221,18 +216,18 @@ public class PreferencesTab {
 
 					}
 
-				}
+				}*/
 
 
-				if(event.item.equals(tiConnection)){
-					makeConnectionPreferences(cOptions);
+		/*		if(event.item.equals(tiConnection)){
+					//makeConnectionPreferences(cOptions);
 				}else if(event.item.equals(tiMainWindow)){
-					makeMainWindowPreferences(cOptions);
+					//makeMainWindowPreferences(cOptions);
 				}else if(event.item.equals(tiMisc)){
-					makeMiscPreferences(cOptions);
+					//makeMiscPreferences(cOptions);
 				}else if(event.item.equals(tiUpdate)){
-					makeUpdatePreferences(cOptions);
-				}else if(event.item.equals(tiPlugin)){
+					//makeUpdatePreferences(cOptions);
+				}else */if(event.item.equals(tiPlugin)){
 					makePlugPreferences(cOptions);
 				}
 
@@ -259,13 +254,13 @@ public class PreferencesTab {
 
 
 		//default selection
-		menuTree.setSelection(new TreeItem[] {tiConnection});
-		makeConnectionPreferences(cOptions);
+		//menuTree.setSelection(new TreeItem[] {tiConnection});
+		//makeConnectionPreferences(cOptions);
 
 		//set the sash weight
 		sash.setWeights(new int[] {80,320});
 
-		//Buttons
+/*		//Buttons
 		Composite button_comp = new Composite(parent, SWT.NULL);
 		gridData = new GridData(GridData.GRAB_HORIZONTAL);
 		gridData.horizontalSpan = 2;
@@ -297,13 +292,13 @@ public class PreferencesTab {
 
 
 		Button cancel = new Button(button_comp,SWT.PUSH);
-		cancel.setText("Cancel");
+		cancel.setText(I18N.translate("global.close"));
 		cancel.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
 				if(pl != null) RCMain.getRCMain().getClient().removeParameterListener(pl);
 				prefsTab.dispose();
 			}
-		});
+		});*/
 
 
 		prefsTab.setControl(parent);
@@ -311,278 +306,30 @@ public class PreferencesTab {
 
 		initAzSMRCFlexyConf();
 
+		tiPlugin = new TreeItem(menuTree,SWT.NULL);
+		tiPlugin.setText("Plugin Settings");
+
+		User activeUser = RCMain.getRCMain().getClient().getUserManager().getActiveUser();
+
 		if(RCMain.getRCMain().connected()
-				&& RCMain.getRCMain().getClient().getUserManager().getActiveUser().checkAccess(RemoteConstants.RIGHTS_ADMIN))
+				&& activeUser != null
+				&& activeUser.checkAccess(RemoteConstants.RIGHTS_ADMIN))
 			initAzFlexyConf();
 
+
+		TreeItem[] items = menuTree.getItems();
+		if(items.length > 0)
+			menuTree.setSelection(items[0]);
 	}
 
-
-
-	public void makeConnectionPreferences(final Composite composite){
+	public void makeSoundPreferences(final Composite composite){
 		Control[] controls = composite.getChildren();
 		for(Control control:controls){
 			control.dispose();
 		}
 
-		//Auto Connect
-		autoConnect = new Button(composite,SWT.CHECK);
-		GridData gridData = new GridData(GridData.GRAB_HORIZONTAL);
-		gridData.horizontalSpan = 2;
-		autoConnect.setLayoutData(gridData);
-		autoConnect.setText("AutoConnect: If connection data and password are saved, attempt last connection on startup");
-
-		if (Boolean.parseBoolean(properties.getProperty("auto_connect","false"))) {
-			autoConnect.setSelection(true);
-		}
-		addModListener(autoConnect,SWT.Selection);
-
-		//fastMode
-		fastMode = new Button(composite,SWT.CHECK);
-		gridData = new GridData(GridData.GRAB_HORIZONTAL);
-		gridData.horizontalSpan = 2;
-		fastMode.setLayoutData(gridData);
-		fastMode.setText("FastMode:  This mode uses more network bandwidth, but will increase the responsiveness of AzSMRC");
-
-		fastMode.setSelection(Boolean.parseBoolean(properties.getProperty("client.fastmode","false")));
-		addModListener(fastMode,SWT.Selection);
-
-		//Update Interval Open
-		Label updateIntervalOpen_Label = new Label(composite,SWT.NULL);
-		updateIntervalOpen_Label.setText("Update Interval while the main window is open (in seconds, minimum of 3):       ");
-
-		updateIntervalOpen_Text = new Text(composite, SWT.SINGLE | SWT.BORDER);
-		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
-		gridData.widthHint = 30;
-		updateIntervalOpen_Text.setLayoutData(gridData);
-		updateIntervalOpen_Text.setText(String.valueOf(Long.parseLong((properties.getProperty("connection_interval_open","5000")))/1000));
-		updateIntervalOpen_Text.addListener (SWT.Verify, new Listener () {
-			public void handleEvent (Event e) {
-				String string = e.text;
-				char [] chars = new char [string.length ()];
-				string.getChars (0, chars.length, chars, 0);
-				for (int i=0; i<chars.length; i++) {
-					if (!('0' <= chars [i] && chars [i] <= '9')) {
-						e.doit = false;
-						return;
-					}
-				}
-			}
-		});
-		addModListener(updateIntervalOpen_Text,SWT.Modify);
-
-
-		//Update Interval Closed
-		Label updateIntervalClosed_Label = new Label(composite,SWT.NULL);
-		updateIntervalClosed_Label.setText("Update Interval while the main window is closed (in seconds, minimum of 3):      ");
-
-		updateIntervalClosed_Text = new Text(composite, SWT.SINGLE | SWT.BORDER);
-		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
-		gridData.widthHint = 30;
-		updateIntervalClosed_Text.setLayoutData(gridData);
-		updateIntervalClosed_Text.setText(String.valueOf(Long.parseLong((properties.getProperty("connection_interval_closed","15000")))/1000));
-		updateIntervalClosed_Text.addListener (SWT.Verify, new Listener () {
-			public void handleEvent (Event e) {
-				String string = e.text;
-				char [] chars = new char [string.length ()];
-				string.getChars (0, chars.length, chars, 0);
-				for (int i=0; i<chars.length; i++) {
-					if (!('0' <= chars [i] && chars [i] <= '9')) {
-						e.doit = false;
-						return;
-					}
-				}
-			}
-		});
-		addModListener(updateIntervalClosed_Text,SWT.Modify);
-		composite.layout();
-	}
-
-
-	public void makeMainWindowPreferences(final Composite composite){
-		Control[] controls = composite.getChildren();
-		for(Control control:controls){
-			control.dispose();
-		}
-
-		//Language Combo
-		Label langLabel = new Label(composite, SWT.NULL);
-		langLabel.setText("Langauge used in AzSMRC: ");
-		GridData gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
-		langLabel.setLayoutData(gd);
-
-		langCombo = new Combo(composite,SWT.DROP_DOWN | SWT.READ_ONLY);
-		langCombo.add("English");
-		//langCombo.add("Deutsch");
-
-
-
-		String lang = properties.getProperty("language","en_EN");
-		if(lang.equalsIgnoreCase("en_EN"))
-			langCombo.select(0);
-		else if(lang.equalsIgnoreCase("de_DE"))
-			langCombo.select(1);
-
-
-		addModListener(langCombo, SWT.Selection);
-
-		//Auto Open
-		autoOpen = new Button(composite,SWT.CHECK);
-		GridData gridData = new GridData(GridData.GRAB_HORIZONTAL);
-		gridData.horizontalSpan = 2;
-		autoOpen.setLayoutData(gridData);
-		autoOpen.setText("AutoOpen: Auto open main window when program is started");
-
-		autoOpen.setSelection(Boolean.parseBoolean(properties.getProperty("auto_open","false")));
-		addModListener(autoOpen,SWT.Selection);
-
-
-		//Tray options
-		trayMinimize = new Button(composite,SWT.CHECK);
-		gridData = new GridData(GridData.GRAB_HORIZONTAL);
-		gridData.horizontalSpan = 2;
-		trayMinimize.setLayoutData(gridData);
-		trayMinimize.setText("Minimizing the main window will send it to the tray");
-		trayMinimize.setSelection(Boolean.parseBoolean(properties.getProperty("tray.minimize","true"))?true:false);
-		addModListener(trayMinimize,SWT.Selection);
-
-
-		//Tray options
-		trayExit = new Button(composite,SWT.CHECK);
-		gridData = new GridData(GridData.GRAB_HORIZONTAL);
-		gridData.horizontalSpan = 2;
-		trayExit.setLayoutData(gridData);
-		trayExit.setText("Exiting the main window will send it to the tray");
-		trayExit.setSelection(Boolean.parseBoolean(properties.getProperty("tray.exit","true"))?true:false);
-		addModListener(trayExit,SWT.Selection);
-
-		//Exit Confirmation
-		exitConfirm = new Button(composite,SWT.CHECK);
-		gridData = new GridData(GridData.GRAB_HORIZONTAL);
-		gridData.horizontalSpan = 2;
-		exitConfirm.setLayoutData(gridData);
-		exitConfirm.setText("Show confirmation dialog on exit");
-		exitConfirm.setSelection(Boolean.parseBoolean(properties.getProperty("confirm.exit","true"))?true:false);
-		addModListener(exitConfirm,SWT.Selection);
-
-		//auto console open
-		autoConsole = new Button(composite,SWT.CHECK);
-		gridData = new GridData(GridData.GRAB_HORIZONTAL);
-		gridData.horizontalSpan = 2;
-		autoConsole.setLayoutData(gridData);
-		autoConsole.setText("Auto open console when opening main window");
-		autoConsole.setSelection(Boolean.parseBoolean(properties.getProperty("auto_console","false"))?true:false);
-		addModListener(autoConsole,SWT.Selection);
-
-		//showhost
-		showHost = new Button(composite,SWT.CHECK);
-		gridData = new GridData(GridData.GRAB_HORIZONTAL);
-		gridData.horizontalSpan = 2;
-		showHost.setLayoutData(gridData);
-		showHost.setText("Show connected server url in the main tab title");
-		showHost.setSelection(Boolean.parseBoolean(properties.getProperty("mainwindow.showHost","false")));
-		addModListener(showHost,SWT.Selection);
-
-		composite.layout();
-	}
-
-
-	public void makeMiscPreferences(final Composite composite){
-		Control[] controls = composite.getChildren();
-		for(Control control:controls){
-			control.dispose();
-		}
-		//popupsEnabled
-		popupsEnabled = new Button(composite,SWT.CHECK);
-		GridData gridData = new GridData(GridData.GRAB_HORIZONTAL);
-		gridData.horizontalSpan = 2;
-		popupsEnabled.setLayoutData(gridData);
-		popupsEnabled.setText("Popup Alerts Enabled");
-
-		popupsEnabled.setSelection(Boolean.parseBoolean(properties.getProperty("popups_enabled","true")));
-		addModListener(popupsEnabled,SWT.Selection);
-
-
-		//show splash screen
-		showSplash = new Button(composite,SWT.CHECK);
-		gridData = new GridData(GridData.GRAB_HORIZONTAL);
-		gridData.horizontalSpan = 2;
-		showSplash.setLayoutData(gridData);
-		showSplash.setText("Show splash screen on startup");
-
-		showSplash.setSelection(Boolean.parseBoolean(properties.getProperty("show_splash","true")));
-		addModListener(showSplash,SWT.Selection);
-
-
-		//AutoClipboard
-		autoClipboard = new Button(composite,SWT.CHECK);
-		gridData = new GridData(GridData.GRAB_HORIZONTAL);
-		gridData.horizontalSpan = 2;
-		autoClipboard.setLayoutData(gridData);
-		autoClipboard.setText("Clipboard Monitor: Monitor the users clipboard at all times for torrent URLs and files");
-
-		autoClipboard.setSelection(Boolean.parseBoolean(properties.getProperty("auto_clipboard",Utilities.isLinux()? "false" : "true")));
-		addModListener(autoClipboard,SWT.Selection);
-
-
-		composite.layout();
-	}
-
-
-	public void makeUpdatePreferences(final Composite composite){
-		Control[] controls = composite.getChildren();
-		for(Control control:controls){
-			control.dispose();
-		}
-
-		//Update betas
-		updateBeta = new Button(composite,SWT.CHECK);
-		updateBeta.setText("Use Beta Builds:  Allow updates to include potentially non-stable, beta builds of AzSMRC" );
-		GridData gridData = new GridData(GridData.GRAB_HORIZONTAL);
-		gridData.horizontalSpan = 2;
-		updateBeta.setLayoutData(gridData);
-
-
-		updateBeta.setSelection(Boolean.parseBoolean(properties.getProperty("update.beta", "false")));
-		addModListener(updateBeta,SWT.Selection);
-
-
-		//Auto Update Check
-		autoUpdateCheck = new Button(composite,SWT.CHECK);
-		gridData = new GridData(GridData.GRAB_HORIZONTAL);
-		gridData.horizontalSpan = 2;
-		autoUpdateCheck.setLayoutData(gridData);
-		autoUpdateCheck.setText("Auto Check for Updates: Allow AzSMRC to check for and alert the user to updates");
-
-
-		autoUpdateCheck.setSelection(Boolean.parseBoolean(properties.getProperty("update.autocheck","true")));
-		addModListener(autoUpdateCheck,SWT.Selection);
-
-		//Perform Auto Update
-
-		autoUpdate = new Button(composite,SWT.CHECK);
-		gridData = new GridData(GridData.GRAB_HORIZONTAL);
-		gridData.horizontalSpan = 2;
-		autoUpdate.setLayoutData(gridData);
-		autoUpdate.setText("Auto Update: If an update is found, automatically merge the files without any user interaction");
-
-		autoUpdate.setSelection(Boolean.parseBoolean(properties.getProperty("update.autoupdate","false")));
-		addModListener(autoUpdate,SWT.Selection);
-
-		//update button
-		final Button updateCheck = new Button(composite,SWT.PUSH);
-		gridData = new GridData(GridData.GRAB_HORIZONTAL);
-		gridData.horizontalSpan = 2;
-		updateCheck.setLayoutData(gridData);
-		updateCheck.setText("Check online for updates");
-		updateCheck.addListener(SWT.Selection, new Listener(){
-			public void handleEvent(Event arg0) {
-				RCMain.getRCMain().getUpdater().checkForUpdates(Boolean.parseBoolean(properties.getProperty("update.beta", "false")));
-				properties.setProperty("update.lastcheck",Long.toString(System.currentTimeMillis()));
-				RCMain.getRCMain().saveConfig();
-			}
-		});
-
+		Label sound = new Label(composite, SWT.NULL);
+		sound.setText("TODO.. make this section");
 
 		composite.layout();
 	}
@@ -620,7 +367,7 @@ public class PreferencesTab {
 
 								public void run() {
 									if(pluginLabel != null && !pluginLabel.isDisposed())
-										pluginLabel.setText("Properties received from server");
+										pluginLabel.setText("Status: Properties received from server");
 									if(singleUser != null && !singleUser.isDisposed()){
 										singleUser.setEnabled(true);
 										if (Boolean.parseBoolean(value)) {
@@ -648,7 +395,7 @@ public class PreferencesTab {
 			RCMain.getRCMain().getClient().addParameterListener(pl);
 
 
-			pluginLabel.setText("Sending request to server for settings.. Please wait");
+			pluginLabel.setText("Status: Sending request to server for settings.. Please wait");
 
 			//Single User
 			singleUser = new Button(composite,SWT.CHECK);
@@ -658,7 +405,25 @@ public class PreferencesTab {
 			singleUser.setText("Enable Single User Mode");
 			singleUser.setEnabled(false);
 
+			singleUser.addListener(SWT.Selection, new Listener(){
+				public void handleEvent(Event arg0) {
+					//Plugin Setting to core
+					if(singleUser != null && !singleUser.isDisposed()){
+						Client client = RCMain.getRCMain().getClient();
+						client.transactionStart();
 
+						if(singleUser.getSelection())
+							client.sendSetPluginParameter("singleUserMode", "true", RemoteConstants.PARAMETER_BOOLEAN);
+						else{
+							client.sendSetPluginParameter("singleUserMode", "false", RemoteConstants.PARAMETER_BOOLEAN);
+							RCMain.getRCMain().getMainWindow().setStatusBarText("Connected in Multi User Mode", SWT.COLOR_DARK_GREEN);
+						}
+						System.out.println("Setting singleUserMode plugin parameter on server to " + Boolean.toString(singleUser.getSelection()));
+						client.transactionCommit();
+
+					}
+				}
+			});
 			addModListener(singleUser,SWT.Selection);
 
 
@@ -692,7 +457,7 @@ public class PreferencesTab {
 		});
 	}
 
-	public void save(Composite parent){
+	/*public void save(Composite parent){
 		if((updateIntervalOpen_Text != null && !updateIntervalOpen_Text.isDisposed())||
 				(updateIntervalClosed_Text != null && !updateIntervalClosed_Text.isDisposed())){
 			String open = updateIntervalOpen_Text.getText();
@@ -825,7 +590,7 @@ public class PreferencesTab {
 		//Update Timer
 		RCMain.getRCMain().updateTimer(true);
 	}
-
+*/
 	private void initAzFlexyConf() {
 		System.out.println("Trying to initialize AzRemoteConf");
 		try {
@@ -973,7 +738,7 @@ public class PreferencesTab {
 
 			fc.getRootSection().initAll();
 			fcm = new SWTMenu(fc,menuTree,cOptions);
-			fcm.addAsSubItem();
+			fcm.addAsRoot();
 
 		} catch (IOException e) {
 			e.printStackTrace();
