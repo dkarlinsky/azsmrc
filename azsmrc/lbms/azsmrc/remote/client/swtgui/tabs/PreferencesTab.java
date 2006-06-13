@@ -55,7 +55,7 @@ public class PreferencesTab {
 	private Button singleUser;
 	private Tree menuTree;
 
-	private TreeItem tiPlugin;
+	private TreeItem tiPlugin, tiSound, tiNotes;
 
 	private Composite cOptions;
 	private ScrolledComposite sc;
@@ -180,55 +180,15 @@ public class PreferencesTab {
 		gridData.horizontalSpan = 1;
 		menuTree.setLayoutData(gridData);
 
-/*		final TreeItem tiConnection = new TreeItem(menuTree,SWT.NULL);
-		tiConnection.setText("Connection");
-
-		final TreeItem tiMainWindow = new TreeItem(menuTree,SWT.NULL);
-		tiMainWindow.setText("Main Window");
-
-		final TreeItem tiMisc = new TreeItem(menuTree,SWT.NULL);
-		tiMisc.setText("Miscellaneous");
-
-		final TreeItem tiUpdate = new TreeItem(menuTree,SWT.NULL);
-		tiUpdate.setText("Update");*/
-
-
-
 		menuTree.addListener(SWT.Selection, new Listener(){
 
 			public void handleEvent(Event event) {
-/*				if(bModified){
-					MessageBox box = new MessageBox(parent.getShell(),SWT.OK | SWT.CANCEL);
-					box.setText("Usaved Changes");
-					box.setMessage("You have made modifications to these settings\n" +
-							"Click OK to apply these changes and continue\n" +
-					"Click Cancel to discard these changes and continue");
-					int answer = box.open();
-					switch(answer){
-
-					case(SWT.OK):
-						save(parent);
-					break;
-
-					case(SWT.CANCEL):
-						bModified = false;
-					break;
-
-					}
-
-				}*/
-
-
-		/*		if(event.item.equals(tiConnection)){
-					//makeConnectionPreferences(cOptions);
-				}else if(event.item.equals(tiMainWindow)){
-					//makeMainWindowPreferences(cOptions);
-				}else if(event.item.equals(tiMisc)){
-					//makeMiscPreferences(cOptions);
-				}else if(event.item.equals(tiUpdate)){
-					//makeUpdatePreferences(cOptions);
-				}else */if(event.item.equals(tiPlugin)){
+				if(event.item.equals(tiPlugin)){
 					makePlugPreferences(cOptions);
+				}else if(event.item.equals(tiSound)){
+					makeSoundPreferences(cOptions);
+				}else if(event.item.equals(tiNotes)){
+					makeNotesPreferences(cOptions);
 				}
 
 			}
@@ -252,62 +212,27 @@ public class PreferencesTab {
 			}
 		});
 
-
-		//default selection
-		//menuTree.setSelection(new TreeItem[] {tiConnection});
-		//makeConnectionPreferences(cOptions);
-
 		//set the sash weight
 		sash.setWeights(new int[] {80,320});
 
-/*		//Buttons
-		Composite button_comp = new Composite(parent, SWT.NULL);
-		gridData = new GridData(GridData.GRAB_HORIZONTAL);
-		gridData.horizontalSpan = 2;
-		button_comp.setLayoutData(gridData);
-
-		GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = 3;
-		gridLayout.marginWidth = 0;
-		button_comp.setLayout(gridLayout);
-
-
-		Button apply = new Button (button_comp,SWT.PUSH);
-		apply.setText("Save Changes");
-		apply.addListener(SWT.Selection, new Listener(){
-			public void handleEvent(Event arg0) {
-				save(parent);
-			}
-		});
-
-		Button commit = new Button(button_comp,SWT.PUSH);
-		commit.setText("Save Changes and Close");
-		commit.addListener(SWT.Selection, new Listener(){
-			public void handleEvent(Event e) {
-				save(parent);
-				if(pl != null) RCMain.getRCMain().getClient().removeParameterListener(pl);
-				prefsTab.dispose();
-			}
-		});
-
-
-		Button cancel = new Button(button_comp,SWT.PUSH);
-		cancel.setText(I18N.translate("global.close"));
-		cancel.addListener(SWT.Selection, new Listener(){
-			public void handleEvent(Event e) {
-				if(pl != null) RCMain.getRCMain().getClient().removeParameterListener(pl);
-				prefsTab.dispose();
-			}
-		});*/
 
 
 		prefsTab.setControl(parent);
 		parentTab.setSelection(prefsTab);
 
+		//First static notes treeitem so that it can
+		//be selected and the composite can be drawn
+		tiNotes = new TreeItem(menuTree,SWT.NULL);
+		tiNotes.setText("Notes");
+
+		//add in flexyconfig AzSMRC stuff
 		initAzSMRCFlexyConf();
 
 		tiPlugin = new TreeItem(menuTree,SWT.NULL);
 		tiPlugin.setText("Plugin Settings");
+
+		tiSound = new TreeItem(menuTree,SWT.NULL);
+		tiSound.setText("Sound Alerts");
 
 		User activeUser = RCMain.getRCMain().getClient().getUserManager().getActiveUser();
 
@@ -316,13 +241,24 @@ public class PreferencesTab {
 				&& activeUser.checkAccess(RemoteConstants.RIGHTS_ADMIN))
 			initAzFlexyConf();
 
-
-		TreeItem[] items = menuTree.getItems();
-		if(items.length > 0)
-			menuTree.setSelection(items[0]);
+		// set the first static notes treeItem and draw the cOptions for it
+		menuTree.setSelection(tiNotes);
+		makeNotesPreferences(cOptions);
 	}
 
-	public void makeSoundPreferences(final Composite composite){
+	private void makeNotesPreferences(final Composite composite){
+		Control[] controls = composite.getChildren();
+		for(Control control:controls){
+			control.dispose();
+		}
+
+		Label sound = new Label(composite, SWT.NULL);
+		sound.setText("In order for you to be able to see and alter Azureus settings remotely, you must be connected to the server and the user must have administrator rights.");
+
+		composite.layout();
+	}
+
+	private void makeSoundPreferences(final Composite composite){
 		Control[] controls = composite.getChildren();
 		for(Control control:controls){
 			control.dispose();
@@ -335,7 +271,7 @@ public class PreferencesTab {
 	}
 
 
-	public void makePlugPreferences(final Composite composite){
+	private void makePlugPreferences(final Composite composite){
 		Control[] controls = composite.getChildren();
 		for(Control control:controls){
 			control.dispose();
@@ -457,140 +393,7 @@ public class PreferencesTab {
 		});
 	}
 
-	/*public void save(Composite parent){
-		if((updateIntervalOpen_Text != null && !updateIntervalOpen_Text.isDisposed())||
-				(updateIntervalClosed_Text != null && !updateIntervalClosed_Text.isDisposed())){
-			String open = updateIntervalOpen_Text.getText();
-			String closed = updateIntervalClosed_Text.getText();
-			if(open.equalsIgnoreCase("") || closed.equalsIgnoreCase("") ){
-				MessageBox messageBox = new MessageBox(parent.getShell(), SWT.ICON_ERROR | SWT.OK);
-				messageBox.setText("Error");
-				messageBox.setMessage("None of the intervals can be blank.");
-				messageBox.open();
-				return;
-			}else if(Long.parseLong(open) < 3){
-				updateIntervalOpen_Text.setText("3");
-				MessageBox messageBox = new MessageBox(parent.getShell(), SWT.ICON_ERROR | SWT.OK);
-				messageBox.setText("Error");
-				messageBox.setMessage("The interval for when the main window is open is too low.  Please set to 3 seconds or above.");
-				messageBox.open();
-				return;
-			}else if(Long.parseLong(closed) < 3){
-				updateIntervalClosed_Text.setText("3");
-				MessageBox messageBox = new MessageBox(parent.getShell(), SWT.ICON_ERROR | SWT.OK);
-				messageBox.setText("Error");
-				messageBox.setMessage("The interval for when the main window is closed is too low.  Please set to 3 seconds or above.");
-				messageBox.open();
-				return;
-			}else{
-				properties.setProperty("connection_interval_open", String.valueOf(Long.parseLong(open)*1000));
-				properties.setProperty("connection_interval_closed", String.valueOf(Long.parseLong(closed)*1000));
-			}
-		}
 
-		//Lang Combo store
-		if(langCombo != null && !langCombo.isDisposed()){
-			int choice = langCombo.getSelectionIndex();
-			switch(choice){
-			case (0):
-				properties.setProperty("language", "en_EN");
-				break;
-			case (1):
-				properties.setProperty("language", "de_DE");
-				break;
-			}
-		}
-
-
-		//Store AutoOpen
-		if(autoOpen != null && !autoOpen.isDisposed())
-			properties.setProperty("auto_open", Boolean.toString(autoOpen.getSelection()));
-
-		//fastmode
-		if(fastMode != null && !fastMode.isDisposed()){
-			properties.setProperty("client.fastmode", Boolean.toString(fastMode.getSelection()));
-			RCMain.getRCMain().getClient().setFastMode(fastMode.getSelection());
-		}
-
-		//Store AutoSave
-		if(autoConnect != null && !autoConnect.isDisposed())
-			properties.setProperty("auto_connect", Boolean.toString(autoConnect.getSelection()));
-
-		//update Beta
-		if(updateBeta != null && !updateBeta.isDisposed())
-			properties.setProperty("update.beta", Boolean.toString(updateBeta.getSelection()));
-
-		//Store AutoUpdateCheck
-		if(autoUpdateCheck != null && !autoUpdateCheck.isDisposed())
-			properties.setProperty("update.autocheck", Boolean.toString(autoUpdateCheck.getSelection()));
-
-		//Store AutoUpdate
-		if(autoUpdate != null && !autoUpdate.isDisposed())
-			properties.setProperty("update.autoupdate", Boolean.toString(autoUpdate.getSelection()));
-
-		//Store tray options
-		if(trayMinimize != null && !trayMinimize.isDisposed())
-			properties.setProperty("tray.minimize", Boolean.toString(trayMinimize.getSelection()));
-
-		//TrayExit
-		if(trayExit != null && !trayExit.isDisposed())
-			properties.setProperty("tray.exit",Boolean.toString(trayExit.getSelection()));
-
-		//Store Confirm exit
-		if(exitConfirm != null && !exitConfirm.isDisposed())
-			properties.setProperty("confirm.exit", Boolean.toString(exitConfirm.getSelection()));
-
-		//Store popupsEnabled
-		if(popupsEnabled != null && !popupsEnabled.isDisposed())
-			properties.setProperty("popups_enabled", Boolean.toString(popupsEnabled.getSelection()));
-
-		//Store Splash Screen Setting
-		if(showSplash != null && !showSplash.isDisposed())
-			properties.setProperty("show_splash", Boolean.toString(showSplash.getSelection()));
-
-		//Store the autoClipboard setting
-		if(autoClipboard != null && !autoClipboard.isDisposed())
-			properties.setProperty("auto_clipboard", Boolean.toString(autoClipboard.getSelection()));
-
-		//Store auto console setting
-		if(autoConsole != null && !autoConsole.isDisposed())
-			properties.setProperty("auto_console", Boolean.toString(autoConsole.getSelection()));
-
-		//showHost setting
-		if(showHost != null && !showHost.isDisposed())
-			properties.setProperty("mainwindow.showHost", Boolean.toString(showHost.getSelection()));
-
-
-		//Plugin Setting to core
-		if(singleUser != null && !singleUser.isDisposed()){
-			Client client = RCMain.getRCMain().getClient();
-			client.transactionStart();
-
-			if(singleUser.getSelection())
-				client.sendSetPluginParameter("singleUserMode", "true", RemoteConstants.PARAMETER_BOOLEAN);
-			else{
-				client.sendSetPluginParameter("singleUserMode", "false", RemoteConstants.PARAMETER_BOOLEAN);
-				RCMain.getRCMain().getMainWindow().setStatusBarText("Connected in Multi User Mode", SWT.COLOR_DARK_GREEN);
-			}
-
-			client.transactionCommit();
-
-		}
-
-
-
-
-
-		//Reset the boolean for modified
-		bModified = false;
-
-		//Save all changes
-		RCMain.getRCMain().saveConfig();
-
-		//Update Timer
-		RCMain.getRCMain().updateTimer(true);
-	}
-*/
 	private void initAzFlexyConf() {
 		System.out.println("Trying to initialize AzRemoteConf");
 		try {

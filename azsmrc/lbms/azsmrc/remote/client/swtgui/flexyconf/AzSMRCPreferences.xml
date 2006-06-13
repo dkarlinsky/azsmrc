@@ -21,7 +21,7 @@
 			<Entry key="mainwindow.showHost" label="mainWindow.showHost" type="boolean" index="4"/>
 			<Group label="mainWindow.trayGroup" index="5">
 				<Entry key="tray.minimize" label="mainWindow.trayMinimize" type="boolean" index="0"/>
-					<Entry key="tray.exit" label="mainWindow.trayExit" type="boolean" index="1"/>
+				<Entry key="tray.exit" label="mainWindow.trayExit" type="boolean" index="1"/>
 			</Group>
 		</Section>
 		<Section label="miscellaneous" index="2">
