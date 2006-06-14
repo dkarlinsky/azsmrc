@@ -2,7 +2,7 @@
 <FlexyConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:noNamespaceSchemaLocation="../../../../../tools/flexyconf/flexyconf.xsd">
 	<Section label="Azureus Remote" index="0">
-		<Entry key="" label="All remote settings will be applied instantly -- no need to save." type="label" index="0"/>
+		<Entry key="" label="Warning:  These settings will directly change the settings in Azureus itslef" type="label" index="0"/>
 		<Section label="ConfigView.section.server" index="0">
 			<Entry key="TCP.Listen.Port" label="ConfigView.label.serverport" type="integer" index="0" validate="1..65535"/>
 			<Group label="ConfigView.section.connection.group.peersources" index="1">
@@ -71,7 +71,7 @@
 			<Entry key="Max Download Speed KBs" label="ConfigView.label.maxdownloadspeed" type="integer" index="3" validate="0.."/>
 			<Entry key="Max Uploads" label="ConfigView.label.maxuploads" type="integer" index="4" validate="2.."/>
 			<Entry key="enable.seedingonly.maxuploads" label="ConfigView.label.maxuploadsseeding" type="boolean" index="5"/>
-			<Entry key="Max Uploads Seeding" label="ConfigView.label.maxuploadsseeding" type="integer" index="6" validate="2.." dependsOn="enable.seedingonly.maxuploads"/>			
+			<Entry key="Max Uploads Seeding" label="ConfigView.label.maxuploadsseeding" type="integer" index="6" validate="2.." dependsOn="enable.seedingonly.maxuploads"/>
 			<Entry key="Max.Peer.Connections.Per.Torrent" label="ConfigView.label.max_peers_per_torrent" type="integer" index="7" validate="0.."/>
 			<Entry key="Max.Peer.Connections.Total" label="ConfigView.label.max_peers_total" type="integer" index="8" validate="0.."/>
 			<Entry key="Allow Same IP Peers" label="ConfigView.label.allowsameip" type="boolean" index="9"/>
@@ -128,7 +128,7 @@
 					<Entry key="Save Torrent Backup" label="ConfigView.label.savetorrentbackup" type="boolean" index="2" dependsOn="Save Torrent Files"/>
 				</Group>
 				<Entry key="Default Start Torrents Stopped" label="ConfigView.label.defaultstarttorrentsstopped" type="boolean" index="1"/>
-				<Group label="" index="2">				
+				<Group label="" index="2">
 					<Entry key="Watch Torrent Folder" label="ConfigView.label.watchtorrentfolder" type="boolean" index="0"/>
 					<Entry key="Watch Torrent Folder Path" label="ConfigView.label.importdirectory" type="string" index="1" dependsOn="Watch Torrent Folder"/>
 					<Entry key="Stats Period" label="ConfigView.section.stats.savefreq" type="integer" index="2" dependsOn="Watch Torrent Folder">
