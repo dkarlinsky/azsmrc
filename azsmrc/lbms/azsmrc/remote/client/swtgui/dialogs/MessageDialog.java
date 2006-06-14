@@ -13,6 +13,8 @@ import java.util.StringTokenizer;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
+import lbms.azsmrc.remote.client.swtgui.sound.Sound;
+import lbms.azsmrc.remote.client.swtgui.sound.SoundManager;
 import lbms.azsmrc.remote.client.util.TimerEvent;
 import lbms.azsmrc.remote.client.util.TimerEventPerformer;
 
@@ -81,12 +83,14 @@ public class MessageDialog {
 	public static MessageDialog error(final Display display, final boolean bautoclose, final int timeToClose, final String title, final String message) {
 		if(!Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("popups_enabled", "true")))
 			return null;
+		SoundManager.playSound(Sound.ERROR);
 		return new MessageDialog(display, bautoclose,timeToClose,STEPS,title,message, TYPE_ERROR);
 	}
 
 	public static MessageDialog error(final Display display, final String title, final String message) {
 		if(!Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("popups_enabled", "true")))
 			return null;
+		SoundManager.playSound(Sound.ERROR);
 		return new MessageDialog(display, false,TIME_TO_CLOSE,STEPS,title,message, TYPE_ERROR);
 	}
 
