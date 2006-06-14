@@ -100,4 +100,8 @@ public class SoundManager {
 	public static boolean isSilent() {
 		return instance.silentMode;
 	}
+
+	public static boolean soundLoaded(Sound key) {
+		return instance.soundBank.containsKey(key);
+	}
 }
