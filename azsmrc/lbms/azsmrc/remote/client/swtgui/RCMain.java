@@ -985,7 +985,10 @@ public class RCMain implements Launchable {
 	}
 
 	private void loadSound (Sound key, String snd) {
-		if (snd == null || snd.equals("")) return;
+		if (snd == null || snd.equals("")) {
+			debugLogger.info("Couldn't Load "+key+" because location was empty.");
+			return;
+		}
 		File sndFile = new File (snd);
 		if (sndFile.exists() && sndFile.canRead()) {
 			SoundManager.unLoad(key);
@@ -994,6 +997,8 @@ public class RCMain implements Launchable {
 			} catch (SoundException e) {
 				e.printStackTrace();
 			}
+		} else {
+			debugLogger.info("Couldn't Load "+key+" from "+snd);
 		}
 	}
 
