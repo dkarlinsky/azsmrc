@@ -970,7 +970,7 @@ public class RCMain implements Launchable {
 	}
 
 	public void loadSounds() {
-		if (Boolean.parseBoolean(properties.getProperty("deactivateSounds", "false"))) return;
+		if (!Boolean.parseBoolean(properties.getProperty("soundManager.active", "true"))) return;
 		loadSound(Sound.ERROR, 					properties.getProperty("sound.Error"));
 		loadSound(Sound.DOWNLOAD_ADDED, 		properties.getProperty("sound.DownloadAdded"));
 		loadSound(Sound.DOWNLOADING_FINISHED,	properties.getProperty("sound.DownloadingFinished"));
