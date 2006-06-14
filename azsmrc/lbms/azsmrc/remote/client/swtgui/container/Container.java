@@ -123,7 +123,7 @@ public abstract class Container implements Comparable<Container> {
 			 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 			 */
 			public int compare(Container o1, Container o2) {
-				return (int)(o1.dl.getStats().getDownloadAverage()-o2.dl.getStats().getDownloadAverage());
+				return compareLong(o1.dl.getStats().getDownloadAverage(),o2.dl.getStats().getDownloadAverage());
 			}
 		});
 		comparatorCollection.put(RemoteConstants.ST_UPLOAD_AVG, new Comparator<Container>() {
@@ -131,7 +131,7 @@ public abstract class Container implements Comparable<Container> {
 			 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 			 */
 			public int compare(Container o1, Container o2) {
-				return (int)(o1.dl.getStats().getUploadAverage()-o2.dl.getStats().getUploadAverage());
+				return compareLong(o1.dl.getStats().getUploadAverage(),o2.dl.getStats().getUploadAverage());
 			}
 		});
 		comparatorCollection.put(RemoteConstants.ST_UPLOADED, new Comparator<Container>() {
@@ -139,7 +139,7 @@ public abstract class Container implements Comparable<Container> {
 			 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 			 */
 			public int compare(Container o1, Container o2) {
-				return (int)(o1.dl.getStats().getUploaded()-o2.dl.getStats().getUploaded());
+				return compareLong(o1.dl.getStats().getUploaded(),o2.dl.getStats().getUploaded());
 			}
 		});
 		comparatorCollection.put(RemoteConstants.ST_DOWNLOADED, new Comparator<Container>() {
@@ -147,7 +147,7 @@ public abstract class Container implements Comparable<Container> {
 			 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 			 */
 			public int compare(Container o1, Container o2) {
-				return (int)(o1.dl.getStats().getDownloaded()-o2.dl.getStats().getDownloaded());
+				return compareLong(o1.dl.getStats().getDownloaded(),o2.dl.getStats().getDownloaded());
 			}
 		});
 		comparatorCollection.put(RemoteConstants.ST_ALL_LEECHER, new Comparator<Container>() {
@@ -179,7 +179,7 @@ public abstract class Container implements Comparable<Container> {
 			 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 			 */
 			public int compare(Container o1, Container o2) {
-				return (int)(o1.dl.getDiscarded()-o2.dl.getDiscarded());
+				return compareLong(o1.dl.getDiscarded(),o2.dl.getDiscarded());
 			}
 		});
 		comparatorCollection.put(RemoteConstants.ST_SHARE, new Comparator<Container>() {
@@ -188,6 +188,14 @@ public abstract class Container implements Comparable<Container> {
 			 */
 			public int compare(Container o1, Container o2) {
 				return (o1.dl.getStats().getShareRatio()-o2.dl.getStats().getShareRatio());
+			}
+		});
+		comparatorCollection.put(RemoteConstants.ST_SIZE, new Comparator<Container>() {
+			/* (non-Javadoc)
+			 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+			 */
+			public int compare(Container o1, Container o2) {
+				return compareLong(o1.dl.getSize(),o2.dl.getSize());
 			}
 		});
 	}
@@ -215,6 +223,13 @@ public abstract class Container implements Comparable<Container> {
 			}
 
 		});
+	}
+
+	private static int compareLong (long v1, long v2) {
+		long t = v1-v2;
+		if (t>0) return 1;
+		if (t==0) return 0;
+		return -1;
 	}
 
 	public Container (Download dl) {
