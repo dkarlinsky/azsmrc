@@ -147,7 +147,7 @@ public class PreferencesTab {
 		grayLabel.setLayoutData(gridData);
 
 		Label title = new Label(grayLabel,SWT.NONE);
-		title.setText("All changes are immediately committed");
+		title.setText(I18N.translate(PFX + "grayTitle.text"));
 		title.setBackground(grayLabel.getBackground());
 
 		//Set it bold
@@ -222,16 +222,16 @@ public class PreferencesTab {
 		//First static notes treeitem so that it can
 		//be selected and the composite can be drawn
 		tiNotes = new TreeItem(menuTree,SWT.NULL);
-		tiNotes.setText("Notes");
+		tiNotes.setText(I18N.translate(PFX + "note.treeItem.text"));
 
 		//add in flexyconfig AzSMRC stuff
 		initAzSMRCFlexyConf();
 
 		tiPlugin = new TreeItem(menuTree,SWT.NULL);
-		tiPlugin.setText("Plugin Settings");
+		tiPlugin.setText(I18N.translate(PFX + "pluginSettings.treeItem.text"));
 
 		tiSound = new TreeItem(menuTree,SWT.NULL);
-		tiSound.setText("Sound Alerts");
+		tiSound.setText(I18N.translate(PFX + "sound.treeItem.text"));
 
 		User activeUser = RCMain.getRCMain().getClient().getUserManager().getActiveUser();
 
@@ -252,7 +252,7 @@ public class PreferencesTab {
 		}
 
 		Label sound = new Label(composite, SWT.NULL);
-		sound.setText("In order for you to be able to see and alter Azureus settings remotely, you must be connected to the server and the user must have administrator rights.");
+		sound.setText(I18N.translate(PFX + "note.note1"));
 
 		composite.layout();
 	}
@@ -657,7 +657,7 @@ public class PreferencesTab {
 		}
 		pluginLabel = new Label(composite,SWT.NULL);
 		if(!RCMain.getRCMain().connected()){
-			pluginLabel.setText("You are not currently connected to the server, therefore no settings are available under this option");
+			pluginLabel.setText(I18N.translate(PFX + "pluginSettings.statusLabel.notConnected"));
 		}else{
 			Client client = RCMain.getRCMain().getClient();
 			client.transactionStart();
@@ -682,7 +682,7 @@ public class PreferencesTab {
 
 								public void run() {
 									if(pluginLabel != null && !pluginLabel.isDisposed())
-										pluginLabel.setText("Status: Properties received from server");
+										pluginLabel.setText(I18N.translate(PFX + "pluginSettings.statusLabel.connected"));
 									if(singleUser != null && !singleUser.isDisposed()){
 										singleUser.setEnabled(true);
 										if (Boolean.parseBoolean(value)) {
@@ -710,14 +710,14 @@ public class PreferencesTab {
 			RCMain.getRCMain().getClient().addParameterListener(pl);
 
 
-			pluginLabel.setText("Status: Sending request to server for settings.. Please wait");
+			pluginLabel.setText(I18N.translate(PFX + "pluginSettings.statusLabel.waiting"));
 
 			//Single User
 			singleUser = new Button(composite,SWT.CHECK);
 			GridData gridData = new GridData(GridData.GRAB_HORIZONTAL);
 			gridData.horizontalSpan = 2;
 			singleUser.setLayoutData(gridData);
-			singleUser.setText("Enable Single User Mode");
+			singleUser.setText(I18N.translate(PFX + "pluginSettings.singleUserButton.text"));
 			singleUser.setEnabled(false);
 
 			singleUser.addListener(SWT.Selection, new Listener(){
@@ -743,19 +743,15 @@ public class PreferencesTab {
 
 
 			Button bCertWiz = new Button(composite, SWT.PUSH);
-			bCertWiz.setText("Open SSL Wizard");
-			bCertWiz.setToolTipText("Opens a wizard to help with creating a certificate and " +
-			"enabling secure connection between the remote and server");
+			bCertWiz.setText(I18N.translate(PFX + "pluginSettings.openSSLButton.text"));
+			bCertWiz.setToolTipText(I18N.translate(PFX + "pluginSettings.openSSLButton.toolTipText"));
 			gridData = new GridData(GridData.GRAB_HORIZONTAL);
 			gridData.horizontalSpan = 2;
 			bCertWiz.setLayoutData(gridData);
 			bCertWiz.addListener(SWT.Selection, new Listener(){
-
 				public void handleEvent(Event arg0) {
 					SSLCertWizard.open();
-
 				}
-
 			});
 
 		}
@@ -894,7 +890,7 @@ public class PreferencesTab {
 					if (v==null) {
 						switch (type) {
 						case Entry.TYPE_STRING:
-							return "Loading Preferences...";
+							return "No Default Found...";
 						case Entry.TYPE_BOOLEAN:
 							return "false";
 						default:
