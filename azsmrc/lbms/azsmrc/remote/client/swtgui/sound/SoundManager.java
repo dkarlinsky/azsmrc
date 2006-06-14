@@ -55,13 +55,14 @@ public class SoundManager {
 	}
 
 
-	public static void playSound (Sound snd) {
-
+	public static boolean playSound (Sound snd) {
 		if (!instance.silentMode && instance.soundBank.containsKey(snd)) {
 			if (instance.soundQueue.offer(instance.soundBank.get(snd))) {
 				System.out.println("Added to Play Queue: "+snd);
+				return true;
 			}
 		}
+		return false;
 	}
 
 	public static void load(Sound key, File audioFile) throws SoundException {
