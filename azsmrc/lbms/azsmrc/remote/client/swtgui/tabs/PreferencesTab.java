@@ -5,6 +5,7 @@
  */
 package lbms.azsmrc.remote.client.swtgui.tabs;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -14,8 +15,11 @@ import lbms.azsmrc.remote.client.User;
 
 import lbms.azsmrc.remote.client.events.ParameterListener;
 import lbms.azsmrc.remote.client.internat.I18N;
+import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.dialogs.SSLCertWizard;
+import lbms.azsmrc.remote.client.swtgui.sound.Sound;
+import lbms.azsmrc.remote.client.swtgui.sound.SoundManager;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.tools.flexyconf.ContentProvider;
 import lbms.tools.flexyconf.Entry;
@@ -43,9 +47,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
@@ -83,7 +90,7 @@ public class PreferencesTab {
 	//Main I18N PFX
 	public static final String PFX = "tab.preferencestab.";
 
-	private boolean bModified = false;
+
 
 	public PreferencesTab(final CTabFolder parentTab){
 
@@ -99,7 +106,6 @@ public class PreferencesTab {
 			defaultProperties.loadFromXML(is);
 			is.close();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} finally {
 			if (is!=null) try { is.close(); } catch (IOException e) {}
@@ -124,13 +130,6 @@ public class PreferencesTab {
 		prefsTab.addDisposeListener(new DisposeListener(){
 
 			public void widgetDisposed(DisposeEvent arg0) {
-				if(bModified){
-					MessageBox box = new MessageBox(parent.getShell(),SWT.OK);
-					box.setText("Usaved Changes");
-					box.setMessage("You have made modifications to the preferences and " +
-					"closed the tab before you saved.  All changes have been discarded");
-					box.open();
-				}
 				if(pl != null) RCMain.getRCMain().getClient().removeParameterListener(pl);
 				closeAzFlexyConf();
 			}
@@ -148,7 +147,7 @@ public class PreferencesTab {
 		grayLabel.setLayoutData(gridData);
 
 		Label title = new Label(grayLabel,SWT.NONE);
-		title.setText("No changes are actually made until saved");
+		title.setText("All changes are immediately committed");
 		title.setBackground(grayLabel.getBackground());
 
 		//Set it bold
@@ -258,18 +257,398 @@ public class PreferencesTab {
 		composite.layout();
 	}
 
+	//set up some privates for the make sound pref section
+	private Group soundSelectionGroup;
+	private Label downloadAddedLabel;
+	private Text downloadAddedText;
+	private Button downloadAddedButton, downloadAdded_testSound;
+	private Label downloadFinishedLabel;
+	private Text downloadFinishedText;
+	private Button downloadFinishedButton, downloadFinished_testSound;
+	private Label seedingFinishedLabel;
+	private Text seedingFinishedText;
+	private Button seedingFinishedButton, seedingFinished_testSound;
+	private Label errorLabel;
+	private Text errorText;
+	private Button errorButton, error_testSound;
+
+
+
 	private void makeSoundPreferences(final Composite composite){
 		Control[] controls = composite.getChildren();
 		for(Control control:controls){
 			control.dispose();
 		}
 
-		Label sound = new Label(composite, SWT.NULL);
-		sound.setText("TODO.. make this section");
+		//button for sound being on or off
+		final Button soundActive = new Button(composite, SWT.CHECK);
+		soundActive.setText(I18N.translate(PFX + "soundManager.active"));
+		soundActive.setSelection(Boolean.parseBoolean(properties.getProperty("soundManager.active", "true")));
+
+		final Button soundDefault = new Button(composite, SWT.CHECK);
+		soundDefault.setText(I18N.translate(PFX + "soundManager.default"));
+		soundDefault.setSelection(Boolean.parseBoolean(properties.getProperty("soundManager.useDefaults", "true")));
+		GridData gd = new GridData();
+		gd.horizontalSpan = 2;
+		soundDefault.setLayoutData(gd);
+
+		//Group for user defined sounds
+		soundSelectionGroup = new Group(composite, SWT.NULL);
+		soundSelectionGroup.setText(I18N.translate(PFX + "sound.soundSelection.Group.text"));
+		soundSelectionGroup.setLayout(new GridLayout(3,false));
+		gd = new GridData();
+		gd.horizontalSpan = 2;
+		gd.widthHint = 400;
+		soundSelectionGroup.setLayoutData(gd);
+
+
+		//---- Download Added
+		downloadAddedLabel = new Label(soundSelectionGroup, SWT.NULL);
+		gd = new GridData();
+		gd.horizontalSpan = 3;
+		downloadAddedLabel.setLayoutData(gd);
+		downloadAddedLabel.setText(I18N.translate(PFX + "sound.soundSelection.downloadAdded.label"));
+
+
+		downloadAddedText = new Text(soundSelectionGroup, SWT.BORDER | SWT.READ_ONLY);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		downloadAddedText.setLayoutData(gd);
+		downloadAddedText.setText(properties.getProperty("sound.DownloadAdded", RCMain.USER_DIR + RCMain.FSEP +"sounds/download_added.wav"));
+
+		downloadAddedButton = new Button(soundSelectionGroup, SWT.PUSH);
+		downloadAddedButton.setImage(ImageRepository.getImage("open_by_file"));
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
+		downloadAddedButton.setLayoutData(gd);
+		downloadAddedButton.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				FileDialog dialog = new FileDialog (composite.getShell(), SWT.OPEN);
+				dialog.setFilterNames (new String [] {"wav Files", "All Files (*.*)"});
+				dialog.setFilterExtensions (new String [] {"*.wav", "*.*"}); //Windows wild cards
+				dialog.setFilterPath (RCMain.USER_DIR + RCMain.FSEP + "sound"); //Windows path
+				dialog.setFileName ("download_added.wav");
+
+				String returnedString = dialog.open();
+				if(returnedString != null){
+					File file = new File(returnedString);
+					if(file.exists() && file.canRead()){
+						properties.setProperty("soundManager.active", "true");
+						properties.setProperty("soundManager.useDefaults", "false");
+						properties.setProperty("sound.DownloadAdded", returnedString);
+						RCMain.getRCMain().saveConfig();
+
+						//reload all the sounds
+						RCMain.getRCMain().loadSounds();
+
+						soundActive.setSelection(true);
+						soundDefault.setSelection(false);
+						downloadAddedText.setText(returnedString);
+					}
+				}
+			}
+		});
+
+		downloadAdded_testSound = new Button(soundSelectionGroup, SWT.PUSH);
+		downloadAdded_testSound.setImage(ImageRepository.getImage("resume"));
+		downloadAdded_testSound.setToolTipText(I18N.translate(PFX + "sound.soundSelection.playsound.tooltip"));
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
+		downloadAdded_testSound.setLayoutData(gd);
+		downloadAdded_testSound.addListener(SWT.Selection, new Listener(){
+			public void handleEvent (Event e){
+				try{
+					if(!SoundManager.playSound(Sound.DOWNLOAD_ADDED)){
+						MessageBox messageBox = new MessageBox(composite.getShell(), SWT.ICON_ERROR | SWT.OK);
+						messageBox.setText(I18N.translate("global.error"));
+						messageBox.setMessage(I18N.translate(PFX + "sound.soundSelection.playsound.error.message"));
+					}
+				}catch (Exception error){
+					error.printStackTrace();
+					MessageBox messageBox = new MessageBox(composite.getShell(), SWT.ICON_ERROR | SWT.OK);
+					messageBox.setText(I18N.translate("global.error"));
+					messageBox.setMessage(I18N.translate(PFX + "sound.soundSelection.playsound.error.message"));
+				}
+			}
+		});
+
+		//----- Download Finished
+		downloadFinishedLabel = new Label(soundSelectionGroup, SWT.NULL);
+		gd = new GridData();
+		gd.horizontalSpan = 3;
+		downloadFinishedLabel.setLayoutData(gd);
+		downloadFinishedLabel.setText(I18N.translate(PFX + "sound.soundSelection.downloadFinished.label"));
+
+
+		downloadFinishedText = new Text(soundSelectionGroup, SWT.BORDER | SWT.READ_ONLY);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		downloadFinishedText.setLayoutData(gd);
+		downloadFinishedText.setText(properties.getProperty("sound.DownloadingFinished", RCMain.USER_DIR + RCMain.FSEP +"sounds/download_finished.wav"));
+
+		downloadFinishedButton = new Button(soundSelectionGroup, SWT.PUSH);
+		downloadFinishedButton.setImage(ImageRepository.getImage("open_by_file"));
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
+		downloadFinishedButton.setLayoutData(gd);
+		downloadFinishedButton.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				FileDialog dialog = new FileDialog (composite.getShell(), SWT.OPEN);
+				dialog.setFilterNames (new String [] {"wav Files", "All Files (*.*)"});
+				dialog.setFilterExtensions (new String [] {"*.wav", "*.*"}); //Windows wild cards
+				dialog.setFilterPath (RCMain.USER_DIR + RCMain.FSEP + "sound"); //Windows path
+				dialog.setFileName ("download_finished.wav");
+
+				String returnedString = dialog.open();
+				if(returnedString != null){
+					File file = new File(returnedString);
+					if(file.exists() && file.canRead()){
+						properties.setProperty("soundManager.active", "true");
+						properties.setProperty("soundManager.useDefaults", "false");
+						properties.setProperty("sound.DownloadingFinished", returnedString);
+						RCMain.getRCMain().saveConfig();
+
+						//reload all the sounds
+						RCMain.getRCMain().loadSounds();
+
+						soundActive.setSelection(true);
+						soundDefault.setSelection(false);
+						downloadFinishedText.setText(returnedString);
+					}
+				}
+			}
+		});
+
+		downloadFinished_testSound = new Button(soundSelectionGroup, SWT.PUSH);
+		downloadFinished_testSound.setImage(ImageRepository.getImage("resume"));
+		downloadFinished_testSound.setToolTipText(I18N.translate(PFX + "sound.soundSelection.playsound.tooltip"));
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
+		downloadFinished_testSound.setLayoutData(gd);
+		downloadFinished_testSound.addListener(SWT.Selection, new Listener(){
+			public void handleEvent (Event e){
+				try{
+					if(!SoundManager.playSound(Sound.DOWNLOADING_FINISHED)){
+						MessageBox messageBox = new MessageBox(composite.getShell(), SWT.ICON_ERROR | SWT.OK);
+						messageBox.setText(I18N.translate("global.error"));
+						messageBox.setMessage(I18N.translate(PFX + "sound.soundSelection.playsound.error.message"));
+					}
+				}catch (Exception error){
+					error.printStackTrace();
+					MessageBox messageBox = new MessageBox(composite.getShell(), SWT.ICON_ERROR | SWT.OK);
+					messageBox.setText(I18N.translate("global.error"));
+					messageBox.setMessage(I18N.translate(PFX + "sound.soundSelection.playsound.error.message"));
+				}
+			}
+		});
+
+
+		//----- Seeding Finished
+		seedingFinishedLabel = new Label(soundSelectionGroup, SWT.NULL);
+		gd = new GridData();
+		gd.horizontalSpan = 3;
+		seedingFinishedLabel.setLayoutData(gd);
+		seedingFinishedLabel.setText(I18N.translate(PFX + "sound.soundSelection.seedingFinished.label"));
+
+
+		seedingFinishedText = new Text(soundSelectionGroup, SWT.BORDER | SWT.READ_ONLY);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		seedingFinishedText.setLayoutData(gd);
+		seedingFinishedText.setText(properties.getProperty("sound.SeedingFinished", RCMain.USER_DIR + RCMain.FSEP +"sounds/seeding_finished.wav"));
+
+		seedingFinishedButton = new Button(soundSelectionGroup, SWT.PUSH);
+		seedingFinishedButton.setImage(ImageRepository.getImage("open_by_file"));
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
+		seedingFinishedButton.setLayoutData(gd);
+		seedingFinishedButton.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				FileDialog dialog = new FileDialog (composite.getShell(), SWT.OPEN);
+				dialog.setFilterNames (new String [] {"wav Files", "All Files (*.*)"});
+				dialog.setFilterExtensions (new String [] {"*.wav", "*.*"}); //Windows wild cards
+				dialog.setFilterPath (RCMain.USER_DIR + RCMain.FSEP + "sound"); //Windows path
+				dialog.setFileName ("seeding_finished.wav");
+
+				String returnedString = dialog.open();
+				if(returnedString != null){
+					File file = new File(returnedString);
+					if(file.exists() && file.canRead()){
+						properties.setProperty("soundManager.active", "true");
+						properties.setProperty("soundManager.useDefaults", "false");
+						properties.setProperty("sound.SeedingFinished", returnedString);
+						RCMain.getRCMain().saveConfig();
+
+						//reload all the sounds
+						RCMain.getRCMain().loadSounds();
+
+						soundActive.setSelection(true);
+						soundDefault.setSelection(false);
+						downloadFinishedText.setText(returnedString);
+					}
+				}
+			}
+		});
+
+		seedingFinished_testSound = new Button(soundSelectionGroup, SWT.PUSH);
+		seedingFinished_testSound.setImage(ImageRepository.getImage("resume"));
+		seedingFinished_testSound.setToolTipText(I18N.translate(PFX + "sound.soundSelection.playsound.tooltip"));
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
+		seedingFinished_testSound.setLayoutData(gd);
+		seedingFinished_testSound.addListener(SWT.Selection, new Listener(){
+			public void handleEvent (Event e){
+				try{
+					if(!SoundManager.playSound(Sound.SEEDING_FINISHED)){
+						MessageBox messageBox = new MessageBox(composite.getShell(), SWT.ICON_ERROR | SWT.OK);
+						messageBox.setText(I18N.translate("global.error"));
+						messageBox.setMessage(I18N.translate(PFX + "sound.soundSelection.playsound.error.message"));
+					}
+				}catch (Exception error){
+					error.printStackTrace();
+					MessageBox messageBox = new MessageBox(composite.getShell(), SWT.ICON_ERROR | SWT.OK);
+					messageBox.setText(I18N.translate("global.error"));
+					messageBox.setMessage(I18N.translate(PFX + "sound.soundSelection.playsound.error.message"));
+				}
+			}
+		});
+
+
+
+		//----- Error
+		errorLabel = new Label(soundSelectionGroup, SWT.NULL);
+		gd = new GridData();
+		gd.horizontalSpan = 3;
+		errorLabel.setLayoutData(gd);
+		errorLabel.setText(I18N.translate(PFX + "sound.soundSelection.error.label"));
+
+
+		errorText = new Text(soundSelectionGroup, SWT.BORDER | SWT.READ_ONLY);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		errorText.setLayoutData(gd);
+		errorText.setText(properties.getProperty("sound.Error", RCMain.USER_DIR + RCMain.FSEP +"sounds/error.wav"));
+
+		errorButton = new Button(soundSelectionGroup, SWT.PUSH);
+		errorButton.setImage(ImageRepository.getImage("open_by_file"));
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
+		errorButton.setLayoutData(gd);
+		errorButton.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				FileDialog dialog = new FileDialog (composite.getShell(), SWT.OPEN);
+				dialog.setFilterNames (new String [] {"wav Files", "All Files (*.*)"});
+				dialog.setFilterExtensions (new String [] {"*.wav", "*.*"}); //Windows wild cards
+				dialog.setFilterPath (RCMain.USER_DIR + RCMain.FSEP + "sound"); //Windows path
+				dialog.setFileName ("error.wav");
+
+				String returnedString = dialog.open();
+				if(returnedString != null){
+					File file = new File(returnedString);
+					if(file.exists() && file.canRead()){
+						properties.setProperty("soundManager.active", "true");
+						properties.setProperty("soundManager.useDefaults", "false");
+						properties.setProperty("sound.Error", returnedString);
+						RCMain.getRCMain().saveConfig();
+
+						//reload all the sounds
+						RCMain.getRCMain().loadSounds();
+
+						soundActive.setSelection(true);
+						soundDefault.setSelection(false);
+						errorText.setText(returnedString);
+					}
+				}
+			}
+		});
+
+		error_testSound = new Button(soundSelectionGroup, SWT.PUSH);
+		error_testSound.setImage(ImageRepository.getImage("resume"));
+		error_testSound.setToolTipText(I18N.translate(PFX + "sound.soundSelection.playsound.tooltip"));
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
+		error_testSound.setLayoutData(gd);
+		error_testSound.addListener(SWT.Selection, new Listener(){
+			public void handleEvent (Event e){
+				try{
+					if(!SoundManager.playSound(Sound.ERROR)){
+						MessageBox messageBox = new MessageBox(composite.getShell(), SWT.ICON_ERROR | SWT.OK);
+						messageBox.setText(I18N.translate("global.error"));
+						messageBox.setMessage(I18N.translate(PFX + "sound.soundSelection.playsound.error.message"));
+					}
+				}catch (Exception error){
+					error.printStackTrace();
+					MessageBox messageBox = new MessageBox(composite.getShell(), SWT.ICON_ERROR | SWT.OK);
+					messageBox.setText(I18N.translate("global.error"));
+					messageBox.setMessage(I18N.translate(PFX + "sound.soundSelection.playsound.error.message"));
+				}
+			}
+		});
+
+		setUseDefault(soundDefault.getSelection());
+
+
+
+		soundDefault.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				properties.setProperty("soundManager.useDefaults", Boolean.toString(soundDefault.getSelection()));
+				RCMain.getRCMain().saveConfig();
+				if(soundDefault.getSelection()){
+					soundSelectionGroup.setEnabled(false);
+
+					//reset everthing to defaults
+					properties.setProperty("sound.Error", "sounds/error.wav");
+					properties.setProperty("sound.DownloadAdded", "sounds/download_added.wav");
+					properties.setProperty("sound.DownloadingFinished", "sounds/download_finished.wav");
+					properties.setProperty("sound.SeedingFinished", "sounds/seeding_finished.wav");
+					RCMain.getRCMain().saveConfig();
+
+					errorText.setText(properties.getProperty("sound.Error", RCMain.USER_DIR + RCMain.FSEP +"sounds/error.wav"));
+					seedingFinishedText.setText(properties.getProperty("sound.SeedingFinished", RCMain.USER_DIR + RCMain.FSEP +"sounds/seeding_finished.wav"));
+					downloadFinishedText.setText(properties.getProperty("sound.DownloadingFinished", RCMain.USER_DIR + RCMain.FSEP +"sounds/download_finished.wav"));
+					downloadAddedText.setText(properties.getProperty("sound.DownloadAdded", RCMain.USER_DIR + RCMain.FSEP +"sounds/download_added.wav"));
+
+					setUseDefault(true);
+				}else{
+					setUseDefault(false);
+				}
+			}
+		});
+
+
+		//listener at the end so that we have all the buttons in place
+		soundActive.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				properties.setProperty("soundManager.active", Boolean.toString(soundActive.getSelection()));
+				RCMain.getRCMain().saveConfig();
+				if(soundActive.getSelection()){
+					soundDefault.setEnabled(true);
+					soundDefault.setSelection(Boolean.parseBoolean(properties.getProperty("soundManager.useDefaults", "true")));
+					setUseDefault(soundDefault.getSelection());
+					RCMain.getRCMain().loadSounds();
+				}else{
+					soundDefault.setEnabled(false);
+					setUseDefault(true);
+					RCMain.getRCMain().unLoadSounds();
+				}
+
+			}
+		});
+
+
+
 
 		composite.layout();
 	}
 
+
+	private void setUseDefault(boolean useDefault){
+		soundSelectionGroup.setEnabled(!useDefault);
+		downloadAddedLabel.setEnabled(!useDefault);
+		downloadAddedText.setEnabled(!useDefault);
+		downloadAddedButton.setEnabled(!useDefault);
+		downloadAdded_testSound.setEnabled(!useDefault);
+		downloadFinishedLabel.setEnabled(!useDefault);
+		downloadFinishedText.setEnabled(!useDefault);
+		downloadFinishedButton.setEnabled(!useDefault);
+		downloadFinished_testSound.setEnabled(!useDefault);
+		seedingFinishedLabel.setEnabled(!useDefault);
+		seedingFinishedText.setEnabled(!useDefault);
+		seedingFinishedButton.setEnabled(!useDefault);
+		seedingFinished_testSound.setEnabled(!useDefault);
+		errorLabel.setEnabled(!useDefault);
+		errorText.setEnabled(!useDefault);
+		errorButton.setEnabled(!useDefault);
+		error_testSound.setEnabled(!useDefault);
+	}
 
 	private void makePlugPreferences(final Composite composite){
 		Control[] controls = composite.getChildren();
@@ -360,7 +739,7 @@ public class PreferencesTab {
 					}
 				}
 			});
-			addModListener(singleUser,SWT.Selection);
+
 
 
 			Button bCertWiz = new Button(composite, SWT.PUSH);
@@ -385,13 +764,6 @@ public class PreferencesTab {
 	}
 
 
-	public void addModListener(Control control, int selectionType){
-		control.addListener(selectionType, new Listener(){
-			public void handleEvent(Event arg0) {
-				bModified = true;
-			}
-		});
-	}
 
 
 	private void initAzFlexyConf() {
