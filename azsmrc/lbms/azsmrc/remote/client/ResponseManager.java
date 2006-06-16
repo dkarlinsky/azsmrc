@@ -405,8 +405,7 @@ public class ResponseManager {
 				List<Element> trackerTorrents = xmlResponse.getChild("TrackerTorrents").getChildren("TrackerTorrent");
 				for (Element tt:trackerTorrents) {
 					TrackerTorrentImpl tti = null;
-					boolean newTorrent = false;;
-					Element tte = new Element ("TrackerTorrent");
+					boolean newTorrent = false;
 					if (tracker.hasTorrent(tt.getAttributeValue("hash"))) {
 						tti = tracker.getTorrent(tt.getAttributeValue("hash"));
 					} else {
@@ -414,28 +413,28 @@ public class ResponseManager {
 					}
 					try {
 						tti.setHash(			tt.getAttributeValue("hash"));
-						tti.setAnnounceCount(	tte.getAttribute("announceCount").getLongValue());
-						tti.setAvgAnnounceCount(tte.getAttribute("avgAnnounceCount").getLongValue());
-						tti.setAnnounceCount(	tte.getAttribute("avgAnnounceCount").getLongValue());
-						tti.setAvgBytesIn(		tte.getAttribute("avgBytesIn").getLongValue());
-						tti.setAvgBytesOut(		tte.getAttribute("avgBytesOut").getLongValue());
-						tti.setAvgDownloaded(	tte.getAttribute("avgDownloaded").getLongValue());
-						tti.setAvgUploaded(		tte.getAttribute("avgUploaded").getLongValue());
-						tti.setAvgScrapeCount(	tte.getAttribute("avgScrapeCount").getLongValue());
-						tti.setCompletedCount(	tte.getAttribute("completedCount").getLongValue());
-						tti.setTotalLeft(		tte.getAttribute("totalLeft").getLongValue());
-						tti.setDateAdded(		tte.getAttribute("dateAdded").getLongValue());
-						tti.setScrapeCount(		tte.getAttribute("scrapeCount").getLongValue());
-						tti.setTotalBytesOut(	tte.getAttribute("totalBytesOut").getLongValue());
-						tti.setTotalBytesIn(	tte.getAttribute("totalBytesIn").getLongValue());
-						tti.setTotalDownloaded(	tte.getAttribute("totalDownloaded").getLongValue());
-						tti.setTotalUploaded(	tte.getAttribute("totalUploaded").getLongValue());
-						tti.setSeedCount(		tte.getAttribute("seedCount").getIntValue());
-						tti.setLeecherCount(	tte.getAttribute("leecherCount").getIntValue());
-						tti.setStatus(			tte.getAttribute("status").getIntValue());
-						tti.setBadNATCount(		tte.getAttribute("badNATCount").getIntValue());
-						tti.setPassive(			tte.getAttribute("isPassive").getBooleanValue());
-						tti.setCanBeRemoved(	tte.getAttribute("canBeRemoved").getBooleanValue());
+						tti.setAnnounceCount(	tt.getAttribute("announceCount").getLongValue());
+						tti.setAvgAnnounceCount(tt.getAttribute("avgAnnounceCount").getLongValue());
+						tti.setAnnounceCount(	tt.getAttribute("avgAnnounceCount").getLongValue());
+						tti.setAvgBytesIn(		tt.getAttribute("avgBytesIn").getLongValue());
+						tti.setAvgBytesOut(		tt.getAttribute("avgBytesOut").getLongValue());
+						tti.setAvgDownloaded(	tt.getAttribute("avgDownloaded").getLongValue());
+						tti.setAvgUploaded(		tt.getAttribute("avgUploaded").getLongValue());
+						tti.setAvgScrapeCount(	tt.getAttribute("avgScrapeCount").getLongValue());
+						tti.setCompletedCount(	tt.getAttribute("completedCount").getLongValue());
+						tti.setTotalLeft(		tt.getAttribute("totalLeft").getLongValue());
+						tti.setDateAdded(		tt.getAttribute("dateAdded").getLongValue());
+						tti.setScrapeCount(		tt.getAttribute("scrapeCount").getLongValue());
+						tti.setTotalBytesOut(	tt.getAttribute("totalBytesOut").getLongValue());
+						tti.setTotalBytesIn(	tt.getAttribute("totalBytesIn").getLongValue());
+						tti.setTotalDownloaded(	tt.getAttribute("totalDownloaded").getLongValue());
+						tti.setTotalUploaded(	tt.getAttribute("totalUploaded").getLongValue());
+						tti.setSeedCount(		tt.getAttribute("seedCount").getIntValue());
+						tti.setLeecherCount(	tt.getAttribute("leecherCount").getIntValue());
+						tti.setStatus(			tt.getAttribute("status").getIntValue());
+						tti.setBadNATCount(		tt.getAttribute("badNATCount").getIntValue());
+						tti.setPassive(			tt.getAttribute("isPassive").getBooleanValue());
+						tti.setCanBeRemoved(	tt.getAttribute("canBeRemoved").getBooleanValue());
 					} catch (DataConversionException e) {
 						e.printStackTrace();
 					}
