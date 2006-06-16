@@ -24,4 +24,6 @@ public interface Tracker {
 
 	public void 	addListener(TrackerListener listener);
 	public void 	removeListener(TrackerListener listener);
+
+	public void		update();
 }

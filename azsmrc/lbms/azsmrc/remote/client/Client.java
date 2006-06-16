@@ -34,6 +34,7 @@ import lbms.azsmrc.remote.client.events.SpeedUpdateListener;
 import lbms.azsmrc.remote.client.impl.DownloadManagerImpl;
 import lbms.azsmrc.remote.client.impl.RemoteInfoImpl;
 import lbms.azsmrc.remote.client.impl.RemoteUpdateManagerImpl;
+import lbms.azsmrc.remote.client.impl.TrackerImpl;
 import lbms.azsmrc.remote.client.impl.UserManagerImpl;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.remote.client.util.Timer;
@@ -75,6 +76,7 @@ public class Client {
 	private ResponseManager responseManager;
 	private RemoteInfoImpl remoteInfo;
 	private RemoteUpdateManagerImpl remoteUpdateManager;
+	private TrackerImpl tracker;
 
 
 	//use Vector of Collections.synchronizedList here
@@ -99,10 +101,7 @@ public class Client {
 	private void init() {
 		downloadManager = new DownloadManagerImpl(this);
 		responseManager = new ResponseManager(this);
-		userManager 	= new UserManagerImpl(this);
-		remoteInfo		= new RemoteInfoImpl(this);
-		remoteUpdateManager = new RemoteUpdateManagerImpl (this);
-		failedConnections 	= 0;
+		reset();
 		timer 	= new Timer("Client Timer",1);
 		ssl 	= false;
 		fastMode = false;
@@ -126,8 +125,10 @@ public class Client {
 	}
 
 	private void reset() {
-		userManager 	= new UserManagerImpl(this);
-		remoteInfo		= new RemoteInfoImpl(this);
+		userManager 		= new UserManagerImpl(this);
+		remoteInfo			= new RemoteInfoImpl(this);
+		remoteUpdateManager = new RemoteUpdateManagerImpl (this);
+		tracker 			= new TrackerImpl (this);
 		downloadManager.clear();
 		failedConnections 	= 0;
 	}
@@ -926,6 +927,14 @@ public class Client {
 	 */
 	protected RemoteUpdateManagerImpl getRemoteUpdateManagerImpl() {
 		return remoteUpdateManager;
+	}
+
+	public Tracker getTracker() {
+		return tracker;
+	}
+
+	protected TrackerImpl getTrackerImpl() {
+		return tracker;
 	}
 
 

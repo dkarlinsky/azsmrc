@@ -4,7 +4,10 @@
 package lbms.azsmrc.remote.client.impl;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Vector;
 
 import lbms.azsmrc.remote.client.Client;
@@ -21,7 +24,7 @@ public class TrackerImpl implements Tracker {
 
 	private static final TrackerTorrentImpl[] emptyArray = new TrackerTorrentImpl[0];
 	private Client client;
-	private List<TrackerTorrentImpl> torrents = new Vector<TrackerTorrentImpl>();
+	private Map<String,TrackerTorrentImpl> torrents = Collections.synchronizedMap(new HashMap<String,TrackerTorrentImpl>());
 	private List<TrackerListener> listeners = new Vector<TrackerListener>();
 
 	public TrackerImpl (Client c) {
@@ -29,10 +32,17 @@ public class TrackerImpl implements Tracker {
 	}
 
 	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.Tracker#update()
+	 */
+	public void update() {
+		client.sendGetTrackerTorrents();
+	}
+
+	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.Tracker#getTorrents()
 	 */
 	public TrackerTorrent[] getTorrents() {
-		return (TrackerTorrent[])torrents.toArray(emptyArray);
+		return torrents.values().toArray(emptyArray);
 	}
 
 	/* (non-Javadoc)
@@ -92,5 +102,17 @@ public class TrackerImpl implements Tracker {
 	 */
 	public void removeListener(TrackerListener listener) {
 		listeners.remove(listener);
+	}
+
+	public void addTorrent (TrackerTorrentImpl t) {
+		torrents.put(t.getHash(), t);
+	}
+
+	public boolean hasTorrent (String hash) {
+		return torrents.containsKey(hash);
+	}
+
+	public TrackerTorrentImpl getTorrent (String hash) {
+		return torrents.get(hash);
 	}
 }

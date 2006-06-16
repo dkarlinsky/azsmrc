@@ -43,6 +43,7 @@ import org.gudy.azureus2.plugins.torrent.TorrentException;
 import org.gudy.azureus2.plugins.torrent.TorrentManager;
 import org.gudy.azureus2.plugins.tracker.TrackerException;
 import org.gudy.azureus2.plugins.tracker.TrackerTorrent;
+import org.gudy.azureus2.plugins.tracker.TrackerTorrentRemovalVetoException;
 import org.gudy.azureus2.plugins.tracker.web.TrackerWebPageResponse;
 import org.gudy.azureus2.plugins.ui.config.ConfigSection;
 import org.gudy.azureus2.plugins.ui.config.Parameter;
@@ -1385,43 +1386,6 @@ public class RequestManager {
 				return false;
 			}
 		});
-		addHandler("hostTorrent", new RequestHandler() {
-			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {
-				if (!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) return false;
-
-				String location = xmlRequest.getAttributeValue("location");
-				Torrent torrent = null;
-				if (location.equalsIgnoreCase("XML")) {
-					try {
-						torrent = getTorrentFromXML(xmlRequest.getChild("Torrent"));
-					} catch (TorrentException e) {
-						e.printStackTrace();
-						user.eventException(e);
-					}
-				} else if (location.equalsIgnoreCase("Download")) {
-					try {
-						String hash = xmlRequest.getAttributeValue("hash");
-						torrent = getDownloadByHash(hash).getTorrent();
-
-					} catch (DownloadException e) {
-						e.printStackTrace();
-						user.eventException(e);
-					}
-				}
-				if (torrent != null) {
-					try {
-						Plugin.getPluginInterface().getTracker().host(torrent,
-								Boolean.parseBoolean(xmlRequest.getAttributeValue("persistent")),
-								Boolean.parseBoolean(xmlRequest.getAttributeValue("passive")));
-					} catch (TrackerException e) {
-						e.printStackTrace();
-						user.eventException(e);
-					}
-				}
-				return false;
-			}
-		});
-
 		/*addHandler("getPluginsFlexyConfig", new RequestHandler() {
 			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {
 				System.out.println("Creating PluginFlexyConf");
@@ -1494,6 +1458,41 @@ public class RequestManager {
 			}
 		});*/
 
+		addHandler("hostTorrent", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {
+				if (!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) return false;
+
+				String location = xmlRequest.getAttributeValue("location");
+				Torrent torrent = null;
+				if (location.equalsIgnoreCase("XML")) {
+					try {
+						torrent = getTorrentFromXML(xmlRequest.getChild("Torrent"));
+					} catch (TorrentException e) {
+						e.printStackTrace();
+						user.eventException(e);
+					}
+				} else if (location.equalsIgnoreCase("Download")) {
+					try {
+						String hash = xmlRequest.getAttributeValue("hash");
+						torrent = getDownloadByHash(hash).getTorrent();
+					} catch (DownloadException e) {
+						e.printStackTrace();
+						user.eventException(e);
+					}
+				}
+				if (torrent != null) {
+					try {
+						Plugin.getPluginInterface().getTracker().host(torrent,
+								Boolean.parseBoolean(xmlRequest.getAttributeValue("persistent")),
+								Boolean.parseBoolean(xmlRequest.getAttributeValue("passive")));
+					} catch (TrackerException e) {
+						e.printStackTrace();
+						user.eventException(e);
+					}
+				}
+				return false;
+			}
+		});
 		addHandler("publishTorrent", new RequestHandler() {
 			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {
 				if (!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) return false;
@@ -1511,7 +1510,6 @@ public class RequestManager {
 					try {
 						String hash = xmlRequest.getAttributeValue("hash");
 						torrent = getDownloadByHash(hash).getTorrent();
-
 					} catch (DownloadException e) {
 						e.printStackTrace();
 						user.eventException(e);
@@ -1535,11 +1533,32 @@ public class RequestManager {
 				Element torrentsE = new Element ("TrackerTorrents");
 				for (TrackerTorrent tt:ttorrents) {
 					Element tte = new Element ("TrackerTorrent");
-					tte.setAttribute("", "");
-					tte.setAttribute("", "");
-					tte.setAttribute("", "");
-					tte.setAttribute("", "");
-					tte.setAttribute("", "");
+					tte.setAttribute("hash", 			EncodingUtil.encode(tt.getTorrent().getHash()));
+					tte.setAttribute("announceCount", 	Long.toString(tt.getAnnounceCount()));
+					tte.setAttribute("avgAnnounceCount",Long.toString(tt.getAverageAnnounceCount()));
+					tte.setAttribute("avgBytesIn", 		Long.toString(tt.getAverageBytesIn()));
+					tte.setAttribute("avgBytesOut", 	Long.toString(tt.getAverageBytesOut()));
+					tte.setAttribute("avgDownloaded", 	Long.toString(tt.getAverageDownloaded()));
+					tte.setAttribute("avgUploaded",		Long.toString(tt.getAverageUploaded()));
+					tte.setAttribute("avgScrapeCount", 	Long.toString(tt.getAverageScrapeCount()));
+					tte.setAttribute("completedCount", 	Long.toString(tt.getCompletedCount()));
+					tte.setAttribute("totalLeft", 		Long.toString(tt.getTotalLeft()));
+					tte.setAttribute("dateAdded", 		Long.toString(tt.getDateAdded()));
+					tte.setAttribute("scrapeCount",		Long.toString(tt.getScrapeCount()));
+					tte.setAttribute("totalBytesOut", 	Long.toString(tt.getTotalBytesOut()));
+					tte.setAttribute("totalBytesIn", 	Long.toString(tt.getTotalBytesIn()));
+					tte.setAttribute("totalDownloaded", Long.toString(tt.getTotalDownloaded()));
+					tte.setAttribute("totalUploaded", 	Long.toString(tt.getTotalUploaded()));
+					tte.setAttribute("seedCount", 		Integer.toString(tt.getSeedCount()));
+					tte.setAttribute("leecherCount", 	Integer.toString(tt.getLeecherCount()));
+					tte.setAttribute("status",			Integer.toString(tt.getStatus()));
+					tte.setAttribute("badNATCount",		Integer.toString(tt.getBadNATCount()));
+					tte.setAttribute("isPassive", 		Boolean.toString(tt.isPassive()));
+					try {
+						tte.setAttribute("canBeRemoved", 	Boolean.toString(tt.canBeRemoved()));
+					} catch (TrackerTorrentRemovalVetoException e) {
+						tte.setAttribute("canBeRemoved", 	"false");
+					}
 					torrentsE.addContent(tte);
 				}
 				response.addContent(torrentsE);

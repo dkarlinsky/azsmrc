@@ -16,11 +16,16 @@ import lbms.azsmrc.remote.client.impl.DownloadStatsImpl;
 import lbms.azsmrc.remote.client.impl.RemoteInfoImpl;
 import lbms.azsmrc.remote.client.impl.RemoteUpdateImpl;
 import lbms.azsmrc.remote.client.impl.RemoteUpdateManagerImpl;
+import lbms.azsmrc.remote.client.impl.TrackerImpl;
+import lbms.azsmrc.remote.client.impl.TrackerTorrentImpl;
 import lbms.azsmrc.remote.client.impl.UserManagerImpl;
 import lbms.azsmrc.shared.DuplicatedUserException;
+import lbms.azsmrc.shared.EncodingUtil;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.azsmrc.shared.UserNotFoundException;
 
+import org.gudy.azureus2.plugins.tracker.TrackerTorrent;
+import org.gudy.azureus2.plugins.tracker.TrackerTorrentRemovalVetoException;
 import org.jdom.*;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -390,6 +395,51 @@ public class ResponseManager {
 					}
 				} else {
 					rum.setUpdatesAvailable(avail);
+				}
+				return Constants.UPDATE_UPDATE_INFO;
+			}
+		});
+		addHandler("getTrackerTorrents", new ResponseHandler() {
+			public long handleRequest(Element xmlResponse) throws IOException {
+				TrackerImpl tracker = client.getTrackerImpl();
+				List<Element> trackerTorrents = xmlResponse.getChild("TrackerTorrents").getChildren("TrackerTorrent");
+				for (Element tt:trackerTorrents) {
+					TrackerTorrentImpl tti = null;
+					boolean newTorrent = false;;
+					Element tte = new Element ("TrackerTorrent");
+					if (tracker.hasTorrent(tt.getAttributeValue("hash"))) {
+						tti = tracker.getTorrent(tt.getAttributeValue("hash"));
+					} else {
+						tti = new TrackerTorrentImpl(client);
+					}
+					try {
+						tti.setHash(			tt.getAttributeValue("hash"));
+						tti.setAnnounceCount(	tte.getAttribute("announceCount").getLongValue());
+						tti.setAvgAnnounceCount(tte.getAttribute("avgAnnounceCount").getLongValue());
+						tti.setAnnounceCount(	tte.getAttribute("avgAnnounceCount").getLongValue());
+						tti.setAvgBytesIn(		tte.getAttribute("avgBytesIn").getLongValue());
+						tti.setAvgBytesOut(		tte.getAttribute("avgBytesOut").getLongValue());
+						tti.setAvgDownloaded(	tte.getAttribute("avgDownloaded").getLongValue());
+						tti.setAvgUploaded(		tte.getAttribute("avgUploaded").getLongValue());
+						tti.setAvgScrapeCount(	tte.getAttribute("avgScrapeCount").getLongValue());
+						tti.setCompletedCount(	tte.getAttribute("completedCount").getLongValue());
+						tti.setTotalLeft(		tte.getAttribute("totalLeft").getLongValue());
+						tti.setDateAdded(		tte.getAttribute("dateAdded").getLongValue());
+						tti.setScrapeCount(		tte.getAttribute("scrapeCount").getLongValue());
+						tti.setTotalBytesOut(	tte.getAttribute("totalBytesOut").getLongValue());
+						tti.setTotalBytesIn(	tte.getAttribute("totalBytesIn").getLongValue());
+						tti.setTotalDownloaded(	tte.getAttribute("totalDownloaded").getLongValue());
+						tti.setTotalUploaded(	tte.getAttribute("totalUploaded").getLongValue());
+						tti.setSeedCount(		tte.getAttribute("seedCount").getIntValue());
+						tti.setLeecherCount(	tte.getAttribute("leecherCount").getIntValue());
+						tti.setStatus(			tte.getAttribute("status").getIntValue());
+						tti.setBadNATCount(		tte.getAttribute("badNATCount").getIntValue());
+						tti.setPassive(			tte.getAttribute("isPassive").getBooleanValue());
+						tti.setCanBeRemoved(	tte.getAttribute("canBeRemoved").getBooleanValue());
+					} catch (DataConversionException e) {
+						e.printStackTrace();
+					}
+					if (newTorrent) tracker.addTorrent(tti);
 				}
 				return Constants.UPDATE_UPDATE_INFO;
 			}

@@ -3,6 +3,7 @@
  */
 package lbms.azsmrc.remote.client.impl;
 
+import lbms.azsmrc.remote.client.Client;
 import lbms.azsmrc.remote.client.TrackerTorrent;
 
 /**
@@ -11,12 +12,29 @@ import lbms.azsmrc.remote.client.TrackerTorrent;
  */
 public class TrackerTorrentImpl implements TrackerTorrent {
 
+	private Client client;
+	private String hash;
+	private long announceCount, avgAnnounceCount;
+	private long avgBytesIn, avgBytesOut;
+	private long avgDownloaded, avgUploaded;
+	private long avgScrapeCount;
+	private long completedCount, totalLeft;
+	private long dateAdded, scrapeCount;
+	private long totalBytesOut, totalBytesIn;
+	private long totalDownloaded, totalUploaded;
+	private int seedCount, leecherCount;
+	private int status, badNATCount;
+	private boolean canBeRemoved, isPassive;
+
+	public TrackerTorrentImpl (Client client) {
+		this.client = client;
+	}
+
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.TrackerTorrent#canBeRemoved()
 	 */
 	public boolean canBeRemoved() {
-		// TODO Auto-generated method stub
-		return false;
+		return canBeRemoved;
 	}
 
 	/* (non-Javadoc)
@@ -31,136 +49,119 @@ public class TrackerTorrentImpl implements TrackerTorrent {
 	 * @see lbms.azsmrc.remote.client.TrackerTorrent#getAnnounceCount()
 	 */
 	public long getAnnounceCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return announceCount;
 	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.TrackerTorrent#getAverageAnnounceCount()
 	 */
 	public long getAverageAnnounceCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return avgAnnounceCount;
 	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.TrackerTorrent#getAverageBytesIn()
 	 */
 	public long getAverageBytesIn() {
-		// TODO Auto-generated method stub
-		return 0;
+		return avgBytesIn;
 	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.TrackerTorrent#getAverageBytesOut()
 	 */
 	public long getAverageBytesOut() {
-		// TODO Auto-generated method stub
-		return 0;
+		return avgBytesOut;
 	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.TrackerTorrent#getAverageDownloaded()
 	 */
 	public long getAverageDownloaded() {
-		// TODO Auto-generated method stub
-		return 0;
+		return avgDownloaded;
 	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.TrackerTorrent#getAverageScrapeCount()
 	 */
 	public long getAverageScrapeCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return avgScrapeCount;
 	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.TrackerTorrent#getAverageUploaded()
 	 */
 	public long getAverageUploaded() {
-		// TODO Auto-generated method stub
-		return 0;
+		return avgUploaded;
 	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.TrackerTorrent#getBadNATCount()
 	 */
 	public int getBadNATCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return badNATCount;
 	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.TrackerTorrent#getCompletedCount()
 	 */
 	public long getCompletedCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return completedCount;
 	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.TrackerTorrent#getDateAdded()
 	 */
 	public long getDateAdded() {
-		// TODO Auto-generated method stub
-		return 0;
+		return dateAdded;
 	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.TrackerTorrent#getLeecherCount()
 	 */
 	public int getLeecherCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return leecherCount;
 	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.TrackerTorrent#getScrapeCount()
 	 */
 	public long getScrapeCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return scrapeCount;
 	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.TrackerTorrent#getSeedCount()
 	 */
 	public int getSeedCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return seedCount;
 	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.TrackerTorrent#getStatus()
 	 */
 	public int getStatus() {
-		// TODO Auto-generated method stub
-		return 0;
+		return status;
 	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.TrackerTorrent#getTotalBytesIn()
 	 */
 	public long getTotalBytesIn() {
-		// TODO Auto-generated method stub
-		return 0;
+		return totalBytesIn;
 	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.TrackerTorrent#getTotalBytesOut()
 	 */
 	public long getTotalBytesOut() {
-		// TODO Auto-generated method stub
-		return 0;
+		return totalBytesOut;
 	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.TrackerTorrent#getTotalDownloaded()
 	 */
 	public long getTotalDownloaded() {
-		// TODO Auto-generated method stub
-		return 0;
+		return totalDownloaded;
 	}
 
 	/* (non-Javadoc)
@@ -168,7 +169,7 @@ public class TrackerTorrentImpl implements TrackerTorrent {
 	 */
 	public long getTotalLeft() {
 		// TODO Auto-generated method stub
-		return 0;
+		return totalLeft;
 	}
 
 	/* (non-Javadoc)
@@ -176,15 +177,14 @@ public class TrackerTorrentImpl implements TrackerTorrent {
 	 */
 	public long getTotalUploaded() {
 		// TODO Auto-generated method stub
-		return 0;
+		return totalUploaded;
 	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.TrackerTorrent#isPassive()
 	 */
 	public boolean isPassive() {
-		// TODO Auto-generated method stub
-		return false;
+		return isPassive;
 	}
 
 	/* (non-Javadoc)
@@ -211,4 +211,164 @@ public class TrackerTorrentImpl implements TrackerTorrent {
 
 	}
 
+	/**
+	 * @return the hash
+	 */
+	public String getHash() {
+		return hash;
+	}
+
+	/**
+	 * @param hash the hash to set
+	 */
+	public void setHash(String hash) {
+		this.hash = hash;
+	}
+
+	/**
+	 * @param announceCount the announceCount to set
+	 */
+	public void setAnnounceCount(long announceCount) {
+		this.announceCount = announceCount;
+	}
+
+	/**
+	 * @param avgAnnounceCount the avgAnnounceCount to set
+	 */
+	public void setAvgAnnounceCount(long avgAnnounceCount) {
+		this.avgAnnounceCount = avgAnnounceCount;
+	}
+
+	/**
+	 * @param avgBytesIn the avgBytesIn to set
+	 */
+	public void setAvgBytesIn(long avgBytesIn) {
+		this.avgBytesIn = avgBytesIn;
+	}
+
+	/**
+	 * @param avgBytesOut the avgBytesOut to set
+	 */
+	public void setAvgBytesOut(long avgBytesOut) {
+		this.avgBytesOut = avgBytesOut;
+	}
+
+	/**
+	 * @param avgDownloaded the avgDownloaded to set
+	 */
+	public void setAvgDownloaded(long avgDownloaded) {
+		this.avgDownloaded = avgDownloaded;
+	}
+
+	/**
+	 * @param avgScrapeCount the avgScrapeCount to set
+	 */
+	public void setAvgScrapeCount(long avgScrapeCount) {
+		this.avgScrapeCount = avgScrapeCount;
+	}
+
+	/**
+	 * @param avgUploaded the avgUploaded to set
+	 */
+	public void setAvgUploaded(long avgUploaded) {
+		this.avgUploaded = avgUploaded;
+	}
+
+	/**
+	 * @param badNATCount the badNATCount to set
+	 */
+	public void setBadNATCount(int badNATCount) {
+		this.badNATCount = badNATCount;
+	}
+
+	/**
+	 * @param canBeRemoved the canBeRemoved to set
+	 */
+	public void setCanBeRemoved(boolean canBeRemoved) {
+		this.canBeRemoved = canBeRemoved;
+	}
+
+	/**
+	 * @param completedCount the completedCount to set
+	 */
+	public void setCompletedCount(long completedCount) {
+		this.completedCount = completedCount;
+	}
+
+	/**
+	 * @param dateAdded the dateAdded to set
+	 */
+	public void setDateAdded(long dateAdded) {
+		this.dateAdded = dateAdded;
+	}
+
+	/**
+	 * @param isPassive the isPassive to set
+	 */
+	public void setPassive(boolean isPassive) {
+		this.isPassive = isPassive;
+	}
+
+	/**
+	 * @param leecherCount the leecherCount to set
+	 */
+	public void setLeecherCount(int leecherCount) {
+		this.leecherCount = leecherCount;
+	}
+
+	/**
+	 * @param scrapeCount the scrapeCount to set
+	 */
+	public void setScrapeCount(long scrapeCount) {
+		this.scrapeCount = scrapeCount;
+	}
+
+	/**
+	 * @param seedCount the seedCount to set
+	 */
+	public void setSeedCount(int seedCount) {
+		this.seedCount = seedCount;
+	}
+
+	/**
+	 * @param status the status to set
+	 */
+	public void setStatus(int status) {
+		this.status = status;
+	}
+
+	/**
+	 * @param totalBytesIn the totalBytesIn to set
+	 */
+	public void setTotalBytesIn(long totalBytesIn) {
+		this.totalBytesIn = totalBytesIn;
+	}
+
+	/**
+	 * @param totalBytesOut the totalBytesOut to set
+	 */
+	public void setTotalBytesOut(long totalBytesOut) {
+		this.totalBytesOut = totalBytesOut;
+	}
+
+	/**
+	 * @param totalDownloaded the totalDownloaded to set
+	 */
+	public void setTotalDownloaded(long totalDownloaded) {
+		this.totalDownloaded = totalDownloaded;
+	}
+
+	/**
+	 * @param totalLeft the totalLeft to set
+	 */
+	public void setTotalLeft(long totalLeft) {
+		this.totalLeft = totalLeft;
+	}
+
+	/**
+	 * @param totalUploaded the totalUploaded to set
+	 */
+	public void setTotalUploaded(long totalUploaded) {
+		this.totalUploaded = totalUploaded;
+	}
 }
