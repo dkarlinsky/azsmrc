@@ -8,5 +8,5 @@ public class Constants {
 	public static final long UPDATE_REMOTE_INFO		= 1<<4;
 	public static final long UPDATE_DRIVE_INFO		= 1<<5;
 	public static final long UPDATE_UPDATE_INFO		= 1<<6;
-
+	public static final long UPDATE_TRACKER			= 1<<7;
 }

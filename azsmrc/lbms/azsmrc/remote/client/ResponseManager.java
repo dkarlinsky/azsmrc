@@ -441,7 +441,7 @@ public class ResponseManager {
 					}
 					if (newTorrent) tracker.addTorrent(tti);
 				}
-				return Constants.UPDATE_UPDATE_INFO;
+				return Constants.UPDATE_TRACKER;
 			}
 		});
 	}
