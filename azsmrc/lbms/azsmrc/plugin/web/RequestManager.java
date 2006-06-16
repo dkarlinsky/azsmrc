@@ -1565,5 +1565,62 @@ public class RequestManager {
 				return true;
 			}
 		});
+		addHandler("trackerTorrentRemove", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, final User user) throws IOException {
+				if (user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+					TrackerTorrent[] torrents = Plugin.getPluginInterface().getTracker().getTorrents();
+					for (TrackerTorrent tt:torrents) {
+						String hash = EncodingUtil.encode(tt.getTorrent().getHash());
+						if (hash.equalsIgnoreCase(xmlRequest.getAttributeValue("hash"))) {
+							try {
+								tt.remove();
+							} catch (TrackerTorrentRemovalVetoException e) {
+								e.printStackTrace();
+							}
+							break;
+						}
+					}
+				}
+				return false;
+			}
+		});
+		addHandler("trackerTorrentStop", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, final User user) throws IOException {
+				if (user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+					TrackerTorrent[] torrents = Plugin.getPluginInterface().getTracker().getTorrents();
+					for (TrackerTorrent tt:torrents) {
+						String hash = EncodingUtil.encode(tt.getTorrent().getHash());
+						if (hash.equalsIgnoreCase(xmlRequest.getAttributeValue("hash"))) {
+							try {
+								tt.stop();
+							} catch (TrackerException e) {
+								e.printStackTrace();
+							}
+							break;
+						}
+					}
+				}
+				return false;
+			}
+		});
+		addHandler("trackerTorrentStart", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, final User user) throws IOException {
+				if (user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+					TrackerTorrent[] torrents = Plugin.getPluginInterface().getTracker().getTorrents();
+					for (TrackerTorrent tt:torrents) {
+						String hash = EncodingUtil.encode(tt.getTorrent().getHash());
+						if (hash.equalsIgnoreCase(xmlRequest.getAttributeValue("hash"))) {
+							try {
+								tt.start();
+							} catch (TrackerException e) {
+								e.printStackTrace();
+							}
+							break;
+						}
+					}
+				}
+				return false;
+			}
+		});
 	}
 }

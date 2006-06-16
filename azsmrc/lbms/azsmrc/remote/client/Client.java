@@ -35,6 +35,7 @@ import lbms.azsmrc.remote.client.impl.DownloadManagerImpl;
 import lbms.azsmrc.remote.client.impl.RemoteInfoImpl;
 import lbms.azsmrc.remote.client.impl.RemoteUpdateManagerImpl;
 import lbms.azsmrc.remote.client.impl.TrackerImpl;
+import lbms.azsmrc.remote.client.impl.TrackerTorrentImpl;
 import lbms.azsmrc.remote.client.impl.UserManagerImpl;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.remote.client.util.Timer;
@@ -709,6 +710,27 @@ public class Client {
 		sendElement.setAttribute("switch", "publishTorrent");
 		sendElement.setAttribute("location", "Download");
 		sendElement.setAttribute("hash", dl.getHash());
+		enqueue(sendElement);
+	}
+
+	public void sendTrackerTorrentRemove (TrackerTorrentImpl t) {
+		Element sendElement = getSendElement();
+		sendElement.setAttribute("switch", "trackerTorrentRemove");
+		sendElement.setAttribute("hash", t.getHash());
+		enqueue(sendElement);
+	}
+
+	public void sendTrackerTorrentStop (TrackerTorrentImpl t) {
+		Element sendElement = getSendElement();
+		sendElement.setAttribute("switch", "trackerTorrentStop");
+		sendElement.setAttribute("hash", t.getHash());
+		enqueue(sendElement);
+	}
+
+	public void sendTrackerTorrentStart (TrackerTorrentImpl t) {
+		Element sendElement = getSendElement();
+		sendElement.setAttribute("switch", "trackerTorrentStart");
+		sendElement.setAttribute("hash", t.getHash());
 		enqueue(sendElement);
 	}
 	//--------------------------------------------------------//

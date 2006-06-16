@@ -191,24 +191,21 @@ public class TrackerTorrentImpl implements TrackerTorrent {
 	 * @see lbms.azsmrc.remote.client.TrackerTorrent#remove()
 	 */
 	public void remove() {
-		// TODO Auto-generated method stub
-
+		client.sendTrackerTorrentRemove(this);
 	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.TrackerTorrent#start()
 	 */
 	public void start() {
-		// TODO Auto-generated method stub
-
+		client.sendTrackerTorrentStart(this);
 	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.TrackerTorrent#stop()
 	 */
 	public void stop() {
-		// TODO Auto-generated method stub
-
+		client.sendTrackerTorrentStop(this);
 	}
 
 	/**
