@@ -106,6 +106,9 @@ public class TrackerImpl implements Tracker {
 
 	public void addTorrent (TrackerTorrentImpl t) {
 		torrents.put(t.getHash(), t);
+		for (TrackerListener l:listeners)
+			l.torrentAdded(t);
+
 	}
 
 	public boolean hasTorrent (String hash) {
