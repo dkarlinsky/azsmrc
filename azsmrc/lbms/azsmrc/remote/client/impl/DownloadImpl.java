@@ -16,7 +16,7 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 	private String hash;
 	private boolean forceStart = false;
 	private int state, position, uploadLimit = -1,downloadLimit = -1, seeds,leecher, totalSeeds,totalLeecher;
-	private long discarded, size, lastScrape, nextScrape;
+	private long discarded, size, lastScrape, nextScrape, announceTTW;
 	private DownloadStatsImpl stats;
 	private List<DownloadListener> listener = new ArrayList<DownloadListener>();
 	private DownloadAdvancedStatsImpl advStats;
@@ -130,6 +130,13 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 		return nextScrape;
 	}
 
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.Download#getAnnounceTimeToWait()
+	 */
+	public long getAnnounceTimeToWait() {
+		return announceTTW;
+	}
+
 	/**
 	 * @param lastScrape the lastScrape to set
 	 */
@@ -142,6 +149,10 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 	 */
 	public void implSetNextScrapeTime(long nextScrape) {
 		this.nextScrape = nextScrape;
+	}
+
+	public void implSetAnnounceTimeToWait (long time) {
+		this.announceTTW = time;
 	}
 
 	public void moveDataFiles(String target) {

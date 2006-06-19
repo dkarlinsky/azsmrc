@@ -165,6 +165,10 @@ public class ResponseManager {
 			dl.implSetNextScrapeTime(Long.parseLong(dle.getAttributeValue("next_scrape")));
 		} catch (Exception e) {}
 
+		try {
+			dl.implSetAnnounceTimeToWait(Long.parseLong(dle.getAttributeValue("announceTimeToWait")));
+		} catch (Exception e) {}
+
 		if (dle.getAttribute("eta") != null)
 			ds.setEta(dle.getAttributeValue("eta"));
 		if (dle.getAttribute("elapsedTime") != null)

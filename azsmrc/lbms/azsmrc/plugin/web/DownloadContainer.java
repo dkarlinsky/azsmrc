@@ -40,7 +40,7 @@ public class DownloadContainer {
 	private int total_seeds, total_leecher;
 	private long discarded;
 	private long last_scrape, next_scrape;
-	private long size;
+	private long announceTTW, size;
 
 	public DownloadContainer (Download dl) {
 		this.dl = dl;
@@ -183,6 +183,12 @@ public class DownloadContainer {
 			next_scrape = dl.getLastScrapeResult().getNextScrapeStartTime();
 			dle.setAttribute("next_scrape",Long.toString(next_scrape));
 		}
+
+		if (announceTTW != dl.getLastAnnounceResult().getTimeToWait()) {
+			announceTTW = dl.getLastAnnounceResult().getTimeToWait();
+			dle.setAttribute("announceTimeToWait",Long.toString(announceTTW));
+		}
+
 		return dle;
 	}
 
@@ -220,6 +226,7 @@ public class DownloadContainer {
 		dle.setAttribute("total_leecher",Integer.toString(total_leecher));
 		dle.setAttribute("last_scrape",Long.toString(last_scrape));
 		dle.setAttribute("next_scrape",Long.toString(next_scrape));
+		dle.setAttribute("announceTimeToWait",Long.toString(announceTTW));
 		dle.setAttribute("size",Long.toString(size));
 		return dle;
 	}
@@ -259,6 +266,7 @@ public class DownloadContainer {
 		last_scrape = dl.getLastScrapeResult().getScrapeStartTime();
 		next_scrape = dl.getLastScrapeResult().getNextScrapeStartTime();
 
+		announceTTW = dl.getLastAnnounceResult().getTimeToWait();
 		size = dl.getTorrent().getSize();
 	}
 

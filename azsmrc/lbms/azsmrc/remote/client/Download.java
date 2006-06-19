@@ -300,6 +300,8 @@ Download
 
   	public long getNextScrapeTime();
 
+  	public long getAnnounceTimeToWait();
+
 	/**
 	 * Get the max upload rate allowed for this download.
 	 * @return upload rate in bytes per second, 0 for unlimited, -1 for upload disabled
