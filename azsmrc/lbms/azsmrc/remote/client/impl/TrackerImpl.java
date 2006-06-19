@@ -22,7 +22,7 @@ import lbms.azsmrc.remote.client.TrackerTorrent;
  */
 public class TrackerImpl implements Tracker {
 
-	private static final TrackerTorrentImpl[] emptyArray = new TrackerTorrentImpl[0];
+	private static final TrackerTorrent[] emptyArray = new TrackerTorrent[0];
 	private Client client;
 	private Map<String,TrackerTorrentImpl> torrents = Collections.synchronizedMap(new HashMap<String,TrackerTorrentImpl>());
 	private List<TrackerListener> listeners = new Vector<TrackerListener>();
