@@ -414,6 +414,7 @@ public class ResponseManager {
 						tti = tracker.getTorrent(tt.getAttributeValue("hash"));
 					} else {
 						tti = new TrackerTorrentImpl(client);
+						newTorrent = true;
 					}
 					try {
 						tti.setHash(			tt.getAttributeValue("hash"));
