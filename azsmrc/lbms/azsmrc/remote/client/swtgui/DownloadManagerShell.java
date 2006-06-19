@@ -51,6 +51,7 @@ import lbms.azsmrc.remote.client.swtgui.dialogs.ServerUpdateDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.TableColumnEditorDialog;
 import lbms.azsmrc.remote.client.swtgui.tabs.ConsoleTab;
 import lbms.azsmrc.remote.client.swtgui.tabs.ManageUsersTab;
+import lbms.azsmrc.remote.client.swtgui.tabs.MyShares;
 import lbms.azsmrc.remote.client.swtgui.tabs.PreferencesTab;
 import lbms.azsmrc.remote.client.swtgui.tabs.ReadmeTab;
 import lbms.azsmrc.remote.client.swtgui.tabs.ServerDetailsTab;
@@ -166,6 +167,7 @@ public class DownloadManagerShell {
 	private ToolItem stopTorrent, queueTorrent, removeTorrent;
 	private MenuItem menuLogin,menuLogout,menuQuickconnect, menuRestartAzureus;
 	private MenuItem menuServerDetails, menuServerUpdate, menuAddByFile, menuAddbyURL;
+	private MenuItem menuMyShares;
 
 
 	//status bar labels
@@ -374,6 +376,16 @@ public class DownloadManagerShell {
 
 
 		//-----Tools Submenu
+
+		menuMyShares = new MenuItem(toolSubmenu, SWT.PUSH);
+		menuMyShares.setText("&My Shares");
+		menuMyShares.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event e){
+				MyShares.open(tabFolder);
+			}
+		});
+
+
 
 		MenuItem menuScraper = new MenuItem(toolSubmenu,SWT.PUSH);
 		menuScraper.setText("&Scrape a torrent file");
