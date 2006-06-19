@@ -14,6 +14,7 @@ public class TrackerTorrentImpl implements TrackerTorrent {
 
 	private Client client;
 	private String hash;
+	private String name;
 	private long announceCount, avgAnnounceCount;
 	private long avgBytesIn, avgBytesOut;
 	private long avgDownloaded, avgUploaded;
@@ -206,6 +207,21 @@ public class TrackerTorrentImpl implements TrackerTorrent {
 	 */
 	public void stop() {
 		client.sendTrackerTorrentStop(this);
+	}
+
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.TrackerTorrent#getName()
+	 */
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**

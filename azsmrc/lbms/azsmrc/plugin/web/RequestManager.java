@@ -1534,6 +1534,7 @@ public class RequestManager {
 				for (TrackerTorrent tt:ttorrents) {
 					Element tte = new Element ("TrackerTorrent");
 					tte.setAttribute("hash", 			EncodingUtil.encode(tt.getTorrent().getHash()));
+					tte.setAttribute("name", 			tt.getTorrent().getName());
 					tte.setAttribute("announceCount", 	Long.toString(tt.getAnnounceCount()));
 					tte.setAttribute("avgAnnounceCount",Long.toString(tt.getAverageAnnounceCount()));
 					tte.setAttribute("avgBytesIn", 		Long.toString(tt.getAverageBytesIn()));

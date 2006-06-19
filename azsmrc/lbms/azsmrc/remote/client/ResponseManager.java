@@ -417,6 +417,7 @@ public class ResponseManager {
 					}
 					try {
 						tti.setHash(			tt.getAttributeValue("hash"));
+						tti.setName(			tt.getAttributeValue("name"));
 						tti.setAnnounceCount(	tt.getAttribute("announceCount").getLongValue());
 						tti.setAvgAnnounceCount(tt.getAttribute("avgAnnounceCount").getLongValue());
 						tti.setAnnounceCount(	tt.getAttribute("avgAnnounceCount").getLongValue());

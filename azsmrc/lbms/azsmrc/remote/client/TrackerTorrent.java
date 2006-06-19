@@ -36,6 +36,9 @@ TrackerTorrent
 	public static final int	TS_STOPPED		= 1;
 	public static final int	TS_PUBLISHED	= 2;
 
+	public String
+	getName();
+
 	public void
 	start();
 
