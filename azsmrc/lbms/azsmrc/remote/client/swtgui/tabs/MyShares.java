@@ -1,14 +1,22 @@
 package lbms.azsmrc.remote.client.swtgui.tabs;
 
+import lbms.azsmrc.remote.client.Constants;
 import lbms.azsmrc.remote.client.TrackerListener;
 import lbms.azsmrc.remote.client.TrackerTorrent;
+import lbms.azsmrc.remote.client.events.ClientUpdateListener;
 import lbms.azsmrc.remote.client.internat.I18N;
+import lbms.azsmrc.remote.client.swtgui.ColorUtilities;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
+import lbms.azsmrc.remote.client.util.DisplayFormatters;
+
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -38,21 +46,63 @@ public class MyShares {
 		RCMain.getRCMain().getClient().getTracker().update();
 		torrents = RCMain.getRCMain().getClient().getTracker().getTorrents();
 
-		TrackerListener tl = new TrackerListener(){
+		final ClientUpdateListener cul = new ClientUpdateListener(){
+
+			public void update(long updateSwitches) {
+				if ((updateSwitches & Constants.UPDATE_TRACKER) != 0){
+					torrents = RCMain.getRCMain().getClient().getTracker().getTorrents();
+					RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
+
+						public void run() {
+							if(table != null && !table.isDisposed()){
+								table.clearAll();
+								table.setItemCount(torrents.length);
+							}
+						}
+
+					});
+
+				}
+			}
+
+		};
+
+		RCMain.getRCMain().getClient().addClientUpdateListener(cul);
+
+
+		final TrackerListener tl = new TrackerListener(){
 
 			public void torrentAdded(TrackerTorrent torrent) {
-				// TODO Auto-generated method stub
-				System.out.println(torrent.getName() + " added!");
+				torrents = RCMain.getRCMain().getClient().getTracker().getTorrents();
+				RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
+
+					public void run() {
+						if(table != null && !table.isDisposed()){
+							table.clearAll();
+							table.setItemCount(torrents.length);
+						}
+					}
+
+				});
 			}
 
 			public void torrentChanged(TrackerTorrent torrent) {
-				// TODO Auto-generated method stub
+				// NOT USED YET
 
 			}
 
 			public void torrentRemoved(TrackerTorrent torrent) {
-				// TODO Auto-generated method stub
+				torrents = RCMain.getRCMain().getClient().getTracker().getTorrents();
+				RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
 
+					public void run() {
+						if(table != null && !table.isDisposed()){
+							table.clearAll();
+							table.setItemCount(torrents.length);
+						}
+					}
+
+				});
 			}
 
 		};
@@ -106,8 +156,15 @@ public class MyShares {
 		start.setToolTipText(I18N.translate(PFX + "toolbar.start.toolTip"));
 		start.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
-				// TODO Auto-generated method stub
-
+				TableItem[] items = table.getSelection();
+				for(TableItem item:items){
+					TrackerTorrent tt = (TrackerTorrent) item.getData("tt");
+					if(tt.getStatus() == TrackerTorrent.TS_STOPPED)
+						tt.start();
+				}
+				RCMain.getRCMain().getClient().getTracker().update();
+				torrents = RCMain.getRCMain().getClient().getTracker().getTorrents();
+				table.setItemCount(torrents.length);
 			}
 		});
 
@@ -118,8 +175,15 @@ public class MyShares {
 		stop.setToolTipText(I18N.translate(PFX + "toolbar.stop.toolTip"));
 		stop.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
-				// TODO Auto-generated method stub
-
+				TableItem[] items = table.getSelection();
+				for(TableItem item:items){
+					TrackerTorrent tt = (TrackerTorrent) item.getData("tt");
+					if(tt.getStatus() != TrackerTorrent.TS_STOPPED)
+						tt.stop();
+				}
+				RCMain.getRCMain().getClient().getTracker().update();
+				torrents = RCMain.getRCMain().getClient().getTracker().getTorrents();
+				table.setItemCount(torrents.length);
 			}
 		});
 
@@ -129,10 +193,23 @@ public class MyShares {
 		remove.setToolTipText(I18N.translate(PFX + "toolbar.remove.toolTip"));
 		remove.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
-				// TODO Auto-generated method stub
-
+				TableItem[] items = table.getSelection();
+				for(TableItem item:items){
+					TrackerTorrent tt = (TrackerTorrent) item.getData("tt");
+					if(tt.canBeRemoved()){
+						tt.remove();
+					}else{
+						try{
+							tt.stop();
+							tt.remove();
+						}catch(Exception e){}  // just a try.. no need to catch
+					}
+				}
 			}
 		});
+
+		//turn off the buttons until a selection event
+		setButtons(false);
 
 		//-----end of toolitems
 
@@ -146,47 +223,47 @@ public class MyShares {
 
 		table.setHeaderVisible(true);
 
-		TableColumn number = new TableColumn (table, SWT.NULL);
+		TableColumn number = new TableColumn (table, SWT.LEFT);
 		number.setText("#");
 		number.setWidth(20);
 
-		TableColumn name = new TableColumn (table, SWT.NULL);
+		TableColumn name = new TableColumn (table, SWT.LEFT);
 		name.setText(I18N.translate(PFX + "tableColumn.name.text"));
 		name.setWidth(200);
 
-		TableColumn seeds = new TableColumn (table, SWT.NULL);
+		TableColumn seeds = new TableColumn (table, SWT.RIGHT);
 		seeds.setText(I18N.translate(PFX + "tableColumn.seeds.text"));
 		seeds.pack();
 
-		TableColumn leechers = new TableColumn (table, SWT.NULL);
+		TableColumn leechers = new TableColumn (table, SWT.RIGHT);
 		leechers.setText(I18N.translate(PFX + "tableColumn.leechers.text"));
 		leechers.pack();
 
-		TableColumn completed = new TableColumn (table, SWT.NULL);
+		TableColumn completed = new TableColumn (table, SWT.RIGHT);
 		completed.setText(I18N.translate(PFX + "tableColumn.completed.text"));
 		completed.pack();
 
-		TableColumn status = new TableColumn (table, SWT.NULL);
+		TableColumn status = new TableColumn (table, SWT.RIGHT);
 		status.setText(I18N.translate(PFX + "tableColumn.status.text"));
 		status.pack();
 
-		TableColumn bytesIn = new TableColumn (table, SWT.NULL);
+		TableColumn bytesIn = new TableColumn (table, SWT.RIGHT);
 		bytesIn.setText(I18N.translate(PFX + "tableColumn.bytesIn.text"));
 		bytesIn.pack();
 
-		TableColumn bytesOut = new TableColumn (table, SWT.NULL);
+		TableColumn bytesOut = new TableColumn (table, SWT.RIGHT);
 		bytesOut.setText(I18N.translate(PFX + "tableColumn.bytesOut.text"));
 		bytesOut.pack();
 
-		TableColumn totalDownloaded = new TableColumn (table, SWT.NULL);
+		TableColumn totalDownloaded = new TableColumn (table, SWT.RIGHT);
 		totalDownloaded.setText(I18N.translate(PFX + "tableColumn.totalDownloaded.text"));
 		totalDownloaded.pack();
 
-		TableColumn totalUploaded = new TableColumn (table, SWT.NULL);
+		TableColumn totalUploaded = new TableColumn (table, SWT.RIGHT);
 		totalUploaded.setText(I18N.translate(PFX + "tableColumn.totalUploaded.text"));
 		totalUploaded.pack();
 
-		TableColumn totalLeft = new TableColumn (table, SWT.NULL);
+		TableColumn totalLeft = new TableColumn (table, SWT.RIGHT);
 		totalLeft.setText(I18N.translate(PFX + "tableColumn.totalLeft.text"));
 		totalLeft.pack();
 
@@ -195,13 +272,47 @@ public class MyShares {
 		table.addListener(SWT.SetData, new Listener(){
 			public void handleEvent(Event e) {
 				TableItem item = (TableItem) e.item;
+				if(item == null) return;
 				int index = table.indexOf (item);
-
+				TrackerTorrent tt = (TrackerTorrent) torrents[index];
+				if(tt == null) return;
 				//set all the data!
-				item.setText(0, String.valueOf(index));
-
-				TrackerTorrent tt = torrents[index];
+				item.setText(0, String.valueOf(index + 1));
 				item.setText(1,tt.getName());
+				item.setText(2,String.valueOf(tt.getSeedCount()));
+				item.setText(3,String.valueOf(tt.getLeecherCount()));
+				item.setText(4,String.valueOf(tt.getCompletedCount()));
+				item.setText(5,String.valueOf(statusToString(tt.getStatus())));
+				item.setText(6,DisplayFormatters.formatByteCountToBase10KBEtcPerSec(tt.getAverageBytesIn()));
+				item.setText(7,DisplayFormatters.formatByteCountToBase10KBEtcPerSec(tt.getAverageBytesOut()));
+				item.setText(8,DisplayFormatters.formatByteCountToBase10KBEtc(tt.getTotalDownloaded()));
+				item.setText(9,DisplayFormatters.formatByteCountToBase10KBEtc(tt.getTotalUploaded()));
+				item.setText(10,DisplayFormatters.formatByteCountToBase10KBEtc(tt.getTotalLeft()));
+				item.setData("tt", tt);
+				if(index%2!=0){
+					item.setBackground(ColorUtilities.getBackgroundColor());
+				}
+			}
+		});
+
+		table.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				TableItem[] items = table.getSelection();
+				if(items.length == 0) return;
+				setButtons(true);
+
+			}
+		});
+
+
+		table.addMouseListener(new MouseAdapter() {
+			public void mouseDown(MouseEvent e) {
+				if(e.button == 1) {
+					if(table.getItem(new Point(e.x,e.y))==null){
+						table.deselectAll();
+						setButtons(false);
+					}
+				}
 			}
 		});
 
@@ -212,6 +323,30 @@ public class MyShares {
 	}
 
 
+	private void setButtons(final boolean bOn){
+		RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
+			public void run() {
+				if(stop != null || !stop.isDisposed())
+					stop.setEnabled(bOn);
+				if(start != null || !start.isDisposed())
+					start.setEnabled(bOn);
+				if(remove != null || !remove.isDisposed())
+					remove.setEnabled(bOn);
+			}
+		});
+	}
+
+	private String statusToString(int status){
+		switch (status){
+		case TrackerTorrent.TS_STARTED:
+			return I18N.translate(PFX + "status.TS_STARTED");
+		case TrackerTorrent.TS_STOPPED:
+			return I18N.translate(PFX + "status.TS_STOPPED");
+		case TrackerTorrent.TS_PUBLISHED:
+			return I18N.translate(PFX + "status.TS_PUBLISHED");
+		}
+		return I18N.translate("gloabal.error");
+	}
 
 	//Static public open ... call this to open
 	public static void open(final CTabFolder parentTab){
