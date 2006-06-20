@@ -129,10 +129,10 @@ public class DownloadManagerShell {
 				if (new_state == Download.ST_SEEDING && downloadsMap.containsKey(download.getHash())) {
 					downloadsMap.get(download.getHash()).removeFromTable();
 					downloadsMap.remove(download.getHash());
-					downloadsArray = downloadsMap.values().toArray(new Container[] {});
+					//downloadsArray = downloadsMap.values().toArray(new Container[] {});
 					SeedContainer sc = new SeedContainer(download,seedsTable,SWT.NULL);
 					seedsMap.put(download.getHash(), sc);
-					seedsArray = seedsMap.values().toArray(new Container[] {});
+					//seedsArray = seedsMap.values().toArray(new Container[] {});
 				}
 			} catch (InterruptedException e) {
 
@@ -145,7 +145,7 @@ public class DownloadManagerShell {
 
 		public void positionChanged(Download download, int oldPosition, int newPosition) {
 			debugLogger.finer("Position changed "+download+" "+oldPosition+" -> "+newPosition);
-			redrawTables(true);
+			redrawTables();
 		}
 
 	};
@@ -586,7 +586,7 @@ public class DownloadManagerShell {
 						container.getDownload().moveUp();
 					}
 				}
-				redrawTables(true);
+				redrawTables();
 			}
 		});
 
@@ -613,7 +613,7 @@ public class DownloadManagerShell {
 					}
 				}
 
-				redrawTables(true);
+				redrawTables();
 
 			}
 		});
@@ -727,12 +727,12 @@ public class DownloadManagerShell {
 					//container.removeFromTable();
 					if(seedsMap.containsKey(container.getDownload().getHash())){
 						seedsMap.remove(container.getDownload().getHash());
-						seedsArray = seedsMap.values().toArray(new Container[] {});
-						redrawTables(false);
+						//seedsArray = seedsMap.values().toArray(new Container[] {});
+						redrawTables();
 					}else if(downloadsMap.containsKey(container.getDownload().getHash())){
 						downloadsMap.remove(container.getDownload().getHash());
-						downloadsArray = downloadsMap.values().toArray(emptyArray);
-						redrawTables(false);
+						//downloadsArray = downloadsMap.values().toArray(emptyArray);
+						redrawTables();
 					}
 				}
 				RCMain.getRCMain().getClient().transactionCommit();
@@ -906,7 +906,7 @@ public class DownloadManagerShell {
 									//int pos = findInsertionPosition(sc, seedsTable);
 									//sc.addToTable(seedsTable, SWT.NONE, pos);
 									seedsMap.put(download.getHash(), sc);
-									seedsArray = seedsMap.values().toArray(emptyArray);
+									//seedsArray = seedsMap.values().toArray(emptyArray);
 									//resortSeeds = true; //just to make sure sometimes findInsertionPosition screws up
 								}
 							}else{
@@ -915,11 +915,11 @@ public class DownloadManagerShell {
 									//int pos = findInsertionPosition(dc, downloadsTable);
 									//dc.addToTable(downloadsTable, SWT.NONE, pos);
 									downloadsMap.put(download.getHash(), dc);
-									downloadsArray = downloadsMap.values().toArray(emptyArray);
+									//downloadsArray = downloadsMap.values().toArray(emptyArray);
 									//resortDownloads = true;
 								}
 							}
-							redrawTables(false);
+							redrawTables();
 						};
 					});
 				} catch (InterruptedException e) {
@@ -934,15 +934,15 @@ public class DownloadManagerShell {
 				if(downloadsMap.containsKey(download.getHash())){
 					//downloadsMap.get(download.getHash()).removeFromTable();
 					downloadsMap.remove(download.getHash());
-					downloadsArray = downloadsMap.values().toArray(emptyArray);
+					//downloadsArray = downloadsMap.values().toArray(emptyArray);
 					//resortDownloads = true;
-					redrawTables(false);
+					redrawTables();
 				}else if(seedsMap.containsKey(download.getHash())){
 					//seedsMap.get(download.getHash()).removeFromTable();
 					seedsMap.remove(download.getHash());
-					seedsArray = seedsMap.values().toArray(emptyArray);
+					//seedsArray = seedsMap.values().toArray(emptyArray);
 					//resortSeeds = true;
-					redrawTables(false);
+					redrawTables();
 				}
 			}
 		};
@@ -959,15 +959,15 @@ public class DownloadManagerShell {
 							if(downloads[i].getState() == Download.ST_SEEDING || downloads[i].getStats().getCompleted() == 1000){
 								SeedContainer sc = new SeedContainer(downloads[i],seedsTable,SWT.NULL);
 								seedsMap.put(downloads[i].getHash(), sc);
-								seedsArray = seedsMap.values().toArray(emptyArray);
+								//seedsArray = seedsMap.values().toArray(emptyArray);
 								//resortSeeds = true;
-								redrawTables(false);
+								redrawTables();
 							}else{
 								DownloadContainer dc = new DownloadContainer(downloads[i],downloadsTable,SWT.BORDER);
 								downloadsMap.put(downloads[i].getHash(), dc);
-								downloadsArray = downloadsMap.values().toArray(emptyArray);
+								//downloadsArray = downloadsMap.values().toArray(emptyArray);
 								//resortDownloads = true;
-								redrawTables(false);
+								redrawTables();
 							}
 						}else{
 							//is present in one of the maps.. so find it and update it
@@ -975,12 +975,12 @@ public class DownloadManagerShell {
 								if(downloads[i].getState() == Download.ST_SEEDING){
 									downloadsMap.get(downloads[i].getHash()).removeFromTable();
 									downloadsMap.remove(downloads[i].getHash());
-									downloadsArray = downloadsMap.values().toArray(emptyArray);
+									//downloadsArray = downloadsMap.values().toArray(emptyArray);
 
 									if(!seedsMap.containsKey(downloads[i].getHash())){
 										SeedContainer sc = new SeedContainer(downloads[i],seedsTable,SWT.NULL);
 										seedsMap.put(downloads[i].getHash(), sc);
-										seedsArray = seedsMap.values().toArray(emptyArray);
+										//seedsArray = seedsMap.values().toArray(emptyArray);
 									}
 								}
 								DownloadContainer dc = downloadsMap.get(downloads[i].getHash());
@@ -990,7 +990,7 @@ public class DownloadManagerShell {
 								SeedContainer sc = seedsMap.get(downloads[i].getHash());
 								sc.update(false);
 							}
-							redrawTables(false);
+							redrawTables();
 						}
 					}
 					/*if (resortSeeds) {
@@ -1076,7 +1076,7 @@ public class DownloadManagerShell {
 				if(tab.equals(myTorrents)){
 					//sortTable(downloadsTable);
 					//sortTable(seedsTable);
-					redrawTables(false);
+					redrawTables();
 				}
 
 			}
@@ -1113,8 +1113,7 @@ public class DownloadManagerShell {
 
 		downloadsTable.addListener(SWT.SetData, new Listener(){
 			public void handleEvent(Event event) {
-				if(downloadsArray.length != downloadsMap.size())
-					downloadsArray = downloadsMap.values().toArray(emptyArray);
+				downloadsArray = downloadsMap.values().toArray(emptyArray);
 				if(downloadsArray.length == 0)
 					return;
 				Comparator<Container> data = (Comparator<Container>) downloadsTable.getData("comparator");
@@ -1122,8 +1121,8 @@ public class DownloadManagerShell {
 				if(!Boolean.parseBoolean((String)downloadsTable.getData("sort")))
 					data = Collections.reverseOrder(data);
 
-				if(downloadsArray.length > 1)
-					Arrays.sort(downloadsArray, data);
+				//if(downloadsArray.length > 1)
+				Arrays.sort(downloadsArray, data);
 
 				TableItem item = (TableItem) event.item;
 				int index = downloadsTable.indexOf(item);
@@ -1243,8 +1242,7 @@ public class DownloadManagerShell {
 		seedsTable.addListener(SWT.SetData, new Listener(){
 
 			public void handleEvent(Event event) {
-				if(seedsArray.length != seedsMap.size())
-					seedsArray = seedsMap.values().toArray(emptyArray);
+				seedsArray = seedsMap.values().toArray(emptyArray);
 				if(seedsArray.length == 0)return;
 
 				Comparator<Container> data = (Comparator<Container>) seedsTable.getData("comparator");
@@ -1253,13 +1251,16 @@ public class DownloadManagerShell {
 				if(!Boolean.parseBoolean((String)seedsTable.getData("sort")))
 					data = Collections.reverseOrder(data);
 
+				//if(seedsArray.length > 1)
 				Arrays.sort(seedsArray, data);
+
 				TableItem item = (TableItem) event.item;
 				int index = seedsTable.indexOf(item);
 				if(index + 1 > seedsArray.length) return;
 				SeedContainer container = (SeedContainer) seedsArray[index];
 				container.setTableItem(item);
-				container.update(true);
+				if(container.getTableItem() != null)
+					container.update(true);
 			}
 		});
 
@@ -1283,7 +1284,6 @@ public class DownloadManagerShell {
 
 
 					//Torrent Control
-					//torrent control
 					Container container = (Container)items[0].getData();
 					Download download = container.getDownload();
 					if(download.getState() == Download.ST_QUEUED || download.getState() == Download.ST_SEEDING){
@@ -1950,10 +1950,7 @@ public class DownloadManagerShell {
 			column.dispose();
 		}
 		createTableColumns(downloadsTable, DownloadContainer.getColumns());
-		if(downloadsArray.length != downloadsMap.size())
-			downloadsArray = downloadsMap.values().toArray(emptyArray);
-
-		for(Container dc : downloadsArray){
+		for(Container dc : downloadsMap.values().toArray(emptyArray)){
 			dc.deleteTableItem();
 		}
 
@@ -1964,10 +1961,7 @@ public class DownloadManagerShell {
 			column.dispose();
 		}
 		createTableColumns(seedsTable, SeedContainer.getColumns());
-		if(seedsArray.length != seedsMap.size())
-			seedsArray = seedsMap.values().toArray(emptyArray);
-
-		for(Container sc : seedsArray){
+		for(Container sc : seedsMap.values().toArray(emptyArray)){
 			sc.deleteTableItem();
 		}
 		seedsTable.clearAll();
@@ -2057,13 +2051,13 @@ public class DownloadManagerShell {
 						//container.removeFromTable();
 						if(seedsMap.containsKey(container.getDownload().getHash())){
 							seedsMap.remove(container.getDownload().getHash());
-							seedsArray = seedsMap.values().toArray(emptyArray);
+							//seedsArray = seedsMap.values().toArray(emptyArray);
 						}else if(downloadsMap.containsKey(container.getDownload().getHash())){
 							downloadsMap.remove(container.getDownload().getHash());
-							downloadsArray = downloadsMap.values().toArray(emptyArray);
+							//downloadsArray = downloadsMap.values().toArray(emptyArray);
 						}
 
-						redrawTables(false);
+						redrawTables();
 					}
 					RCMain.getRCMain().getClient().transactionCommit();
 
@@ -2105,12 +2099,12 @@ public class DownloadManagerShell {
 						//container.removeFromTable();
 						if(seedsMap.containsKey(container.getDownload().getHash())){
 							seedsMap.remove(container.getDownload().getHash());
-							seedsArray = seedsMap.values().toArray(emptyArray);
+							//seedsArray = seedsMap.values().toArray(emptyArray);
 						}else if(downloadsMap.containsKey(container.getDownload().getHash())){
 							downloadsMap.remove(container.getDownload().getHash());
-							downloadsArray = downloadsMap.values().toArray(emptyArray);
+							//downloadsArray = downloadsMap.values().toArray(emptyArray);
 						}
-						redrawTables(false);
+						redrawTables();
 					}
 					RCMain.getRCMain().getClient().transactionCommit();
 
@@ -2143,12 +2137,12 @@ public class DownloadManagerShell {
 							//container.removeFromTable();
 							if(seedsMap.containsKey(container.getDownload().getHash())){
 								seedsMap.remove(container.getDownload().getHash());
-								seedsArray = seedsMap.values().toArray(emptyArray);
+								//seedsArray = seedsMap.values().toArray(emptyArray);
 							}else if(downloadsMap.containsKey(container.getDownload().getHash())){
 								downloadsMap.remove(container.getDownload().getHash());
-								downloadsArray = downloadsMap.values().toArray(emptyArray);
+								//downloadsArray = downloadsMap.values().toArray(emptyArray);
 							}
-							redrawTables(false);
+							redrawTables();
 						}
 						RCMain.getRCMain().getClient().transactionCommit();
 						break;
@@ -2198,12 +2192,12 @@ public class DownloadManagerShell {
 							//container.removeFromTable();
 							if(seedsMap.containsKey(container.getDownload().getHash())){
 								seedsMap.remove(container.getDownload().getHash());
-								seedsArray = seedsMap.values().toArray(emptyArray);
+								//seedsArray = seedsMap.values().toArray(emptyArray);
 							}else if(downloadsMap.containsKey(container.getDownload().getHash())){
 								downloadsMap.remove(container.getDownload().getHash());
-								downloadsArray = downloadsMap.values().toArray(emptyArray);
+								//downloadsArray = downloadsMap.values().toArray(emptyArray);
 							}
-							redrawTables(false);
+							redrawTables();
 						}
 						RCMain.getRCMain().getClient().transactionCommit();
 						break;
@@ -3002,7 +2996,7 @@ public class DownloadManagerShell {
 						table.setSortColumn(col);
 					}
 				}
-				redrawTables(true);
+				redrawTables();
 			}
 		};
 
@@ -3447,19 +3441,19 @@ public class DownloadManagerShell {
 		return new int[]{seedsMap.size(), downloadsMap.size()};
 	}
 
-	public void redrawTables(final boolean clear){
+	public void redrawTables(){
 		Display display = RCMain.getRCMain().getDisplay();
 		if(display == null || display.isDisposed()) return;
 		display.asyncExec(new Runnable(){
 			public void run() {
 				if(downloadsTable != null || !downloadsTable.isDisposed()){
-					if(clear) downloadsTable.clearAll();
-					downloadsTable.setItemCount(downloadsArray.length);
+					downloadsTable.clearAll();
+					downloadsTable.setItemCount(downloadsMap.size());
 				}
 
 				if(seedsTable != null || !seedsTable.isDisposed()){
-					if(clear) seedsTable.clearAll();
-					seedsTable.setItemCount(seedsArray.length);
+					seedsTable.clearAll();
+					seedsTable.setItemCount(seedsMap.size());
 				}
 
 			}
