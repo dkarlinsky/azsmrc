@@ -1130,6 +1130,9 @@ public class DownloadManagerShell {
 				//System.out.println("Table count: " + downloadsTable.getItemCount() + " Index: " + index + " | downloadsArray: " + downloadsArray.length + " | downloadsMap: " + downloadsMap.size());
 				DownloadContainer container = (DownloadContainer) downloadsArray[index];
 				container.setTableItem(item);
+				if(index%2!=0){
+					item.setBackground(ColorUtilities.getBackgroundColor());
+				}
 				if(container.getTableItem() != null)
 					container.update(true);
 			}
@@ -1259,6 +1262,11 @@ public class DownloadManagerShell {
 				if(index + 1 > seedsArray.length) return;
 				SeedContainer container = (SeedContainer) seedsArray[index];
 				container.setTableItem(item);
+
+				if(index%2!=0){
+					item.setBackground(ColorUtilities.getBackgroundColor());
+				}
+
 				if(container.getTableItem() != null)
 					container.update(true);
 			}
