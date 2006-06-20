@@ -1,11 +1,15 @@
 package lbms.azsmrc.remote.client.swtgui.tabs;
 
+import java.io.File;
+
 import lbms.azsmrc.remote.client.Constants;
+import lbms.azsmrc.remote.client.Tracker;
 import lbms.azsmrc.remote.client.TrackerListener;
 import lbms.azsmrc.remote.client.TrackerTorrent;
 import lbms.azsmrc.remote.client.events.ClientUpdateListener;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.ColorUtilities;
+import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
@@ -19,10 +23,14 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -128,8 +136,114 @@ public class MyShares {
 		addTorrent.setToolTipText(I18N.translate(PFX + "toolbar.addTorrent.toolTip") );
 		addTorrent.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
-				// TODO Auto-generated method stub
+				FileDialog dialog = new FileDialog (parent.getShell(), SWT.OPEN);
+				dialog.setText(I18N.translate(PFX + "toolbar.addTorrent.toolTip"));
+				dialog.setFilterNames (new String [] {"Torrent Files", "All Files (*.*)"});
+				dialog.setFilterExtensions (new String [] {"*.torrent", "*.*"}); //Windows wild cards
+				String lastDir =  RCMain.getRCMain().getProperties().getProperty("Last.Directory");
+				if (lastDir != null) {
+					dialog.setFilterPath(lastDir);
+				}
 
+				String string = dialog.open();
+				if(string != null){
+					try{
+						final File file = new File(string);
+						if(file.exists() && file.canRead() && file.isFile()){
+							final Shell shell = new Shell();
+							shell.setLayout(new GridLayout(2,false));
+							shell.setText(I18N.translate(PFX + "addTorrent.shell.text"));
+
+							Composite group = new Composite(shell, SWT.BORDER);
+							group.setLayout(new GridLayout(1,false));
+							GridData gridData = new GridData(GridData.FILL_BOTH);
+							gridData.horizontalSpan = 2;
+							gridData.widthHint = 150;
+							group.setLayoutData(gridData);
+							group.setBackground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_WHITE));
+
+							final Button bHost = new Button(group,SWT.RADIO);
+							bHost.setText(I18N.translate(PFX + "addTorrent.host.text"));
+							bHost.setBackground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_WHITE));
+							bHost.setSelection(true);
+
+
+
+							final Button bPersistent = new Button(group, SWT.CHECK);
+							bPersistent.setText(I18N.translate(PFX + "addTorrent.persistent.text"));
+							bPersistent.setBackground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_WHITE));
+							gridData = new GridData();
+							gridData.horizontalIndent = 20;
+							bPersistent.setLayoutData(gridData);
+
+							final Button bPassive = new Button(group, SWT.CHECK);
+							bPassive.setText(I18N.translate(PFX + "addTorrent.passive.text"));
+							bPassive.setBackground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_WHITE));
+							gridData = new GridData();
+							gridData.horizontalIndent = 20;
+							bPassive.setLayoutData(gridData);
+
+
+							bHost.addListener(SWT.Selection, new Listener(){
+								public void handleEvent(Event arg0) {
+									bPersistent.setEnabled(true);
+									bPassive.setEnabled(true);
+								}
+							});
+
+							new Label(group,SWT.HORIZONTAL | SWT.SEPARATOR);
+
+							final Button bPublish = new Button(group, SWT.RADIO);
+							bPublish.setText(I18N.translate(PFX + "addTorrent.publish.text"));
+							bPublish.setBackground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_WHITE));
+							bPublish.addListener(SWT.Selection, new Listener(){
+								public void handleEvent(Event arg0) {
+									bPersistent.setEnabled(false);
+									bPassive.setEnabled(false);
+								}
+							});
+
+
+							final Button bAccept = new Button(shell, SWT.PUSH);
+							bAccept.setText(I18N.translate("global.accept"));
+							bAccept.addListener(SWT.Selection, new Listener(){
+								public void handleEvent(Event e){
+									Tracker tracker = RCMain.getRCMain().getClient().getTracker();
+									if(bHost.getSelection()){
+										tracker.host(file, bPersistent.getSelection(), bPassive.getSelection());
+									}else{
+										tracker.publish(file);
+									}
+									RCMain.getRCMain().getClient().getTracker().update();
+									torrents = RCMain.getRCMain().getClient().getTracker().getTorrents();
+									table.setItemCount(torrents.length);
+									shell.dispose();
+								}
+							});
+
+
+							final Button bCancel = new Button(shell, SWT.PUSH);
+							bCancel.setText(I18N.translate("global.cancel"));
+							bCancel.addListener(SWT.Selection, new Listener(){
+								public void handleEvent(Event arg0) {
+									shell.dispose();
+								}
+							});
+
+
+							GUI_Utilities.centerShellandOpen(shell);
+
+
+
+							lastDir = file.getParent();
+							RCMain.getRCMain().getProperties().setProperty("Last.Directory", lastDir);
+							RCMain.getRCMain().saveConfig();
+						}
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+
+				}
 			}
 		});
 
