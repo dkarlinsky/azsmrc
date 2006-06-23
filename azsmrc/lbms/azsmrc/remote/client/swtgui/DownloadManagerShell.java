@@ -51,7 +51,7 @@ import lbms.azsmrc.remote.client.swtgui.dialogs.ServerUpdateDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.TableColumnEditorDialog;
 import lbms.azsmrc.remote.client.swtgui.tabs.ConsoleTab;
 import lbms.azsmrc.remote.client.swtgui.tabs.ManageUsersTab;
-import lbms.azsmrc.remote.client.swtgui.tabs.MyShares;
+import lbms.azsmrc.remote.client.swtgui.tabs.MyTracker;
 import lbms.azsmrc.remote.client.swtgui.tabs.PreferencesTab;
 import lbms.azsmrc.remote.client.swtgui.tabs.ReadmeTab;
 import lbms.azsmrc.remote.client.swtgui.tabs.ServerDetailsTab;
@@ -378,10 +378,10 @@ public class DownloadManagerShell {
 		//-----Tools Submenu
 
 		menuMyShares = new MenuItem(toolSubmenu, SWT.PUSH);
-		menuMyShares.setText("&My Shares");
+		menuMyShares.setText("&My Tracker");
 		menuMyShares.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e){
-				MyShares.open(tabFolder);
+				MyTracker.open(tabFolder);
 			}
 		});
 
