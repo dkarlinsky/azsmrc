@@ -302,7 +302,7 @@ public abstract class Container implements Comparable<Container> {
 			public void run() {
 				try {
 					DecimalFormat df = new DecimalFormat();
-					df.applyPattern("##0.00");
+					df.applyPattern("##0.000");
 
 					//ProgressBar
 					if (tableColumns.contains(RemoteConstants.ST_COMPLETITION)) {
@@ -322,7 +322,6 @@ public abstract class Container implements Comparable<Container> {
 									true);
 							item.setImage(tableColumns.indexOf(RemoteConstants.ST_COMPLETITION),progBarImage);
 						}
-
 						oldPercentage = newPercentage;
 					}
 
@@ -348,15 +347,11 @@ public abstract class Container implements Comparable<Container> {
 							if (newHealth==0){
 								item.setImage(tableColumns.indexOf(RemoteConstants.ST_HEALTH),resizedHealthImages[5]);
 							}
-
 							else{
 								item.setImage(tableColumns.indexOf(RemoteConstants.ST_HEALTH),resizedHealthImages[newHealth-1]);
 							}
-
 						}
 					}
-
-
 
 					//position
 					if (tableColumns.contains(RemoteConstants.ST_POSITION)) {
