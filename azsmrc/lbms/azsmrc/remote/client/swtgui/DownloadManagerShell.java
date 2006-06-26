@@ -1171,16 +1171,8 @@ public class DownloadManagerShell {
 						if(items.length > 1) return;
 
 						Container dc = (Container)items[0].getData();
-						//Check for one already open
-						CTabItem[] ctabs = tabFolder.getItems();
-						for(CTabItem ctab:ctabs){
-							if(ctab.getText().equalsIgnoreCase(dc.getDownload().getName())){
-								tabFolder.setSelection(ctab);
-								return;
-							}
-
-						}
-						new TorrentDetailsTab(tabFolder,dc.getDownload());
+						//check for dupicate happens IN the tab open now
+						TorrentDetailsTab.open(tabFolder,dc.getDownload());
 
 					}
 
@@ -1298,16 +1290,8 @@ public class DownloadManagerShell {
 						TableItem[] items = seedsTable.getSelection();
 						if(items.length > 1) return;
 						Container sc = (Container)items[0].getData();
-						//Check for one already open
-						CTabItem[] ctabs = tabFolder.getItems();
-						for(CTabItem ctab:ctabs){
-							if(ctab.getText().equalsIgnoreCase(sc.getDownload().getName())){
-								tabFolder.setSelection(ctab);
-								return;
-							}
-
-						}
-						new TorrentDetailsTab(tabFolder,sc.getDownload());
+						//check for dupicate happens IN the tab open now
+						TorrentDetailsTab.open(tabFolder,sc.getDownload());
 					}
 
 				}

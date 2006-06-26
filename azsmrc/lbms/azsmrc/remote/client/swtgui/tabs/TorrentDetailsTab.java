@@ -31,6 +31,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -70,7 +71,27 @@ public class TorrentDetailsTab {
 	public static final String PFX = "tab.torrentdetailstab.";
 
 
-	public TorrentDetailsTab(CTabFolder parentTab, Download _download){
+	public static void open(final CTabFolder parentTab, final Download _download){
+		Display display = RCMain.getRCMain().getDisplay();
+		if(display == null) return;
+		display.asyncExec(new Runnable(){
+			public void run() {
+				CTabItem[] tabs = parentTab.getItems();
+				for(CTabItem tab:tabs){
+					if(tab.getText().equalsIgnoreCase(_download.getName())){
+						parentTab.setSelection(tab);
+						return;
+					}
+				}
+				new TorrentDetailsTab(parentTab, _download);
+
+			}
+
+		});
+	}
+
+
+	private TorrentDetailsTab(CTabFolder parentTab, Download _download){
 		download = _download;
 		ds = download.getStats();
 		das = download.getAdvancedStats();
