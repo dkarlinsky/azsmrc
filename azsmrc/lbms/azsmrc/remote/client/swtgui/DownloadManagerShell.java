@@ -1032,7 +1032,7 @@ public class DownloadManagerShell {
 
 		//add in the non closable My torrents ctabitem
 		myTorrents = new CTabItem(tabFolder, SWT.NONE);
-
+		myTorrents.setToolTipText("Click here to resort the tables");
 		tabFolder.addMouseListener(new MouseListener(){
 
 			public void mouseDoubleClick(MouseEvent arg0) {
