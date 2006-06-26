@@ -110,6 +110,10 @@ public class RCMain implements Launchable {
 	private long runTime;
 	private boolean manifestInUse;
 
+
+	//  I18N prefix
+	public static final String PFX = "rcmain.";
+
 	private Transferable emptyTransfer = new Transferable() {
 		private DataFlavor[] emptyArray = new DataFlavor[0];
 		public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
@@ -258,33 +262,33 @@ public class RCMain implements Launchable {
 		final Menu menu = new Menu(shell, SWT.POP_UP);
 
 		final MenuItem openMainWindowMenuItem = new MenuItem(menu, SWT.PUSH);
-		openMainWindowMenuItem.setText("Open Main Window");
+		openMainWindowMenuItem.setText(I18N.translate(PFX + "traymenu.openMainWindow"));
 
 		final MenuItem addMenuItem = new MenuItem(menu, SWT.CASCADE);
-		addMenuItem.setText("Add");
+		addMenuItem.setText(I18N.translate(PFX + "traymenu.add"));
 		final Menu addMenu = new Menu(addMenuItem);
 		addMenuItem.setMenu(addMenu);
 
-		final MenuItem addByUrl = new MenuItem(addMenu,SWT.PUSH);
-		addByUrl.setText("by URL");
-
 		final MenuItem addByFile = new MenuItem(addMenu,SWT.PUSH);
-		addByFile.setText("by File");
+		addByFile.setText(I18N.translate(PFX + "traymenu.add.byFile"));
+
+		final MenuItem addByUrl = new MenuItem(addMenu,SWT.PUSH);
+		addByUrl.setText(I18N.translate(PFX + "traymenu.add.byURL"));
 
 		new MenuItem (menu, SWT.SEPARATOR);
 
 		final MenuItem connectDisconnectMenuItem = new MenuItem(menu, SWT.PUSH);
-		if (!connect) connectDisconnectMenuItem.setText("Connect");
-		else connectDisconnectMenuItem.setText("Disconnect");
+		if (!connect) connectDisconnectMenuItem.setText(I18N.translate(PFX + "traymenu.connect"));
+		else connectDisconnectMenuItem.setText(I18N.translate(PFX + "traymenu.disconnect"));
 
 		final MenuItem silentItem = new MenuItem(menu, SWT.CHECK);
-		silentItem.setText("Silent Mode");
+		silentItem.setText(I18N.translate(PFX + "traymenu.silentMode"));
 
 		final MenuItem disablePopupItem = new MenuItem(menu, SWT.CHECK);
-		disablePopupItem.setText("Disable Popups");
+		disablePopupItem.setText(I18N.translate(PFX + "traymenu.disablePopups"));
 
 		final MenuItem closeMenuItem = new MenuItem(menu, SWT.PUSH);
-		closeMenuItem.setText("Close");
+		closeMenuItem.setText(I18N.translate(PFX + "traymenu.close"));
 
 		//###########################################################
 
@@ -309,7 +313,7 @@ public class RCMain implements Launchable {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (connect) {
-					connectDisconnectMenuItem.setText("Connect");
+					connectDisconnectMenuItem.setText(I18N.translate(PFX + "traymenu.connect"));
 					disconnect();
 					setTrayIcon(0);
 					if(mainWindow != null){
@@ -318,7 +322,7 @@ public class RCMain implements Launchable {
 						mainWindow.clearMapsAndChildred();
 					}
 				} else {
-					connectDisconnectMenuItem.setText("Disconnect");
+					connectDisconnectMenuItem.setText(I18N.translate(PFX + "traymenu.disconnect"));
 					client.sendGetGlobalStats();
 					if (mainWindow != null) {
 						connect(true);
@@ -338,10 +342,10 @@ public class RCMain implements Launchable {
 
 			public void menuShown(MenuEvent arg0) {
 				if (!connect){
-					connectDisconnectMenuItem.setText("Connect");
+					connectDisconnectMenuItem.setText(I18N.translate(PFX + "traymenu.connect"));
 					addMenuItem.setEnabled(false);
 				}else{
-					connectDisconnectMenuItem.setText("Disconnect");
+					connectDisconnectMenuItem.setText(I18N.translate(PFX + "traymenu.disconnect"));
 					addMenuItem.setEnabled(true);
 				}
 				silentItem.setSelection(SoundManager.isSilent());
@@ -515,10 +519,14 @@ public class RCMain implements Launchable {
 					display.syncExec(new Runnable() {
 						public void run() {
 							//setTrayToolTip("AzSMRC: D:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d)+" - U:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u));
-							setTrayToolTip(client.getDownloadManager().getSeedingDownloadsOnly().length + " seeding, "
-									+ client.getDownloadManager().getDownloadsOnly().length + " downloading,\n"
-									+ "D: "+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d)
-									+ ", U: "+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u));
+							setTrayToolTip(client.getDownloadManager().getSeedingDownloadsOnly().length + " "
+									+ I18N.translate(PFX + "tray.tooltip.part1") + " "
+									+ client.getDownloadManager().getDownloadsOnly().length + " "
+									+ I18N.translate(PFX + "tray.tooltip.part2") + "\n"
+									+ I18N.translate(PFX + "tray.tooltip.part3")
+									+ " "+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d)
+									+ I18N.translate(PFX + "tray.tooltip.part4")
+									+ " "+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u));
 						}
 					});
 			}
@@ -528,14 +536,16 @@ public class RCMain implements Launchable {
 			public void httpError(int statusCode) {
 				if (statusCode == UNAUTHORIZED) {
 					if (mainWindow != null) {
-						mainWindow.setStatusBarText("Connection failed: "+statusCode+" Bad Username or Password", SWT.COLOR_RED);
+						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.failed") + " " + statusCode
+								+ I18N.translate(PFX + "mainwindow.statusbar.badUsername_badPassword"), SWT.COLOR_RED);
 					}
-					normalLogger.warning("Connection failed: "+statusCode+" Bad Username or Password");
-					MessageDialog.error(display,"Connection failed",statusCode+" Bad Username or Password");
+					normalLogger.warning("Connection failed: " + statusCode + " Bad Username or Password");
+					MessageDialog.error(display,I18N.translate(PFX + "mainwindow.statusbar.failed")
+							,statusCode + " " + I18N.translate(PFX + "mainwindow.statusbar.badUsername_badPassword"));
 					disconnect();
 				} else {
 					if (mainWindow != null) {
-						mainWindow.setStatusBarText("Connection failed: "+statusCode, SWT.COLOR_RED);
+						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.failed") + " "+statusCode, SWT.COLOR_RED);
 					}
 					normalLogger.warning("Connection failed: "+statusCode);
 				}
@@ -561,18 +571,24 @@ public class RCMain implements Launchable {
 					else
 						updateTimer(false,delay);
 					if (mainWindow != null) {
-						mainWindow.setStatusBarText("Connection failed "+client.getFailedConnections()+" time(s).", SWT.COLOR_RED);
+						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.failed") + " "
+								+ client.getFailedConnections()
+								+ " " + I18N.translate(PFX + "mainwindow.statusbar.numTimes"), SWT.COLOR_RED);
 					}
 					failedConnection = true;
 					 if(client.getFailedConnections() > 0 && client.getFailedConnections()%3 == 0){
 						 MessageDialog.error(RCMain.getRCMain().getDisplay(),
-									"Connection Error", "Failed " + RCMain.getRCMain().getClient().getFailedConnections() + " connection attempts. Please check your settings.");
+									I18N.translate(PFX + "mainwindow.statusbar.connectionError")
+									, I18N.translate(PFX + "mainwindow.statusbar.connectionError.failed")
+									+ " " + RCMain.getRCMain().getClient().getFailedConnections() + " "
+									+ I18N.translate(PFX + "mainwindow.statusbar.connectionError.failed_part2"));
 							return;
 						}
 				} else if (failedConnection && state == ST_CONNECTED) {
 					if (mainWindow != null) {
 						updateTimer(true,0);
-						mainWindow.setStatusBarText("Connection successful.", SWT.COLOR_DARK_GREEN);
+						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.connectionSuccessful")
+								, SWT.COLOR_DARK_GREEN);
 					} else
 						updateTimer(false,0);
 				}
@@ -594,10 +610,11 @@ public class RCMain implements Launchable {
 				switch (type) {
 				case RemoteConstants.EV_DL_FINISHED:
 					if (mainWindow != null) {
-						mainWindow.setStatusBarText("Download Finished: "+event.getAttributeValue("name"), SWT.COLOR_DARK_GREEN);
+						mainWindow.setStatusBarText(I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")
+								+ " " + event.getAttributeValue("name"), SWT.COLOR_DARK_GREEN);
 					}
 					SoundManager.playSound(Sound.DOWNLOADING_FINISHED);
-					MessageDialog.message(display,"Download Finished",event.getAttributeValue("name"));
+					MessageDialog.message(display,I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished"),event.getAttributeValue("name"));
 					if (event.getAttributeValue("duration") != null)
 						normalLogger.info("Download Finished: "+event.getAttributeValue("name")+"\n"
 											+"Finished in: "+DisplayFormatters.formatTime(Long.parseLong(event.getAttributeValue("duration"))*1000));
@@ -616,28 +633,28 @@ public class RCMain implements Launchable {
 					if (mainWindow != null) {
 						mainWindow.setStatusBarText("Remote Exception: "+msg, SWT.COLOR_RED);
 					}
-					normalLogger.severe("Remote Exception: "+msg);
+					normalLogger.severe(I18N.translate(PFX + "mainwindow.statusbar.remoteException") + " " + msg);
 					break;
 				case RemoteConstants.EV_UPDATE_AVAILABLE:
 					if (mainWindow != null) {
-						mainWindow.setStatusBarText("Remote Update Available", SWT.COLOR_DARK_GREEN);
+						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.remoteUpdateAvailable"), SWT.COLOR_DARK_GREEN);
 					}
 					normalLogger.severe("Remote Update Available");
 					client.getRemoteUpdateManager().load();
 					break;
 				case RemoteConstants.EV_MESSAGE:
 					if (mainWindow != null) {
-						mainWindow.setStatusBarText("Server Message: "+msg);
+						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.serverMessage") + ": " + msg);
 					}
-					MessageDialog.message(getDisplay(), "Server Message", msg);
+					MessageDialog.message(getDisplay(), I18N.translate(PFX + "mainwindow.statusbar.serverMessage"), msg);
 					normalLogger.info("Server Message: "+msg);
 					break;
 				case RemoteConstants.EV_ERROR_MESSAGE:
 					if (mainWindow != null) {
-						mainWindow.setStatusBarText("Server ErrorMessage: "+msg, SWT.COLOR_RED);
+						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.serverErrorMessage") + ": " + msg, SWT.COLOR_RED);
 					}
 					normalLogger.severe("Server ErrorMessage: "+msg);
-					MessageDialog.error(getDisplay(), "Server ErrorMessage", msg);
+					MessageDialog.error(getDisplay(), I18N.translate(PFX + "mainwindow.statusbar.serverErrorMessage"), msg);
 					break;
 				}
 			}
@@ -672,20 +689,21 @@ public class RCMain implements Launchable {
 				System.out.println("Update Exception: "+e.getLocalizedMessage());
 				System.out.println("Update Exception: "+e.getMessage());
 				if (mainWindow != null) {
-					mainWindow.setStatusBarText("Update Exception: "+e.getLocalizedMessage(),SWT.COLOR_RED);
+					mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.updateException") + ": "+e.getLocalizedMessage(),SWT.COLOR_RED);
 				}
 				normalLogger.severe("Update Exception: "+e.getLocalizedMessage());
 
 			}
 			public void noUpdate() {
 				if (mainWindow != null) {
-					mainWindow.setStatusBarText("No Update Available");
+					mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.noUpdateAvailable"));
 				}
 				normalLogger.info("No Update Available");
 			}
 			public void updateAvailable(final Update update) {
 				if (mainWindow != null) {
-					mainWindow.setStatusBarText("Update Available: Version "+update.getVersion());
+					mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.updateAvailable")
+							+ " " + update.getVersion());
 				}
 				normalLogger.info("Update Available: Version "+update.getVersion());
 				if (Boolean.parseBoolean(properties.getProperty("update.autoupdate", "false"))) {
@@ -701,20 +719,22 @@ public class RCMain implements Launchable {
 			}
 			public void updateFailed(String reason) {
 				if (mainWindow != null) {
-					mainWindow.setStatusBarText("Update Failed: "+reason,SWT.COLOR_RED);
+					mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.updateFailed")
+							+ ": " + reason,SWT.COLOR_RED);
 				}
 				normalLogger.info("Update Failed: "+reason);
 			}
 			public void updateFinished() {
 				if (mainWindow != null) {
-					mainWindow.setStatusBarText("Update Finished");
+					mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.updateFinished"));
 				}
 				normalLogger.info("Update Finished");
 			}
 
 			public void updateError(String error) {
 				if (mainWindow != null) {
-					mainWindow.setStatusBarText("Update Error: "+error,SWT.COLOR_RED);
+					mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.updateError")
+							+ ": " + error,SWT.COLOR_RED);
 				}
 				normalLogger.info("Update Error: "+error);
 			}
@@ -726,7 +746,7 @@ public class RCMain implements Launchable {
 			long lastcheck = Long.parseLong(properties.getProperty("update.lastcheck", "0"));
 			if (System.currentTimeMillis()-lastcheck > 1000*60*60*24) {
 				if (mainWindow != null) {
-					mainWindow.setStatusBarText("Checking for Updates");
+					mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.checking"));
 				}
 				normalLogger.info("Checking for Updates");
 				updater.checkForUpdates(Boolean.parseBoolean(properties.getProperty("update.beta", "false")));
@@ -912,7 +932,7 @@ public class RCMain implements Launchable {
 	public void setTrayIcon(int connection){
 		if(systrayItem == null || systrayItem.isDisposed()) return;
 		if(connection==0){
-			systrayItem.setToolTipText("AzSMRC -- Not Connected");
+			systrayItem.setToolTipText(I18N.translate(PFX + "tray.tooltip.notConnected"));
 			systrayItem.setImage(ImageRepository.getImage("TrayIcon_Red"));
 		}else if(connection == 1){
 			systrayItem.setImage(ImageRepository.getImage("TrayIcon_Connecting"));

@@ -37,6 +37,7 @@ import lbms.azsmrc.remote.client.events.DownloadListener;
 import lbms.azsmrc.remote.client.events.DownloadManagerListener;
 import lbms.azsmrc.remote.client.events.ParameterListener;
 import lbms.azsmrc.remote.client.events.SpeedUpdateListener;
+import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.container.Container;
 import lbms.azsmrc.remote.client.swtgui.container.DownloadContainer;
 import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
@@ -997,7 +998,7 @@ public class DownloadManagerShell {
 				if(key.equalsIgnoreCase("singleUserMode")){
 					bSingleUserMode = Boolean.parseBoolean(value);
 					if(bSingleUserMode)
-						setStatusBarText("Connected in Single User Mode",SWT.COLOR_DARK_GREEN );
+						setStatusBarText(I18N.translate("rcmain.mainwindow.statusbar.connectedSingleUser"),SWT.COLOR_DARK_GREEN );
 
 				}
 
