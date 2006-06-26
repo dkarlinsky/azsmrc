@@ -15,6 +15,7 @@ import lbms.azsmrc.remote.client.DownloadFile;
 import lbms.azsmrc.remote.client.DownloadFileManager;
 import lbms.azsmrc.remote.client.DownloadStats;
 import lbms.azsmrc.remote.client.events.ClientUpdateListener;
+import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.ColorUtilities;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
@@ -64,6 +65,9 @@ public class TorrentDetailsTab {
 	private DecimalFormat df;
 	private DownloadFileManager dfm;
 	private DownloadFile[] dfm_files;
+
+	//  I18N prefix
+	public static final String PFX = "tab.torrentdetailstab.";
 
 
 	public TorrentDetailsTab(CTabFolder parentTab, Download _download){
@@ -171,7 +175,7 @@ public class TorrentDetailsTab {
 	private void loadSubTab1(CTabFolder tabFolder){
 
 		final CTabItem detailsTab = new CTabItem(tabFolder, SWT.NULL);
-		detailsTab.setText("Details");
+		detailsTab.setText(I18N.translate(PFX + "subtab1.text"));
 
 
 		final Composite parent = new Composite(tabFolder, SWT.NULL);
@@ -186,7 +190,7 @@ public class TorrentDetailsTab {
 
 
 		Group transfer = new Group(parent,SWT.NONE);
-		transfer.setText("Transfer");
+		transfer.setText(I18N.translate(PFX + "subtab1.group_transfer.text"));
 		gridLayout = new GridLayout();
 		gridLayout.numColumns = 3;
 		transfer.setLayout(gridLayout);
@@ -204,40 +208,43 @@ public class TorrentDetailsTab {
 
 		//Time Elapsed
 		Label timeElapsed_Label = new Label(transfer1, SWT.NULL);
-		timeElapsed_Label.setText("Time Elapsed: ");
+		timeElapsed_Label.setText(I18N.translate(PFX + "subtab1.group_transfer.timeElapsed") + " ");
 
 		timeElapsed = new Label(transfer1, SWT.NULL);
 		timeElapsed.setText(ds.getElapsedTime());
 
 		//downloaded
 		Label downloaded_Label = new Label(transfer1,SWT.NULL);
-		downloaded_Label.setText("Downloaded:  ");
+		downloaded_Label.setText(I18N.translate(PFX + "subtab1.group_transfer.downloaded") + "  ");
 
 		downloaded = new Label(transfer1,SWT.NULL);
 		downloaded.setText(DisplayFormatters.formatByteCountToBase10KBEtc(ds.getDownloaded()));
 
 		//Uploaded
 		Label uploaded_Label = new Label(transfer1,SWT.NULL);
-		uploaded_Label.setText("Uploaded:");
+		uploaded_Label.setText(I18N.translate(PFX + "subtab1.group_transfer.uploaded"));
 
 		uploaded = new Label(transfer1,SWT.NULL);
 		uploaded.setText(DisplayFormatters.formatByteCountToBase10KBEtc(ds.getUploaded()));
 
 		//Seeds
 		Label seeds_Label = new Label(transfer1, SWT.NULL);
-		seeds_Label.setText("Seeds: ");
+		seeds_Label.setText(I18N.translate(PFX + "subtab1.group_transfer.seeds")+" ");
 
 		seeds = new Label(transfer1, SWT.NULL);
 		if(download.getTotalSeeds() < 0)
-			seeds.setText(download.getSeeds() + " connected ( 0 in swarm )");
+			seeds.setText(download.getSeeds() + " " + I18N.translate(PFX + "subtab1.group_transfer.seeds.label_0"));
 		else
-			seeds.setText(download.getSeeds() + " connected ( " + download.getTotalSeeds() + " in swarm )");
+			seeds.setText(download.getSeeds() + " "
+					+ I18N.translate(PFX + "subtab1.group_transfer.seeds.label_filled_1_of_2")
+					+ " " + download.getTotalSeeds() + " "
+					+ I18N.translate(PFX + "subtab1.group_transfer.seeds.label_filled_2_of_2"));
 		//Swarm Speed
 		Label swarmSpeed_Label = new Label(transfer1, SWT.NULL);
-		swarmSpeed_Label.setText("Swarm Speed: ");
+		swarmSpeed_Label.setText(I18N.translate(PFX + "subtab1.group_transfer.swarmspeed") + " ");
 
 		swarmSpeed = new Label(transfer1, SWT.NULL);
-		swarmSpeed.setText(DisplayFormatters.formatByteCountToBase10KBEtc(ds.getTotalAverage()) + "/s");
+		swarmSpeed.setText(DisplayFormatters.formatByteCountToBase10KBEtcPerSec(ds.getTotalAverage()));
 
 
 		//_________________\\
@@ -253,38 +260,41 @@ public class TorrentDetailsTab {
 
 		//Remaining
 		Label remaining_Label = new Label(transfer2, SWT.NULL);
-		remaining_Label.setText("Remaining: ");
+		remaining_Label.setText(I18N.translate(PFX  + "subtab1.group_transfer.remaining") + " ");
 
 		remaining = new Label(transfer2, SWT.NULL);
 		remaining.setText(ds.getETA());
 
 		//Download Speed
 		Label downloadSpeed_Label = new Label(transfer2, SWT.NULL);
-		downloadSpeed_Label.setText("Download Speed: ");
+		downloadSpeed_Label.setText(I18N.translate(PFX + "subtab1.group_transfer.downloadSpeed") + " ");
 
 		downloadSpeed = new Label(transfer2, SWT.NULL);
-		downloadSpeed.setText(DisplayFormatters.formatByteCountToBase10KBEtc(ds.getDownloadAverage()) + "/s");
+		downloadSpeed.setText(DisplayFormatters.formatByteCountToBase10KBEtcPerSec(ds.getDownloadAverage()));
 
 		//Upload Speed
 		Label uploadSpeed_Label = new Label(transfer2, SWT.NULL);
-		uploadSpeed_Label.setText("Upload Speed: ");
+		uploadSpeed_Label.setText(I18N.translate(PFX + "subtab1.group_transfer.uploadSpeed") + " ");
 
 		uploadSpeed = new Label(transfer2, SWT.NULL);
-		uploadSpeed.setText(DisplayFormatters.formatByteCountToBase10KBEtc(ds.getUploadAverage()) + "/s");
+		uploadSpeed.setText(DisplayFormatters.formatByteCountToBase10KBEtcPerSec(ds.getUploadAverage()));
 
 		//peers
 		Label peers_Label = new Label(transfer2, SWT.NULL);
-		peers_Label.setText("Peers: ");
+		peers_Label.setText(I18N.translate(PFX + "subtab1.group_transfer.peers") + " ");
 
 		peers = new Label(transfer2, SWT.NULL);
 		if(download.getTotalLeecher() < 0)
-			peers.setText(download.getLeecher() + " connected ( 0 in swarm )");
+			peers.setText(download.getLeecher() + " " + I18N.translate(PFX + "subtab1.group_transfer.peers.0.text"));
 		else
-			peers.setText(download.getLeecher() + " connected ( " + download.getTotalLeecher() + " in swarm )");
+			peers.setText(download.getLeecher() + " "
+					+ I18N.translate(PFX + "subtab1.group_transfer.peers.connected.1_of_2")
+					+ " " + download.getTotalLeecher()
+					+ " " + I18N.translate(PFX + "subtab1.group_transfer.peers.connected.2_of_2"));
 
 		//Average Completion
 		Label averageCompletion_Label = new Label(transfer2, SWT.NULL);
-		averageCompletion_Label.setText("Average Completion:  ");
+		averageCompletion_Label.setText(I18N.translate(PFX + "subtab1.averageCompletion") + "  ");
 
 		averageCompletion = new Label(transfer2, SWT.NULL);
 
@@ -307,7 +317,7 @@ public class TorrentDetailsTab {
 
 		//Share Ratio
 		Label shareRatio_Label = new Label(transfer3, SWT.NULL);
-		shareRatio_Label.setText("Share Ratio: ");
+		shareRatio_Label.setText(I18N.translate(PFX + "subtab1.shareRatio") + " ");
 
 		shareRatio = new Label(transfer3, SWT.NULL);
 		if(((float)ds.getShareRatio()/100) < 0)
@@ -317,27 +327,27 @@ public class TorrentDetailsTab {
 
 		//Hash Fails
 		Label hashFails_Label = new Label(transfer3, SWT.NULL);
-		hashFails_Label.setText("Amount Discarded: ");
+		hashFails_Label.setText(I18N.translate(PFX + "subtab1.amountDiscarded") + " ");
 
 		hashFails = new Label(transfer3, SWT.NULL);
 		hashFails.setText(DisplayFormatters.formatByteCountToBase10KBEtc(download.getDiscarded()));
 
 		//Upload Rate
 		Label uploadRate_Label = new Label(transfer3, SWT.NULL);
-		uploadRate_Label.setText("Upload Rate: ");
+		uploadRate_Label.setText(I18N.translate(PFX + "subtab1.uploadRate") + " ");
 
 		uploadRate = new Label(transfer3, SWT.NULL);
 		int rate = download.getUploadRateLimitBytesPerSecond();
 		if(rate <= 0)
-			uploadRate.setText("Maximum");
+			uploadRate.setText(I18N.translate(PFX + "subtab1.uploadRate.Maximum"));
 		else
-			uploadRate.setText(DisplayFormatters.formatByteCountToBase10KBEtc(rate));
+			uploadRate.setText(DisplayFormatters.formatByteCountToBase10KBEtcPerSec(rate));
 
 
 		//------------------------------------------------------------\\
 		//--------------------- Information ---------------------------\\
 		Group info = new Group(parent,SWT.NONE);
-		info.setText("Information");
+		info.setText(I18N.translate(PFX + "subtab1.group2.text"));
 		gridLayout = new GridLayout();
 		gridLayout.numColumns = 3;
 		info.setLayout(gridLayout);
@@ -356,32 +366,32 @@ public class TorrentDetailsTab {
 
 		// Name
 		Label name_Label = new Label(info1,SWT.NONE);
-		name_Label.setText("Name:  ");
+		name_Label.setText(I18N.translate(PFX + "subtab1.name") + "  ");
 
 		Label name = new Label(info1,SWT.NONE);
 		name.setText(download.getName());
 
 		//Save in
 		Label saveIn_Label = new Label(info1,SWT.NULL);
-		saveIn_Label.setText("Save In: ");
+		saveIn_Label.setText(I18N.translate(PFX + "subtab1.saveIn") + " ");
 
 		saveIn = new Label(info1, SWT.NULL);
 		saveIn.setText(das.getSaveDir());
 
 		// # of Pieces
 		Label numPieces_Label = new Label(info1, SWT.NULL);
-		numPieces_Label.setText("# of Pieces: ");
+		numPieces_Label.setText(I18N.translate(PFX + "subtab1.numPieces") + " ");
 
 		numPieces = new Label(info1, SWT.NULL);
 		numPieces.setText(Long.toString(das.getPieceCount()));
 
 		//Tracker URL
 		Label trackerURL_Label = new Label(info1, SWT.NULL);
-		trackerURL_Label.setText("Tracker URL: ");
+		trackerURL_Label.setText(I18N.translate(PFX + "subtab1.trackerURL") + " ");
 
 		trackerURL = new Label(info1, SWT.NULL);
 		trackerURL.setText(das.getTrackerUrl());
-		trackerURL.setToolTipText("Click to open main tracker page in browser");
+		trackerURL.setToolTipText(I18N.translate(PFX + "subtab1.trackerURL.tooltipText"));
 		trackerURL.setCursor(RCMain.getRCMain().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
 		trackerURL.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_DARK_BLUE));
 		trackerURL.addListener(SWT.MouseDown, new Listener(){
@@ -398,14 +408,14 @@ public class TorrentDetailsTab {
 
 		// Tracker Status
 		Label trackerStatus_Label = new Label(info1, SWT.NULL);
-		trackerStatus_Label.setText("Tracker Status: ");
+		trackerStatus_Label.setText(I18N.translate(PFX + "subtab1.trackerStatus") + " ");
 
 		trackerStatus = new Label(info1, SWT.NULL);
 		trackerStatus.setText(ds.getTrackerStatus());
 
 		//Tracker Comment
 		Label trackerComment_Label = new Label(info1, SWT.NULL);
-		trackerComment_Label.setText("Comment: ");
+		trackerComment_Label.setText(I18N.translate(PFX + "subtab1.trackerComment") + " ");
 
 		trackerComment = new Label(info1, SWT.NULL);
 		trackerComment.setText(das.getComment());
@@ -423,7 +433,7 @@ public class TorrentDetailsTab {
 
 		//Total Size
 		Label totalSize_Label = new Label(info2, SWT.NULL);
-		totalSize_Label.setText("Total Size: ");
+		totalSize_Label.setText(I18N.translate(PFX + "subtab1.totalSize") + " ");
 
 		Label totalSize = new Label(info2, SWT.NULL);
 		totalSize.setText(DisplayFormatters.formatByteCountToBase10KBEtc(download.getSize()));
@@ -431,7 +441,7 @@ public class TorrentDetailsTab {
 
 		//HASH
 		Label hash_label = new Label(info2, SWT.NULL);
-		hash_label.setText("Hash: ");
+		hash_label.setText(I18N.translate(PFX + "subtab1.hash") + " ");
 
 		Label hash = new Label(info2, SWT.NULL);
 		byte[] hashByte = EncodingUtil.decode(download.getHash());
@@ -439,14 +449,14 @@ public class TorrentDetailsTab {
 
 		//Piece Size
 		Label pieceSize_Label = new Label(info2, SWT.NULL);
-		pieceSize_Label.setText("Piece Size: ");
+		pieceSize_Label.setText(I18N.translate(PFX + "subtab1.PieceSize") + " ");
 
 		pieceSize = new Label(info2, SWT.NULL);
 		pieceSize.setText(DisplayFormatters.formatByteCountToBase10KBEtc(das.getPieceSize()));
 
 		//Torrent Created On
 		Label createdOn_Label = new Label(info2, SWT.NULL);
-		createdOn_Label.setText("Created On: ");
+		createdOn_Label.setText(I18N.translate(PFX + "subtab1.CreatedOn") + " ");
 
 		createdOn = new Label(info2, SWT.NULL);
 		createdOn.setText(das.getCreatedOn());
@@ -454,14 +464,14 @@ public class TorrentDetailsTab {
 
 		// Last Scrape
 		Label lastScrape_label = new Label(info2, SWT.NULL);
-		lastScrape_label.setText("Last Scrape:");
+		lastScrape_label.setText(I18N.translate(PFX + "subtab1.LastScrape"));
 
 		lastScrape = new Label(info2, SWT.NULL);
 		lastScrape.setText(DisplayFormatters.formatDate(download.getLastScrapeTime()));
 
 		//Next Scrape
 		Label nextScrape_label = new Label(info2, SWT.NULL);
-		nextScrape_label.setText("Next Scrape:");
+		nextScrape_label.setText(I18N.translate(PFX + "subtab1.NextScrape"));
 
 		nextScrape = new Label(info2, SWT.NULL);
 		nextScrape.setText(DisplayFormatters.formatDate(download.getNextScrapeTime()));
@@ -472,8 +482,8 @@ public class TorrentDetailsTab {
 		gridData = new GridData();
 		gridData.horizontalSpan = 2;
 		scrape.setLayoutData(gridData);
-		scrape.setText("Scrape Tracker");
-		scrape.setToolTipText("Scraping the tracker will update the torrent information (seeds, leechers, etc.)");
+		scrape.setText(I18N.translate(PFX + "subtab1.scrapeButton.text"));
+		scrape.setToolTipText(I18N.translate(PFX + "subtab1.scrapeButton.tooltiptext"));
 		scrape.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
 				download.requestScrape();
@@ -485,8 +495,8 @@ public class TorrentDetailsTab {
 		gridData = new GridData();
 		gridData.horizontalSpan = 2;
 		announce.setLayoutData(gridData);
-		announce.setText("Request Announce");
-		announce.setToolTipText("Request an announce from the tracker.  This will update the peers and peer info.");
+		announce.setText(I18N.translate(PFX + "subtab1.announceButton.text"));
+		announce.setToolTipText(I18N.translate(PFX + "subtab1.announceButton.tooltiptext"));
 		announce.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
 				download.requestAnnounce();
@@ -512,20 +522,27 @@ public class TorrentDetailsTab {
 				downloaded.setText(DisplayFormatters.formatByteCountToBase10KBEtc(download.getStats().getDownloaded()));
 				uploaded.setText(DisplayFormatters.formatByteCountToBase10KBEtc(download.getStats().getUploaded()));
 				if(download.getTotalSeeds() < 0)
-					seeds.setText(download.getSeeds() + " connected ( 0 in swarm )");
+					seeds.setText(download.getSeeds() + " " + I18N.translate(PFX + "subtab1.group_transfer.seeds.label_0"));
 				else
-					seeds.setText(download.getSeeds() + " connected ( " + download.getTotalSeeds() + " in swarm )");
-				swarmSpeed.setText(DisplayFormatters.formatByteCountToBase10KBEtc(ds.getTotalAverage()) + "/s");
+					seeds.setText(download.getSeeds() + " "
+							+ I18N.translate(PFX + "subtab1.group_transfer.seeds.label_filled_1_of_2")
+							+ " " + download.getTotalSeeds() + " "
+							+ I18N.translate(PFX + "subtab1.group_transfer.seeds.label_filled_2_of_2"));
+				swarmSpeed.setText(DisplayFormatters.formatByteCountToBase10KBEtcPerSec(ds.getTotalAverage()));
 				transfer1.layout();
 
 				//composite 2
 				remaining.setText(ds.getETA());
-				downloadSpeed.setText(DisplayFormatters.formatByteCountToBase10KBEtc(ds.getDownloadAverage()) + "/s");
-				uploadSpeed.setText(DisplayFormatters.formatByteCountToBase10KBEtc(ds.getUploadAverage()) + "/s");
+				downloadSpeed.setText(DisplayFormatters.formatByteCountToBase10KBEtcPerSec(ds.getDownloadAverage()));
+				uploadSpeed.setText(DisplayFormatters.formatByteCountToBase10KBEtcPerSec(ds.getUploadAverage()));
 				if(download.getTotalLeecher() < 0)
-					peers.setText(download.getLeecher() + " connected ( 0 in swarm )");
+					peers.setText(download.getLeecher() + " " + I18N.translate(PFX + "subtab1.group_transfer.peers.0.text"));
 				else
-					peers.setText(download.getLeecher() + " connected ( " + download.getTotalLeecher() + " in swarm )");
+					peers.setText(download.getLeecher() + " "
+							+ I18N.translate(PFX + "subtab1.group_transfer.peers.connected.1_of_2")
+							+ " " + download.getTotalLeecher()
+							+ " " + I18N.translate(PFX + "subtab1.group_transfer.peers.connected.2_of_2"));
+
 				if(ds.getAvailability() < 0)
 					averageCompletion.setText("");
 				else
@@ -541,7 +558,7 @@ public class TorrentDetailsTab {
 				hashFails.setText(DisplayFormatters.formatByteCountToBase10KBEtc(download.getDiscarded()));
 				int rate = download.getUploadRateLimitBytesPerSecond();
 				if(rate <= 0)
-					uploadRate.setText("Maximum");
+					uploadRate.setText(I18N.translate(PFX + "subtab1.uploadRate.Maximum"));
 				else
 					uploadRate.setText(DisplayFormatters.formatByteCountToBase10KBEtc(rate));
 				transfer3.layout();
@@ -575,7 +592,7 @@ public class TorrentDetailsTab {
 	private void loadSubTab2(CTabFolder tabFolder){
 
 		final CTabItem filesTab = new CTabItem(tabFolder, SWT.NULL);
-		filesTab.setText("Files");
+		filesTab.setText(I18N.translate(PFX + "subtab2.tab.text"));
 
 
 		final Composite parent = new Composite(tabFolder, SWT.NULL);
@@ -601,28 +618,28 @@ public class TorrentDetailsTab {
 		filesTable.setHeaderVisible(true);
 
 		TableColumn name = new TableColumn(filesTable,SWT.LEFT);
-		name.setText("Name");
+		name.setText(I18N.translate(PFX + "subtab2.filesTable.column.name"));
 		name.setWidth(350);
 
 		TableColumn size = new TableColumn(filesTable,SWT.RIGHT);
-		size.setText("Size");
+		size.setText(I18N.translate(PFX + "subtab2.filesTable.column.size"));
 		size.setWidth(100);
 
 		TableColumn done = new TableColumn(filesTable,SWT.RIGHT);
-		done.setText("Done");
+		done.setText(I18N.translate(PFX + "subtab2.filesTable.column.done"));
 		done.setWidth(50);
 
 		TableColumn percent = new TableColumn(filesTable,SWT.RIGHT);
-		percent.setText("%");
+		percent.setText(I18N.translate(PFX + "subtab2.filesTable.column.percent"));
 		percent.setWidth(75);
 
 
 		TableColumn numPieces = new TableColumn(filesTable,SWT.RIGHT);
-		numPieces.setText("# of Pieces");
+		numPieces.setText(I18N.translate(PFX + "subtab2.filesTable.column.numPieces"));
 		numPieces.pack();
 
 		TableColumn priority = new TableColumn(filesTable, SWT.LEFT);
-		priority.setText("Priority");
+		priority.setText(I18N.translate(PFX + "subtab2.filesTable.column.priority"));
 		priority.pack();
 
 		filesTable.addListener(SWT.SetData, new Listener() {
@@ -641,16 +658,16 @@ public class TorrentDetailsTab {
 					item.setText(4,Integer.toString(dfm_files[index].getNumPieces()));
 					String priority_status;
 					if(dfm_files[index].getPriority())
-						priority_status="High";
+						priority_status=I18N.translate(PFX + "subtab2.priorityStatus.high");
 					else if(dfm_files[index].getSkipped())
-						priority_status="Do Not Download";
+						priority_status=I18N.translate(PFX + "subtab2.priorityStatus.doNotDownload");
 					else if(dfm_files[index].getDeleted())
-						priority_status="Deleted";
+						priority_status=I18N.translate(PFX + "subtab2.priorityStatus.deleted");
 					else
-						priority_status="Normal";
+						priority_status=I18N.translate(PFX + "subtab2.priorityStatus.normal");
 					item.setText(5, priority_status);
 
-//                  gray if needed
+//					gray if needed
 					if(index%2!=0){
 						item.setBackground(ColorUtilities.getBackgroundColor());
 					}
@@ -665,11 +682,11 @@ public class TorrentDetailsTab {
 		final Menu menu = new Menu(filesTable);
 
 		final MenuItem setPriority = new MenuItem(menu, SWT.CASCADE);
-		setPriority.setText("Set Priority");
+		setPriority.setText(I18N.translate(PFX + "subtab2.table.menu.setPriority"));
 		Menu submenu = new Menu(setPriority);
 
 		final MenuItem priority_high = new MenuItem(submenu, SWT.PUSH);
-		priority_high.setText("High");
+		priority_high.setText(I18N.translate(PFX + "subtab2.table.menu.setPriority.sub.High"));
 		priority_high.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
 				int[] indices = filesTable.getSelectionIndices();
@@ -685,7 +702,7 @@ public class TorrentDetailsTab {
 		});
 
 		final MenuItem priority_normal = new MenuItem(submenu, SWT.PUSH);
-		priority_normal.setText("Normal");
+		priority_normal.setText(I18N.translate(PFX + "subtab2.table.menu.setPriority.sub.Normal"));
 		priority_normal.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
 				int[] indices = filesTable.getSelectionIndices();
@@ -701,7 +718,7 @@ public class TorrentDetailsTab {
 		});
 
 		final MenuItem do_not_download = new MenuItem(submenu, SWT.PUSH);
-		do_not_download.setText("Do Not Download");
+		do_not_download.setText(I18N.translate(PFX + "subtab2.table.menu.setPriority.sub.doNotDownload"));
 		do_not_download.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
 				int[] indices = filesTable.getSelectionIndices();
@@ -715,7 +732,7 @@ public class TorrentDetailsTab {
 		});
 
 		final MenuItem delete = new MenuItem(submenu, SWT.PUSH);
-		delete.setText("Delete");
+		delete.setText(I18N.translate(PFX + "subtab2.table.menu.setPriority.sub.delete"));
 		delete.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
 				int[] indices = filesTable.getSelectionIndices();
