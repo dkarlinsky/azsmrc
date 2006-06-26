@@ -590,7 +590,7 @@ public class TorrentDetailsTab {
 
 
 		//Table for files present in the download
-		filesTable = new Table(parent,SWT.VIRTUAL | SWT.BORDER | SWT.MULTI);
+		filesTable = new Table(parent,SWT.VIRTUAL | SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
 		gridData = new GridData(GridData.FILL_BOTH);
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = true;
