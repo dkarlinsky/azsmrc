@@ -209,7 +209,8 @@
 				<Option value="86400" label="24 h" index="23"/>
 			</Entry>
 		</Section>
+		<!--Wait till next release to complete it
 		<Section label="ConfigView.section.stats" index="7">
-		</Section>
+		</Section>-->
 	</Section>
 </FlexyConfiguration>
