@@ -28,10 +28,9 @@ public class MultiUserDownloadListener implements org.gudy.azureus2.plugins.down
 	public void stateChanged(final Download download, int old_state, int new_state) {
 		if (old_state == Download.ST_DOWNLOADING && new_state == Download.ST_SEEDING) {
 			String cat = download.getAttribute(ta);
-			final boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
-			if (cat != null) {
+			final boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);if (cat != null) {
 				try {
-					if (!download.getSavePath().equals(COConfigurationManager.getStringParameter("Default save path"))) return;//not in standart save path
+					if (!download.getSavePath().contains(COConfigurationManager.getStringParameter("Default save path"))) return;//not in standart save path
 					if (cat.equalsIgnoreCase(MultiUser.SHARED_CAT_NAME) ) { //Multiple owner
 						DiskManagerFileInfo[] fileInfo = download.getDiskManagerFileInfo();
 						final File[] files = new File[fileInfo.length];
