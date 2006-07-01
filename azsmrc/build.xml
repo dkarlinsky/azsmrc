@@ -62,9 +62,7 @@
 		<jar destfile="${root.dir}/${dist.dir}/azsmrcPlugin_${version}.jar" basedir="${root.dir}/${build.dir}" excludes="${dist.jar.excludes}">
 			<include name="lbms/azsmrc/plugin/**/*" />
 			<include name="lbms/azsmrc/shared/**/*" />
-			<fileset dir="${root.dir}">
-				<filename name="plugin.properties" />
-			</fileset>
+			<fileset file="${root.dir}/plugin.properties" />
 		</jar>
 		<echo message="Creating AzSMRC_${version}.jar..." />
 		<jar destfile="${root.dir}/${dist.dir}/AzSMRC_${version}.jar" basedir="${root.dir}/${build.dir}" excludes="${dist.jar.excludes}">
@@ -76,10 +74,8 @@
 			<include name="lbms/tools/i18n/*" />
 			<include name="lbms/tools/stats/*" />
 			<include name="lbms/tools/flexyconf/**/*" />
-			<fileset dir="${root.dir}">
-				<filename name="azsmrc.properties" />
-				<filename name="default.cfg" />
-			</fileset>
+			<fileset file="${root.dir}/default.cfg" />
+			<fileset file="${root.dir}/azsmrc.properties" />
 		</jar>
 		<echo message="Creating launcher.jar..." />
 		<jar destfile="${root.dir}/${dist.dir}/launcher.jar" basedir="${root.dir}/${build.dir}" excludes="${dist.jar.excludes}">
