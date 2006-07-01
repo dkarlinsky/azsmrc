@@ -440,31 +440,33 @@ public class RequestManager {
 								else
 									newTorrent = torrentManager.getURLDownloader(new URL(url)).download();
 								Download dl = Plugin.getPluginInterface().getDownloadManager().addDownload(newTorrent,null,file);
-								user.addDownload(dl);
-								try {
-									Plugin.getXMLConfig().saveConfigFile();
-								} catch (IOException e) {}
+								if (!user.hasDownload(dl)) {
+									user.addDownload(dl);
+									try {
+										Plugin.getXMLConfig().saveConfigFile();
+									} catch (IOException e) {}
 
-								if (dl.isComplete()) {
-									DiskManagerFileInfo[] fileInfo = dl.getDiskManagerFileInfo();
-									final File[] files = new File[fileInfo.length];
-									for (int i=0;i<files.length;i++) {
-										files[i] = fileInfo[i].getFile();
-									}
-									for (File file:files) {
-										try {
-											Utilities.copy(file, new File(user.getOutputDir()), false);
-										} catch (IOException e) {
-											Plugin.addToLog(e.getMessage());
-											e.printStackTrace();
+									if (dl.isComplete()) {
+										DiskManagerFileInfo[] fileInfo = dl.getDiskManagerFileInfo();
+										final File[] files = new File[fileInfo.length];
+										for (int i=0;i<files.length;i++) {
+											files[i] = fileInfo[i].getFile();
 										}
+										for (File file:files) {
+											try {
+												Utilities.copy(file, new File(user.getOutputDir()), false);
+											} catch (IOException e) {
+												Plugin.addToLog(e.getMessage());
+												e.printStackTrace();
+											}
+										}
+										user.eventDownloadFinished(dl);
+									} else if (dl.getAttribute(ta) == null) {
+										dl.setAttribute(ta, user.getUsername());
+										dl.addListener(MultiUserDownloadListener.getInstance());
+									} else {
+										dl.setAttribute(ta, MultiUser.SHARED_CAT_NAME);
 									}
-									user.eventDownloadFinished(dl);
-								} else if (dl.getAttribute(ta) == null) {
-									dl.setAttribute(ta, user.getUsername());
-									dl.addListener(MultiUserDownloadListener.getInstance());
-								} else {
-									dl.setAttribute(ta, MultiUser.SHARED_CAT_NAME);
 								}
 							} catch (MalformedURLException e) {
 								user.eventException(e);

@@ -614,12 +614,17 @@ public class RCMain implements Launchable {
 								+ " " + event.getAttributeValue("name"), SWT.COLOR_DARK_GREEN);
 					}
 					SoundManager.playSound(Sound.DOWNLOADING_FINISHED);
-					MessageDialog.message(display,I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished"),event.getAttributeValue("name"));
-					if (event.getAttributeValue("duration") != null)
-						normalLogger.info("Download Finished: "+event.getAttributeValue("name")+"\n"
-											+"Finished in: "+DisplayFormatters.formatTime(Long.parseLong(event.getAttributeValue("duration"))*1000));
-					else
-						normalLogger.info("Download Finished: "+event.getAttributeValue("name"));
+
+					if (event.getAttributeValue("duration") != null) {
+						normalLogger.info(I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+": "+event.getAttributeValue("name")+"\n"
+											+I18N.translate(PFX  + "mainwindow.statusbar.downloadFinishedIn")+DisplayFormatters.formatTime(Long.parseLong(event.getAttributeValue("duration"))*1000));
+						MessageDialog.message(display,I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished"),
+								event.getAttributeValue("name")+"\n"+I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+DisplayFormatters.formatTime(Long.parseLong(event.getAttributeValue("duration"))*1000));
+					}
+					else {
+						normalLogger.info(I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+": "+event.getAttributeValue("name"));
+						MessageDialog.message(display,I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished"),event.getAttributeValue("name"));
+					}
 					break;
 
 				case RemoteConstants.EV_DL_EXCEPTION:

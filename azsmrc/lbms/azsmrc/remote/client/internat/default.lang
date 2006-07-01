@@ -248,6 +248,7 @@ rcmain.mainwindow.statusbar.connectionError.failed=Failed
 rcmain.mainwindow.statusbar.connectionError.failed_part2=connection attempts. Please check your settings.
 rcmain.mainwindow.statusbar.connectionSuccessful=Connection Successful
 rcmain.mainwindow.statusbar.downloadFinished=Download Finished:
+rcmain.mainwindow.statusbar.downloadFinishedIn=Finished In: 
 rcmain.mainwindow.statusbar.failed=Connection failed:
 rcmain.mainwindow.statusbar.noUpdateAvailable=No Update Available
 rcmain.mainwindow.statusbar.numTimes=time(s)
