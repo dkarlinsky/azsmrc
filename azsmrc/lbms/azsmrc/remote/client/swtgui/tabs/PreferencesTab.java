@@ -241,7 +241,9 @@ public class PreferencesTab {
 			initAzFlexyConf();
 
 		// set the first static notes treeItem and draw the cOptions for it
-		menuTree.setSelection(tiNotes);
+		try { //it is supported as of SWT3.2
+			menuTree.setSelection(tiNotes);
+		} catch (NoSuchMethodError e1) {}
 		makeNotesPreferences(cOptions);
 	}
 
