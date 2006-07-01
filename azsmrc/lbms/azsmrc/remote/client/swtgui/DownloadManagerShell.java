@@ -2872,6 +2872,7 @@ public class DownloadManagerShell {
 				size.setText("Size");
 				size.setMoveable(true);
 				size.addControlListener(resizeListener);
+				size.addListener(SWT.Selection, getSortListener(table,RemoteConstants.ST_SIZE));
 				try{
 					size.setWidth(column_width_list.get(i));
 				}catch(Exception e){
