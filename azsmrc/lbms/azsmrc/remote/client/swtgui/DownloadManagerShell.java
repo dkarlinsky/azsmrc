@@ -1662,6 +1662,7 @@ public class DownloadManagerShell {
 
 			public void shellDeiconified(ShellEvent arg0) {
 				RCMain.getRCMain().updateTimer(true);
+				RCMain.getRCMain().getClient().getDownloadManager().update(true);
 			}
 
 			public void shellIconified(ShellEvent arg0) {
