@@ -545,6 +545,7 @@ public abstract class Container implements Comparable<Container> {
 					//Share Ratio
 					if (tableColumns.contains(RemoteConstants.ST_SHARE)) {
 						float ratio = (ds.getShareRatio()/1000f);
+						if(ratio < 0f) ratio = 0f;
 						if(oldShareRatio != ratio
 								|| item.getText(tableColumns.indexOf(RemoteConstants.ST_SHARE)).equalsIgnoreCase("")
 								|| bForce){
