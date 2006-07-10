@@ -512,3 +512,4 @@ tab.torrentdetailstab.subtab2.table.menu.setPriority.sub.High=High
 tab.torrentdetailstab.subtab2.table.menu.setPriority.sub.Normal=Normal
 tab.torrentdetailstab.subtab2.table.menu.setPriority.sub.delete=Delete
 tab.torrentdetailstab.subtab2.table.menu.setPriority.sub.doNotDownload=Do Not Download
+tab.torrentdetailstab.subtab2.toolbar.refresh.tooltip=Refresh the file statistics

@@ -17,6 +17,7 @@ import lbms.azsmrc.remote.client.DownloadStats;
 import lbms.azsmrc.remote.client.events.ClientUpdateListener;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.ColorUtilities;
+import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.shared.EncodingUtil;
@@ -41,6 +42,8 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 
 public class TorrentDetailsTab {
 	private Composite transfer1, transfer2, transfer3;
@@ -625,6 +628,24 @@ public class TorrentDetailsTab {
 		gridLayout.marginHeight = 0;
 		gridLayout.marginWidth = 0;
 		parent.setLayout(gridLayout);
+
+
+		//Toolbar for buttons like refresh
+		ToolBar tb = new ToolBar(parent, SWT.FLAT | SWT.HORIZONTAL);
+		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		gridData.grabExcessHorizontalSpace = true;
+		gridData.horizontalSpan = 1;
+		tb.setLayoutData(gridData);
+
+		ToolItem refreshItem = new ToolItem(tb, SWT.PUSH);
+		refreshItem.setImage(ImageRepository.getImage("refresh"));
+		refreshItem.setToolTipText(I18N.translate(PFX + "subtab2.toolbar.refresh.tooltip"));
+		refreshItem.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				//call a refresh of the statistics
+				dfm.update();
+			}
+		});
 
 
 		//Table for files present in the download
