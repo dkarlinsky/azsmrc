@@ -3128,6 +3128,9 @@ public class DownloadManagerShell {
 									container.getDownload().moveTo(drag_drop_line_end+1);
 									if(RCMain.getRCMain().connected())
 										RCMain.getRCMain().getClient().getDownloadManager().update(false);
+
+									//make sure to redraw the table here so a resort happens
+									redrawTables();
 								}
 							}
 						}else{
@@ -3139,6 +3142,9 @@ public class DownloadManagerShell {
 									container.getDownload().moveTo(drag_drop_line_end+1);
 									if(RCMain.getRCMain().connected())
 										RCMain.getRCMain().getClient().getDownloadManager().update(false);
+
+									//make sure to redraw the table here so a resort happens
+									redrawTables();
 								}
 							}
 						}
