@@ -69,8 +69,10 @@ public class DownloadContainer extends Container {
 		Display display = RCMain.getRCMain().getDisplay();
 		display.asyncExec(new Runnable(){
 			public void run() {
-				item.getParent().remove(item.getParent().indexOf(item));
-				dispose();
+				if(item != null || !item.isDisposed()){
+					item.getParent().remove(item.getParent().indexOf(item));
+					dispose();
+				}
 			}
 		});
 	}
