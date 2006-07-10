@@ -7,6 +7,8 @@ package lbms.azsmrc.remote.client.swtgui.tabs;
 
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import lbms.azsmrc.remote.client.Constants;
 import lbms.azsmrc.remote.client.Download;
@@ -188,6 +190,16 @@ public class TorrentDetailsTab {
 		//Listen for when tab is closed and make sure to remove the client update listener
 		masterTab.addDisposeListener(new DisposeListener(){
 			public void widgetDisposed(DisposeEvent arg0) {
+				if (filesTable != null || !filesTable.isDisposed()) {
+					TableColumn[] columns = filesTable.getColumns();
+					List<Integer> dl_column_list = new ArrayList<Integer>();
+					for (TableColumn column:columns){
+						dl_column_list.add(column.getWidth());
+					}
+					RCMain.getRCMain().getProperties().setProperty("torrentDetails.filesTable.columns.widths", EncodingUtil.IntListToString(dl_column_list));
+					RCMain.getRCMain().saveConfig();
+				}
+
 				RCMain.getRCMain().getClient().removeClientUpdateListener(cul);
 
 				//TODO store table column widths
@@ -659,30 +671,36 @@ public class TorrentDetailsTab {
 		filesTable.setLayoutData(gridData);
 		filesTable.setHeaderVisible(true);
 
+		//Pull in previously save settings if available
+		String stringColSizes = RCMain.getRCMain().getProperties().getProperty("torrentDetails.filesTable.columns.widths", "null");
+		if(stringColSizes.equalsIgnoreCase("null"))
+			stringColSizes = "[350, 100, 50, 75, 100, 150]";
+		int[] colSize = EncodingUtil.StringToIntArray(stringColSizes);
+
 		TableColumn name = new TableColumn(filesTable,SWT.LEFT);
 		name.setText(I18N.translate(PFX + "subtab2.filesTable.column.name"));
-		name.setWidth(350);
+		name.setWidth(colSize[0]);
 
 		TableColumn size = new TableColumn(filesTable,SWT.RIGHT);
 		size.setText(I18N.translate(PFX + "subtab2.filesTable.column.size"));
-		size.setWidth(100);
+		size.setWidth(colSize[1]);
 
 		TableColumn done = new TableColumn(filesTable,SWT.RIGHT);
 		done.setText(I18N.translate(PFX + "subtab2.filesTable.column.done"));
-		done.setWidth(50);
+		done.setWidth(colSize[2]);
 
 		TableColumn percent = new TableColumn(filesTable,SWT.RIGHT);
 		percent.setText(I18N.translate(PFX + "subtab2.filesTable.column.percent"));
-		percent.setWidth(75);
+		percent.setWidth(colSize[3]);
 
 
 		TableColumn numPieces = new TableColumn(filesTable,SWT.RIGHT);
 		numPieces.setText(I18N.translate(PFX + "subtab2.filesTable.column.numPieces"));
-		numPieces.pack();
+		numPieces.setWidth(colSize[4]);
 
 		TableColumn priority = new TableColumn(filesTable, SWT.LEFT);
 		priority.setText(I18N.translate(PFX + "subtab2.filesTable.column.priority"));
-		priority.pack();
+		priority.setWidth(colSize[5]);
 
 		filesTable.addListener(SWT.SetData, new Listener() {
 			public void handleEvent(Event e) {
