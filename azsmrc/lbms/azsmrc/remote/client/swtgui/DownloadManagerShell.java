@@ -2553,60 +2553,6 @@ public class DownloadManagerShell {
 
 
 
-
-	/*	public void sortTable(final Table table){
-		RCMain.getRCMain().getDisplay().syncExec(new Runnable(){
-			public void run() {
-				TableItem[] items = table.getItems();
-				Comparator<Container> comp = (Comparator<Container>)table.getData("comparator");
-				if (comp == null) return;
-				int minimum;
-				for (int i = 0; i < items.length - 1; i++) {
-					minimum = i;  current minimum
-					 find the global minimum 
-					Container cMinimum = (Container)items[minimum].getData();
-					for (int j = i + 1; j < items.length; j++) {
-						Container cJ = (Container)items[j].getData();
-						int result = comp.compare(cMinimum, cJ);
-						if (result > 0) {
-							 new minimum 
-							cMinimum = cJ;
-							minimum = j;
-						}
-					}
-					 swap data[i] and data[minimum] 
-					if(i!=minimum){
-						cMinimum.changePosition(i, table);
-						TableItem temp = items[i];
-						items[i] = items[minimum];
-						items[minimum] = temp;
-					}
-				}
-
-			}
-
-		});
-	}
-
-	public int findInsertionPosition(Container insertItem, Table table) {
-		TableItem[] items = table.getItems();
-		Comparator<Container> comp = (Comparator<Container>)table.getData("comparator");
-		if (comp == null) return items.length;
-		int pos = 0;
-		boolean found = false;
-		for (int j = 0; j < items.length; j++) {
-			Container cJ = (Container)items[j].getData();
-			int result = comp.compare(insertItem, cJ);
-			pos = j;
-			if (result < 0)	{
-				found = true;
-				break;
-			}
-		}
-		if (!found) pos = items.length;
-		return pos;
-	}
-	 */
 	public void createTableColumns(final Table table, final List<Integer> dlList) {
 		ControlListener resizeListener = new ControlListener(){
 			public void controlMoved(ControlEvent arg0) {}
