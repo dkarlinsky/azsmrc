@@ -18,6 +18,7 @@ import java.util.Vector;
 
 import lbms.azsmrc.remote.client.RemoteInfo;
 import lbms.azsmrc.shared.RemoteConstants;
+import lbms.tools.CryptoTools;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.program.Program;
@@ -34,6 +35,7 @@ public class ErrorReporter {
 	private String email = "";
 	private String additionalInfo = "";
 	private String systemInfo = "";
+	private String hash = "";
 	private boolean init;
 
 	private List<ErrorReporterListener> listener = new Vector<ErrorReporterListener>();
@@ -70,6 +72,7 @@ public class ErrorReporter {
 					sb.append((char)i);
 				}
 				errorLog = sb.toString();
+				hash = CryptoTools.formatByte(CryptoTools.messageDigest(errorLog.getBytes(), "SHA-1"));
 				System.out.println("Errorlog: "+errorLog);
 			} else {
 				System.out.println(error+" did not exist");
@@ -101,7 +104,7 @@ public class ErrorReporter {
 						conn.setDoInput(true);
 						os = conn.getOutputStream();
 						OutputStreamWriter osw = new OutputStreamWriter(os);
-						String send = "error_log="+errorLog+"&email="+email+"&additional_info="+additionalInfo+"&system_info="+systemInfo;
+						String send = "error_log="+errorLog+"&hash="+hash+"&email="+email+"&additional_info="+additionalInfo+"&system_info="+systemInfo;
 						System.out.println("Error Report: "+send);
 						osw.write(send);
 						osw.close();
@@ -135,14 +138,14 @@ public class ErrorReporter {
 
 	public void sendPerEMail () {
 		try {
-			Program.launch(("mailto:azsmrc-devs@list.sourceforge.net?subject=AzSMRC+ErrorReport&body="+URLEncoder.encode("System Info:\n"+systemInfo+"\n\nAdditional Info:\n"+additionalInfo+"\n\nStackTrace:\n"+errorLog,RemoteConstants.DEFAULT_ENCODING)).replace('+', ' '));
+			Program.launch(("mailto:azsmrc-devs@list.sourceforge.net?subject=AzSMRC+ErrorReport&body="+URLEncoder.encode("System Info:\n"+systemInfo+"\n\nAdditional Info:\n"+additionalInfo+"\n\nStackTrace ("+hash+"):\n"+errorLog,RemoteConstants.DEFAULT_ENCODING)).replace('+', ' '));
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 	}
 
 	public String getFormattedReport() {
-		return "System Info:\n"+systemInfo+"\n\nAdditional Info:\n"+additionalInfo+"\n\nStackTrace:\n"+errorLog;
+		return "System Info:\n"+systemInfo+"\n\nAdditional Info:\n"+additionalInfo+"\n\nStackTrace ("+hash+"):\n"+errorLog;
 	}
 
 	/**
