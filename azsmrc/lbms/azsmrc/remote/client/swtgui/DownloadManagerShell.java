@@ -60,6 +60,7 @@ import lbms.azsmrc.remote.client.swtgui.tabs.TorrentDetailsTab;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.shared.EncodingUtil;
 import lbms.azsmrc.shared.RemoteConstants;
+import lbms.azsmrc.shared.SWTSafeRunnable;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
@@ -848,9 +849,9 @@ public class DownloadManagerShell {
 				if(state > 0){
 					setLogInOutButtons(true);
 					//reset the title of MyTorrents once Logged in
-					RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
+					RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
 
-						public void run() {
+						public void runSafe() {
 							String userLoggedIn = RCMain.getRCMain().getClient().getUsername();
 							if(myTorrents != null || !myTorrents.isDisposed()){
 								if(bSingleUserMode){
@@ -892,8 +893,8 @@ public class DownloadManagerShell {
 					}
 
 					semaphore.acquire();
-					RCMain.getRCMain().getDisplay().syncExec(new Runnable() {
-						public void run() {
+					RCMain.getRCMain().getDisplay().syncExec(new SWTSafeRunnable() {
+						public void runSafe() {
 							if(download.getState() == Download.ST_SEEDING || download.getStats().getCompleted() == 1000){
 								if (!seedsMap.containsKey(download.getHash())) {
 									SeedContainer sc = new SeedContainer(download);
@@ -1743,93 +1744,63 @@ public class DownloadManagerShell {
 			e.printStackTrace();
 			return;
 		}
-		connectionStatusIcon.getDisplay().syncExec( new Runnable() {
-			public void run() {
-				try {
-					if(connectionStatusIcon == null || connectionStatusIcon.isDisposed())
-						return;
-					if(connection == 0){
-						connectionStatusIcon.setImage(ImageRepository.getImage("connect_no"));
-						connectionStatusIcon.setToolTipText("Not Connected to server");
-					}
-					else if(connection == 1){
+		connectionStatusIcon.getDisplay().syncExec( new SWTSafeRunnable() {
+			public void runSafe() {
+				if(connectionStatusIcon == null || connectionStatusIcon.isDisposed())
+					return;
+				if(connection == 0){
+					connectionStatusIcon.setImage(ImageRepository.getImage("connect_no"));
+					connectionStatusIcon.setToolTipText("Not Connected to server");
+				}
+				else if(connection == 1){
 
-						connectionStatusIcon.setImage(ImageRepository.getImage("connect_creating"));
-						connectionStatusIcon.setToolTipText("Attempting to connect to server");
-					}
-					else if(connection == 2){
-						connectionStatusIcon.setImage(ImageRepository.getImage("connect_established"));
-						connectionStatusIcon.setToolTipText("Connected to server\nDouble-Click for Server Details");
-					}
-				} catch (SWTException e) {
-					e.printStackTrace();
+					connectionStatusIcon.setImage(ImageRepository.getImage("connect_creating"));
+					connectionStatusIcon.setToolTipText("Attempting to connect to server");
+				}
+				else if(connection == 2){
+					connectionStatusIcon.setImage(ImageRepository.getImage("connect_established"));
+					connectionStatusIcon.setToolTipText("Connected to server\nDouble-Click for Server Details");
 				}
 			}});
 	}
 
-	public void setSSLStatusBar(boolean benabled, boolean buse_ssl){
+	public void setSSLStatusBar(final boolean benabled, final boolean buse_ssl){
 		Display display = RCMain.getRCMain().getDisplay();
 		if(display == null || display.isDisposed()) return;
-		if(benabled){
-			if(buse_ssl){
-				display.asyncExec(new Runnable() {
-					public void run() {
-						try {
-							sslStatusIcon.setEnabled(true);
-							sslStatusIcon.setImage(ImageRepository.getImage("ssl_enabled"));
-							sslStatusIcon.setToolTipText("SSL Enabled\nDouble-Click for Server Details");
-						} catch (SWTException e) {
-							e.printStackTrace();
-						}
-					}
-				});
-
-			}else{
-				display.asyncExec(new Runnable() {
-					public void run() {
-						try {
-							sslStatusIcon.setEnabled(true);
-							sslStatusIcon.setImage(ImageRepository.getImage("ssl_disabled"));
-							sslStatusIcon.setToolTipText("SSL Disabled\nDouble-Click for Server Details");
-						} catch (SWTException e) {
-							e.printStackTrace();
-						}
-					}
-				});
-
-			}
-		}else{
-			display.asyncExec(new Runnable() {
-				public void run() {
-					try {
+		display.asyncExec(new SWTSafeRunnable() {
+			public void runSafe() {
+				if(benabled){
+					if(buse_ssl){
+						sslStatusIcon.setEnabled(true);
+						sslStatusIcon.setImage(ImageRepository.getImage("ssl_enabled"));
+						sslStatusIcon.setToolTipText("SSL Enabled\nDouble-Click for Server Details");
+					} else {
+						sslStatusIcon.setEnabled(true);
 						sslStatusIcon.setImage(ImageRepository.getImage("ssl_disabled"));
-						sslStatusIcon.setEnabled(false);
-					} catch (SWTException e) {
-						e.printStackTrace();
+						sslStatusIcon.setToolTipText("SSL Disabled\nDouble-Click for Server Details");
 					}
+				} else {
+					sslStatusIcon.setImage(ImageRepository.getImage("ssl_disabled"));
+					sslStatusIcon.setEnabled(false);
 				}
-			});
+			}
+		});
 		}
-	}
 
 
 	public void setTorrentMoveButtons(final boolean bTop, final boolean bUp, final boolean bDown, final boolean bBottom){
 		Display display = RCMain.getRCMain().getDisplay();
 		if(display == null || display.isDisposed()) return;
-		display.asyncExec(new Runnable() {
-			public void run() {
-				try {
-					if (top.isEnabled() != bTop)
-						top.setEnabled(bTop);
-					if (up.isEnabled() != bUp)
-						up.setEnabled(bUp);
-					if (down.isEnabled() != bDown)
-						down.setEnabled(bDown);
-					if (bottom.isEnabled() != bBottom)
-						bottom.setEnabled(bBottom);
-				} catch (SWTException e) {
-					e.printStackTrace();
-				}
+		display.asyncExec(new SWTSafeRunnable() {
+			public void runSafe() {
+				if (top.isEnabled() != bTop)
+					top.setEnabled(bTop);
+				if (up.isEnabled() != bUp)
+					up.setEnabled(bUp);
+				if (down.isEnabled() != bDown)
+					down.setEnabled(bDown);
+				if (bottom.isEnabled() != bBottom)
+					bottom.setEnabled(bBottom);
 			}
 		});
 	}
@@ -1838,63 +1809,56 @@ public class DownloadManagerShell {
 	public void setLogInOutButtons(final boolean bLoggedIn){
 		Display display = RCMain.getRCMain().getDisplay();
 		if(display == null || display.isDisposed()) return;
-		display.asyncExec(new Runnable() {
-			public void run() {
-				try {
-					if(bLoggedIn){
-
-						login.setEnabled(false);
-						menuLogin.setEnabled(false);
-						menuRestartAzureus.setEnabled(true);
-						menuServerDetails.setEnabled(true);
-						menuServerUpdate.setEnabled(true);
-						menuAddByFile.setEnabled(true);
-						menuAddbyURL.setEnabled(true);
-						menuLogout.setEnabled(true);
-						logout.setEnabled(true);
-						quickconnect.setEnabled(false);
-						menuQuickconnect.setEnabled(false);
-						refresh.setEnabled(true);
-						preferences.setEnabled(true);
-						addTorrent_by_file.setEnabled(true);
-						addTorrent_by_url.setEnabled(true);
-						pauseAll.setEnabled(true);
-						resumeAll.setEnabled(true);
-						manage_users.setEnabled(true);
-
-					}else{
-						login.setEnabled(true);
-						menuLogin.setEnabled(true);
-						menuLogout.setEnabled(false);
-						menuRestartAzureus.setEnabled(false);
-						menuServerDetails.setEnabled(false);
-						menuServerUpdate.setEnabled(false);
-						menuAddByFile.setEnabled(false);
-						menuAddbyURL.setEnabled(false);
-						logout.setEnabled(false);
-						quickconnect.setEnabled(true);
-						menuQuickconnect.setEnabled(true);
-						refresh.setEnabled(false);
-						preferences.setEnabled(true);
-						addTorrent_by_file.setEnabled(false);
-						addTorrent_by_url.setEnabled(false);
-						pauseAll.setEnabled(false);
-						resumeAll.setEnabled(false);
-						manage_users.setEnabled(false);
-						setTorrentMoveButtons(false,false,false,false);
-						setToolBarTorrentIcons(false,false,false);
-						setSSLStatusBar(false,false);
-						setConnectionStatusBar(0);
-						azureusDownload = "N/S";
-						downSpeed = 0;
-						azureusUpload = "N/S";
-						upSpeed = 0;
-						refreshStatusBar();
-					}
-				} catch (SWTException e) {
-					e.printStackTrace();
+		display.asyncExec(new SWTSafeRunnable() {
+			public void runSafe() {
+				if(bLoggedIn){
+					login.setEnabled(false);
+					menuLogin.setEnabled(false);
+					menuRestartAzureus.setEnabled(true);
+					menuServerDetails.setEnabled(true);
+					menuServerUpdate.setEnabled(true);
+					menuAddByFile.setEnabled(true);
+					menuAddbyURL.setEnabled(true);
+					menuLogout.setEnabled(true);
+					logout.setEnabled(true);
+					quickconnect.setEnabled(false);
+					menuQuickconnect.setEnabled(false);
+					refresh.setEnabled(true);
+					preferences.setEnabled(true);
+					addTorrent_by_file.setEnabled(true);
+					addTorrent_by_url.setEnabled(true);
+					pauseAll.setEnabled(true);
+					resumeAll.setEnabled(true);
+					manage_users.setEnabled(true);
+				}else{
+					login.setEnabled(true);
+					menuLogin.setEnabled(true);
+					menuLogout.setEnabled(false);
+					menuRestartAzureus.setEnabled(false);
+					menuServerDetails.setEnabled(false);
+					menuServerUpdate.setEnabled(false);
+					menuAddByFile.setEnabled(false);
+					menuAddbyURL.setEnabled(false);
+					logout.setEnabled(false);
+					quickconnect.setEnabled(true);
+					menuQuickconnect.setEnabled(true);
+					refresh.setEnabled(false);
+					preferences.setEnabled(true);
+					addTorrent_by_file.setEnabled(false);
+					addTorrent_by_url.setEnabled(false);
+					pauseAll.setEnabled(false);
+					resumeAll.setEnabled(false);
+					manage_users.setEnabled(false);
+					setTorrentMoveButtons(false,false,false,false);
+					setToolBarTorrentIcons(false,false,false);
+					setSSLStatusBar(false,false);
+					setConnectionStatusBar(0);
+					azureusDownload = "N/S";
+					downSpeed = 0;
+					azureusUpload = "N/S";
+					upSpeed = 0;
+					refreshStatusBar();
 				}
-
 			}
 		});
 	}
@@ -2461,8 +2425,8 @@ public class DownloadManagerShell {
 	public void setGUItoLoggedOut(){
 		final Display display = RCMain.getRCMain().getDisplay();
 		if(display == null || display.isDisposed()) return;
-		display.asyncExec(new Runnable(){
-			public void run() {
+		display.asyncExec(new SWTSafeRunnable(){
+			public void runSafe() {
 				if(DOWNLOAD_MANAGER_SHELL != null){
 					setLogInOutButtons(false);
 					setSSLStatusBar(false, false);
@@ -2495,8 +2459,8 @@ public class DownloadManagerShell {
 	public void setStatusBarText(final String text, final int color){
 		final Display display = RCMain.getRCMain().getDisplay();
 		if(display == null || display.isDisposed()) return;
-		display.asyncExec(new Runnable(){
-			public void run() {
+		display.asyncExec(new SWTSafeRunnable(){
+			public void runSafe() {
 				try {
 					if(statusBarText == null || statusBarText.isDisposed())
 						return;
@@ -2532,8 +2496,8 @@ public class DownloadManagerShell {
 
 
 	public void setToolBarTorrentIcons(final boolean bQueue, final boolean bStop, final boolean bRemove){
-		RCMain.getRCMain().getDisplay().syncExec(new Runnable(){
-			public void run() {
+		RCMain.getRCMain().getDisplay().syncExec(new SWTSafeRunnable(){
+			public void runSafe() {
 				if(queueTorrent != null || !queueTorrent.isDisposed()){
 					queueTorrent.setEnabled(bQueue);
 				}
@@ -2958,46 +2922,38 @@ public class DownloadManagerShell {
 		downloadsArray = downloadsMap.values().toArray(emptyArray);
 		seedsMap.clear();
 		seedsArray = seedsMap.values().toArray(emptyArray);
-		RCMain.getRCMain().getDisplay().syncExec(new Runnable(){
-			public void run() {
-				try {
-					downloadsTable.removeAll();
-					seedsTable.removeAll();
-					Control[] children_downloads = downloadsTable.getChildren();
-					for(Control child:children_downloads) child.dispose();
-					Control[] children_seeds = seedsTable.getChildren();
-					for(Control child:children_seeds) child.dispose();
-				}catch(SWTException e){
-
-				}
+		RCMain.getRCMain().getDisplay().syncExec(new SWTSafeRunnable(){
+			public void runSafe() {
+				downloadsTable.removeAll();
+				seedsTable.removeAll();
+				Control[] children_downloads = downloadsTable.getChildren();
+				for(Control child:children_downloads) child.dispose();
+				Control[] children_seeds = seedsTable.getChildren();
+				for(Control child:children_seeds) child.dispose();
 			}
 		});
 
 	}
 
 	public void refreshStatusBar(){
-		RCMain.getRCMain().getDisplay().syncExec(new Runnable(){
-			public void run() {
-				try {
-					if(statusDown != null || !statusDown.isDisposed()){
-						if(azureusDownload.equalsIgnoreCase("0"))
-							statusDown.setText(DisplayFormatters.formatByteCountToBase10KBEtcPerSec(downSpeed));
-						else if(azureusDownload.equalsIgnoreCase("N/S"))
-							statusDown.setText("[" + azureusDownload + "] " + DisplayFormatters.formatByteCountToBase10KBEtcPerSec(downSpeed));
-						else
-							statusDown.setText("[" + azureusDownload + "K] " + DisplayFormatters.formatByteCountToBase10KBEtcPerSec(downSpeed));
+		RCMain.getRCMain().getDisplay().syncExec(new SWTSafeRunnable(){
+			public void runSafe() {
+				if(statusDown != null || !statusDown.isDisposed()){
+					if(azureusDownload.equalsIgnoreCase("0"))
+						statusDown.setText(DisplayFormatters.formatByteCountToBase10KBEtcPerSec(downSpeed));
+					else if(azureusDownload.equalsIgnoreCase("N/S"))
+						statusDown.setText("[" + azureusDownload + "] " + DisplayFormatters.formatByteCountToBase10KBEtcPerSec(downSpeed));
+					else
+						statusDown.setText("[" + azureusDownload + "K] " + DisplayFormatters.formatByteCountToBase10KBEtcPerSec(downSpeed));
 
-						if(azureusUpload.equalsIgnoreCase("0"))
-							statusUp.setText(DisplayFormatters.formatByteCountToBase10KBEtcPerSec(upSpeed));
-						else if(azureusUpload.equalsIgnoreCase("N/S"))
-							statusUp.setText("[" + azureusUpload + "] " + DisplayFormatters.formatByteCountToBase10KBEtcPerSec(upSpeed));
-						else
-							statusUp.setText("[" + azureusUpload + "K] " + DisplayFormatters.formatByteCountToBase10KBEtcPerSec(upSpeed));
+					if(azureusUpload.equalsIgnoreCase("0"))
+						statusUp.setText(DisplayFormatters.formatByteCountToBase10KBEtcPerSec(upSpeed));
+					else if(azureusUpload.equalsIgnoreCase("N/S"))
+						statusUp.setText("[" + azureusUpload + "] " + DisplayFormatters.formatByteCountToBase10KBEtcPerSec(upSpeed));
+					else
+						statusUp.setText("[" + azureusUpload + "K] " + DisplayFormatters.formatByteCountToBase10KBEtcPerSec(upSpeed));
 
-						statusbarComp.layout();
-					}
-				} catch (SWTException e) {
-					e.printStackTrace();
+					statusbarComp.layout();
 				}
 			}
 		});
@@ -3301,9 +3257,9 @@ public class DownloadManagerShell {
 	public void saveColumnWidthsToPreferencesFile(){
 		Display display = RCMain.getRCMain().getDisplay();
 		if(display == null || display.isDisposed()) return;
-		display.asyncExec(new Runnable(){
+		display.asyncExec(new SWTSafeRunnable(){
 
-			public void run() {
+			public void runSafe() {
 				Properties properties = RCMain.getRCMain().getProperties();
 				//save the downloadsTable column widths
 				if (!downloadsTable.isDisposed()) {
@@ -3342,8 +3298,8 @@ public class DownloadManagerShell {
 	public void redrawTables(){
 		Display display = RCMain.getRCMain().getDisplay();
 		if(display == null || display.isDisposed()) return;
-		display.asyncExec(new Runnable(){
-			public void run() {
+		display.asyncExec(new SWTSafeRunnable(){
+			public void runSafe() {
 				if(downloadsTable != null || !downloadsTable.isDisposed()){
 					downloadsTable.clearAll();
 					downloadsTable.setItemCount(downloadsMap.size());
@@ -3355,7 +3311,6 @@ public class DownloadManagerShell {
 				}
 
 			}
-
 		});
 	}
 }//EOF

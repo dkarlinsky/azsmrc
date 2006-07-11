@@ -10,6 +10,7 @@ import lbms.azsmrc.remote.client.Download;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.shared.EncodingUtil;
 import lbms.azsmrc.shared.RemoteConstants;
+import lbms.azsmrc.shared.SWTSafeRunnable;
 
 public class DownloadContainer extends Container {
 
@@ -67,14 +68,12 @@ public class DownloadContainer extends Container {
 
 	public void removeFromTable(){
 		Display display = RCMain.getRCMain().getDisplay();
-		display.asyncExec(new Runnable(){
-			public void run() {
-				try{
-					if(item != null || !item.isDisposed()){
-						item.getParent().remove(item.getParent().indexOf(item));
-						dispose();
-					}
-				}catch(Exception e){}
+		display.asyncExec(new SWTSafeRunnable(){
+			public void runSafe() {
+				if(item != null || !item.isDisposed()){
+					item.getParent().remove(item.getParent().indexOf(item));
+					dispose();
+				}
 			}
 		});
 	}

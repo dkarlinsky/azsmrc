@@ -4,11 +4,10 @@
 	<property file="build.properties" />
 	<property file="azsmrc.properties" />
 	<property name="root.dir" value="." />
-	<!-- REMINDER: this needs to be "." for public source -->
-
+	
 	<property name="generic.excludes" value="**/*.jar **/*.txt **/*.jardesc **/.classpath **/.project **/aereg.lib **/aereg.dll **/.svn" />
 	<property name="dist.jar.excludes" value="${generic.excludes} **/*.java " />
-	<!-- <property name="dist.source.excludes" value="${generic.excludes} **/*.class" /> -->
+	
 
 
 	<target name="init">
