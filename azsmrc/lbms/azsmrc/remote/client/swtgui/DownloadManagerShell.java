@@ -129,10 +129,10 @@ public class DownloadManagerShell {
 				semaphore.acquire();
 				//Changing from Downloading to Seeding
 				if (new_state == Download.ST_SEEDING && downloadsMap.containsKey(download.getHash())) {
-					downloadsMap.get(download.getHash()).removeFromTable();
 					downloadsMap.remove(download.getHash());
 					SeedContainer sc = new SeedContainer(download,seedsTable,SWT.NULL);
 					seedsMap.put(download.getHash(), sc);
+					redrawTables = true;
 				}
 			} catch (InterruptedException e) {
 
@@ -145,13 +145,14 @@ public class DownloadManagerShell {
 
 		public void positionChanged(Download download, int oldPosition, int newPosition) {
 			debugLogger.finer("Position changed "+download+" "+oldPosition+" -> "+newPosition);
-			redrawTables();
+			redrawTables = true;
 		}
 
 	};
 
 	private boolean COLLAPSED;
 	private boolean bSingleUserMode;
+	private boolean redrawTables;
 	private String TITLE;
 
 	private SortedMap<String,DownloadContainer> downloadsMap	= new TreeMap<String,DownloadContainer>();
@@ -940,11 +941,11 @@ public class DownloadManagerShell {
 							if(downloads[i].getState() == Download.ST_SEEDING || downloads[i].getStats().getCompleted() == 1000){
 								SeedContainer sc = new SeedContainer(downloads[i],seedsTable,SWT.NULL);
 								seedsMap.put(downloads[i].getHash(), sc);
-								redrawTables();
+								redrawTables = true;
 							}else{
 								DownloadContainer dc = new DownloadContainer(downloads[i],downloadsTable,SWT.BORDER);
 								downloadsMap.put(downloads[i].getHash(), dc);
-								redrawTables();
+								redrawTables = true;
 							}
 						}else{
 							//is present in one of the maps.. so find it and update it
@@ -964,7 +965,7 @@ public class DownloadManagerShell {
 								SeedContainer sc = seedsMap.get(downloads[i].getHash());
 								sc.update(false);
 							}
-							redrawTables();
+							redrawTables = true;
 						}
 					}
 				}
@@ -972,7 +973,10 @@ public class DownloadManagerShell {
 				if ((updateSwitches & Constants.UPDATE_USERS) != 0){
 					setLogInOutButtons(true);
 				}
-
+				if (redrawTables) {
+					redrawTables();
+					redrawTables = false;
+				}
 			}
 		};
 
@@ -2434,16 +2438,7 @@ public class DownloadManagerShell {
 					setStatusBarText("Disconnected", SWT.COLOR_RED);
 					setLogInOutButtons(false);
 					DOWNLOAD_MANAGER_SHELL.setText(TITLE);
-					downloadsMap.clear();
-					downloadsArray = emptyArray;
-					seedsMap.clear();
-					seedsArray = emptyArray;
-					downloadsTable.removeAll();
-					seedsTable.removeAll();
-					Control[] children_downloads = downloadsTable.getChildren();
-					for(Control child:children_downloads) child.dispose();
-					Control[] children_seeds = seedsTable.getChildren();
-					for(Control child:children_seeds) child.dispose();
+					clearMapsAndChildred();
 				}
 				RCMain.getRCMain().setTrayIcon(0);
 			}
@@ -2880,43 +2875,6 @@ public class DownloadManagerShell {
 	}
 
 
-
-	private class CLabelPadding extends CLabel {
-		private int lastWidth = 0;
-		private long widthSetOn = 0;
-		private final int KEEPWIDTHFOR_MS = 30 * 1000;
-
-		public CLabelPadding(Composite parent, int style) {
-			super(parent, style | SWT.CENTER);
-
-			GridData gridData = new GridData(GridData.HORIZONTAL_ALIGN_CENTER
-					| GridData.VERTICAL_ALIGN_FILL);
-			setLayoutData(gridData);
-		}
-
-		/* (non-Javadoc)
-		 * @see org.eclipse.swt.custom.CLabel#computeSize(int, int, boolean)
-		 */
-		public Point computeSize(int wHint, int hHint, boolean changed) {
-			if ( !isVisible()){
-				return( new Point(0,0));
-			}
-			Point pt = super.computeSize(wHint, hHint, changed);
-			pt.x += 4;
-
-			long now = System.currentTimeMillis();
-			if (lastWidth > pt.x && now - widthSetOn < KEEPWIDTHFOR_MS) {
-				pt.x = lastWidth;
-			} else {
-				if (lastWidth != pt.x)
-					lastWidth = pt.x;
-				widthSetOn = now;
-			}
-
-			return pt;
-		}
-	}
-
 	public void clearMapsAndChildred(){
 		downloadsMap.clear();
 		downloadsArray = downloadsMap.values().toArray(emptyArray);
@@ -2932,7 +2890,27 @@ public class DownloadManagerShell {
 				for(Control child:children_seeds) child.dispose();
 			}
 		});
+	}
 
+	public void redrawTables(){
+		downloadsArray = downloadsMap.values().toArray(emptyArray);
+		seedsArray = seedsMap.values().toArray(emptyArray);
+		Display display = RCMain.getRCMain().getDisplay();
+		if(display == null || display.isDisposed()) return;
+		display.asyncExec(new SWTSafeRunnable(){
+			public void runSafe() {
+				if(downloadsTable != null || !downloadsTable.isDisposed()){
+					downloadsTable.clearAll();
+					downloadsTable.setItemCount(downloadsArray.length);
+				}
+
+				if(seedsTable != null || !seedsTable.isDisposed()){
+					seedsTable.clearAll();
+					seedsTable.setItemCount(seedsArray.length);
+				}
+
+			}
+		});
 	}
 
 	public void refreshStatusBar(){
@@ -3295,22 +3273,40 @@ public class DownloadManagerShell {
 		return new int[]{seedsMap.size(), downloadsMap.size()};
 	}
 
-	public void redrawTables(){
-		Display display = RCMain.getRCMain().getDisplay();
-		if(display == null || display.isDisposed()) return;
-		display.asyncExec(new SWTSafeRunnable(){
-			public void runSafe() {
-				if(downloadsTable != null || !downloadsTable.isDisposed()){
-					downloadsTable.clearAll();
-					downloadsTable.setItemCount(downloadsMap.size());
-				}
 
-				if(seedsTable != null || !seedsTable.isDisposed()){
-					seedsTable.clearAll();
-					seedsTable.setItemCount(seedsMap.size());
-				}
+	private class CLabelPadding extends CLabel {
+		private int lastWidth = 0;
+		private long widthSetOn = 0;
+		private final int KEEPWIDTHFOR_MS = 30 * 1000;
 
+		public CLabelPadding(Composite parent, int style) {
+			super(parent, style | SWT.CENTER);
+
+			GridData gridData = new GridData(GridData.HORIZONTAL_ALIGN_CENTER
+					| GridData.VERTICAL_ALIGN_FILL);
+			setLayoutData(gridData);
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.swt.custom.CLabel#computeSize(int, int, boolean)
+		 */
+		public Point computeSize(int wHint, int hHint, boolean changed) {
+			if ( !isVisible()){
+				return( new Point(0,0));
 			}
-		});
+			Point pt = super.computeSize(wHint, hHint, changed);
+			pt.x += 4;
+
+			long now = System.currentTimeMillis();
+			if (lastWidth > pt.x && now - widthSetOn < KEEPWIDTHFOR_MS) {
+				pt.x = lastWidth;
+			} else {
+				if (lastWidth != pt.x)
+					lastWidth = pt.x;
+				widthSetOn = now;
+			}
+
+			return pt;
+		}
 	}
 }//EOF
