@@ -71,10 +71,18 @@ public class RemoteConstants {
 	public static final int PARAMETER_INT		= 2;
 	public static final int PARAMETER_BOOLEAN	= 3;
 	public static final int PARAMETER_FLOAT		= 4;
+	//These are not Supported by Az Config
+	public static final int PARAMETER_LONG		= 5;
+	public static final int PARAMETER_DOUBLE	= 6;
 
 	//User Rights
 	public static final int RIGHTS_ADMIN = 1;
 	public static final int RIGHTS_FORCESTART = 1<<1;
+
+	//IPC Status Codes
+	public static final int IPC_EXCEPTION				= -2;
+	public static final int IPC_ERROR_PLUGIN_NOT_FOUND	= -1;
+	public static final int IPC_OK						= 1;
 
 	//Az Core
 	public static final String CORE_PARAM_INT_MAX_UPLOAD_SPEED_KBYTES_PER_SEC			= "Max Upload Speed KBs";

@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 import java.util.zip.GZIPOutputStream;
 
 import lbms.azsmrc.plugin.main.MultiUser;
@@ -30,12 +31,15 @@ import org.gudy.azureus2.core3.security.SESecurityManager;
 import org.gudy.azureus2.core3.util.Constants;
 import org.gudy.azureus2.plugins.PluginConfig;
 import org.gudy.azureus2.plugins.PluginInterface;
+import org.gudy.azureus2.plugins.PluginManager;
 import org.gudy.azureus2.plugins.disk.DiskManagerFileInfo;
 import org.gudy.azureus2.plugins.download.Download;
 import org.gudy.azureus2.plugins.download.DownloadException;
 import org.gudy.azureus2.plugins.download.DownloadRemovalVetoException;
 import org.gudy.azureus2.plugins.download.DownloadStats;
 import org.gudy.azureus2.plugins.download.DownloadWillBeAddedListener;
+import org.gudy.azureus2.plugins.ipc.IPCException;
+import org.gudy.azureus2.plugins.ipc.IPCInterface;
 import org.gudy.azureus2.plugins.peers.PeerManagerStats;
 import org.gudy.azureus2.plugins.torrent.Torrent;
 import org.gudy.azureus2.plugins.torrent.TorrentAttribute;
@@ -1623,6 +1627,79 @@ public class RequestManager {
 					}
 				}
 				return false;
+			}
+		});
+		addHandler("ipcCall", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, final User user) throws IOException {
+				response.setAttribute("senderID", xmlRequest.getAttributeValue("senderID"));
+				response.setAttribute("pluginID", xmlRequest.getAttributeValue("pluginID"));
+				response.setAttribute("method", xmlRequest.getAttributeValue("method"));
+				if (xmlRequest.getAttribute("pluginID") == null) {
+					return false;
+				} else {
+					PluginManager pm = Plugin.getPluginInterface().getPluginManager();
+					PluginInterface tPi = pm.getPluginInterfaceByID(xmlRequest.getAttributeValue("pluginID"));
+					if (tPi == null) {
+						response.setAttribute("status", Integer.toString(RemoteConstants.IPC_ERROR_PLUGIN_NOT_FOUND));
+						return true;
+					}
+					List<Element> paramList = xmlRequest.getChildren("Parameter");
+					List<Object> params = new Vector<Object>();
+					for (Element e:paramList) {
+						switch (Integer.parseInt(e.getAttributeValue("type"))) {
+						case RemoteConstants.PARAMETER_BOOLEAN:
+							params.add(Boolean.parseBoolean(e.getText()));
+							break;
+						case RemoteConstants.PARAMETER_FLOAT:
+							params.add(Float.parseFloat(e.getText()));
+							break;
+						case RemoteConstants.PARAMETER_INT:
+							params.add(Integer.parseInt(e.getText()));
+							break;
+						case RemoteConstants.PARAMETER_STRING:
+							params.add(e.getText());
+							break;
+						case RemoteConstants.PARAMETER_LONG:
+							params.add(Long.parseLong(e.getText()));
+							break;
+						case RemoteConstants.PARAMETER_DOUBLE:
+							params.add(Double.parseDouble(e.getText()));
+							break;
+						}
+					}
+
+					IPCInterface ipcI = tPi.getIPC();
+					Object result = null;
+					try {
+						result = ipcI.invoke(xmlRequest.getAttributeValue("method"), params.toArray());
+					} catch (IPCException e) {
+						e.printStackTrace();
+						response.setAttribute("status", Integer.toString(RemoteConstants.IPC_EXCEPTION));
+						response.setText(e.getMessage());
+						return true;
+					}
+					if (result == null) return false;
+					Element resultElement = new Element("Result");
+					if (result instanceof Boolean) {
+						resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_BOOLEAN));
+					} else if (result instanceof Integer) {
+						resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_INT));
+					} else if (result instanceof Float) {
+						resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_FLOAT));
+					} else if (result instanceof String) {
+						resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_STRING));
+					} else if (result instanceof Long) {
+						resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_LONG));
+					} else if (result instanceof Double) {
+						resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_DOUBLE));;
+					} else
+						resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_NOT_FOUND));
+
+					resultElement.setText(result.toString());
+					response.addContent(resultElement);
+					response.setAttribute("status", Integer.toString(RemoteConstants.IPC_OK));
+				}
+				return true;
 			}
 		});
 	}

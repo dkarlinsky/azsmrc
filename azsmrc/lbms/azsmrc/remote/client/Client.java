@@ -733,6 +733,45 @@ public class Client {
 		sendElement.setAttribute("hash", t.getHash());
 		enqueue(sendElement);
 	}
+
+	/**
+	 * Send an IPC call to Azureus
+	 * 
+	 * @param pluginID the pluginID of the target plugin
+	 * @param senderID the local (plugin)ID of the sender
+	 * @param method the remote method to call
+	 * @param params array of Parameters supported are: boolean, int, long, float, double, String
+	 */
+	public void sendIPCCall (String pluginID, String senderID, String method, Object[] params) {
+		Element sendElement = getSendElement();
+		sendElement.setAttribute("switch", "ipcCall");
+		sendElement.setAttribute("pluginID", pluginID);
+		sendElement.setAttribute("senderID", senderID);
+		sendElement.setAttribute("method", method);
+
+		if (params != null) {
+			for (Object o : params) {
+				Element e = new Element ("Parameter");
+				if (o instanceof Boolean) {
+					e.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_BOOLEAN));
+				} else if (o instanceof Integer) {
+					e.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_INT));
+				} else if (o instanceof Float) {
+					e.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_FLOAT));
+				} else if (o instanceof String) {
+					e.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_STRING));
+				} else if (o instanceof Long) {
+					e.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_LONG));
+				} else if (o instanceof Double) {
+					e.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_DOUBLE));
+				} else continue; //if nothing matches don't append
+
+				e.setText(o.toString());
+				sendElement.addContent(e);
+			}
+		}
+		enqueue(sendElement);
+	}
 	//--------------------------------------------------------//
 
 	public Element loadTorrentToXML (File torrentFile) throws IOException {
