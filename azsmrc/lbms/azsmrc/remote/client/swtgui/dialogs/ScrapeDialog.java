@@ -20,6 +20,7 @@ import lbms.azsmrc.remote.client.torrent.scraper.ScrapeResult;
 import lbms.azsmrc.remote.client.torrent.scraper.Scraper;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.shared.EncodingUtil;
+import lbms.azsmrc.shared.SWTSafeRunnable;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -57,11 +58,13 @@ public class ScrapeDialog {
 	private Display display;
 	private Button deleteOnSend;
 	private Shell shell;
+	private static ScrapeDialog instance;
 
 	//I18N prefix
 	public static final String PFX = "dialog.scrapedialog.";
 
 	private ScrapeDialog(){
+		instance = this;
 		//set the display
 		display = RCMain.getRCMain().getDisplay();
 
@@ -646,9 +649,9 @@ public class ScrapeDialog {
 				scraper.addListener(new ScrapeListener(){
 
 					public void scrapeFailed(final String reason) {
-						display.asyncExec(new Runnable(){
+						display.asyncExec(new SWTSafeRunnable(){
 
-							public void run() {
+							public void runSafe() {
 								pb.setVisible(false);
 								status.setText(I18N.translate(PFX + "detailstab.status.text.failed") + " - " + reason);
 								parent.layout();
@@ -658,8 +661,8 @@ public class ScrapeDialog {
 					}
 
 					public void scrapeFinished(final ScrapeResult sr) {
-						display.asyncExec(new Runnable(){
-							public void run() {
+						display.asyncExec(new SWTSafeRunnable(){
+							public void runSafe() {
 								pb.setVisible(false);
 								status.setText(I18N.translate(PFX + "detailstab.status.text.success"));
 								gStats.setText(I18N.translate(PFX + "detailstab.stats.group.text.received") + " " + combo.getItem(combo.getSelectionIndex()));
@@ -695,6 +698,13 @@ public class ScrapeDialog {
 		tabFolder.setSelection(tab);
 	}
 
+	/**
+	 * @return the shell
+	 */
+	public Shell getShell() {
+		return shell;
+	}
+
 
 
 	/**
@@ -703,23 +713,26 @@ public class ScrapeDialog {
 	 */
 	public static void open() {
 		Display display = RCMain.getRCMain().getDisplay();
-		if(display == null) return;
-		display.asyncExec(new Runnable(){
-			public void run() {
-				Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
-				for(int i = 0; i < shells.length; i++){
-					if(shells[i].getText().equalsIgnoreCase(I18N.translate(PFX + "shell.text"))){
-						shells[i].setActive();
-						shells[i].setFocus();
-						return;
-					}
-				}
-			   new ScrapeDialog();
+		if(display == null || display.isDisposed()) return;
+		display.asyncExec(new SWTSafeRunnable(){
+			public void runSafe() {
+				if (instance == null || instance.getShell() == null || instance.getShell().isDisposed())
+					new ScrapeDialog();
+			}
+		});
+	}
+
+
+	public static void openAndScrape(File torrent) {
+		Display display = RCMain.getRCMain().getDisplay();
+		if(display == null || display.isDisposed()) return;
+		display.asyncExec(new SWTSafeRunnable(){
+			public void runSafe() {
+				if (instance == null || instance.getShell() == null || instance.getShell().isDisposed())
+					new ScrapeDialog();
 
 			}
-
 		});
-
 	}
 
 
