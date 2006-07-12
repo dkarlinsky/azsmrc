@@ -155,6 +155,25 @@ Download
 	public boolean
 	isForceStart();
 
+	/**
+	 * When a download is completed it is rechecked (if the option is enabled). This method
+	 * returns true during this phase (at which time the status will be seeding)
+	 * @return
+	 * @since 2.3.0.6
+	 */
+	public boolean
+	isChecking();
+
+	/**
+	 * Indicates if the download has completed or not, exluding any files marked
+	 * as Do No Download
+	 *  
+	 * @return Download Complete status
+	 * @since 2.1.0.4
+	 */
+	public boolean
+	isComplete();
+
   /** Set the forcestart state of the download
    * @param forceStart True - Download will start, despite any Start/Stop rules/limits<BR>
    * False - Turn forcestart state off.  Download may or may not stop, depending on

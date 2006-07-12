@@ -95,6 +95,8 @@ public class ResponseManager {
 		if (dle.getAttributeValue("name") != null)
 			dl.implSetName(dle.getAttributeValue("name"));
 		dl.implSetForceStart(Boolean.parseBoolean(dle.getAttributeValue("forceStart")));
+		dl.implSetChecking(Boolean.parseBoolean(dle.getAttributeValue("checking")));
+		dl.implSetComplete(Boolean.parseBoolean(dle.getAttributeValue("complete")));
 		try {
 			dl.implSetPosition(dle.getAttribute("position").getIntValue());
 		} catch (Exception e) {}

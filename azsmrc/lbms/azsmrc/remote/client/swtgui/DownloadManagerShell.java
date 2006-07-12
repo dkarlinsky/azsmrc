@@ -896,7 +896,7 @@ public class DownloadManagerShell {
 					semaphore.acquire();
 					RCMain.getRCMain().getDisplay().syncExec(new SWTSafeRunnable() {
 						public void runSafe() {
-							if(download.getState() == Download.ST_SEEDING || download.getStats().getCompleted() == 1000){
+							if(download.getState() == Download.ST_SEEDING || download.isComplete()){
 								if (!seedsMap.containsKey(download.getHash())) {
 									SeedContainer sc = new SeedContainer(download);
 									seedsMap.put(download.getHash(), sc);
@@ -938,7 +938,7 @@ public class DownloadManagerShell {
 					Download[] downloads = RCMain.getRCMain().getClient().getDownloadManager().getSortedDownloads();
 					for (int i = 0; i < downloads.length; i++){
 						if(!downloadsMap.containsKey(downloads[i].getHash()) && !seedsMap.containsKey(downloads[i].getHash())){
-							if(downloads[i].getState() == Download.ST_SEEDING || downloads[i].getStats().getCompleted() == 1000){
+							if(downloads[i].getState() == Download.ST_SEEDING || downloads[i].isComplete()){
 								SeedContainer sc = new SeedContainer(downloads[i],seedsTable,SWT.NULL);
 								seedsMap.put(downloads[i].getHash(), sc);
 								redrawTables = true;

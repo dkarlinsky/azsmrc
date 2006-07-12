@@ -22,7 +22,7 @@ public class DownloadContainer {
 
 	private String name;
 	private String hash;
-	private boolean forceStart;
+	private boolean forceStart, checking, complete;
 	private int position;
 	private long downloaded, uploaded;
 	private long downloadAVG, uploadAVG, totalAVG;
@@ -60,6 +60,14 @@ public class DownloadContainer {
 		if (forceStart != dl.isForceStart()) {
 			forceStart = dl.isForceStart();
 			dle.setAttribute("forceStart", Boolean.toString(forceStart));
+		}
+		if (checking != dl.isChecking()) {
+			checking = dl.isChecking();
+			dle.setAttribute("checking", Boolean.toString(forceStart));
+		}
+		if (complete != dl.isComplete()) {
+			complete = dl.isComplete();
+			dle.setAttribute("complete", Boolean.toString(forceStart));
 		}
 		if (position != dl.getPosition()) {
 			position = dl.getPosition();
@@ -202,6 +210,8 @@ public class DownloadContainer {
 		dle.setAttribute("name", name);
 		dle.setAttribute("hash", hash);
 		dle.setAttribute("forceStart", Boolean.toString(forceStart));
+		dle.setAttribute("checking", Boolean.toString(forceStart));
+		dle.setAttribute("complete", Boolean.toString(forceStart));
 		dle.setAttribute("position", Integer.toString(position));
 		dle.setAttribute("downloaded", Long.toString(downloaded));
 		dle.setAttribute("uploaded", Long.toString(uploaded));
@@ -236,6 +246,8 @@ public class DownloadContainer {
 		name = dl.getName();
 		hash = EncodingUtil.encode(dl.getTorrent().getHash());
 		forceStart = dl.isForceStart();
+		checking = dl.isChecking();
+		complete = dl.isComplete();
 		position = dl.getPosition();
 		downloaded = ds.getDownloaded();
 		uploaded = ds.getUploaded();

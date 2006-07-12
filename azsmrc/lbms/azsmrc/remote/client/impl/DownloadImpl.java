@@ -14,7 +14,7 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 
 	private String name = "";
 	private String hash;
-	private boolean forceStart = false;
+	private boolean forceStart = false, checking = false, complete = false;
 	private int state, position, uploadLimit = -1,downloadLimit = -1, seeds,leecher, totalSeeds,totalLeecher;
 	private long discarded, size, lastScrape, nextScrape, announceTTW;
 	private DownloadStatsImpl stats;
@@ -66,6 +66,22 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 
 	public boolean isForceStart() {
 		return forceStart;
+	}
+
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.Download#isChecking()
+	 */
+	public boolean isChecking() {
+		// TODO Auto-generated method stub
+		return checking;
+	}
+
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.Download#isComplete()
+	 */
+	public boolean isComplete() {
+		// TODO Auto-generated method stub
+		return complete;
 	}
 
 	public void setForceStart(boolean forceStart) {
@@ -334,6 +350,14 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 
 	public void implSetForceStart (boolean forceStart) {
 		this.forceStart = forceStart;
+	}
+
+	public void implSetChecking (boolean checking) {
+		this.checking = checking;
+	}
+
+	public void implSetComplete (boolean complete) {
+		this.complete = complete;
 	}
 
 	/**
