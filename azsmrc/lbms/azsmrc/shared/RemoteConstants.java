@@ -66,14 +66,15 @@ public class RemoteConstants {
 	public static final int EV_ERROR_MESSAGE= 7;
 
 	//Parameter types
-	public static final int PARAMETER_NOT_FOUND = -1;
-	public static final int PARAMETER_STRING 	= 1;
-	public static final int PARAMETER_INT		= 2;
-	public static final int PARAMETER_BOOLEAN	= 3;
-	public static final int PARAMETER_FLOAT		= 4;
+	public static final int PARAMETER_NOT_FOUND 	= -1;
+	public static final int PARAMETER_STRING 		= 1;
+	public static final int PARAMETER_INT			= 2;
+	public static final int PARAMETER_BOOLEAN		= 3;
+	public static final int PARAMETER_FLOAT			= 4;
 	//These are not Supported by Az Config
-	public static final int PARAMETER_LONG		= 5;
-	public static final int PARAMETER_DOUBLE	= 6;
+	public static final int PARAMETER_LONG			= 5;
+	public static final int PARAMETER_DOUBLE		= 6;
+	public static final int PARAMETER_XML_ELEMENT	= 7;
 
 	//User Rights
 	public static final int RIGHTS_ADMIN = 1;

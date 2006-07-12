@@ -1665,6 +1665,9 @@ public class RequestManager {
 						case RemoteConstants.PARAMETER_DOUBLE:
 							params.add(Double.parseDouble(e.getText()));
 							break;
+						case RemoteConstants.PARAMETER_XML_ELEMENT:
+							params.add(e.getChildren().get(0));
+							break;
 						}
 					}
 
@@ -1682,20 +1685,29 @@ public class RequestManager {
 					Element resultElement = new Element("Result");
 					if (result instanceof Boolean) {
 						resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_BOOLEAN));
+						resultElement.setText(result.toString());
 					} else if (result instanceof Integer) {
 						resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_INT));
+						resultElement.setText(result.toString());
 					} else if (result instanceof Float) {
 						resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_FLOAT));
+						resultElement.setText(result.toString());
 					} else if (result instanceof String) {
 						resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_STRING));
+						resultElement.setText(result.toString());
 					} else if (result instanceof Long) {
 						resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_LONG));
+						resultElement.setText(result.toString());
 					} else if (result instanceof Double) {
-						resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_DOUBLE));;
+						resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_DOUBLE));
+						resultElement.setText(result.toString());
+					} else if (result instanceof Element) {
+						resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_XML_ELEMENT));
+						resultElement.addContent((Element)result);
 					} else
 						resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_NOT_FOUND));
 
-					resultElement.setText(result.toString());
+
 					response.addContent(resultElement);
 					response.setAttribute("status", Integer.toString(RemoteConstants.IPC_OK));
 				}

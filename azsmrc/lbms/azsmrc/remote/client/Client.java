@@ -754,19 +754,26 @@ public class Client {
 				Element e = new Element ("Parameter");
 				if (o instanceof Boolean) {
 					e.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_BOOLEAN));
+					e.setText(o.toString());
 				} else if (o instanceof Integer) {
 					e.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_INT));
+					e.setText(o.toString());
 				} else if (o instanceof Float) {
 					e.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_FLOAT));
+					e.setText(o.toString());
 				} else if (o instanceof String) {
 					e.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_STRING));
+					e.setText(o.toString());
 				} else if (o instanceof Long) {
 					e.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_LONG));
+					e.setText(o.toString());
 				} else if (o instanceof Double) {
 					e.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_DOUBLE));
-				} else continue; //if nothing matches don't append
-
-				e.setText(o.toString());
+					e.setText(o.toString());
+				} else if (o instanceof Element) {
+					e.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_XML_ELEMENT));
+					e.addContent((Element)o);
+				}else continue; //if nothing matches don't append
 				sendElement.addContent(e);
 			}
 		}
