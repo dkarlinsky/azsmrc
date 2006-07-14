@@ -617,7 +617,7 @@ public class RCMain implements Launchable {
 
 					if (event.getAttributeValue("duration") != null) {
 						normalLogger.info(I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+": "+event.getAttributeValue("name")
-											+I18N.translate(PFX  + "mainwindow.statusbar.downloadFinishedIn")+DisplayFormatters.formatTime(Long.parseLong(event.getAttributeValue("duration"))*1000));
+											+" "+I18N.translate(PFX  + "mainwindow.statusbar.downloadFinishedIn")+DisplayFormatters.formatTime(Long.parseLong(event.getAttributeValue("duration"))*1000));
 						MessageDialog.message(display,I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished"),
 								event.getAttributeValue("name")+"\n"+I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+DisplayFormatters.formatTime(Long.parseLong(event.getAttributeValue("duration"))*1000));
 					}

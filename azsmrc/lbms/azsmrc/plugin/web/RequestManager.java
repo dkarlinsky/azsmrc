@@ -17,6 +17,7 @@ import java.util.zip.GZIPOutputStream;
 import lbms.azsmrc.plugin.main.MultiUser;
 import lbms.azsmrc.plugin.main.MultiUserDownloadListener;
 import lbms.azsmrc.plugin.main.Plugin;
+import lbms.azsmrc.plugin.main.Timers;
 import lbms.azsmrc.plugin.main.User;
 import lbms.azsmrc.plugin.main.Utilities;
 import lbms.azsmrc.shared.DuplicatedUserException;
@@ -54,6 +55,8 @@ import org.gudy.azureus2.plugins.ui.config.Parameter;
 import org.gudy.azureus2.plugins.update.Update;
 import org.gudy.azureus2.plugins.update.UpdateCheckInstance;
 import org.gudy.azureus2.plugins.update.UpdateException;
+import org.gudy.azureus2.plugins.utils.UTTimerEvent;
+import org.gudy.azureus2.plugins.utils.UTTimerEventPerformer;
 import org.gudy.azureus2.plugins.utils.resourcedownloader.ResourceDownloader;
 import org.gudy.azureus2.plugins.utils.resourcedownloader.ResourceDownloaderException;
 import org.gudy.azureus2.pluginsimpl.local.ui.config.BooleanParameterImpl;
@@ -78,6 +81,7 @@ public class RequestManager {
 	private static RequestManager instance = new RequestManager();
 	private Map<String, Integer[]> downloadControlList = new HashMap<String, Integer[]>();
 	private DownloadContainerManager dcm;
+	private UTTimerEvent resumeTask;
 
 	private boolean restart = false;
 
@@ -558,7 +562,6 @@ public class RequestManager {
 						user.eventException(e);
 						e.printStackTrace();
 					} catch (DownloadRemovalVetoException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -699,7 +702,6 @@ public class RequestManager {
 						Download dl = getDownloadByHash (hash);
 						dl.setPosition(newpos);
 					} catch (DataConversionException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (DownloadException e) {
 						user.eventException(e);
@@ -737,7 +739,6 @@ public class RequestManager {
 						Download dl = getDownloadByHash (hash);
 						dl.moveTo(newpos);
 					} catch (DataConversionException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (DownloadException e) {
 						user.eventException(e);
@@ -865,7 +866,6 @@ public class RequestManager {
 						transferList.addContent(dle);
 						response.addContent(transferList);
 					} catch (DataConversionException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (DownloadException e) {
 						user.eventException(e);
@@ -879,8 +879,10 @@ public class RequestManager {
 			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException{
 				Download[] dlList = Plugin.getPluginInterface().getDownloadManager().getDownloads(true);
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
-				for (Download dl:dlList) {
-					if(singleUser || user.hasDownload(dl)) {
+				if (singleUser) {
+					Plugin.getPluginInterface().getDownloadManager().startAllDownloads();
+				} else	for (Download dl:dlList) {
+					if(user.hasDownload(dl)) {
 						try {
 							dl.restart();
 						} catch (DownloadException e) {
@@ -896,8 +898,10 @@ public class RequestManager {
 			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException{
 				Download[] dlList = Plugin.getPluginInterface().getDownloadManager().getDownloads(true);
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
-				for (Download dl:dlList) {
-					if(singleUser || user.hasDownload(dl)) {
+				if (singleUser) {
+					Plugin.getPluginInterface().getDownloadManager().stopAllDownloads();
+				} else	for (Download dl:dlList) {
+					if(user.hasDownload(dl)) {
 						try {
 							dl.stop();
 						} catch (DownloadException e) {
@@ -905,6 +909,33 @@ public class RequestManager {
 							e.printStackTrace();
 						}
 					}
+				}
+				return false;
+			}
+		});
+		addHandler("pauseDownloads", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException{
+				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
+				if (singleUser || user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+					Plugin.getPluginInterface().getDownloadManager().pauseDownloads();
+					if (xmlRequest.getAttribute("timeout") != null) {
+						if (resumeTask != null) resumeTask.cancel();
+						long timeout = System.currentTimeMillis() + Long.parseLong(xmlRequest.getAttributeValue("timeout"))*1000;
+						resumeTask = Timers.getTimer().addEvent(timeout, new UTTimerEventPerformer() {
+							public void perform(UTTimerEvent event) {
+								Plugin.getPluginInterface().getDownloadManager().resumeDownloads();
+							}
+						});
+					}
+				}
+				return false;
+			}
+		});
+		addHandler("resumeDownloads", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException{
+				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
+				if (singleUser || user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+					Plugin.getPluginInterface().getDownloadManager().resumeDownloads();
 				}
 				return false;
 			}

@@ -105,7 +105,7 @@ public class DownloadManagerImpl implements DownloadManager {
 	public Download[] getDownloadsOnly() {
 		List<Download> dl = new ArrayList<Download>();
 		for (Download d:downloads.values()) {
-			if (d.getState()!= Download.ST_SEEDING && d.getStats().getCompleted() != 1000 && d.getState() != Download.ST_STOPPED)
+			if (d.getState()!= Download.ST_SEEDING && !d.isComplete() && d.getState() != Download.ST_STOPPED)
 				dl.add(d);
 		}
 		return dl.toArray(emptyDlArray);
@@ -117,7 +117,7 @@ public class DownloadManagerImpl implements DownloadManager {
 	public Download[] getSeedingDownloadsOnly() {
 		List<Download> dl = new ArrayList<Download>();
 		for (Download d:downloads.values()) {
-			if ((d.getState()== Download.ST_SEEDING || d.getStats().getCompleted() == 1000) && d.getState() != Download.ST_STOPPED)
+			if ((d.getState()== Download.ST_SEEDING || d.isComplete()) && d.getState() != Download.ST_STOPPED)
 				dl.add(d);
 		}
 		return dl.toArray(emptyDlArray);
@@ -134,18 +134,16 @@ public class DownloadManagerImpl implements DownloadManager {
 	}
 
 	public void startAllDownloads() {
-		// TODO Auto-generated method stub
+		client.sendStartAll();
 
 	}
 
 	public void stopAllDownloads() {
-		// TODO Auto-generated method stub
-
+		client.sendStopAll();
 	}
 
 	public boolean isSeedingOnly() {
-		// TODO Auto-generated method stub
-		return false;
+		return getDownloadsOnly().length == 0;
 	}
 
 	public void addListener(DownloadManagerListener l) {

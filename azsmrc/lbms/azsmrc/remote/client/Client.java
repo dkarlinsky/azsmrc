@@ -426,6 +426,20 @@ public class Client {
 		enqueue(sendElement);
 	}
 
+	public void sendPauseDownloads (int timeout) {
+		Element sendElement = getSendElement();
+		sendElement.setAttribute("switch", "pauseDownloads");
+		if (timeout>0)
+			sendElement.setAttribute("timeout", Integer.toString(timeout));
+		enqueue(sendElement);
+	}
+
+	public void sendResumeDownloads () {
+		Element sendElement = getSendElement();
+		sendElement.setAttribute("switch", "resumeDownloads");
+		enqueue(sendElement);
+	}
+
 	public void sendSetForceStart (String hash, boolean start) {
 		Element sendElement = getSendElement();
 		sendElement.setAttribute("switch", "setForceStart");
