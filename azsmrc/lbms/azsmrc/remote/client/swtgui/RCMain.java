@@ -22,7 +22,6 @@ import java.util.InvalidPropertiesFormatException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -266,6 +265,7 @@ public class RCMain implements Launchable {
 
 		final MenuItem addMenuItem = new MenuItem(menu, SWT.CASCADE);
 		addMenuItem.setText(I18N.translate(PFX + "traymenu.add"));
+
 		final Menu addMenu = new Menu(addMenuItem);
 		addMenuItem.setMenu(addMenu);
 
@@ -274,6 +274,18 @@ public class RCMain implements Launchable {
 
 		final MenuItem addByUrl = new MenuItem(addMenu,SWT.PUSH);
 		addByUrl.setText(I18N.translate(PFX + "traymenu.add.byURL"));
+
+		final MenuItem quickMenuItem = new MenuItem(menu, SWT.CASCADE);
+		quickMenuItem.setText(I18N.translate(PFX + "traymenu.quickmenu"));
+
+		final Menu quickMenu = new Menu(addMenuItem);
+		quickMenuItem.setMenu(quickMenu);
+
+		final MenuItem pauseDownloads_1min = new MenuItem(quickMenu,SWT.PUSH);
+		pauseDownloads_1min.setText(I18N.translate(PFX + "traymenu.quickmenu.pause1min"));
+
+		final MenuItem pauseDownloads_5min = new MenuItem(quickMenu,SWT.PUSH);
+		pauseDownloads_5min.setText(I18N.translate(PFX + "traymenu.quickmenu.pause5min"));
 
 		new MenuItem (menu, SWT.SEPARATOR);
 
@@ -344,9 +356,11 @@ public class RCMain implements Launchable {
 				if (!connect){
 					connectDisconnectMenuItem.setText(I18N.translate(PFX + "traymenu.connect"));
 					addMenuItem.setEnabled(false);
+					quickMenuItem.setEnabled(false);
 				}else{
 					connectDisconnectMenuItem.setText(I18N.translate(PFX + "traymenu.disconnect"));
 					addMenuItem.setEnabled(true);
+					quickMenuItem.setEnabled(true);
 				}
 				silentItem.setSelection(SoundManager.isSilent());
 				disablePopupItem.setSelection(!Boolean.parseBoolean(properties.getProperty("popups_enabled")));
@@ -364,6 +378,20 @@ public class RCMain implements Launchable {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				OpenByFileDialog.open(display);
+			}
+		});
+
+		pauseDownloads_1min.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				client.getDownloadManager().pauseDownloads(60);
+			}
+		});
+
+		pauseDownloads_5min.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				client.getDownloadManager().pauseDownloads(300);
 			}
 		});
 

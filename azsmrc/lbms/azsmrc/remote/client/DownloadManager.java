@@ -165,6 +165,17 @@ DownloadManager
 	public void
 	pauseDownloads();
 
+
+	/**
+	 * pause all running downloads.
+	 * 
+	 * Will resume after timeout 
+	 * 
+	 * @param timeout in sec
+	 */
+	public void
+	pauseDownloads(int timeout);
+
 	/**
 	 * resume previously paused downloads
 	 */

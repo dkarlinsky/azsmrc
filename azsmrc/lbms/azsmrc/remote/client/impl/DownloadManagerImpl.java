@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -124,13 +122,18 @@ public class DownloadManagerImpl implements DownloadManager {
 	}
 
 	public void pauseDownloads() {
-		// TODO Auto-generated method stub
+		client.sendPauseDownloads(0);
+	}
 
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.DownloadManager#pauseDownloads(int)
+	 */
+	public void pauseDownloads(int timeout) {
+		client.sendPauseDownloads(timeout);
 	}
 
 	public void resumeDownloads() {
-		// TODO Auto-generated method stub
-
+		client.sendResumeDownloads();
 	}
 
 	public void startAllDownloads() {
