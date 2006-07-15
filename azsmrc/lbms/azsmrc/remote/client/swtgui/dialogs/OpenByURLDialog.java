@@ -8,6 +8,7 @@ package lbms.azsmrc.remote.client.swtgui.dialogs;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
+import lbms.azsmrc.shared.SWTSafeRunnable;
 
 import org.eclipse.swt.SWT;
 //import org.eclipse.swt.dnd.Clipboard;
@@ -31,10 +32,15 @@ public class OpenByURLDialog {
 	//I18N prefix
 	public static final String PFX = "dialog.openbyurldialog.";
 
+	private static OpenByURLDialog instance;
+
+	private Shell shell;
 
 	private OpenByURLDialog(final String url){
+		instance = this;
+
 		//Shell
-		final Shell shell = new Shell(RCMain.getRCMain().getDisplay());
+		shell = new Shell(RCMain.getRCMain().getDisplay());
 		shell.setLayout(new GridLayout(1,false));
 		shell.setText(I18N.translate(PFX + "shell.text"));
 
@@ -220,22 +226,18 @@ public class OpenByURLDialog {
 	 *
 	 */
 	public static void open(){
-		Display display = RCMain.getRCMain().getDisplay();
+		final Display display = RCMain.getRCMain().getDisplay();
 		final String url = RCMain.getRCMain().getAWTClipboardString();
 		if(display == null) return;
-		display.asyncExec(new Runnable(){
-			public void run() {
-				Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
-				for(int i = 0; i < shells.length; i++){
-					if(shells[i].getText().equalsIgnoreCase(I18N.translate(PFX + "shell.text"))){
-						shells[i].setActive();
-						shells[i].setFocus();
-						return;
-					}
-				}
-				new OpenByURLDialog(url);
-			}
+		display.asyncExec(new SWTSafeRunnable(){
+			public void runSafe() {
+				if(display == null) return;
+				if (instance == null || instance.shell == null || instance.shell.isDisposed()){
+					new OpenByURLDialog(url);
+				}else
+					instance.shell.setActive();
 
+			}
 		});
 	}
 
