@@ -29,20 +29,22 @@ import org.eclipse.swt.widgets.Text;
 
 public class SSLCertWizard {
 	private Shell shell;
+	private static SSLCertWizard instance;
 	private Display display;
 	private Composite parent;
 	private Button next,cancel,finish;
-	
+
 //	I18N prefix
 	public static final String PFX = "dialog.sslcertwizard.";
-	
+
 	public SSLCertWizard(){
+		instance = this;
 		display = RCMain.getRCMain().getDisplay();
 
-		shell = new Shell(display);		
+		shell = new Shell(display);
 		shell.setLayout(new GridLayout(1,false));
 		shell.setText(I18N.translate(PFX + "shell.text"));
-		
+
 		parent = new Composite(shell,SWT.BORDER);
 		parent.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 		GridData gd = new GridData(GridData.FILL_BOTH);
@@ -69,14 +71,14 @@ public class SSLCertWizard {
 		cancel.setText(I18N.translate("global.cancel"));
 		cancel.addListener(SWT.Selection, new Listener(){
 
-			public void handleEvent(Event arg0) {				
-				shell.close();				
+			public void handleEvent(Event arg0) {
+				shell.close();
 			}
 		});
 
 		//Next
 		next = new Button(buttonComp,SWT.PUSH);
-		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);		
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		next.setLayoutData(gd);
 		next.setText(I18N.translate(PFX + "next_button.text"));
 		next.setEnabled(false);
@@ -85,7 +87,7 @@ public class SSLCertWizard {
 
 		//Finish
 		finish = new Button(buttonComp,SWT.PUSH);
-		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);		
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		finish.setLayoutData(gd);
 		finish.setText(I18N.translate(PFX + "finish_button.text"));
 		finish.setEnabled(false);
@@ -139,7 +141,7 @@ public class SSLCertWizard {
 
 			public void widgetSelected(SelectionEvent arg0) {
 				RCMain.getRCMain().getClient().sendSetCoreParameter("Security.JAR.tools.dir", text.getText(),RemoteConstants.PARAMETER_STRING);
-				next.removeSelectionListener(this);				
+				next.removeSelectionListener(this);
 				step2();
 			}
 
@@ -184,8 +186,8 @@ public class SSLCertWizard {
 
 		final Text alias_field =new Text(parent,SWT.BORDER);
 
-		alias_field.setText(I18N.translate(PFX + "step2.alias.example"));	
-		
+		alias_field.setText(I18N.translate(PFX + "step2.alias.example"));
+
 
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 2;
@@ -197,9 +199,9 @@ public class SSLCertWizard {
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 3;
 		alias_about.setLayoutData(gridData);
-		
-		
-		
+
+
+
 		// strength
 
 		Label strength_label = new Label(parent,SWT.NULL);
@@ -225,7 +227,7 @@ public class SSLCertWizard {
 
 		// first + last name
 
-		String[]	field_names = { 
+		String[]	field_names = {
 				I18N.translate(PFX + "step2.name.text"),
 				I18N.translate(PFX + "step2.unit.text"),
 				I18N.translate(PFX + "step2.org.text"),
@@ -291,7 +293,7 @@ public class SSLCertWizard {
 
 
 		parent.layout();
-		
+
 	}
 
 	private void step3(){
@@ -302,7 +304,7 @@ public class SSLCertWizard {
 			control.dispose();
 		}
 
-		
+
 		Label info = new Label(parent,SWT.WRAP);
 		info.setText(I18N.translate(PFX + "step3.info.text"));
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -314,32 +316,38 @@ public class SSLCertWizard {
 		sslEnabled.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 		sslEnabled.setText(I18N.translate(PFX + "step3.enablessl_button.text"));
 		sslEnabled.setSelection(true);
-		
+
 		finish.addSelectionListener(new SelectionListener(){
 
 			public void widgetDefaultSelected(SelectionEvent arg0) {}
 
 			public void widgetSelected(SelectionEvent arg0) {
-				
-				RCMain.getRCMain().getClient().transactionStart();			
-				
+
+				RCMain.getRCMain().getClient().transactionStart();
+
 				RCMain.getRCMain().getClient().sendSetPluginParameter("use_ssl", Boolean.toString(sslEnabled.getSelection()), RemoteConstants.PARAMETER_BOOLEAN);
-				
+
 				RCMain.getRCMain().getClient().sendRestartAzureus();
-				
+
 				RCMain.getRCMain().getClient().transactionCommit();
-				
+
 				shell.close();
-				
+
 			}
-			
+
 		});
 		parent.layout();
-		
+
 	}
 
 
-	public static void open() {		
-		new SSLCertWizard();
+	public static void open() {
+		final Display display = RCMain.getRCMain().getDisplay();
+		if(display == null) return;
+		if (instance == null || instance.shell == null || instance.shell.isDisposed()){
+			new SSLCertWizard();
+		}else
+			instance.shell.setActive();
+
 	}
 }
