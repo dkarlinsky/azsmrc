@@ -802,7 +802,7 @@ public class DownloadManagerShell {
 					tbmenu.setLocation (pt.x, pt.y);
 					tbmenu.setVisible (true);
 				}else
-				RCMain.getRCMain().getClient().sendStopAll();
+				RCMain.getRCMain().getClient().getDownloadManager().pauseDownloads();
 			}
 		});
 
@@ -814,7 +814,7 @@ public class DownloadManagerShell {
 		resumeAll.setToolTipText("Resume all paused torrents");
 		resumeAll.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
-				RCMain.getRCMain().getClient().sendStartAll();
+				RCMain.getRCMain().getClient().getDownloadManager().resumeDownloads();
 			}
 		});
 
