@@ -935,6 +935,7 @@ public class RequestManager {
 			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException{
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser || user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+					if (resumeTask != null) resumeTask.cancel();
 					Plugin.getPluginInterface().getDownloadManager().resumeDownloads();
 				}
 				return false;
