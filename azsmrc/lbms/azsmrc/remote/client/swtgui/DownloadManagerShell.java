@@ -251,7 +251,7 @@ public class DownloadManagerShell {
 		menuLogin.setText("&Connect to Server");
 		menuLogin.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
-				new ConnectionDialog(RCMain.getRCMain().getDisplay());
+				ConnectionDialog.open(RCMain.getRCMain().getDisplay());
 			}
 		});
 
@@ -268,7 +268,7 @@ public class DownloadManagerShell {
 					RCMain.getRCMain().connect(true);
 					initializeConnection();
 				} else
-					new ConnectionDialog(RCMain.getRCMain().getDisplay());
+					ConnectionDialog.open(RCMain.getRCMain().getDisplay());
 			}
 		});
 
@@ -463,7 +463,7 @@ public class DownloadManagerShell {
 		login.setToolTipText("Connect to server");
 		login.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
-				new ConnectionDialog(RCMain.getRCMain().getDisplay());
+				ConnectionDialog.open(RCMain.getRCMain().getDisplay());
 			}
 		});
 
@@ -481,7 +481,7 @@ public class DownloadManagerShell {
 					RCMain.getRCMain().connect(true);
 					initializeConnection();
 				} else
-					new ConnectionDialog(RCMain.getRCMain().getDisplay());
+					ConnectionDialog.open(RCMain.getRCMain().getDisplay());
 			}
 		});
 

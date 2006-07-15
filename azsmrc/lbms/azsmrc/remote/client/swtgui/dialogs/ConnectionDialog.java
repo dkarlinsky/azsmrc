@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class ConnectionDialog {
 
-	private int remoteConstants = RemoteConstants.ST_ALL;
+	//private int remoteConstants = RemoteConstants.ST_ALL;
 
 	private Properties properties;
 
@@ -46,15 +46,21 @@ public class ConnectionDialog {
 	private Button save_settings;
 	private Button save_password;
 
-	//I18N prefix
-	public static final String PFX = "dialog.connectiondialog.";
+	private Shell shell;
 
-	public ConnectionDialog(Display display){
+	private static ConnectionDialog instance;
+
+	//I18N prefix
+	private static final String PFX = "dialog.connectiondialog.";
+
+	private ConnectionDialog(Display display){
+		instance = this;
+
 		properties = RCMain.getRCMain().getProperties();
 
 
 		//Shell
-		final Shell shell = new Shell(display);
+		shell = new Shell(display);
 		shell.setLayout(new GridLayout(1,false));
 		shell.setText(I18N.translate(PFX + "shell.text"));
 
@@ -528,5 +534,17 @@ public class ConnectionDialog {
 		if(containsNumber(0))
 			loadIndex(0);
 	}
+
+	/**
+	 * Static open method
+	 */
+	public static void open(Display display){
+		if(display == null) return;
+		if (instance == null || instance.shell == null || instance.shell.isDisposed()){
+			new ConnectionDialog(display);
+		}else
+			instance.shell.setActive();
+	}
+
 
 }//EOF
