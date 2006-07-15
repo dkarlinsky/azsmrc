@@ -25,11 +25,17 @@ public class NormalUserDialog {
 	//I18N prefix
 	public static final String PFX = "dialog.normaluserdialog.";
 
+	private static NormalUserDialog instance;
+
+	private Shell shell;
+
 	private NormalUserDialog(Display display, String username) {
 		if (display == null)
 			return;
 
-		final Shell shell = new Shell(display.getActiveShell());
+		instance = this;
+
+		shell = new Shell(display.getActiveShell());
 		shell.setText(I18N.translate(PFX + "shell.text"));
 		final User user;
 
@@ -155,14 +161,10 @@ public class NormalUserDialog {
 	public static void open(String username) {
 		Display display = RCMain.getRCMain().getDisplay();
 		if(display == null) return;
-		Shell[] shells = display.getShells();
-		for(Shell shell:shells){
-			if(shell.getText().equalsIgnoreCase(I18N.translate(PFX + "shell.text"))){
-				shell.setActive();
-				return;
-			}
-		}
-		new NormalUserDialog(display, username);
+		if (instance == null || instance.shell == null || instance.shell.isDisposed()){
+			new NormalUserDialog(display,username);
+		}else
+			instance.shell.setActive();
 	}
 
 
