@@ -48,6 +48,7 @@ import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.container.DownloadContainer;
 import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ErrorDialog;
+import lbms.azsmrc.remote.client.swtgui.dialogs.InputShell;
 import lbms.azsmrc.remote.client.swtgui.dialogs.MessageDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByFileDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByURLDialog;
@@ -287,6 +288,9 @@ public class RCMain implements Launchable {
 		final MenuItem pauseDownloads_5min = new MenuItem(quickMenu,SWT.PUSH);
 		pauseDownloads_5min.setText(I18N.translate(PFX + "traymenu.quickmenu.pause5min"));
 
+		final MenuItem pauseDownloads_UserSpecified = new MenuItem(quickMenu, SWT.PUSH);
+		pauseDownloads_UserSpecified.setText(I18N.translate(PFX + "traymenu.quickmenu.pauseUserSpecified"));
+
 		new MenuItem (menu, SWT.SEPARATOR);
 
 		final MenuItem connectDisconnectMenuItem = new MenuItem(menu, SWT.PUSH);
@@ -392,6 +396,21 @@ public class RCMain implements Launchable {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				client.getDownloadManager().pauseDownloads(300);
+			}
+		});
+
+		pauseDownloads_UserSpecified.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try{
+					InputShell is = new InputShell(I18N.translate(PFX + "traymenu.quickmenu.pauseUserSpecified.inputShell.title"),
+							I18N.translate(PFX + "traymenu.quickmenu.pauseUserSpecified.inputShell.message"));
+					String str_minutes = is.open();
+					int mins = Integer.parseInt(str_minutes);
+					client.getDownloadManager().pauseDownloads(mins);
+				}catch(Exception ex) {}
+
+
 			}
 		});
 
