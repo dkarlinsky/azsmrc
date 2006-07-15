@@ -15,6 +15,7 @@ import lbms.azsmrc.remote.client.RemoteUpdateManager;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
+import lbms.azsmrc.shared.SWTSafeRunnable;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -36,12 +37,17 @@ public class ServerUpdateDialog {
 //	I18N prefix
 	public static final String PFX = "dialog.serverupdatedialog.";
 
+	private Shell shell;
+	private static ServerUpdateDialog instance;
+
 	private ServerUpdateDialog(){
+		instance = this;
+
 		final RemoteUpdateManager rum = RCMain.getRCMain().getClient().getRemoteUpdateManager();
 
 
 		//Shell
-		final Shell shell = new Shell(RCMain.getRCMain().getDisplay());
+		shell = new Shell(RCMain.getRCMain().getDisplay());
 		shell.setLayout(new GridLayout(1,false));
 		shell.setText(I18N.translate(PFX + "shell.text"));
 
@@ -158,19 +164,16 @@ public class ServerUpdateDialog {
 	 * open the ServerUpdateDialog
 	 */
 	public static void open() {
-		Display display = RCMain.getRCMain().getDisplay();
+		final Display display = RCMain.getRCMain().getDisplay();
 		if(display == null) return;
-		display.asyncExec(new Runnable(){
-			public void run() {
-				Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
-				for(int i = 0; i < shells.length; i++){
-					if(shells[i].getText().equalsIgnoreCase(I18N.translate(PFX + "shell.text"))){
-						shells[i].setActive();
-						shells[i].setFocus();
-						return;
-					}
-				}
-			   new ServerUpdateDialog();
+		display.asyncExec(new SWTSafeRunnable(){
+			public void runSafe() {
+				if(display == null) return;
+				if (instance == null || instance.shell == null || instance.shell.isDisposed()){
+					new ServerUpdateDialog();
+				}else
+					instance.shell.setActive();
+
 
 			}
 
