@@ -73,10 +73,14 @@ public class OpenByFileDialog {
 
 	private Text saveTo;
 
+	private Shell shell;
+
 	private Map<String, AddTorrentContainer> tMap = new HashMap<String, AddTorrentContainer>();
 	private Map<String,String> driveMap = new HashMap<String,String>();
 
 	private AddTorrentContainer activeATC;
+
+	private static OpenByFileDialog instance;
 
 	//private int drag_drop_line_start = -1;
 
@@ -84,11 +88,14 @@ public class OpenByFileDialog {
 	public static final String PFX = "dialog.openbyfiledialog.";
 
 	private OpenByFileDialog(Display display, final String[] filenames) {
+		//set the static instance
+		instance = this;
+
 		//pull last dir if available
 		lastDir =  RCMain.getRCMain().getProperties().getProperty("Last.Directory");
 
 		// Shell
-		final Shell shell = new Shell(display);
+		shell = new Shell(display);
 		shell.setLayout(new GridLayout(1, false));
 		shell.setText(I18N.translate(PFX + "shell.text"));
 
@@ -560,26 +567,23 @@ public class OpenByFileDialog {
 	 */
 	public static void open(Display display){
 		if(display == null) return;
-		Shell[] shells = display.getShells();
-		for(Shell shell:shells){
-			if(shell.getText().equalsIgnoreCase(I18N.translate(PFX + "shell.text"))){
-				shell.setActive();
-				return;
-			}
-		}
-		new OpenByFileDialog(display,null);
+		if (instance == null || instance.shell == null || instance.shell.isDisposed()){
+			new OpenByFileDialog(display, null);
+		}else
+			instance.shell.setActive();
 	}
 
+	/**
+	 * Static open with fileNames
+	 * @param display
+	 * @param fileNames
+	 */
 	public static void open(Display display, String[] fileNames){
 		if(display == null) return;
-		Shell[] shells = display.getShells();
-		for(Shell shell:shells){
-			if(shell.getText().equalsIgnoreCase(I18N.translate(PFX + "shell.text"))){
-				shell.setActive();
-				return;
-			}
-		}
-		new OpenByFileDialog(display, fileNames);
+		if (instance == null || instance.shell == null || instance.shell.isDisposed()){
+			new OpenByFileDialog(display, fileNames);
+		}else
+			instance.shell.setActive();
 	}
 
 
