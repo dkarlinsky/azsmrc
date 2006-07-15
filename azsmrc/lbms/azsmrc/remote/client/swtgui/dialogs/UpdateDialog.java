@@ -6,6 +6,7 @@ import java.util.List;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
+import lbms.azsmrc.shared.SWTSafeRunnable;
 import lbms.tools.updater.Changelog;
 import lbms.tools.updater.Update;
 import lbms.tools.updater.UpdateFile;
@@ -29,6 +30,8 @@ import org.eclipse.swt.custom.CLabel;
 
 public class UpdateDialog{
 
+	private static UpdateDialog instance;
+
 	private Shell dialogShell;
 	private Tree ChangelogTree;
 	private Button cancel;
@@ -39,10 +42,11 @@ public class UpdateDialog{
 	public static final String PFX = "dialog.updatedialog.";
 
 	private UpdateDialog(final Display parent, final Update update, final Updater updater) {
+		instance = this;
+		parent.asyncExec(new SWTSafeRunnable(){
 
-		parent.asyncExec(new Runnable(){
+			public void runSafe() {
 
-			public void run() {
 				try {
 					List<UpdateFile> files = update.getFileList();
 					dialogShell = new Shell(parent);
@@ -204,15 +208,17 @@ public class UpdateDialog{
 	 */
 	public static void open(final Display display, final Update update, final Updater updater){
 		if(display == null) return;
-		Shell[] shells = display.getShells();
-		for(Shell shell:shells){
-			if(shell.getText().equalsIgnoreCase(I18N.translate(PFX + "shell.text"))){
-				shell.setActive();
-				return;
-			}
-		}
-		new UpdateDialog(display,update,updater);
+		if(display == null) return;
+		if (instance == null || instance.dialogShell == null || instance.dialogShell.isDisposed()){
+			new UpdateDialog(display,update,updater);
+		}else
+			instance.dialogShell.setActive();
+
 	}
+
+
+
+
 
 	private String getImportanceLevelString(int level){
 		if(level == Update.LV_BUGFIX)
@@ -238,4 +244,4 @@ public class UpdateDialog{
 		else return I18N.translate("global.error");
 	}
 
-}
+}//EOF
