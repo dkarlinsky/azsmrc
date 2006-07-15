@@ -24,7 +24,8 @@ import org.eclipse.swt.widgets.*;
  */
 public class TableColumnEditorDialog {
 
-	private Display display;
+	private static TableColumnEditorDialog instance;
+
 	private Shell shell;
 	private Color blue;
 	private Table table;
@@ -95,7 +96,9 @@ public class TableColumnEditorDialog {
 	 * Default Constructor
 	 * @param bIsDownloadConatiner
 	 */
-	public TableColumnEditorDialog(final boolean _bIsDownloadConatiner) {
+	private TableColumnEditorDialog(final boolean _bIsDownloadConatiner) {
+		instance = this;
+
 		bIsDownloadContainer = _bIsDownloadConatiner;
 		if(bIsDownloadContainer)
 			tableColumns = DownloadContainer.getColumns();
@@ -104,7 +107,7 @@ public class TableColumnEditorDialog {
 
 
 		RowData rd;
-		display = RCMain.getRCMain().getDisplay();
+		final Display display = RCMain.getRCMain().getDisplay();
 
 		blue = new Color(display,0,0,128);
 
@@ -461,5 +464,16 @@ public class TableColumnEditorDialog {
 	}
 
 
+	/**
+	 *Static open method
+	 */
+	public static void open(final boolean _bIsDownloadConatiner) {
+		final Display display = RCMain.getRCMain().getDisplay();
+		if(display == null) return;
+		if (instance == null || instance.shell == null || instance.shell.isDisposed()){
+			new TableColumnEditorDialog(_bIsDownloadConatiner);
+		}else
+			instance.shell.setActive();
+	}
 }//EOF
 

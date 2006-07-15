@@ -2384,7 +2384,7 @@ public class DownloadManagerShell {
 		editColumns.setText("Edit Columns");
 		editColumns.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
-				new TableColumnEditorDialog(table.equals(downloadsTable)?true:false);
+				TableColumnEditorDialog.open(table.equals(downloadsTable)?true:false);
 			}
 		});
 
