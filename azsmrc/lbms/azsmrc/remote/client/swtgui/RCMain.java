@@ -408,7 +408,7 @@ public class RCMain implements Launchable {
 					String str_minutes = is.open();
 					int mins = Integer.parseInt(str_minutes);
 					client.getDownloadManager().pauseDownloads(mins*60);
-					normalLogger.info("Pausing all downloads for " + mins*60  + " minutes");
+					normalLogger.info("Pausing all downloads for " + mins*60  + " seconds (" + mins + " minutes)");
 				}catch(Exception ex) {}
 
 
