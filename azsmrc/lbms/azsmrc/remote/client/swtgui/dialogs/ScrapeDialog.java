@@ -50,7 +50,7 @@ import org.eclipse.swt.widgets.TableItem;
 public class ScrapeDialog {
 
 	private String lastDir;
-	private static SortedMap<String,AddTorrentContainer> map = new TreeMap<String,AddTorrentContainer>();
+	private SortedMap<String,AddTorrentContainer> addTorrentMap = new TreeMap<String,AddTorrentContainer>();
 
 
 	//SWT components
@@ -149,7 +149,7 @@ public class ScrapeDialog {
 
 						//if already in the map, then do not add it to the map again and just
 						//open the tab for this file
-						if(map.containsKey(atc.getName())){
+						if(addTorrentMap.containsKey(atc.getName())){
 							CTabItem[] items = tabFolder.getItems();
 							for(CTabItem item:items){
 								if(item.getText().equalsIgnoreCase(atc.getName())){
@@ -157,11 +157,11 @@ public class ScrapeDialog {
 									return;
 								}
 							}
-							torrentTabOpen(tabFolder,map.get(atc.getName()));
+							torrentTabOpen(tabFolder,addTorrentMap.get(atc.getName()));
 							return;
 						}
 
-						map.put(atc.getName(), atc);
+						addTorrentMap.put(atc.getName(), atc);
 /*
 						//Add it to the table
 						TableItem item = new TableItem(torrentTable,SWT.NULL);
@@ -176,7 +176,7 @@ public class ScrapeDialog {
 						redrawTable();
 
 						//open its tab
-						torrentTabOpen(tabFolder,map.get(atc.getName()));
+						torrentTabOpen(tabFolder,addTorrentMap.get(atc.getName()));
 
 					}catch(TOTorrentException e){
 						MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION | SWT.OK);
@@ -230,7 +230,7 @@ public class ScrapeDialog {
 						return;
 					}
 				}
-				torrentTabOpen(tabFolder,map.get(items[0].getText(0)));
+				torrentTabOpen(tabFolder,addTorrentMap.get(items[0].getText(0)));
 			}
 
 		});
@@ -241,7 +241,7 @@ public class ScrapeDialog {
 		torrentTable.addListener(SWT.SetData, new Listener(){
 			public void handleEvent(Event event) {
 				try{
-					AddTorrentContainer[] atcArray = map.values().toArray(new AddTorrentContainer[map.size()]);
+					AddTorrentContainer[] atcArray = addTorrentMap.values().toArray(new AddTorrentContainer[addTorrentMap.size()]);
 
 
 					TableItem item = (TableItem) event.item;
@@ -286,7 +286,7 @@ public class ScrapeDialog {
 						item.dispose();
 					}
 				}
-				map.clear();
+				addTorrentMap.clear();
 				//redraw the table
 				redrawTable();
 			}
@@ -774,10 +774,11 @@ public class ScrapeDialog {
 		if(display == null || display.isDisposed()) return;
 		display.asyncExec(new SWTSafeRunnable(){
 			public void runSafe() {
-				addTorrentToMap(torrent);
 				if (instance == null || instance.getShell() == null || instance.getShell().isDisposed()){
 					new ScrapeDialog();
 				}
+				addTorrentToMap(torrent);
+				instance.redrawTable();
 			}
 		});
 	}
@@ -792,13 +793,13 @@ public class ScrapeDialog {
 		if(display == null || display.isDisposed()) return;
 		display.asyncExec(new SWTSafeRunnable(){
 			public void runSafe() {
-				for(File torrent:torrents){
-					addTorrentToMap(torrent);
-				}
-
 				if (instance == null || instance.getShell() == null || instance.getShell().isDisposed()){
 					new ScrapeDialog();
 				}
+				for(File torrent:torrents){
+					addTorrentToMap(torrent);
+				}
+				instance.redrawTable();
 			}
 		});
 	}
@@ -807,8 +808,8 @@ public class ScrapeDialog {
 	private static void addTorrentToMap(final File torrent){
 		try {
 			AddTorrentContainer	atc = new AddTorrentContainer(torrent);
-			if(!map.containsKey(atc.getName())){
-				map.put(atc.getName(), atc);
+			if(!instance.addTorrentMap.containsKey(atc.getName())){
+				instance.addTorrentMap.put(atc.getName(), atc);
 			}
 		} catch (TOTorrentException e) {
 			e.printStackTrace();
@@ -828,7 +829,7 @@ public class ScrapeDialog {
 		display.asyncExec(new SWTSafeRunnable(){
 			public void runSafe() {
 				if(torrentTable != null){
-					torrentTable.setItemCount(map.size());
+					torrentTable.setItemCount(addTorrentMap.size());
 					torrentTable.clearAll();
 				}
 			}
