@@ -34,10 +34,16 @@ public class MoveDataDialog {
 	private Label tDir;
 	private Group gName;
 
+	private Shell shell;
+
+	private static MoveDataDialog instance;
+
 	//I18N prefix
-	public static final String PFX = "dialog.movedatadialog.";
+	private static final String PFX = "dialog.movedatadialog.";
 
 	private MoveDataDialog(Container container){
+		instance = this;
+
 		download = container.getDownload();
 		das = download.getAdvancedStats();
 
@@ -67,7 +73,7 @@ public class MoveDataDialog {
 		//Add the CUL to the Client
 		RCMain.getRCMain().getClient().addClientUpdateListener(cul);
 
-		final Shell shell = new Shell(RCMain.getRCMain().getDisplay());
+		shell = new Shell(RCMain.getRCMain().getDisplay());
 		shell.setText(I18N.translate(PFX + "shell.text"));
 		shell.setLayout(new GridLayout(1,false));
 
@@ -195,25 +201,17 @@ public class MoveDataDialog {
 
 	}
 
+	/**
+	 * Static open method
+	 * @param container
+	 */
 	public static void open(final Container container){
 		Display display = RCMain.getRCMain().getDisplay();
 		if(display == null) return;
-		display.asyncExec(new Runnable(){
-			public void run() {
-				Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
-				for(int i = 0; i < shells.length; i++){
-					if(shells[i].getText().equalsIgnoreCase(I18N.translate(PFX + "shell.text"))){
-						shells[i].setActive();
-						shells[i].setFocus();
-						return;
-					}
-				}
-				new MoveDataDialog(container);
-
-			}
-
-		});
-
-
-	}
+				if(display == null) return;
+				if (instance == null || instance.shell == null || instance.shell.isDisposed()){
+					new MoveDataDialog(container);
+				}else
+					instance.shell.setActive();
+		}
 }
