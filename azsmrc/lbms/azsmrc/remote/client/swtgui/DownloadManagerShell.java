@@ -92,6 +92,7 @@ import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -451,7 +452,7 @@ public class DownloadManagerShell {
 
 
 		//Toolbar for torrent adding and other features
-		ToolBar bar = new ToolBar(DOWNLOAD_MANAGER_SHELL,SWT.HORIZONTAL | SWT.FLAT);
+		final ToolBar bar = new ToolBar(DOWNLOAD_MANAGER_SHELL,SWT.HORIZONTAL | SWT.FLAT);
 		GridData gridData = new GridData();
 		gridData.horizontalSpan = 2;
 		bar.setLayoutData(gridData);
@@ -741,14 +742,71 @@ public class DownloadManagerShell {
 		//separator
 		new ToolItem(bar,SWT.SEPARATOR);
 
-		pauseAll = new ToolItem(bar, SWT.PUSH);
+		pauseAll = new ToolItem(bar, SWT.DROP_DOWN);
 		pauseAll.setImage(ImageRepository.getImage("pause"));
 		pauseAll.setToolTipText("Pause all torrents");
+
+
+
+		final Menu tbmenu = new Menu (DOWNLOAD_MANAGER_SHELL, SWT.POP_UP);
+
+		final MenuItem pauseDownloads_1min = new MenuItem(tbmenu,SWT.PUSH);
+		pauseDownloads_1min.setText(I18N.translate("rcmain." + "traymenu.quickmenu.pause1min"));
+
+		final MenuItem pauseDownloads_5min = new MenuItem(tbmenu,SWT.PUSH);
+		pauseDownloads_5min.setText(I18N.translate("rcmain." + "traymenu.quickmenu.pause5min"));
+
+		final MenuItem pauseDownloads_UserSpecified = new MenuItem(tbmenu, SWT.PUSH);
+		pauseDownloads_UserSpecified.setText(I18N.translate("rcmain." + "traymenu.quickmenu.pauseUserSpecified"));
+
+
+
+		pauseDownloads_1min.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				RCMain.getRCMain().getClient().getDownloadManager().pauseDownloads(60);
+			}
+		});
+
+		pauseDownloads_5min.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				RCMain.getRCMain().getClient().getDownloadManager().pauseDownloads(300);
+			}
+		});
+
+		pauseDownloads_UserSpecified.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try{
+					InputShell is = new InputShell(I18N.translate("rcmain." + "traymenu.quickmenu.pauseUserSpecified.inputShell.title"),
+							I18N.translate("rcmain." + "traymenu.quickmenu.pauseUserSpecified.inputShell.message"));
+					String str_minutes = is.open();
+					int mins = Integer.parseInt(str_minutes);
+					RCMain.getRCMain().getClient().getDownloadManager().pauseDownloads(mins*60);
+					RCMain.getRCMain().getNormalLogger().info("Pausing all downloads for " + mins*60  + " seconds (" + mins + " minutes)");
+				}catch(Exception ex) {}
+
+
+			}
+		});
+
+
+		//main pause listener
 		pauseAll.addListener(SWT.Selection, new Listener(){
-			public void handleEvent (Event e){
+			public void handleEvent (Event event){
+				if (event.detail == SWT.ARROW) {
+					Rectangle rect = pauseAll.getBounds ();
+					Point pt = new Point (rect.x, rect.y + rect.height);
+					pt = bar.toDisplay (pt);
+					tbmenu.setLocation (pt.x, pt.y);
+					tbmenu.setVisible (true);
+				}else
 				RCMain.getRCMain().getClient().sendStopAll();
 			}
 		});
+
+
 
 
 		resumeAll = new ToolItem(bar, SWT.PUSH);
