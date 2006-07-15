@@ -202,19 +202,16 @@ public class OpenByURLDialog {
 	 * @param URL
 	 */
 	public static void openWithURL(final String URL){
-		Display display = RCMain.getRCMain().getDisplay();
+		final Display display = RCMain.getRCMain().getDisplay();
 		if(display == null) return;
-		display.asyncExec(new Runnable(){
-			public void run() {
-				Shell[] shells = RCMain.getRCMain().getDisplay().getShells();
-				for(int i = 0; i < shells.length; i++){
-					if(shells[i].getText().equalsIgnoreCase(I18N.translate(PFX + "shell.text"))){
-						shells[i].setActive();
-						shells[i].setFocus();
-						return;
-					}
-				}
-				new OpenByURLDialog(URL);
+		display.asyncExec(new SWTSafeRunnable(){
+			public void runSafe() {
+				if(display == null) return;
+				if (instance == null || instance.shell == null || instance.shell.isDisposed()){
+					new OpenByURLDialog(URL);
+				}else
+					instance.shell.setActive();
+
 			}
 
 		});
