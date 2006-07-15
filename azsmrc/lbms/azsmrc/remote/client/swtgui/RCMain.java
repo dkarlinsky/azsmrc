@@ -407,7 +407,8 @@ public class RCMain implements Launchable {
 							I18N.translate(PFX + "traymenu.quickmenu.pauseUserSpecified.inputShell.message"));
 					String str_minutes = is.open();
 					int mins = Integer.parseInt(str_minutes);
-					client.getDownloadManager().pauseDownloads(mins);
+					client.getDownloadManager().pauseDownloads(mins*60);
+					normalLogger.info("Pausing all downloads for " + mins*60  + " minutes");
 				}catch(Exception ex) {}
 
 
