@@ -3,7 +3,8 @@ package lbms.azsmrc.remote.client.swtgui.dialogs;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.ColorUtilities;
@@ -49,7 +50,7 @@ import org.eclipse.swt.widgets.TableItem;
 public class ScrapeDialog {
 
 	private String lastDir;
-	private HashMap<String,AddTorrentContainer> map = new HashMap<String,AddTorrentContainer>();
+	private static SortedMap<String,AddTorrentContainer> map = new TreeMap<String,AddTorrentContainer>();
 
 
 	//SWT components
@@ -59,6 +60,7 @@ public class ScrapeDialog {
 	private Button deleteOnSend;
 	private Shell shell;
 	private static ScrapeDialog instance;
+	private File torrentFile;
 
 	//I18N prefix
 	public static final String PFX = "dialog.scrapedialog.";
@@ -137,13 +139,16 @@ public class ScrapeDialog {
 				if (choosen_file != null)
 					try {
 						//Make the file
-						File test = new File(choosen_file);
-						lastDir = test.getParent();
+						torrentFile = new File(choosen_file);
+						lastDir = torrentFile.getParent();
 						RCMain.getRCMain().getProperties().setProperty("Last.Directory", lastDir);
 						RCMain.getRCMain().saveConfig();
 
-						//put the torrent in the container and add to the map
-						AddTorrentContainer atc = new AddTorrentContainer(test);
+						//put the torrent in a container and add to the map
+						AddTorrentContainer atc = new AddTorrentContainer(torrentFile);
+
+						//if already in the map, then do not add it to the map again and just
+						//open the tab for this file
 						if(map.containsKey(atc.getName())){
 							CTabItem[] items = tabFolder.getItems();
 							for(CTabItem item:items){
@@ -155,8 +160,9 @@ public class ScrapeDialog {
 							torrentTabOpen(tabFolder,map.get(atc.getName()));
 							return;
 						}
-						map.put(atc.getName(), atc);
 
+						map.put(atc.getName(), atc);
+/*
 						//Add it to the table
 						TableItem item = new TableItem(torrentTable,SWT.NULL);
 						item.setText(0,atc.getName());
@@ -165,6 +171,9 @@ public class ScrapeDialog {
 						if(torrentTable.indexOf(item)%2!=0){
 							item.setBackground(ColorUtilities.getBackgroundColor());
 						}
+*/
+						//redraw the table
+						redrawTable();
 
 						//open its tab
 						torrentTabOpen(tabFolder,map.get(atc.getName()));
@@ -196,10 +205,12 @@ public class ScrapeDialog {
 		ttGroup.setLayoutData(gd);
 
 		//urlTable
-		torrentTable = new Table(ttGroup,SWT.BORDER | SWT.SINGLE |  SWT.V_SCROLL | SWT.H_SCROLL);
+		torrentTable = new Table(ttGroup,SWT.BORDER | SWT.SINGLE |  SWT.V_SCROLL | SWT.H_SCROLL | SWT.VIRTUAL);
 		gd = new GridData(GridData.FILL_BOTH);
 		torrentTable.setLayoutData(gd);
 		torrentTable.setHeaderVisible(true);
+
+
 
 
 		TableColumn ttName = new TableColumn(torrentTable,SWT.NULL);
@@ -225,6 +236,37 @@ public class ScrapeDialog {
 		});
 
 
+
+		//Virtual listener for table
+		torrentTable.addListener(SWT.SetData, new Listener(){
+			public void handleEvent(Event event) {
+				try{
+					AddTorrentContainer[] atcArray = map.values().toArray(new AddTorrentContainer[map.size()]);
+
+
+					TableItem item = (TableItem) event.item;
+					int index = torrentTable.indexOf(item);
+
+					AddTorrentContainer atc = atcArray[index];
+
+					item.setText(0,atc.getName());
+
+					//Shade every other one
+					if(torrentTable.indexOf(item)%2!=0){
+						item.setBackground(ColorUtilities.getBackgroundColor());
+					}
+
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+
+
+
+			}
+
+		});
+
+
 		//buttons under the urlTable
 		Composite utButtonComp = new Composite(ttGroup,SWT.NULL);
 		utButtonComp.setLayout(new GridLayout(2,false));
@@ -245,7 +287,8 @@ public class ScrapeDialog {
 					}
 				}
 				map.clear();
-				torrentTable.removeAll();
+				//redraw the table
+				redrawTable();
 			}
 		});
 
@@ -722,18 +765,74 @@ public class ScrapeDialog {
 		});
 	}
 
-
-	public static void openAndScrape(File torrent) {
+	/**
+	 * Opens the scrape dialog with a file already in place
+	 * @param File torrent
+	 */
+	public static void openFileAndScrape(final File torrent) {
 		Display display = RCMain.getRCMain().getDisplay();
 		if(display == null || display.isDisposed()) return;
 		display.asyncExec(new SWTSafeRunnable(){
 			public void runSafe() {
-				if (instance == null || instance.getShell() == null || instance.getShell().isDisposed())
+				addTorrentToMap(torrent);
+				if (instance == null || instance.getShell() == null || instance.getShell().isDisposed()){
 					new ScrapeDialog();
-
+				}
 			}
 		});
 	}
 
+
+	/**
+	 * Opens the scrape dialog with an array of files already in place
+	 * @param File[] torrents
+	 */
+	public static void openFilesAndScrape(final File[] torrents) {
+		Display display = RCMain.getRCMain().getDisplay();
+		if(display == null || display.isDisposed()) return;
+		display.asyncExec(new SWTSafeRunnable(){
+			public void runSafe() {
+				for(File torrent:torrents){
+					addTorrentToMap(torrent);
+				}
+
+				if (instance == null || instance.getShell() == null || instance.getShell().isDisposed()){
+					new ScrapeDialog();
+				}
+			}
+		});
+	}
+
+
+	private static void addTorrentToMap(final File torrent){
+		try {
+			AddTorrentContainer	atc = new AddTorrentContainer(torrent);
+			if(!map.containsKey(atc.getName())){
+				map.put(atc.getName(), atc);
+			}
+		} catch (TOTorrentException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * Clears the main table so that .setData can redraw everything
+	 * 
+	 */
+	private void redrawTable() {
+		Display display = RCMain.getRCMain().getDisplay();
+		if(display == null || display.isDisposed()) return;
+		display.asyncExec(new SWTSafeRunnable(){
+			public void runSafe() {
+				if(torrentTable != null){
+					torrentTable.setItemCount(map.size());
+					torrentTable.clearAll();
+				}
+			}
+		});
+	}
 
 }//EOF
