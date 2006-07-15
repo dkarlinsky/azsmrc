@@ -63,11 +63,11 @@ public class DownloadContainer {
 		}
 		if (checking != dl.isChecking()) {
 			checking = dl.isChecking();
-			dle.setAttribute("checking", Boolean.toString(forceStart));
+			dle.setAttribute("checking", Boolean.toString(checking));
 		}
 		if (complete != dl.isComplete()) {
 			complete = dl.isComplete();
-			dle.setAttribute("complete", Boolean.toString(forceStart));
+			dle.setAttribute("complete", Boolean.toString(complete));
 		}
 		if (position != dl.getPosition()) {
 			position = dl.getPosition();
@@ -210,8 +210,8 @@ public class DownloadContainer {
 		dle.setAttribute("name", name);
 		dle.setAttribute("hash", hash);
 		dle.setAttribute("forceStart", Boolean.toString(forceStart));
-		dle.setAttribute("checking", Boolean.toString(forceStart));
-		dle.setAttribute("complete", Boolean.toString(forceStart));
+		dle.setAttribute("checking", Boolean.toString(checking));
+		dle.setAttribute("complete", Boolean.toString(complete));
 		dle.setAttribute("position", Integer.toString(position));
 		dle.setAttribute("downloaded", Long.toString(downloaded));
 		dle.setAttribute("uploaded", Long.toString(uploaded));
