@@ -208,7 +208,6 @@ public class UpdateDialog{
 	 */
 	public static void open(final Display display, final Update update, final Updater updater){
 		if(display == null) return;
-		if(display == null) return;
 		if (instance == null || instance.dialogShell == null || instance.dialogShell.isDisposed()){
 			new UpdateDialog(display,update,updater);
 		}else
