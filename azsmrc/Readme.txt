@@ -30,7 +30,7 @@ AzSMRC is pronounced AzSmirk
 	Server system:
 	1. A running version of Azureus 2.4.0.3 (currently CVS only) or greater
 	2. Java 1.5 or greater
-	3. SWT version 3.1 or greater
+	3. SWT version 3.2 or greater
 		Note:  A fresh installation of Azureus 2.4.0.3 will provide
 		this automatically
 	4. Functioning internet connection with at least one port
@@ -40,9 +40,7 @@ AzSMRC is pronounced AzSmirk
 
 	Remote system:
 	1.  Java 1.5 or greater
-	2.  SWT version 3.1 or greater (3.2M4 does not work well on Windows, if
-			you are going to use the 3.2 branch, be sure to use at least
-			version 3.2M5a or greater)
+	2.  SWT version 3.2
 	3.  Functioning internet connection with at least one port
 		available for communication to the server
 		(default port is 49009)
@@ -76,7 +74,7 @@ Installation of AzSMRC comes in two parts:
 		3.  commons-codec_1.3.jar
 		4.	commons-io_1.2.jar
 
-	jdom and commons-codec/io are contained in the Library.zip file.
+	jdom and commons-codec/io are contained in the pluginLibrary.zip file.
 	Be sure when uncompressing them, to keep the version number as
 	Azureus will not load them if they do not have them.
 
@@ -85,7 +83,7 @@ Installation of AzSMRC comes in two parts:
 3.2  Installing the remote control program
 
 		1.  Create a directory of your choice and extract the
-			contents of the AzSMRC_xxx.zip as well as Library.zip there
+			contents of the AzSMRC_xxx.zip as well as clientLibrary.zip there
 		2.  If you did not download the file with the SWT libraries
 			in it, then you will need to manually obtain those and
 			place them in your chosen folder yourself.
