@@ -848,6 +848,10 @@ public class DownloadManagerShell {
 		manage_users.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
 				User user = RCMain.getRCMain().getClient().getUserManager().getActiveUser();
+				if (user == null) {
+					manage_users.setEnabled(false);
+					return;
+				}
 				if(user.checkAccess(RemoteConstants.RIGHTS_ADMIN))
 					ManageUsersTab.open(tabFolder);
 				else
@@ -1029,7 +1033,7 @@ public class DownloadManagerShell {
 				}
 
 				if ((updateSwitches & Constants.UPDATE_USERS) != 0){
-					setLogInOutButtons(true);
+					setUserButton();
 				}
 				if (redrawTables) {
 					redrawTables();
@@ -1867,6 +1871,18 @@ public class DownloadManagerShell {
 		});
 	}
 
+	public void setUserButton () {
+		Display display = RCMain.getRCMain().getDisplay();
+		if(display == null || display.isDisposed()) return;
+		display.asyncExec(new SWTSafeRunnable() {
+			public void runSafe() {
+				User user = RCMain.getRCMain().getClient().getUserManager().getActiveUser();
+				if (user != null)
+					manage_users.setEnabled(true);
+			}
+		});
+	}
+
 
 	public void setLogInOutButtons(final boolean bLoggedIn){
 		Display display = RCMain.getRCMain().getDisplay();
@@ -1891,7 +1907,6 @@ public class DownloadManagerShell {
 					addTorrent_by_url.setEnabled(true);
 					pauseAll.setEnabled(true);
 					resumeAll.setEnabled(true);
-					manage_users.setEnabled(true);
 				}else{
 					login.setEnabled(true);
 					menuLogin.setEnabled(true);
