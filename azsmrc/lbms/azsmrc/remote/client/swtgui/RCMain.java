@@ -453,7 +453,7 @@ public class RCMain implements Launchable {
 			InputStream is = null;
 			try {
 				is = RCMain.class.getClassLoader().getResourceAsStream("default.cfg");
-				properties.loadFromXML(is);
+				defaultProps.loadFromXML(is);
 				is.close();
 				properties = new ExtendedProperties(defaultProps); //read in default values
 			} catch (IOException e1) {
