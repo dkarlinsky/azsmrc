@@ -65,6 +65,7 @@ import lbms.azsmrc.remote.client.util.TimerEvent;
 import lbms.azsmrc.remote.client.util.TimerEventPerformer;
 import lbms.azsmrc.remote.client.util.TimerEventPeriodic;
 import lbms.azsmrc.shared.RemoteConstants;
+import lbms.tools.ExtendedProperties;
 import lbms.tools.launcher.Launchable;
 import lbms.tools.updater.Update;
 import lbms.tools.updater.UpdateListener;
@@ -97,7 +98,8 @@ public class RCMain implements Launchable {
 	protected Display display;
 	private static RCMain rcMain;
 	private Client client;
-	private Properties properties, azsmrcProperties;
+	private ExtendedProperties properties;
+	private Properties  azsmrcProperties;
 	private File confFile;
 	private Timer timer;
 	private TimerEventPeriodic updateTimer;
@@ -172,14 +174,14 @@ public class RCMain implements Launchable {
 		terminated = false;
 
 
-		connect = (Boolean.parseBoolean(properties.getProperty("auto_connect","false")));
+		connect = properties.getPropertyAsBoolean("auto_connect");
 		createContents();
 		if (connect) {
 			if (properties.getProperty("connection_password_0", "").equals("")
 					|| properties.getProperty("connection_username_0", "").equals("")
 					|| properties.getProperty("connection_lastURL_0", "").equals("")) {
 				connect = false;
-			} else if (Boolean.parseBoolean(properties.getProperty("auto_open", "true"))) {
+			} else if (properties.getPropertyAsBoolean("auto_open", true)) {
 				updateTimer(true);
 				client.getDownloadManager().update(true);
 			} else {
@@ -207,7 +209,7 @@ public class RCMain implements Launchable {
 		ImageRepository.loadImages(display);
 
 		//Show Splash
-		if(Boolean.parseBoolean(properties.getProperty("show_splash","true"))){
+		if(properties.getPropertyAsBoolean("show_splash",true)){
 			new SplashScreen(RCMain.getRCMain().getDisplay(),20);
 		}
 
@@ -251,7 +253,7 @@ public class RCMain implements Launchable {
 
 		//Open mainWindow if AutoOpen is true
 
-		if(Boolean.parseBoolean(properties.getProperty("auto_open", "true"))){
+		if(properties.getPropertyAsBoolean("auto_open", true)){
 			if (mainWindow == null) {
 				mainWindow = new DownloadManagerShell();
 			}
@@ -367,7 +369,7 @@ public class RCMain implements Launchable {
 					quickMenuItem.setEnabled(true);
 				}
 				silentItem.setSelection(SoundManager.isSilent());
-				disablePopupItem.setSelection(!Boolean.parseBoolean(properties.getProperty("popups_enabled")));
+				disablePopupItem.setSelection(!properties.getPropertyAsBoolean("popups_enabled"));
 			}
 		});
 
@@ -425,7 +427,7 @@ public class RCMain implements Launchable {
 		disablePopupItem.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				properties.setProperty("popups_enabled", Boolean.toString(silentItem.getSelection()));
+				properties.setProperty("popups_enabled", silentItem.getSelection());
 			}
 		});
 
@@ -446,7 +448,7 @@ public class RCMain implements Launchable {
 		System.out.println("Checking javaw.exe.manifest");
 		javawExeManifest();
 		confFile = new File(USER_DIR+FSEP+"config.cfg");
-		properties = new Properties();
+		properties = new ExtendedProperties();
 		System.out.println("Loading Properties.");
 		if (confFile.exists() && confFile.canRead()) {
 			FileInputStream fin = null;
@@ -560,7 +562,7 @@ public class RCMain implements Launchable {
 		client.setServer(properties.getProperty("connection_lastURL_0",null));
 		client.setUsername(properties.getProperty("connection_username_0"));
 		client.setPassword(properties.getProperty("connection_password_0"));
-		client.setFastMode(Boolean.parseBoolean(properties.getProperty("client.fastmode", "false")));
+		client.setFastMode(properties.getPropertyAsBoolean("client.fastmode"));
 		client.addSpeedUpdateListener(new SpeedUpdateListener() {
 			public void setSpeed(final int d, final int u) {
 				if(display != null)
@@ -759,7 +761,7 @@ public class RCMain implements Launchable {
 							+ " " + update.getVersion());
 				}
 				normalLogger.info("Update Available: Version "+update.getVersion());
-				if (Boolean.parseBoolean(properties.getProperty("update.autoupdate", "false"))) {
+				if (properties.getPropertyAsBoolean("update.autoupdate")) {
 					updater.doUpdate();
 				}else{
 					display.asyncExec(new Runnable() {
@@ -795,15 +797,15 @@ public class RCMain implements Launchable {
 				UpdateProgressDialog.initialize(dls);
 			}
 		});
-		if (Boolean.parseBoolean(properties.getProperty("update.autocheck", "true"))) {
-			long lastcheck = Long.parseLong(properties.getProperty("update.lastcheck", "0"));
+		if (properties.getPropertyAsBoolean("update.autocheck", true)) {
+			long lastcheck = properties.getPropertyAsLong("update.lastcheck");
 			if (System.currentTimeMillis()-lastcheck > 1000*60*60*24) {
 				if (mainWindow != null) {
 					mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.checking"));
 				}
 				normalLogger.info("Checking for Updates");
-				updater.checkForUpdates(Boolean.parseBoolean(properties.getProperty("update.beta", "false")));
-				properties.setProperty("update.lastcheck",Long.toString(System.currentTimeMillis()));
+				updater.checkForUpdates(properties.getPropertyAsBoolean("update.beta"));
+				properties.setProperty("update.lastcheck",System.currentTimeMillis());
 			}
 		}
 		System.out.println("Loading Sounds.");
@@ -828,9 +830,9 @@ public class RCMain implements Launchable {
 	public long getRunTime() {
 		long now = System.currentTimeMillis();
 		long rTime = (now-runTime)
-			+Long.parseLong(properties.getProperty("runTime", "0"));
+			+properties.getPropertyAsLong("runTime");
 		runTime = now;
-		properties.setProperty("runTime", Long.toString(rTime));
+		properties.setProperty("runTime", rTime);
 		return rTime;
 	}
 
@@ -875,7 +877,7 @@ public class RCMain implements Launchable {
 		if (updateTimer != null) updateTimer.cancel();
 		debugLogger.finer("Changing Timer: "+(open?"GUI mode":"Tray mode"));
 		if (open) {
-			updateTimer = timer.addPeriodicEvent(Long.parseLong(properties.getProperty("connection_interval_open","5000"))+delay,
+			updateTimer = timer.addPeriodicEvent(properties.getPropertyAsLong("connection_interval_open",5000)+delay,
 				new TimerEventPerformer() {
 				public void perform(TimerEvent event) {
 					debugLogger.finest("Timer: GUI mode");
@@ -884,7 +886,7 @@ public class RCMain implements Launchable {
 			});
 		}
 		else {
-			updateTimer = timer.addPeriodicEvent(Long.parseLong(properties.getProperty("connection_interval_closed","15000"))+delay,
+			updateTimer = timer.addPeriodicEvent(properties.getPropertyAsLong("connection_interval_closed",15000)+delay,
 				new TimerEventPerformer() {
 				public void perform(TimerEvent event) {
 					debugLogger.finest("Timer: Tray mode");
@@ -958,7 +960,7 @@ public class RCMain implements Launchable {
 		return normalLogger;
 	}
 
-	public Properties getProperties() {
+	public ExtendedProperties getProperties() {
 		return properties;
 	}
 
@@ -1043,7 +1045,7 @@ public class RCMain implements Launchable {
 	}
 
 	public void loadSounds() {
-		if (!Boolean.parseBoolean(properties.getProperty("soundManager.active", "true"))) return;
+		if (!properties.getPropertyAsBoolean("soundManager.active", true)) return;
 		loadSound(Sound.ERROR, 					properties.getProperty("sound.Error"));
 		loadSound(Sound.DOWNLOAD_ADDED, 		properties.getProperty("sound.DownloadAdded"));
 		loadSound(Sound.DOWNLOADING_FINISHED,	properties.getProperty("sound.DownloadingFinished"));
@@ -1114,7 +1116,7 @@ public class RCMain implements Launchable {
 			Pattern magnetPattern = Pattern.compile("^magnet:\\?xt=urn:btih:[A-Za-z2-7]{32}$",Pattern.CASE_INSENSITIVE);
 
 			public void flavorsChanged(FlavorEvent event) {
-				if(connect && Boolean.parseBoolean(properties.getProperty("auto_clipboard",Utilities.isLinux()? "false" : "true"))){
+				if(connect && properties.getPropertyAsBoolean("auto_clipboard",Utilities.isLinux()? false : true)){
 					try {
 						Transferable contents = clipboard.getContents(this);
 						if ( ( contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor) ) {

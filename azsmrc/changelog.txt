@@ -1,12 +1,29 @@
-Changelog for Version: 0.9.6
+Changelog for Version: 0.9.7
 
 ***New Features***
 
-- Automatic ErrorReporter
-- Graphical Updater
+- Main tables are now sortable by column
+- My Tracker tab added to manage shares.  Includes Hosting and Publishing of a torrent file
+- Added the ability to use sounds
+- A normal user can now change their password remotely
+- Added a Scrape and Announce button to the torrent details tab
+- Double-Clicking on the connection icon or the SSL icon will now open the Server Details tab
+
+***Changes***
+
+- Display the how long it took to complete the download in the sliding alert window
+- Major work on the Downloads and Seeding tables to increase speed and stability
+- Tray menu now includes a 'silent mode' to disable all sounds
+- Tray menu now includes disable all Popups switch
+- Tray menu and ToolBar menu now includes a quick pause feature to pause torrents for a given amount of time
+- Added an Update File stats button to the files sub tab of the torrent details
+- Enhanced Scrape Dialog some to allow for passing a torrent file to it directly
+- Many tweaks to the transfer packages to reduce their size, especially if there are many stopped torrents
 
 ***BugFixes***
 
-- fixed crash in Azureus Remote Configuration
-- fixed crash in AddByFile
+- Fix 'Manage Users' so that all features now work
+- Fixed many SWT errors for Update Dialog and ServerUpdate Dialog
+- Fixed the updater so that it works correctly now
+- Fixed many Null Point Errors and Widget is Disposed Errors
 
