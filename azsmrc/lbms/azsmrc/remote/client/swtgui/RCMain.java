@@ -355,7 +355,6 @@ public class RCMain implements Launchable {
 		menu.addMenuListener(new MenuListener(){
 
 			public void menuHidden(MenuEvent arg0) {
-				// TODO Auto-generated method stub
 			}
 
 			public void menuShown(MenuEvent arg0) {
@@ -448,36 +447,33 @@ public class RCMain implements Launchable {
 		System.out.println("Checking javaw.exe.manifest");
 		javawExeManifest();
 		confFile = new File(USER_DIR+FSEP+"config.cfg");
-		properties = new ExtendedProperties();
+		properties = null;
+		{
+			Properties defaultProps = new Properties();
+			InputStream is = null;
+			try {
+				is = RCMain.class.getClassLoader().getResourceAsStream("default.cfg");
+				properties.loadFromXML(is);
+				is.close();
+				properties = new ExtendedProperties(defaultProps); //read in default values
+			} catch (IOException e1) {
+				properties = new ExtendedProperties(); //if something happens create empty properties
+				e1.printStackTrace();
+			} finally {
+				if (is!=null) try { is.close(); } catch (IOException e) {}
+			}
+		}
+
 		System.out.println("Loading Properties.");
 		if (confFile.exists() && confFile.canRead()) {
 			FileInputStream fin = null;
 			try {
 				fin = new FileInputStream(confFile);
 				properties.loadFromXML(fin);
-			}  catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvalidPropertiesFormatException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}  finally {
 				if (fin!=null) try { fin.close(); } catch (IOException e) {}
-			}
-		} else {
-			InputStream is = null;
-			try {
-				is = RCMain.class.getClassLoader().getResourceAsStream("default.cfg");
-				properties.loadFromXML(is);
-				is.close();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} finally {
-				if (is!=null) try { is.close(); } catch (IOException e) {}
 			}
 		}
 		azsmrcProperties = new Properties();
@@ -488,7 +484,6 @@ public class RCMain implements Launchable {
 				azsmrcProperties.load(is);
 				is.close();
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			} finally {
 				if (is!=null) try { is.close(); } catch (IOException e) {}
@@ -1027,17 +1022,12 @@ public class RCMain implements Launchable {
 				if (!confFile.exists()) confFile.createNewFile();
 				fos = new FileOutputStream(confFile);
 				properties.storeToXML(fos, null);
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} finally {if (fos != null)
 				try {
 					fos.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -1090,13 +1080,10 @@ public class RCMain implements Launchable {
 			  }
 			}
 		} catch (HeadlessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (UnsupportedFlavorException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (RuntimeException e) {
 			e.printStackTrace();
