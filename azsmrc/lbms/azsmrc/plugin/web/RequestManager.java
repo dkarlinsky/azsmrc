@@ -399,6 +399,7 @@ public class RequestManager {
 				Download[] dlList = Plugin.getPluginInterface().getDownloadManager().getDownloads(true);
 				for (Download dl:dlList) {
 					if(singleUser || user.hasDownload(dl)) {
+						if (dl.getTorrent() == null) continue;
 						Element dle = new Element ("Transfer");
 						setDlStats(dle, dl, switches);
 						transferList.addContent(dle);

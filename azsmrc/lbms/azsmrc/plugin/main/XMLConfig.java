@@ -321,7 +321,8 @@ public class XMLConfig {
 	public void removeInvalidDownloadsFromUsers (Download[] dls) {
 		List<String> dlh = new ArrayList<String>();
 		for (int i=0;i<dls.length;i++) {
-			dlh.add(EncodingUtil.encode(dls[i].getTorrent().getHash()));
+			if (dls[i].getTorrent() != null)
+				dlh.add(EncodingUtil.encode(dls[i].getTorrent().getHash()));
 		}
 		Set<String> keys = userList.keySet();
 		for (String key:keys) {

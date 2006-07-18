@@ -133,7 +133,9 @@ public class User extends lbms.azsmrc.shared.User {
 	 * @return String represantation of the downloadHash
 	 */
 	public String getDlHash(Download dl) {
-		return EncodingUtil.encode(dl.getTorrent().getHash());
+		if (dl.getTorrent()!=null)
+			return EncodingUtil.encode(dl.getTorrent().getHash());
+		return "";
 	}
 
 	/**
@@ -190,7 +192,8 @@ public class User extends lbms.azsmrc.shared.User {
 		event.setAttribute("name", dl.getName());
 		event.setAttribute("hash", getDlHash(dl));
 		event.setAttribute("duration", Long.toString(dl.getStats().getSecondsDownloading()));
-		event.setAttribute("avgDownload", Plugin.getPluginInterface().getUtilities().getFormatters().formatByteCountToKiBEtcPerSec(dl.getTorrent().getSize()/dl.getStats().getSecondsDownloading()));
+		if (dl.getTorrent() != null)
+			event.setAttribute("avgDownload", Plugin.getPluginInterface().getUtilities().getFormatters().formatByteCountToKiBEtcPerSec(dl.getTorrent().getSize()/dl.getStats().getSecondsDownloading()));
 		removeDownload(dl);
 		eventQueue.offer(event);
 	}

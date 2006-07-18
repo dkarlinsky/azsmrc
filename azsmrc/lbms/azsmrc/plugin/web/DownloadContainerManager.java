@@ -24,7 +24,11 @@ public class DownloadContainerManager {
 		 * @see org.gudy.azureus2.plugins.download.DownloadManagerListener#downloadAdded(org.gudy.azureus2.plugins.download.Download)
 		 */
 		public void downloadAdded(Download download) {
-			dcList.add(new DownloadContainer(download));
+			try {
+				dcList.add(new DownloadContainer(download));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		/* (non-Javadoc)
 		 * @see org.gudy.azureus2.plugins.download.DownloadManagerListener#downloadRemoved(org.gudy.azureus2.plugins.download.Download)

@@ -8,8 +8,7 @@
 	<property name="generic.excludes" value="**/*.jar **/*.txt **/*.jardesc **/.classpath **/.project **/aereg.lib **/aereg.dll **/.svn" />
 	<property name="dist.jar.excludes" value="${generic.excludes} **/*.java " />
 	
-
-
+	
 	<target name="init">
 		<echo message="Preparing to build AzSMRC..." />
 
@@ -94,6 +93,15 @@
 			<fileset file="${root.dir}/changelog.txt" />
 			<fileset file="${dist.dir}/AzSMRC_${version}.jar" />
 		</zip>
+	</target>	
+
+	<target name="setupFiles">
+		<taskdef name="nsis" classname="net.sf.nsisant.Task">
+			<classpath location="../nsisant-1.1.jar"/>
+		</taskdef>
+		<nsis script="${root.dir}/setup.nsi">
+			<define name="Version" value="${version}"/>
+		</nsis>
 	</target>
 
 	<target name="modPluginProps">

@@ -42,8 +42,9 @@ public class DownloadContainer {
 	private long last_scrape, next_scrape;
 	private long announceTTW, size;
 
-	public DownloadContainer (Download dl) {
+	public DownloadContainer (Download dl) throws Exception {
 		this.dl = dl;
+		if (dl.getTorrent() == null) throw new Exception("Torrent not here");
 		_new = true;
 		setDlStats();
 	}
