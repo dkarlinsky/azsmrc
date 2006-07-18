@@ -662,7 +662,7 @@ public class RCMain implements Launchable {
 
 					if (event.getAttributeValue("duration") != null) {
 						long duration = Long.parseLong(event.getAttributeValue("duration"));
-						String avgDl = DisplayFormatters.formatByteCountToBase10KBEtcPerSec(client.getDownloadManager().getDownload(event.getAttributeValue("hash")).getSize()/duration);
+						String avgDl = (event.getAttributeValue("avgDownload") != null)?event.getAttributeValue("avgDownload") : "";
 						normalLogger.info(I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+": "+event.getAttributeValue("name")
 											+" "+I18N.translate(PFX  + "mainwindow.statusbar.downloadFinishedIn")+DisplayFormatters.formatTime(duration*1000)+" "+avgDl);
 						MessageDialog.message(display,I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished"),

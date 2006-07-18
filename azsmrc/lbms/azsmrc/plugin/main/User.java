@@ -190,6 +190,7 @@ public class User extends lbms.azsmrc.shared.User {
 		event.setAttribute("name", dl.getName());
 		event.setAttribute("hash", getDlHash(dl));
 		event.setAttribute("duration", Long.toString(dl.getStats().getSecondsDownloading()));
+		event.setAttribute("avgDownload", Plugin.getPluginInterface().getUtilities().getFormatters().formatByteCountToKiBEtcPerSec(dl.getTorrent().getSize()/dl.getStats().getSecondsDownloading()));
 		removeDownload(dl);
 		eventQueue.offer(event);
 	}
