@@ -46,7 +46,7 @@ public class ExtendedProperties extends Properties {
 	 * @return
 	 */
 	public boolean getPropertyAsBoolean (String key) {
-		return Boolean.parseBoolean(key);
+		return Boolean.parseBoolean(getProperty(key));
 	}
 
 	/**
@@ -64,7 +64,7 @@ public class ExtendedProperties extends Properties {
 		if (prop == null)
 			return def;
 		else
-			return Boolean.parseBoolean(key);
+			return Boolean.parseBoolean(getProperty(key));
 	}
 
 	/**
