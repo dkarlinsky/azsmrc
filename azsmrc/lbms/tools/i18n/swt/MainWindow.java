@@ -660,22 +660,31 @@ public class MainWindow {
 		add.setLayoutData(gd);
 		add.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
-				NewDialog dlog = new NewDialog("Enter New Key and Default Value");
-				String[] newKey = dlog.open();
-				if(newKey[0] == null) return; //User Cancelled
-				if(newKey[0].equalsIgnoreCase("")){
-					MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
-					mb.setText("Error");
-					mb.setMessage("You did not enter a value for the key, please choose Add again and enter a value for the key.");
-					mb.open();
-					return;
+				try{
+					NewDialog dlog = new NewDialog("Enter New Key and Default Value");
+					if(mainTable.getSelectionCount() == 1){
+						TableItem item = mainTable.getSelection()[0];
+						String title = item.getText(1);
+						dlog.setTextValue(title, "");
+					}
+
+					String[] newKey = dlog.open();
+					if(newKey[0] == null) return; //User Cancelled
+					if(newKey[0].equalsIgnoreCase("")){
+						MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
+						mb.setText("Error");
+						mb.setMessage("You did not enter a value for the key, please choose Add again and enter a value for the key.");
+						mb.open();
+						return;
+					}
+
+					defaultMap.put(newKey[0], newKey[1]);
+					transMap.put(newKey[0], "");
+					clearTable();
+					isSaved = false;
+				}catch(Exception e){
+					e.printStackTrace();
 				}
-
-				defaultMap.put(newKey[0], newKey[1]);
-				transMap.put(newKey[0], "");
-				clearTable();
-				isSaved = false;
-
 			}
 		});
 

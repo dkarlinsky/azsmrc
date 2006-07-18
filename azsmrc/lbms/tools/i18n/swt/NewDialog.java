@@ -16,19 +16,19 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 
-public class NewDialog {	
+public class NewDialog {
 	private String sTitleKey;
-	
-	
-	
+
+
+
 	private String[] textValue = {"",""};
 
 
 	public NewDialog(String Title) {
 		this.sTitleKey = Title;
-		
-		
-		
+
+
+
 
 		this.setTextValue("","");
 	}
@@ -40,14 +40,14 @@ public class NewDialog {
 
 		final Shell shell = new Shell(display.getActiveShell());
 		shell.setText(sTitleKey);
-		
+
 
 		GridLayout layout = new GridLayout();
 		shell.setLayout(layout);
 
 		Label label = new Label(shell, SWT.WRAP);
 		label.setText("New Key Name");
-		
+
 		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.widthHint = 200;
 		label.setLayoutData(gridData);
@@ -58,11 +58,16 @@ public class NewDialog {
 		textKey.setLayoutData(gridData);
 		textKey.setText(textValue[0]);
 		textKey.selectAll();
+		try{
+			if(textKey.getText().lastIndexOf(".") > 0)
+				textKey.setSelection(textKey.getText().lastIndexOf("."),textKey.getText().length());
+		}catch(Exception e){}
 
-		
+
+
 		Label label2 = new Label(shell, SWT.WRAP);
 		label2.setText("Default Value");
-		
+
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.widthHint = 200;
 		label.setLayoutData(gridData);
@@ -73,8 +78,8 @@ public class NewDialog {
 		textObj.setLayoutData(gridData);
 		textObj.setText(textValue[1]);
 		textObj.selectAll();
-		
-		
+
+
 		Composite panel = new Composite(shell, SWT.NULL);
 		layout = new GridLayout();
 		layout.numColumns = 3;
@@ -117,7 +122,7 @@ public class NewDialog {
 		});
 
 		shell.pack();
-		centerShellRelativeToandOpen(shell,ETC.getETC().getMainWindow().getShell());		
+		centerShellRelativeToandOpen(shell,ETC.getETC().getMainWindow().getShell());
 		setTextValue(null,null);
 		shell.open();
 
