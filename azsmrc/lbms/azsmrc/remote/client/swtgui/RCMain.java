@@ -661,10 +661,12 @@ public class RCMain implements Launchable {
 					SoundManager.playSound(Sound.DOWNLOADING_FINISHED);
 
 					if (event.getAttributeValue("duration") != null) {
+						long duration = Long.parseLong(event.getAttributeValue("duration"));
+						String avgDl = DisplayFormatters.formatByteCountToBase10KBEtcPerSec(client.getDownloadManager().getDownload(event.getAttributeValue("hash")).getSize()/duration);
 						normalLogger.info(I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+": "+event.getAttributeValue("name")
-											+" "+I18N.translate(PFX  + "mainwindow.statusbar.downloadFinishedIn")+DisplayFormatters.formatTime(Long.parseLong(event.getAttributeValue("duration"))*1000));
+											+" "+I18N.translate(PFX  + "mainwindow.statusbar.downloadFinishedIn")+DisplayFormatters.formatTime(duration*1000)+" "+avgDl);
 						MessageDialog.message(display,I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished"),
-								event.getAttributeValue("name")+"\n"+I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+DisplayFormatters.formatTime(Long.parseLong(event.getAttributeValue("duration"))*1000));
+								event.getAttributeValue("name")+"\n"+I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+DisplayFormatters.formatTime(duration*1000)+" "+avgDl);
 					}
 					else {
 						normalLogger.info(I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+": "+event.getAttributeValue("name"));
