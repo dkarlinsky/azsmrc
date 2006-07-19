@@ -100,10 +100,10 @@
 			<classpath location="../nsisant-1.1.jar"/>
 		</taskdef>
 		<!-- grab the NSIS Ant Tasks here http://sourceforge.net/projects/nsisant/ -->
-		<nsis script="${nsisand.dir}/setup_noswt.nsi">
+		<nsis script="${nsisant.dir}/setup_noswt.nsi">
 			<define name="VERSION" value="${version}"/>
 		</nsis>
-		<nsis script="${nsisand.dir}/setup_swt.nsi">
+		<nsis script="${nsisant.dir}/setup_swt.nsi">
 			<define name="VERSION" value="${version}"/>
 		</nsis>
 	</target>
