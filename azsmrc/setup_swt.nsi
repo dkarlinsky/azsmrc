@@ -59,6 +59,7 @@ Section -Main SEC0000
 	File Readme.txt
 	File AzSMRCupdate.xml.gz
 	File launch.properties
+	File javaw.exe.manifest
 	File lbms\azsmrc\libs\jdom_1.0.jar
 	File lbms\azsmrc\libs\commons-codec_1.3.jar
 	WriteRegStr HKLM "${REGKEY}\Components" Main 1
@@ -116,6 +117,7 @@ Section /o un.Main UNSEC0000
 	Delete /REBOOTOK $INSTDIR\commons-codec_1.3.jar
 	Delete /REBOOTOK $INSTDIR\jdom_1.0.jar
 	Delete /REBOOTOK "$INSTDIR\AzSMRC_${VERSION}.jar"
+	Delete /REBOOTOK $INSTDIR\javaw.exe.manifest
 	Delete /REBOOTOK $INSTDIR\AzSMRC.exe
 	Delete /REBOOTOK $INSTDIR\launcher.jar
 	Delete /REBOOTOK $INSTDIR\license.txt
