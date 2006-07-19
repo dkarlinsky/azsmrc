@@ -99,8 +99,12 @@
 		<taskdef name="nsis" classname="net.sf.nsisant.Task">
 			<classpath location="../nsisant-1.1.jar"/>
 		</taskdef>
-		<nsis script="${root.dir}/setup.nsi">
-			<define name="Version" value="${version}"/>
+		<!-- grab the NSIS Ant Tasks here http://sourceforge.net/projects/nsisant/ -->
+		<nsis script="${nsisand.dir}/setup_noswt.nsi">
+			<define name="VERSION" value="${version}"/>
+		</nsis>
+		<nsis script="${nsisand.dir}/setup_swt.nsi">
+			<define name="VERSION" value="${version}"/>
 		</nsis>
 	</target>
 
