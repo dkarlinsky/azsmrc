@@ -97,13 +97,15 @@
 
 	<target name="setupFiles">
 		<taskdef name="nsis" classname="net.sf.nsisant.Task">
-			<classpath location="../nsisant-1.1.jar"/>
+			<classpath location="${nsisant.dir}/nsisant-1.1.jar"/>
 		</taskdef>
 		<!-- grab the NSIS Ant Tasks here http://sourceforge.net/projects/nsisant/ -->
-		<nsis script="${nsisant.dir}/setup_noswt.nsi">
+		<echo message="Creating Setup no SWT version" />
+		<nsis script="setup_noswt.nsi" makensispath="C:/Programme/NSIS/">
 			<define name="VERSION" value="${version}"/>
 		</nsis>
-		<nsis script="${nsisant.dir}/setup_swt.nsi">
+		<echo message="Creating Setup SWT version" />
+		<nsis script="setup_swt.nsi" makensispath="C:/Programme/NSIS/">
 			<define name="VERSION" value="${version}"/>
 		</nsis>
 	</target>
