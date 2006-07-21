@@ -36,7 +36,7 @@ public class ReadmeTab {
 
 
 
-	private String paypalURL = "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=omschaub%40users%2esourceforge%2enet&item_name=AzMultiUser%20Donation&no_shipping=0&no_note=1&tax=0&currency_code=USD&bn=PP%2dDonationsBF&charset=UTF%2d8";
+	private String paypalURL = "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=damokles%40users%2esourceforge%2enet&item_name=AzSMRC%20Donation&no_shipping=0&no_note=1&tax=0&currency_code=USD&bn=PP%2dDonationsBF&charset=UTF%2d8";
 	private String amazonComURL = "http://www.amazon.com/exec/obidos/redirect?tag=azsmrc-20&amp;creative=374005&amp;camp=211041&amp;link_code=qs1&amp;adid=0TY7KZ926FVJDA9X0AQ9&amp;path=subst/home/home.html";
 	private String amazonDeURL = "http://www.amazon.de/exec/obidos/redirect-home?tag=azsmrc-21&site=home";
 	private String homepageURL = "http://azsmrc.sourceforge.net";
