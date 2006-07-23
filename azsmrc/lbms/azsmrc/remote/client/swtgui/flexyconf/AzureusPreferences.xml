@@ -121,7 +121,7 @@
 			<Entry key="Confirm Data Delete" label="ConfigView.section.file.confirm_data_delete" type="boolean" index="13"/>
 			<Entry key="Move Deleted Data To Recycle Bin" label="ConfigView.section.file.nativedelete" type="boolean" index="14"/>
 			<Entry key="Use Config File Backups" label="ConfigView.label.backupconfigfiles" type="boolean" index="15"/>
-			<Section label="ConfigView.section.file.torrents" index="0">
+			<Section label="ConfigView.section.torrents" index="0">
 				<Group label="" index="0">
 					<Entry key="Save Torrent Files" label="ConfigView.label.savetorrents" type="boolean" index="0"/>
 					<Entry key="General_sDefaultTorrent_Directory" label="ConfigView.label.savedirectory" type="string" index="1" dependsOn="Save Torrent Files"/>
