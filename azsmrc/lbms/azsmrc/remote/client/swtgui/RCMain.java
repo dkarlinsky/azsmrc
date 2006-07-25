@@ -210,7 +210,9 @@ public class RCMain implements Launchable {
 
 		//Show Splash
 		if(properties.getPropertyAsBoolean("show_splash",true)){
-			new SplashScreen(RCMain.getRCMain().getDisplay(),20);
+			SplashScreen splash = new SplashScreen(RCMain.getRCMain().getDisplay());
+			splash.setStatusText("Starting AzSMRC");
+			splash.open(20);
 		}
 
 		final Tray systray = display.getSystemTray ();
