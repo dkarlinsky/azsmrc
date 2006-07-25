@@ -71,6 +71,8 @@ import lbms.tools.updater.Update;
 import lbms.tools.updater.UpdateListener;
 import lbms.tools.updater.Updater;
 
+import lbms.azsmrc.shared.SWTSafeRunnable;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
@@ -563,8 +565,8 @@ public class RCMain implements Launchable {
 		client.addSpeedUpdateListener(new SpeedUpdateListener() {
 			public void setSpeed(final int d, final int u) {
 				if(display != null)
-					display.syncExec(new Runnable() {
-						public void run() {
+					display.syncExec(new SWTSafeRunnable() {
+						public void runSafe() {
 							//setTrayToolTip("AzSMRC: D:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d)+" - U:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u));
 							setTrayToolTip(client.getDownloadManager().getSeedingDownloadsOnly().length + " "
 									+ I18N.translate(PFX + "tray.tooltip.part1") + " "
