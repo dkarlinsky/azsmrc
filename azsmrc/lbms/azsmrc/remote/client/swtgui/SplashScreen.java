@@ -5,6 +5,8 @@
  */
 package lbms.azsmrc.remote.client.swtgui;
 
+import lbms.azsmrc.remote.client.util.TimerEvent;
+import lbms.azsmrc.remote.client.util.TimerEventPerformer;
 import lbms.azsmrc.shared.SWTSafeRunnable;
 
 import org.eclipse.swt.SWT;
@@ -20,11 +22,7 @@ import org.eclipse.swt.widgets.Shell;
 
 public class SplashScreen {
 
-	/**
-	 * Open the main Splash Screen
-	 * @param display
-	 * @param tenths_secondsOpen -- tenths of seconds (100ms) to stay open
-	 */
+	private static SplashScreen instance;
 
 	private ProgressBar bar;
 	private Label status;
@@ -39,9 +37,10 @@ public class SplashScreen {
 	 * @param _display
 	 * @param tenths_secondsOpen
 	 */
-	public SplashScreen(Display _display){
+	private SplashScreen(Display _display){
 		//set the display
 		display = _display;
+		instance = this;
 
 
 		//The shell with it's FormLayout
@@ -52,7 +51,7 @@ public class SplashScreen {
 
 		//ProgressBar
 		bar = new ProgressBar(splash, SWT.SMOOTH);
-		bar.setMaximum(10);
+		bar.setMaximum(100);
 		bar.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 
 		FormData progressData = new FormData();
@@ -97,47 +96,39 @@ public class SplashScreen {
 
 		//pack the shell
 		splash.pack();
-
-
-
-
 	}
+
+
 
 	/**
 	 * Sets the progressbar on the Splash Screen
 	 * @param int count
 	 */
-	public void setProgressBarSelection(final int count){
+	private void setProgressBarSelection(final int count){
 		display.asyncExec(new SWTSafeRunnable(){
 			@Override
 			public void runSafe() {
-				if(count > bar.getMaximum())
+				if(count >= bar.getMaximum()) {
 					bar.setSelection(bar.getMaximum());
+					close();
+				}
 				else
 					bar.setSelection(count);
 			}
 		});
 	}
 
-	/**
-	 * Sets the maximum number on the progressbar on the Splash Screen
-	 * @param int max
-	 */
-	public void setProgressBarMaximum(final int max){
-		display.asyncExec(new SWTSafeRunnable(){
-			@Override
-			public void runSafe() {
-				bar.setMaximum(max);
-			}
-		});
+	private void close() {
+		splash.close();
+		instance = null;
 	}
 
 	/**
 	 * Sets the maximum number on the progressbar on the Splash Screen
 	 * @param int max
 	 */
-	public void setStatusText(final String text){
-		display.asyncExec(new SWTSafeRunnable(){
+	private void setStatusText(final String text){
+		display.syncExec(new SWTSafeRunnable(){
 			@Override
 			public void runSafe() {
 				status.setText(text);
@@ -145,24 +136,36 @@ public class SplashScreen {
 		});
 	}
 
-	public void open(final int tenths_secondsOpen){
-		display.asyncExec(new SWTSafeRunnable() {
+	public static void open(final Display _display, final int tenths_secondsOpen){
+		_display.syncExec(new SWTSafeRunnable() {
 			public void runSafe() {
-				//open
-				GUI_Utilities.centerShellandOpen(splash);
-				//Timed kill
-				for (int i = 0; i < tenths_secondsOpen; i++) {
-					//bar.setSelection(i + 1);
-					try {
-						Thread.sleep(100);
-					} catch (Throwable e) {
+				new SplashScreen(_display);
+				GUI_Utilities.centerShellandOpen(instance.splash);
+
+				//closing timer
+				RCMain.getRCMain().getMainTimer().addEvent(tenths_secondsOpen*100+System.currentTimeMillis(), new TimerEventPerformer() {
+					public void perform(TimerEvent event) {
+						_display.syncExec(new SWTSafeRunnable() {
+							public void runSafe() {
+								if (instance != null)
+									instance.close();
+							}
+						});
 					}
-				}
-				splash.close();
+				});
 			}
 		});
 	}
 
+	public static void setProgress (int prog) {
+		if (instance != null)
+			instance.setProgressBarSelection(prog);
+	}
+
+	public static void setText (String text) {
+		if (instance != null)
+			instance.setStatusText(text);
+	}
 
 }
 
