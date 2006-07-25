@@ -50,17 +50,6 @@ public class SplashScreen {
 		splash.setLayout(layout);
 		splash.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 
-		//Image for the splash screen
-		Label label = new Label(splash, SWT.NONE);
-		label.setImage(ImageRepository.getImage("splash"));
-
-		FormData labelData = new FormData();
-		labelData.right = new FormAttachment(100, 0);
-		labelData.bottom = new FormAttachment(100, -40);
-		label.setLayoutData(labelData);
-
-
-
 		//ProgressBar
 		bar = new ProgressBar(splash, SWT.SMOOTH);
 		bar.setMaximum(10);
@@ -86,7 +75,7 @@ public class SplashScreen {
 		status.setFont(newFont);
 		newFont.dispose();
 
-		//status.setText("Starting AzSMRC");
+		status.setText("Starting AzSMRC");
 		status.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 
 		FormData statusData = new FormData();
@@ -94,9 +83,17 @@ public class SplashScreen {
 		statusData.right = new FormAttachment(100, -5);
 		statusData.bottom = new FormAttachment(100, -(bar.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y + 7));
 		status.setLayoutData(statusData);
+		status.pack();
 
+		//Image for the splash screen
+		Label label = new Label(splash, SWT.NONE);
+		label.setImage(ImageRepository.getImage("splash"));
 
-
+		FormData labelData = new FormData();
+		labelData.right = new FormAttachment(100, 0);
+		labelData.bottom = new FormAttachment(100, - (bar.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y + 7 /*Size of the Bar*/
+				+  status.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y)); /*Size of the status label*/
+		label.setLayoutData(labelData);
 
 		//pack the shell
 		splash.pack();
