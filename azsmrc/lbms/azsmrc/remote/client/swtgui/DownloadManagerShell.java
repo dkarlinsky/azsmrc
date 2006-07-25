@@ -503,6 +503,11 @@ public class DownloadManagerShell {
 		refresh.setToolTipText("Refresh");
 		refresh.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
+				SplashScreen splash = new SplashScreen(RCMain.getRCMain().getDisplay());
+				splash.setProgressBarMaximum(1000);
+				splash.setProgressBarSelection(750);
+				splash.setStatusText("Stating up the goodness");
+				splash.open(50);
 				if(RCMain.getRCMain().connected())
 					RCMain.getRCMain().getClient().getDownloadManager().update(true);
 			}
