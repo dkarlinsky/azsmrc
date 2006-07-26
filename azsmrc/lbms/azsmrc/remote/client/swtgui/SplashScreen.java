@@ -70,7 +70,7 @@ public class SplashScreen {
 		for (int i = 0; i < fontData.length; i++) {
 			fontData[i].setHeight(fontData[i].getHeight() + 2);
 		}
-		Font newFont = new Font(RCMain.getRCMain().getDisplay(), fontData);
+		Font newFont = new Font(display, fontData);
 		status.setFont(newFont);
 		newFont.dispose();
 
@@ -128,7 +128,7 @@ public class SplashScreen {
 	 * @param int max
 	 */
 	private void setStatusText(final String text){
-		display.syncExec(new SWTSafeRunnable(){
+		display.asyncExec(new SWTSafeRunnable(){
 			@Override
 			public void runSafe() {
 				status.setText(text);
@@ -163,8 +163,17 @@ public class SplashScreen {
 	}
 
 	public static void setText (String text) {
+		System.out.println ("Startup: "+text);
 		if (instance != null)
 			instance.setStatusText(text);
+	}
+
+	public static void setProgressAndText (String text, int progress) {
+		System.out.println ("Startup: "+text);
+		if (instance != null) {
+			instance.setProgressBarSelection(progress);
+			instance.setStatusText(text);
+		}
 	}
 
 }

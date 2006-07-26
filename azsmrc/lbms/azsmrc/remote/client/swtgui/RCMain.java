@@ -172,7 +172,6 @@ public class RCMain implements Launchable {
 	public void open() {
 		DownloadContainer.loadColumns();
 		SeedContainer.loadColumns();
-		display = Display.getDefault();
 		terminated = false;
 
 
@@ -444,6 +443,8 @@ public class RCMain implements Launchable {
 	}
 
 	public RCMain () {
+		rcMain = this;
+		display = Display.getDefault();
 		runTime = System.currentTimeMillis();
 		System.out.println("Starting up RCMain.");
 		System.out.println("Checking javaw.exe.manifest");
@@ -491,7 +492,10 @@ public class RCMain implements Launchable {
 				if (is!=null) try { is.close(); } catch (IOException e) {}
 			}
 		}
-		System.out.println("Creating Logger.");
+		if(properties.getPropertyAsBoolean("show_splash",true)){
+			SplashScreen.open(display, 20);
+		}
+		SplashScreen.setProgressAndText("Creating Logger.",10);
 		normalLogger = Logger.getLogger(LOGGER_NORMAL);
 		debugLogger = Logger.getLogger(LOGGER_DEBUG);
 		normalLogger.setLevel(Level.FINEST);
@@ -517,7 +521,7 @@ public class RCMain implements Launchable {
 		normalLogger.addHandler(consoleHandler);
 		debugLogger.addHandler(consoleHandler);
 
-		System.out.println("Loading I18N.");
+		SplashScreen.setProgressAndText("Loading I18N.",20);
 		try {
 			I18N.setDefault("lbms/azsmrc/remote/client/internat/default.lang");
 			if (properties.getProperty("language") != null) {
@@ -553,7 +557,7 @@ public class RCMain implements Launchable {
 				return true;
 			}
 		});
-		System.out.println("Creating Client.");
+		SplashScreen.setProgressAndText("Creating Client.",30);
 		client = new Client();
 		client.setDebugLogger(debugLogger);
 		client.setServer(properties.getProperty("connection_lastURL_0",null));
@@ -733,7 +737,7 @@ public class RCMain implements Launchable {
 		});
 
 
-		System.out.println("Creating Updater.");
+		SplashScreen.setProgressAndText("Creating Updater.",50);
 		try {
 			updater = new Updater(new URL(RemoteConstants.UPDATE_URL),new File("AzSMRCupdate.xml.gz"),new File(USER_DIR));
 		} catch (MalformedURLException e2) {
@@ -807,12 +811,11 @@ public class RCMain implements Launchable {
 				properties.setProperty("update.lastcheck",System.currentTimeMillis());
 			}
 		}
-		System.out.println("Loading Sounds.");
+		SplashScreen.setProgressAndText("Loading Sounds.",60);
 		loadSounds();
-		System.out.println("Creating Timer.");
+		SplashScreen.setProgressAndText("Creating Timer.",70);
 		timer = new Timer("Main Timer",5);
-		System.out.println("Finished Startup.");
-		rcMain = this;
+		SplashScreen.setProgressAndText("Finished Startup.",80);
 	}
 
 	private void shutdown() {

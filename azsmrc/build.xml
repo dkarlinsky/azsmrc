@@ -88,10 +88,21 @@
 	<target name="distribute" depends="jar">
 		<zip destfile="${root.dir}/${dist.dir}/AzSMRC_${version}.zip">
 			<fileset file="${root.dir}/Readme.txt" />
+			<fileset file="${root.dir}/AzSMRCupdate.xml.gz" />
+			<fileset file="${root.dir}/changelog.txt" />
+			<fileset file="${dist.dir}/AzSMRC_${version}.jar" />
+			<fileset file="${root.dir}/launch.properties" />
+			<fileset file="${dist.dir}/launcher.jar" />
+		</zip>
+		<zip destfile="${root.dir}/${dist.dir}/AzSMRC_${version}_win.zip">
+			<fileset file="${root.dir}/Readme.txt" />
 			<fileset file="${root.dir}/javaw.exe.manifest" />
 			<fileset file="${root.dir}/AzSMRCupdate.xml.gz" />
 			<fileset file="${root.dir}/changelog.txt" />
 			<fileset file="${dist.dir}/AzSMRC_${version}.jar" />
+			<fileset file="${root.dir}/AzSMRC.exe" />
+			<fileset file="${root.dir}/launch.properties" />
+			<fileset file="${dist.dir}/launcher.jar" />
 		</zip>
 	</target>	
 
