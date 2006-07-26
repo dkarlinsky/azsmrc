@@ -114,7 +114,7 @@ public class SplashScreen {
 	 * @param int count
 	 */
 	private void setProgressBarSelection(final int count){
-		display.asyncExec(new SWTSafeRunnable(){
+		display.syncExec(new SWTSafeRunnable(){
 			@Override
 			public void runSafe() {
 				if(count >= bar.getMaximum()) {
@@ -138,7 +138,7 @@ public class SplashScreen {
 	 * @param int max
 	 */
 	private void setStatusText(final String text){
-		display.asyncExec(new SWTSafeRunnable(){
+		display.syncExec(new SWTSafeRunnable(){
 			@Override
 			public void runSafe() {
 				status.setText(text);
