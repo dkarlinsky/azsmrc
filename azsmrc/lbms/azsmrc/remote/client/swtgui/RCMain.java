@@ -18,7 +18,6 @@ import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.cert.X509Certificate;
-import java.util.InvalidPropertiesFormatException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -65,13 +64,12 @@ import lbms.azsmrc.remote.client.util.TimerEvent;
 import lbms.azsmrc.remote.client.util.TimerEventPerformer;
 import lbms.azsmrc.remote.client.util.TimerEventPeriodic;
 import lbms.azsmrc.shared.RemoteConstants;
+import lbms.azsmrc.shared.SWTSafeRunnable;
 import lbms.tools.ExtendedProperties;
 import lbms.tools.launcher.Launchable;
 import lbms.tools.updater.Update;
 import lbms.tools.updater.UpdateListener;
 import lbms.tools.updater.Updater;
-
-import lbms.azsmrc.shared.SWTSafeRunnable;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuEvent;
@@ -207,7 +205,9 @@ public class RCMain implements Launchable {
 
 	protected void createContents() {
 		shell = new Shell();
+		SplashScreen.setProgressAndText("Loading Images", 80);
 		ImageRepository.loadImages(display);
+		SplashScreen.setProgressAndText("Creating GUI", 90);
 
 /*		//Show Splash
 		if(properties.getPropertyAsBoolean("show_splash",true)){
@@ -439,7 +439,7 @@ public class RCMain implements Launchable {
 
 		//Add in the clipboard monitor
 		addAWTClipboardMonitor();
-
+		SplashScreen.setProgressAndText("All Done", 100);
 	}
 
 	public RCMain () {
@@ -492,10 +492,6 @@ public class RCMain implements Launchable {
 				if (is!=null) try { is.close(); } catch (IOException e) {}
 			}
 		}
-
-		//We need the timer for the splash.. so this has to come first
-		timer = new Timer("Main Timer",5);
-
 		if(properties.getPropertyAsBoolean("show_splash",true)){
 			SplashScreen.open(display, 20);
 		}
@@ -817,9 +813,9 @@ public class RCMain implements Launchable {
 		}
 		SplashScreen.setProgressAndText("Loading Sounds.",60);
 		loadSounds();
-		//SplashScreen.setProgressAndText("Creating Timer.",70);
-
-		SplashScreen.setProgressAndText("Finished Startup.",80);
+		SplashScreen.setProgressAndText("Creating Timer.",65);
+		timer = new Timer("Main Timer",5);
+		SplashScreen.setProgressAndText("Finished Startup.",70);
 	}
 
 	private void shutdown() {

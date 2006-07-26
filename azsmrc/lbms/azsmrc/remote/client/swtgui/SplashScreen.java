@@ -151,18 +151,6 @@ public class SplashScreen {
 			public void runSafe() {
 				new SplashScreen(_display);
 				GUI_Utilities.centerShellandOpen(instance.splash);
-
-				//closing timer
-				RCMain.getRCMain().getMainTimer().addEvent(tenths_secondsOpen*100+System.currentTimeMillis(), new TimerEventPerformer() {
-					public void perform(TimerEvent event) {
-						_display.syncExec(new SWTSafeRunnable() {
-							public void runSafe() {
-								if (instance != null)
-									instance.close();
-							}
-						});
-					}
-				});
 			}
 		});
 	}
@@ -181,8 +169,8 @@ public class SplashScreen {
 	public static void setProgressAndText (String text, int progress) {
 		System.out.println ("Startup: "+text);
 		if (instance != null) {
-			instance.setProgressBarSelection(progress);
 			instance.setStatusText(text);
+			instance.setProgressBarSelection(progress);
 		}
 	}
 
