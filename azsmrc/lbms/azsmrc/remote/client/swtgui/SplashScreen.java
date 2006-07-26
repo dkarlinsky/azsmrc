@@ -5,6 +5,8 @@
  */
 package lbms.azsmrc.remote.client.swtgui;
 
+import java.io.InputStream;
+
 import lbms.azsmrc.remote.client.util.TimerEvent;
 import lbms.azsmrc.remote.client.util.TimerEventPerformer;
 import lbms.azsmrc.shared.SWTSafeRunnable;
@@ -12,6 +14,7 @@ import lbms.azsmrc.shared.SWTSafeRunnable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -28,6 +31,7 @@ public class SplashScreen {
 	private Label status;
 	private Display display;
 	private Shell splash;
+	private Image image;
 
 	/**
 	 * The main splashscreen
@@ -41,6 +45,11 @@ public class SplashScreen {
 		//set the display
 		display = _display;
 		instance = this;
+
+		//load the image
+		String res = "lbms/azsmrc/remote/client/swtgui/resources/AzSMRC_Splash.png";
+		InputStream is = ImageRepository.class.getClassLoader().getResourceAsStream(res);
+		image = new Image(display,is);
 
 
 		//The shell with it's FormLayout
@@ -86,7 +95,7 @@ public class SplashScreen {
 
 		//Image for the splash screen
 		Label label = new Label(splash, SWT.NONE);
-		label.setImage(ImageRepository.getImage("splash"));
+		label.setImage(image);
 
 		FormData labelData = new FormData();
 		labelData.right = new FormAttachment(100, 0);
@@ -120,6 +129,7 @@ public class SplashScreen {
 
 	private void close() {
 		splash.close();
+		image.dispose();
 		instance = null;
 	}
 

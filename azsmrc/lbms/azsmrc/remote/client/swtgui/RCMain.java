@@ -209,10 +209,10 @@ public class RCMain implements Launchable {
 		shell = new Shell();
 		ImageRepository.loadImages(display);
 
-		//Show Splash
+/*		//Show Splash
 		if(properties.getPropertyAsBoolean("show_splash",true)){
 			SplashScreen.open(getDisplay(), 20);
-		}
+		}*/
 
 		final Tray systray = display.getSystemTray ();
 		systrayItem = new TrayItem (systray, SWT.NONE);
@@ -492,6 +492,10 @@ public class RCMain implements Launchable {
 				if (is!=null) try { is.close(); } catch (IOException e) {}
 			}
 		}
+
+		//We need the timer for the splash.. so this has to come first
+		timer = new Timer("Main Timer",5);
+
 		if(properties.getPropertyAsBoolean("show_splash",true)){
 			SplashScreen.open(display, 20);
 		}
@@ -813,8 +817,8 @@ public class RCMain implements Launchable {
 		}
 		SplashScreen.setProgressAndText("Loading Sounds.",60);
 		loadSounds();
-		SplashScreen.setProgressAndText("Creating Timer.",70);
-		timer = new Timer("Main Timer",5);
+		//SplashScreen.setProgressAndText("Creating Timer.",70);
+
 		SplashScreen.setProgressAndText("Finished Startup.",80);
 	}
 
