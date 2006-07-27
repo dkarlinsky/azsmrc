@@ -7,8 +7,6 @@ package lbms.azsmrc.remote.client.swtgui;
 
 import java.io.InputStream;
 
-import lbms.azsmrc.remote.client.util.TimerEvent;
-import lbms.azsmrc.remote.client.util.TimerEventPerformer;
 import lbms.azsmrc.shared.SWTSafeRunnable;
 
 import org.eclipse.swt.SWT;
