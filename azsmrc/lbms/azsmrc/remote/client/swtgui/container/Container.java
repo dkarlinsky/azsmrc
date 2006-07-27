@@ -19,7 +19,7 @@ import lbms.azsmrc.shared.RemoteConstants;
 import lbms.azsmrc.shared.SWTSafeRunnable;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.SWTException;
+
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -244,8 +244,10 @@ public abstract class Container implements Comparable<Container> {
 	}
 
 	public void deleteTableItem(){
-		item.dispose();
-		item = null;
+		if(item != null){
+			item.dispose();
+			item = null;
+		}
 	}
 
 	public int compareTo(Container o) {
