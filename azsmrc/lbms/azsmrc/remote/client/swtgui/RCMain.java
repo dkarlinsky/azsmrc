@@ -147,6 +147,7 @@ public class RCMain implements Launchable {
 			if (rcMain == null) { //if it is launched by launchable then rcMain should already exist
 				new RCMain();
 			}
+			rcMain.init();
 			rcMain.open();
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -174,7 +175,11 @@ public class RCMain implements Launchable {
 
 
 		connect = properties.getPropertyAsBoolean("auto_connect");
-		createContents();
+		display.asyncExec(new SWTSafeRunnable() {
+			public void runSafe() {
+				createContents();
+			}
+		});
 		if (connect) {
 			if (properties.getProperty("connection_password_0", "").equals("")
 					|| properties.getProperty("connection_username_0", "").equals("")
@@ -442,8 +447,7 @@ public class RCMain implements Launchable {
 		SplashScreen.setProgressAndText("All Done", 100);
 	}
 
-	public RCMain () {
-		rcMain = this;
+	private void init () {
 		display = Display.getDefault();
 		runTime = System.currentTimeMillis();
 		System.out.println("Starting up RCMain.");
@@ -816,6 +820,10 @@ public class RCMain implements Launchable {
 		SplashScreen.setProgressAndText("Creating Timer.",65);
 		timer = new Timer("Main Timer",5);
 		SplashScreen.setProgressAndText("Finished Startup.",70);
+	}
+
+	public RCMain () {
+		rcMain = this;
 	}
 
 	private void shutdown() {
