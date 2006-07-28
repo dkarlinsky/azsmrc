@@ -846,7 +846,7 @@ public class Client {
 		speedUpdateListners.remove(listener);
 	}
 
-	protected void callSpeedUpdateListener(int u, int d) {
+	protected void callSpeedUpdateListener(int d, int u) {
 		for (int i=0;i<speedUpdateListners.size();i++)
 			speedUpdateListners.get(i).setSpeed(d, u);
 	}
