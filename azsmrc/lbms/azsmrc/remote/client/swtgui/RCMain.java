@@ -610,8 +610,8 @@ public class RCMain implements Launchable {
 			public void connectionState(final int state) {
 				debugLogger.finer("Connection State: "+state);
 				if(display != null)
-					display.syncExec(new Runnable() {
-						public void run() {
+					display.syncExec(new SWTSafeRunnable() {
+						public void runSafe() {
 							if (state == ST_CONNECTED) setTrayIcon(2);
 							else if(state == ST_CONNECTING)setTrayIcon(1);
 							else setTrayIcon(0);
@@ -771,8 +771,8 @@ public class RCMain implements Launchable {
 				if (properties.getPropertyAsBoolean("update.autoupdate")) {
 					updater.doUpdate();
 				}else{
-					display.asyncExec(new Runnable() {
-						public void run() {
+					display.asyncExec(new SWTSafeRunnable() {
+						public void runSafe() {
 							UpdateDialog.open(display,update,updater);
 						}
 					});
@@ -1137,8 +1137,8 @@ public class RCMain implements Launchable {
 								}
 								if (valid) {
 									clipboard.setContents(emptyTransfer,null); //clear Transfer
-									display.asyncExec(new Runnable(){
-										public void run() {
+									display.asyncExec(new SWTSafeRunnable(){
+										public void runSafe() {
 											OpenByURLDialog.openWithURL(string);
 										}
 									});
