@@ -185,11 +185,8 @@ public class RCMain implements Launchable {
 					|| properties.getProperty("connection_username_0", "").equals("")
 					|| properties.getProperty("connection_lastURL_0", "").equals("")) {
 				connect = false;
-			} else if (properties.getPropertyAsBoolean("auto_open", true)) {
-				updateTimer(true);
-				client.getDownloadManager().update(true);
 			} else {
-				updateTimer(false);
+				updateTimer(properties.getPropertyAsBoolean("auto_open", true));
 				client.getDownloadManager().update(true);
 			}
 		}
