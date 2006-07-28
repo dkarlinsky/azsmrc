@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Vector;
@@ -81,7 +82,7 @@ public class Client {
 
 
 	//use Vector of Collections.synchronizedList here
-	private List<ClientUpdateListener> 	clientUpdateListeners	= new Vector<ClientUpdateListener>();
+	private List<ClientUpdateListener> 	clientUpdateListeners	= new ArrayList<ClientUpdateListener>();
 	private List<SpeedUpdateListener> 	speedUpdateListners		= new Vector<SpeedUpdateListener>();
 	private List<ExceptionListener> 	exceptionListeners		= new Vector<ExceptionListener>();
 	private List<ConnectionListener> 	connectionListeners		= new Vector<ConnectionListener>();
@@ -832,9 +833,9 @@ public class Client {
 	}
 
 	protected void callClientUpdateListeners (long updateSwitches) {
-		for (ClientUpdateListener l:clientUpdateListeners) {
-			l.update(updateSwitches);
-		}
+		for (int i=0;i<clientUpdateListeners.size();i++)
+			clientUpdateListeners.get(i).update(updateSwitches);
+
 	}
 
 	public void addSpeedUpdateListener (SpeedUpdateListener listener) {
@@ -846,9 +847,8 @@ public class Client {
 	}
 
 	protected void callSpeedUpdateListener(int u, int d) {
-		for (SpeedUpdateListener l:speedUpdateListners) {
-			l.setSpeed(u, d);
-		}
+		for (int i=0;i<speedUpdateListners.size();i++)
+			speedUpdateListners.get(i).setSpeed(d, u);
 	}
 
 	public void addExceptionListener (ExceptionListener listener) {
@@ -860,9 +860,8 @@ public class Client {
 	}
 
 	protected void callExceptionListener(Exception e, boolean serious) {
-		for (ExceptionListener l:exceptionListeners) {
-			l.exceptionOccured(e,serious);
-		}
+		for (int i=0;i<exceptionListeners.size();i++)
+			exceptionListeners.get(i).exceptionOccured(e, serious);
 	}
 
 	public void addConnectionListener (ConnectionListener listener) {
@@ -874,9 +873,8 @@ public class Client {
 	}
 
 	protected void callConnectionListener(int state) {
-		for (ConnectionListener l:connectionListeners) {
-			l.connectionState(state);
-		}
+		for (int i=0;i<connectionListeners.size();i++)
+			connectionListeners.get(i).connectionState(state);
 	}
 
 	public void addClientEventListener (ClientEventListener listener) {
@@ -888,9 +886,9 @@ public class Client {
 	}
 
 	protected void callClientEventListener(int type,long time, Element event) {
-		for (ClientEventListener l:eventListeners) {
-			l.handleEvent(type, time, event);
-		}
+		for (int i=0;i<eventListeners.size();i++)
+			eventListeners.get(i).handleEvent(type, time, event);
+
 	}
 
 	public void addHTTPErrorListener (HTTPErrorListener listener) {
@@ -902,9 +900,9 @@ public class Client {
 	}
 
 	protected void callHTTPErrorListener(int statusCode) {
-		for (HTTPErrorListener l:httpErrorListeners) {
-			l.httpError(statusCode);
-		}
+		for (int i=0;i<httpErrorListeners.size();i++)
+			httpErrorListeners.get(i).httpError(statusCode);
+
 	}
 
 	public void addParameterListener (ParameterListener listener) {
@@ -917,23 +915,21 @@ public class Client {
 
 	protected void callAzParameterListener(String key, String value, int type) {
 		if (!verifyParameter(key, value, type)) return;
-		for (ParameterListener l:parameterListeners) {
-			l.azParameter(key, value, type);
-		}
+		for (int i=0;i<parameterListeners.size();i++)
+			parameterListeners.get(i).azParameter(key, value, type);
+
 	}
 
 	protected void callPluginParameterListener(String key, String value, int type) {
 		if (!verifyParameter(key, value, type)) return;
-		for (ParameterListener l:parameterListeners) {
-			l.pluginParameter(key, value, type);
-		}
+		for (int i=0;i<parameterListeners.size();i++)
+			parameterListeners.get(i).pluginParameter(key, value, type);
 	}
 
 	protected void callCoreParameterListener(String key, String value, int type) {
 		if (!verifyParameter(key, value, type)) return;
-		for (ParameterListener l:parameterListeners) {
-			l.coreParameter(key, value, type);
-		}
+		for (int i=0;i<parameterListeners.size();i++)
+			parameterListeners.get(i).coreParameter(key, value, type);
 	}
 
 	protected boolean verifyParameter (String key, String value, int type) {
