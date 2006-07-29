@@ -15,7 +15,6 @@ import lbms.azsmrc.remote.client.Client;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByFileDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByURLDialog;
 import lbms.azsmrc.shared.RemoteConstants;
-import lbms.tools.ExtendedProperties;
 
 
 /**
@@ -37,17 +36,17 @@ public class StartServer {
 
 	public StartServer() {
 		try {
-			socket = new ServerSocket(6880, 50, InetAddress.getByName("127.0.0.1"));
+			socket = new ServerSocket(49008, 50, InetAddress.getByName("127.0.0.1"));
 
 			state = STATE_LISTENING;
 
 			System.out.println("StartServer: listening on "
-					+ "127.0.0.1:6880 for passed torrent info");
+					+ "127.0.0.1:49008 for passed torrent info");
 
 		}catch (Throwable t) {
 			state = STATE_FAULTY;
 			String reason = t.getMessage() == null ? "<>" : t.getMessage();
-			System.out.println("StartServer ERROR: unable" + " to bind to 127.0.0.1:6880 listening"
+			System.out.println("StartServer ERROR: unable" + " to bind to 127.0.0.1:49008 listening"
 					+ " for passed torrent info: " + reason);
 		}
 	}

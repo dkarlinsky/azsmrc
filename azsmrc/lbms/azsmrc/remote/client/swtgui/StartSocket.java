@@ -27,10 +27,10 @@ public class StartSocket {
 		Socket sck = null;
 		PrintWriter pw = null;
 		try {
-			String msg = "StartSocket: passing startup args to already-running AzSMRC java process listening on [127.0.0.1: 6880]";
+			String msg = "StartSocket: passing startup args to already-running AzSMRC java process listening on [127.0.0.1: 49008]";
 			System.out.println( msg );
 
-			sck = new Socket("127.0.0.1", 6880);
+			sck = new Socket("127.0.0.1", 49008);
 
 			pw = new PrintWriter(new OutputStreamWriter(sck.getOutputStream(),RemoteConstants.DEFAULT_ENCODING));
 
