@@ -111,6 +111,7 @@ public class RCMain implements Launchable {
 	private DownloadManagerShell mainWindow;
 	private long runTime;
 	private boolean manifestInUse;
+	private StartServer startServer;
 
 
 	//  I18N prefix
@@ -147,6 +148,8 @@ public class RCMain implements Launchable {
 			if (rcMain == null) { //if it is launched by launchable then rcMain should already exist
 				new RCMain();
 			}
+			rcMain.initConfig();
+			if (!rcMain.checkInstance(args)) return;
 			rcMain.init();
 			rcMain.open();
 		} catch (Throwable e) {
@@ -166,6 +169,73 @@ public class RCMain implements Launchable {
 				if (fout != null)fout.close();
 			}
 		}
+	}
+
+	public boolean checkInstance (String[] args) {
+		boolean closedown = false;
+
+		startServer = new StartServer();
+
+		for (int i=0;i<args.length;i++){
+
+			String	arg = args[i];
+
+			if ( arg.equalsIgnoreCase( "--closedown" )){
+				closedown	= true;
+				break;
+			}
+			// Sometimes Windows use filename in 8.3 form and cannot
+			// match .torrent extension. To solve this, canonical path
+			// is used to get back the long form
+
+			String filename = arg;
+
+			if( filename.toUpperCase().startsWith( "HTTP:" ) ||
+					filename.toUpperCase().startsWith( "HTTPS:" ) ||
+					filename.toUpperCase().startsWith( "MAGNET:" ) ) {
+				System.out.println("Main::main: args[" + i
+						+ "] handling as a URI: " + filename);
+				continue;  //URIs cannot be checked as a .torrent file
+			}
+
+			try{
+				File	file = new File(filename);
+
+				if ( !file.exists()){
+
+					throw( new Exception("File not found" ));
+				}
+
+				args[i] = file.getCanonicalPath();
+
+				System.out.println("Main::main: args[" + i
+						+ "] exists = " + new File(filename).exists());
+
+			}catch( Throwable e ){
+				System.out.println(
+						"Failed to access torrent file '" + filename
+						+ "'. Ensure sufficient temporary "
+						+ "file space available (check browser cache usage).");
+			}
+		}
+
+		boolean another_instance = startServer.getState() != StartServer.STATE_LISTENING;
+
+		if( another_instance && !properties.getPropertyAsBoolean("multiInstance") ) {
+			StartSocket ss = new StartSocket(args);
+			closedown = true;
+			if( !ss.sendArgs() ) {  //arg passing attempt failed, so start core anyway
+				closedown = false;
+				String msg = "There appears to be another program process already listening on socket [127.0.0.1: 6880].\nLoading of torrents via command line parameter will fail until this is fixed.";
+				System.out.println( msg );
+			}
+		}
+
+		if (closedown) return false;
+
+		//let the server wait for connections
+		startServer.pollForConnections();
+		return true;
 	}
 
 	public void open() {
@@ -195,6 +265,8 @@ public class RCMain implements Launchable {
 			System.out.println("Crash Detected");
 			ErrorDialog.createAndOpen();
 		}
+		startServer.setCoreStarted(true);
+		startServer.openQueuedTorrents();
 		while (!terminated) { //runnig
 			if (!display.readAndDispatch ()) display.sleep ();
 		}
@@ -385,7 +457,7 @@ public class RCMain implements Launchable {
 		addByFile.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				OpenByFileDialog.open(display);
+				OpenByFileDialog.open();
 			}
 		});
 
@@ -444,12 +516,7 @@ public class RCMain implements Launchable {
 		SplashScreen.setProgressAndText("All Done", 100);
 	}
 
-	private void init () {
-		display = Display.getDefault();
-		runTime = System.currentTimeMillis();
-		System.out.println("Starting up RCMain.");
-		System.out.println("Checking javaw.exe.manifest");
-		javawExeManifest();
+	private void initConfig() {
 		confFile = new File(USER_DIR+FSEP+"config.cfg");
 		properties = null;
 		{
@@ -493,6 +560,15 @@ public class RCMain implements Launchable {
 				if (is!=null) try { is.close(); } catch (IOException e) {}
 			}
 		}
+	}
+
+	private void init () {
+		display = Display.getDefault();
+		runTime = System.currentTimeMillis();
+		System.out.println("Starting up RCMain.");
+		System.out.println("Checking javaw.exe.manifest");
+		javawExeManifest();
+
 		if(properties.getPropertyAsBoolean("show_splash",true)){
 			SplashScreen.open(display, 20);
 		}
