@@ -584,10 +584,38 @@ public class OpenByFileDialog {
 		if(display == null) return;
 		if (instance == null || instance.shell == null || instance.shell.isDisposed()){
 			new OpenByFileDialog(display, fileNames);
-		} else
+		} else{
 			instance.shell.setActive();
+			instance.addFileToInstance(fileNames);
+		}
+
+
 	}
 
+
+	private void addFileToInstance(final String[] fileNames){
+		// See if we come in with a file already
+		if (fileNames != null) {
+			try {
+				for (String filename : fileNames) {
+					File test = new File(filename);
+					if (test.isFile() && test.canRead()) {
+						AddTorrentContainer container = new AddTorrentContainer(
+								test);
+						TableItem item = new TableItem(filesTable, SWT.NULL);
+						item.setText(0, container.getName());
+						item.setText(1, container.getFilePath());
+						tMap.put(container.getName(), container);
+						filesTable.setSelection(item);
+						generateDetails(container.getName());
+						lastDir = container.getFilePath();
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 
 	private void createDragDrop(final Table parent) {
