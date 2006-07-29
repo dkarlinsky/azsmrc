@@ -565,7 +565,8 @@ public class OpenByFileDialog {
 	 * public open method without a string
 	 * 
 	 */
-	public static void open(Display display){
+	public static void open(){
+		final Display display = RCMain.getRCMain().getDisplay();
 		if(display == null) return;
 		if (instance == null || instance.shell == null || instance.shell.isDisposed()){
 			new OpenByFileDialog(display, null);
@@ -578,11 +579,12 @@ public class OpenByFileDialog {
 	 * @param display
 	 * @param fileNames
 	 */
-	public static void open(Display display, String[] fileNames){
+	public static void open(String[] fileNames){
+		final Display display = RCMain.getRCMain().getDisplay();
 		if(display == null) return;
 		if (instance == null || instance.shell == null || instance.shell.isDisposed()){
 			new OpenByFileDialog(display, fileNames);
-		}else
+		} else
 			instance.shell.setActive();
 	}
 

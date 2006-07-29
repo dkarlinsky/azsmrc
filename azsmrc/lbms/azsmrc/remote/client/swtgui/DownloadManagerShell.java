@@ -317,7 +317,7 @@ public class DownloadManagerShell {
 		menuAddByFile.setText("Send Torrent &File to Server");
 		menuAddByFile.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e){
-				OpenByFileDialog.open(RCMain.getRCMain().getDisplay());
+				OpenByFileDialog.open();
 			}
 		});
 
@@ -519,7 +519,7 @@ public class DownloadManagerShell {
 		addTorrent_by_file.setToolTipText("Add a torrent from a local file");
 		addTorrent_by_file.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
-				OpenByFileDialog.open(RCMain.getRCMain().getDisplay());
+				OpenByFileDialog.open();
 			}
 		});
 
@@ -3246,7 +3246,7 @@ public class DownloadManagerShell {
 				}
 			}
 			if (files.size()>0) {
-				OpenByFileDialog.open(RCMain.getRCMain().getDisplay(), files.toArray(new String[0]));
+				OpenByFileDialog.open(files.toArray(new String[0]));
 			}
 		}
 	}
