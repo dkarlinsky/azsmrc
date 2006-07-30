@@ -1356,8 +1356,14 @@ public class RequestManager {
 				if (uci == null) {
 					response.setAttribute("updateAvailable", Boolean.toString(false));
 				} else {
-					response.setAttribute("updateAvailable", Boolean.toString(true));
+
 					Update[] updates = uci.getUpdates();
+
+					if (updates.length==0)
+						response.setAttribute("updateAvailable", Boolean.toString(false));
+					else
+						response.setAttribute("updateAvailable", Boolean.toString(true));
+
 					for (Update update:updates) {
 						Element uElement = new Element ("Update");
 						uElement.setAttribute("name", update.getName());
@@ -1400,7 +1406,6 @@ public class RequestManager {
 							t.start();
 						}
 					}
-					return false;
 				}
 				return false;
 			}

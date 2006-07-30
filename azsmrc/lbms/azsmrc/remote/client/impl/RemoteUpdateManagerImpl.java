@@ -18,8 +18,7 @@ public class RemoteUpdateManagerImpl implements RemoteUpdateManager {
 	}
 
 	public boolean updatesAvailable() {
-		// TODO Auto-generated method stub
-		return false;
+		return updatesAvailable;
 	}
 
 	public RemoteUpdate[] getUpdates() {
@@ -27,8 +26,7 @@ public class RemoteUpdateManagerImpl implements RemoteUpdateManager {
 	}
 
 	public void load() {
-		// TODO Auto-generated method stub
-
+		client.sendGetUpdateInfo();
 	}
 
 	public void applyUpdates(String[] u) {

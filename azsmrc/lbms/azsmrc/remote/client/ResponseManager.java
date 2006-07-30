@@ -20,15 +20,12 @@ import lbms.azsmrc.remote.client.impl.TrackerImpl;
 import lbms.azsmrc.remote.client.impl.TrackerTorrentImpl;
 import lbms.azsmrc.remote.client.impl.UserManagerImpl;
 import lbms.azsmrc.shared.DuplicatedUserException;
-import lbms.azsmrc.shared.EncodingUtil;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.azsmrc.shared.UserNotFoundException;
 
-import org.gudy.azureus2.plugins.tracker.TrackerTorrent;
-import org.gudy.azureus2.plugins.tracker.TrackerTorrentRemovalVetoException;
-import org.jdom.*;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom.DataConversionException;
+import org.jdom.Document;
+import org.jdom.Element;
 
 public class ResponseManager {
 	private Map<String,ResponseHandler> handlerList = new HashMap<String, ResponseHandler>();

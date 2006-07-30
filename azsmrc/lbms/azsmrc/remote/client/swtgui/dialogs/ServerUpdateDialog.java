@@ -10,14 +10,18 @@ package lbms.azsmrc.remote.client.swtgui.dialogs;
 import java.util.ArrayList;
 import java.util.List;
 
+import lbms.azsmrc.remote.client.Constants;
 import lbms.azsmrc.remote.client.RemoteUpdate;
 import lbms.azsmrc.remote.client.RemoteUpdateManager;
+import lbms.azsmrc.remote.client.events.ClientUpdateListener;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.shared.SWTSafeRunnable;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -39,12 +43,44 @@ public class ServerUpdateDialog {
 
 	private Shell shell;
 	private static ServerUpdateDialog instance;
+	Label infoLabel;
+	Table table;
+
+	private ClientUpdateListener clientUpdate = new ClientUpdateListener() {
+		/* (non-Javadoc)
+		 * @see lbms.azsmrc.remote.client.events.ClientUpdateListener#update(long)
+		 */
+		public void update(long updateSwitches) {
+			if ((updateSwitches & Constants.UPDATE_UPDATE_INFO) != 0) {
+				RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable() {
+					public void runSafe() {
+						RemoteUpdateManager rum = RCMain.getRCMain().getClient().getRemoteUpdateManager();
+						infoLabel.setText(I18N.translate(PFX + "infolabel.line1.text") + " " +
+								RCMain.getRCMain().getClient().getServer().getHost() +
+								I18N.translate(PFX + "infolabel.line2.text") + " " + rum.getUpdates().length);
+
+						table.removeAll();
+
+						RemoteUpdate[] rus = rum.getUpdates();
+						for(RemoteUpdate ru:rus){
+							TableItem item = new TableItem(table,SWT.NULL);
+							item.setText(1,ru.getName());
+							item.setText(ru.getNewVersion());
+							item.setChecked(true);
+							item.setData(ru);
+						}
+					};
+				});
+			}
+
+		}
+	};
 
 	private ServerUpdateDialog(){
 		instance = this;
 
 		final RemoteUpdateManager rum = RCMain.getRCMain().getClient().getRemoteUpdateManager();
-
+		rum.load();
 
 		//Shell
 		shell = new Shell(RCMain.getRCMain().getDisplay());
@@ -63,7 +99,7 @@ public class ServerUpdateDialog {
 
 
 		//first line
-		Label infoLabel = new Label(comp,SWT.BORDER | SWT.CENTER);
+		infoLabel = new Label(comp,SWT.BORDER | SWT.CENTER);
 		infoLabel.setText(I18N.translate(PFX + "infolabel.line1.text") + " " +
 				RCMain.getRCMain().getClient().getServer().getHost() +
 				I18N.translate(PFX + "infolabel.line2.text") + " " + rum.getUpdates().length);
@@ -76,7 +112,7 @@ public class ServerUpdateDialog {
 
 
 		//Table for updates
-		final Table table = new Table(comp,SWT.BORDER | SWT.V_SCROLL | SWT.CHECK | SWT.SINGLE);
+		table = new Table(comp,SWT.BORDER | SWT.V_SCROLL | SWT.CHECK | SWT.SINGLE);
 		gd = new GridData(GridData.FILL_BOTH);
 		gd.horizontalSpan = 2;
 		gd.verticalSpan = 30;
@@ -103,10 +139,6 @@ public class ServerUpdateDialog {
 			item.setChecked(true);
 			item.setData(ru);
 		}
-
-
-
-
 
 		//Bottom Buttons
 		Composite button_comp = new Composite(shell, SWT.NULL);
@@ -153,8 +185,19 @@ public class ServerUpdateDialog {
 			 }
 		 });
 
+		RCMain.getRCMain().getClient().addClientUpdateListener(clientUpdate);
 
+		shell.addShellListener(new ShellListener() {
+			public void shellActivated(ShellEvent e) {}
 
+			public void shellClosed(ShellEvent e) {
+				RCMain.getRCMain().getClient().removeClientUpdateListener(clientUpdate);
+			}
+
+			public void shellDeactivated(ShellEvent e) {}
+			public void shellDeiconified(ShellEvent e) {}
+			public void shellIconified(ShellEvent e) {}
+		});
 		//Center and open shell
 		GUI_Utilities.centerShellandOpen(shell);
 	}

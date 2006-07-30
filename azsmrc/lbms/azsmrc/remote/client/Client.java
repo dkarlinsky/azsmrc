@@ -652,6 +652,12 @@ public class Client {
 		enqueue(sendElement);
 	}*/
 
+	public void sendGetUpdateInfo () {
+		Element sendElement = getSendElement();
+		sendElement.setAttribute("switch", "getUpdateInfo");
+		enqueue(sendElement);
+	}
+
 	public void sendApplyUpdates(String[] names) {
 		Element sendElement = getSendElement();
 		sendElement.setAttribute("switch", "applyUpdates");
