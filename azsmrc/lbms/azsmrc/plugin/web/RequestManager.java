@@ -1369,6 +1369,7 @@ public class RequestManager {
 						uElement.setAttribute("name", update.getName());
 						uElement.setAttribute("newVersion", update.getNewVersion());
 						uElement.setAttribute("isMandatory",Boolean.toString(update.isMandatory()));
+						response.addContent(uElement);
 					}
 				}
 				return true;

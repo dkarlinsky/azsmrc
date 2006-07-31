@@ -65,7 +65,7 @@ public class ServerUpdateDialog {
 						for(RemoteUpdate ru:rus){
 							TableItem item = new TableItem(table,SWT.NULL);
 							item.setText(1,ru.getName());
-							item.setText(ru.getNewVersion());
+							item.setText(2,ru.getNewVersion());
 							item.setChecked(true);
 							item.setData(ru);
 						}

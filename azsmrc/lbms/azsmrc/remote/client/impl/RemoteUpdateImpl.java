@@ -6,9 +6,9 @@ import lbms.azsmrc.remote.client.RemoteUpdate;
 
 public class RemoteUpdateImpl implements RemoteUpdate {
 
-	String name;
-	String newVersion;
-	boolean mandatory;
+	private String name;
+	private String newVersion;
+	private boolean mandatory;
 
 	public RemoteUpdateImpl (Element update) {
 		name = update.getAttributeValue("name");
@@ -18,17 +18,17 @@ public class RemoteUpdateImpl implements RemoteUpdate {
 
 	public String getName() {
 		// TODO Auto-generated method stub
-		return null;
+		return name;
 	}
 
 	public String getNewVersion() {
 		// TODO Auto-generated method stub
-		return null;
+		return newVersion;
 	}
 
 	public boolean isMandatory() {
 		// TODO Auto-generated method stub
-		return false;
+		return mandatory;
 	}
 
 	/**

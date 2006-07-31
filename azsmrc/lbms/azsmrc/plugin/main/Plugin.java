@@ -103,9 +103,9 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 							}
 
 							public void complete(UpdateCheckInstance instance) {
-								latestUpdate = instance;
 								//return if update list is 0
 								if (instance.getUpdates().length == 0) return;
+								latestUpdate = instance;
 
 								User[] users = config.getUsers();
 								for (User user:users) {
