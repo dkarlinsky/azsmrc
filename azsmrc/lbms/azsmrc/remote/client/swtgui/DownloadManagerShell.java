@@ -1947,7 +1947,7 @@ public class DownloadManagerShell {
 			column.dispose();
 		}
 		createTableColumns(downloadsTable, DownloadContainer.getColumns());
-		for(Container dc : downloadsMap.values().toArray(emptyArray)){
+		for(Container dc : downloadsMap.values()){
 			dc.deleteTableItem();
 		}
 
@@ -1958,7 +1958,7 @@ public class DownloadManagerShell {
 			column.dispose();
 		}
 		createTableColumns(seedsTable, SeedContainer.getColumns());
-		for(Container sc : seedsMap.values().toArray(emptyArray)){
+		for(Container sc : seedsMap.values()){
 			sc.deleteTableItem();
 		}
 		seedsTable.clearAll();
