@@ -7,7 +7,14 @@ import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.Callable;
 
+import org.apache.commons.codec.binary.Base64;
+
 /**
+ * Abstract Class for Downloads.
+ * 
+ * Requires Commons-Codec.jar {@link http://jakarta.apache.org/commons/codec/}
+ * 
+ * 
  * @author Damokles
  *
  */
@@ -28,6 +35,12 @@ public abstract class Download implements Runnable, Callable<Download> {
 	protected String failureReason = "";
 	protected boolean finished = false;
 	protected boolean failed = false;
+
+	protected String referer;
+	protected String userAgent = "Mozilla/5.0 (Windows; U; Windows NT 5.1; de; rv:1.8.0.2) Gecko/20060308 Firefox/1.5.0.2";
+	protected String cookie;
+	protected String login;
+
 	protected Proxy proxy;
 	protected List<DownloadListener> dlListener = new Vector<DownloadListener>();
 
@@ -70,6 +83,34 @@ public abstract class Download implements Runnable, Callable<Download> {
 	}
 
 	/**
+	 * Clone Constructor
+	 * 
+	 * @param d Download to clone
+	 */
+	public Download (Download d) {
+		this.source = d.source;
+		this.target = d.target;
+		this.cookie = d.cookie;
+		this.referer = d.referer;
+		this.login = d.login;
+		this.proxy = d.proxy;
+	}
+
+	/**
+	 * @param source the source to set
+	 */
+	public void setSource(URL source) {
+		this.source = source;
+	}
+
+	/**
+	 * @param target the target to set
+	 */
+	public void setTarget(File target) {
+		this.target = target;
+	}
+
+	/**
 	 * Sets the Proxy to use
 	 * 
 	 * @param proxy the proxy to use
@@ -101,6 +142,57 @@ public abstract class Download implements Runnable, Callable<Download> {
 	 */
 	public File getTarget() {
 		return target;
+	}
+
+
+	/**
+	 * @return the referer or null
+	 */
+	public String getReferer() {
+		return referer;
+	}
+
+	/**
+	 * This needs to be set before the Download is executed
+	 *
+	 * @param referer the referer to set
+	 */
+	public void setReferer(String referer) {
+		this.referer = referer;
+	}
+
+	/**
+	 * @return the userAgent
+	 */
+	public String getUserAgent() {
+		return userAgent;
+	}
+
+	/**
+	 * This needs to be set before the Download is executed
+	 *
+	 * @param userAgent the userAgent to set
+	 */
+	public void setUserAgent(String userAgent) {
+		this.userAgent = userAgent;
+	}
+
+	/**
+	 * @param cookie the cookie to set
+	 */
+	public void setCookie(String cookie) {
+		this.cookie = cookie;
+	}
+
+	/**
+	 * @return the cookie
+	 */
+	public String getCookie() {
+		return cookie;
+	}
+
+	public void setLogin (String username, String pass) {
+		login = new String(new Base64().encode((username+":"+pass).getBytes()));
 	}
 
 	/**

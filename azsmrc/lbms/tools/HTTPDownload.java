@@ -14,8 +14,6 @@ import lbms.tools.stats.StatsInputStream;
 public class HTTPDownload extends Download  {
 
 	private StringBuffer buffer;
-	private String referer;
-	private String userAgent = "Mozilla/5.0 (Windows; U; Windows NT 5.1; de; rv:1.8.0.2) Gecko/20060308 Firefox/1.5.0.2";
 
 	public HTTPDownload(URL source, File target) {
 		super(source, target);
@@ -24,6 +22,11 @@ public class HTTPDownload extends Download  {
 
 	public HTTPDownload(URL source) {
 		super(source);
+		// TODO Auto-generated constructor stub
+	}
+
+	public HTTPDownload(Download d) {
+		super(d);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -51,6 +54,12 @@ public class HTTPDownload extends Download  {
 			conn.addRequestProperty("User-Agent", userAgent);
 			if (referer != null)
 				conn.addRequestProperty("Referer", referer);
+
+			if (cookie != null)
+				conn.addRequestProperty("Cookie", cookie);
+
+			if (login != null)
+				conn.setRequestProperty("Authorization", "Basic: "+login);
 
 			callStateChanged(STATE_CONNECTING);
 			conn.connect();
@@ -149,37 +158,5 @@ public class HTTPDownload extends Download  {
 	 */
 	public StringBuffer getBuffer() {
 		return buffer;
-	}
-
-	/**
-	 * @return the referer or null
-	 */
-	public String getReferer() {
-		return referer;
-	}
-
-	/**
-	 * This needs to be set before the Download is executed
-	 *
-	 * @param referer the referer to set
-	 */
-	public void setReferer(String referer) {
-		this.referer = referer;
-	}
-
-	/**
-	 * @return the userAgent
-	 */
-	public String getUserAgent() {
-		return userAgent;
-	}
-
-	/**
-	 * This needs to be set before the Download is executed
-	 *
-	 * @param userAgent the userAgent to set
-	 */
-	public void setUserAgent(String userAgent) {
-		this.userAgent = userAgent;
 	}
 }

@@ -51,7 +51,8 @@ public class SFDownload extends Download {
 	}
 
 	public Download call() throws Exception {
-		currentDL = new HTTPDownload(source);
+		currentDL = new HTTPDownload(this);
+		currentDL.setSource(source);
 		if (proxy != null);
 			currentDL.setProxy(proxy);
 		try {
@@ -94,7 +95,8 @@ public class SFDownload extends Download {
 					failureReason = "Aborted by User";
 					return this;
 				}
-				currentDL = new HTTPDownload(x,target);
+				currentDL = new HTTPDownload(this);
+				currentDL.setSource(x);
 				if (proxy != null);
 					currentDL.setProxy(proxy);
 				currentDL.setReferer(referer);
