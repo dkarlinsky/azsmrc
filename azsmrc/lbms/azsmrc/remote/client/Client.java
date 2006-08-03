@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,15 +55,25 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
+/**
+ * This class is the connection to the Azureus Server.
+ * 
+ * This class is responsible for all requests send to the Azureus server.
+ * The response is handled by @see ResponseManager.
+ * 
+ * @author Damokles
+ *
+ */
 public class Client {
 
 	private static final long TRANSACTION_TIMEOUT = 1500;
 
 	private Semaphore semaphore = new Semaphore(1);
-	private boolean transaction, ssl, fastMode;
+	private boolean transaction, ssl, fastMode, useProxy;
 	private URL server;
 	private String username;
 	private String password;
+	private Proxy proxy;
 	private Queue<Element> transactionQueue = new ConcurrentLinkedQueue<Element>();
 	private TimerEvent transactionTimeout;
 	private Timer timer;
@@ -90,11 +101,18 @@ public class Client {
 	private List<HTTPErrorListener> 	httpErrorListeners		= new Vector<HTTPErrorListener>();
 	private List<ParameterListener>		parameterListeners		= new Vector<ParameterListener>();
 
+	/**
+	 * Creates the client
+	 */
 	public Client () {
 		init();
 	}
 
 
+	/**
+	 * Creates the Client with an URL
+	 * @param server
+	 */
 	public Client(URL server) {
 		this.server = server;
 		init();
@@ -135,9 +153,16 @@ public class Client {
 		failedConnections 	= 0;
 	}
 
+	/**
+	 * Starts a transaction.
+	 * 
+	 * A transaction will queue all requests while until it is commited
+	 * or send by timeout.
+	 */
 	public void transactionStart() {
 		transaction = true;
 		debug.fine("Transaction Started");
+		if (transactionTimeout != null) transactionTimeout.cancel();
 		transactionTimeout = timer.addEvent(System.currentTimeMillis()+TRANSACTION_TIMEOUT, new TimerEventPerformer() {
 			public void perform(TimerEvent event) {
 				debug.warning("Transaction Committed by Timeout.");
@@ -146,6 +171,11 @@ public class Client {
 		});
 	}
 
+	/**
+	 * Commits the transaction.
+	 * 
+	 * Commits the active transaction.
+	 */
 	public void transactionCommit() {
 		if (transactionTimeout != null) transactionTimeout.cancel();
 		transaction = false;
@@ -153,9 +183,14 @@ public class Client {
 		send();
 	}
 
+	/**
+	 * Sends the queue to the server.
+	 * 
+	 * This is Threaded, if a transaction is active
+	 * it will return immediately.
+	 */
 	private void send() {
 		if (transaction) return;
-
 		new Thread(new Runnable() {
 			public void run() {
 				if (!semaphore.tryAcquire()) {
@@ -201,6 +236,10 @@ public class Client {
 	}
 
 
+	/**
+	 * Sends the request Document to the Server
+	 * @param req the Document to send
+	 */
 	private void sendHttpRequest(Document req) {
 		if (server == null) return;
 		InputStream is = null;
@@ -209,9 +248,12 @@ public class Client {
 		try {
 			for (int i=0;i<2;i++)
 				try {
+					if (useProxy)
+						connection = (HttpURLConnection)server.openConnection(proxy);
+					else
+						connection = (HttpURLConnection)server.openConnection();
 
-					connection = (HttpURLConnection)server.openConnection();
-					if ( server.getProtocol().equalsIgnoreCase("https")){
+					if (server.getProtocol().equalsIgnoreCase("https")){
 						ssl = true;
 						//see ConfigurationChecker for SSL client defaults
 						HttpsURLConnection ssl_connection = (HttpsURLConnection)connection;
@@ -295,11 +337,19 @@ public class Client {
 		}
 	}
 
+	/**
+	 * Creates a standard queue Element
+	 * @return the Element
+	 */
 	private Element getSendElement() {
 		Element sendElement = new Element("Query");
 		return sendElement;
 	}
 
+	/**
+	 * Add an Element to the Transaction Queue
+	 * @param e
+	 */
 	private void enqueue(Element e) {
 		transactionQueue.offer(e);
 		send();
@@ -802,6 +852,15 @@ public class Client {
 	}
 	//--------------------------------------------------------//
 
+	/**
+	 * Loads a Torrent file into an XML element.
+	 * 
+	 * The Torrent Data is Base64 encoded
+	 * 
+	 * @param torrentFile the Torrent to read
+	 * @return the Element containing the Torrent data
+	 * @throws IOException
+	 */
 	public Element loadTorrentToXML (File torrentFile) throws IOException {
 		Element torrent = new Element ("Torrent");
 		FileInputStream fis = null;
@@ -938,6 +997,14 @@ public class Client {
 			parameterListeners.get(i).coreParameter(key, value, type);
 	}
 
+	/**
+	 * Verifies Parameters
+	 * 
+	 * @param key
+	 * @param value
+	 * @param type
+	 * @return true or false
+	 */
 	protected boolean verifyParameter (String key, String value, int type) {
 		if (key == null || value == null) return false;
 		if (type<1 || type>4) return false;
@@ -953,14 +1020,12 @@ public class Client {
 		return server;
 	}
 
-
 	/**
 	 * @return Returns the username.
 	 */
 	public String getUsername() {
 		return username;
 	}
-
 
 	/**
 	 * @return Returns the downloadManager.
@@ -969,6 +1034,9 @@ public class Client {
 		return downloadManager;
 	}
 
+	/**
+	 * @return Returns the DownloadManagerImpl
+	 */
 	protected DownloadManagerImpl getDownloadManagerImpl() {
 		return downloadManager;
 	}
@@ -980,6 +1048,9 @@ public class Client {
 		return userManager;
 	}
 
+	/**
+	 * @return Returns the userManagerImpl.
+	 */
 	protected UserManagerImpl getUserManagerImpl() {
 		return userManager;
 	}
@@ -1013,14 +1084,19 @@ public class Client {
 		return remoteUpdateManager;
 	}
 
+	/**
+	 * @return returns the Tracker
+	 */
 	public Tracker getTracker() {
 		return tracker;
 	}
 
+	/**
+	 * @return returns the TrackerImpl
+	 */
 	protected TrackerImpl getTrackerImpl() {
 		return tracker;
 	}
-
 
 	/**
 	 * @param password The password to set.
@@ -1060,6 +1136,21 @@ public class Client {
 		}
 	}
 
+	/**
+	 * Set the proxy to use.
+	 * 
+	 * Set either proxy, or null to deactivate proxy use.
+	 * 
+	 * @param proxy the proxy to set
+	 */
+	public void setProxy(Proxy proxy) {
+		if (proxy == null) {
+			useProxy = false;
+		} else {
+			this.proxy = proxy;
+			useProxy = true;
+		}
+	}
 
 
 	/**
