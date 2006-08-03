@@ -6,6 +6,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.torrent.TOTorrent;
 import lbms.azsmrc.remote.client.torrent.TOTorrentException;
 import lbms.azsmrc.shared.RemoteConstants;
@@ -48,6 +49,7 @@ public class Scraper implements Runnable {
 		try {
 			URL realScrapeURL = new URL (scrapeURL);
 			HTTPDownload dl = new HTTPDownload(realScrapeURL);
+			dl.setProxy(RCMain.getRCMain().getProxy());
 			dl.run();
 //			System.out.println(dl.getBuffer().toString());
 			if (dl.hasFailed()) {
