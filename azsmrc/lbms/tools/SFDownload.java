@@ -52,6 +52,8 @@ public class SFDownload extends Download {
 
 	public Download call() throws Exception {
 		currentDL = new HTTPDownload(source);
+		if (proxy != null);
+			currentDL.setProxy(proxy);
 		try {
 			callStateChanged(STATE_INITIALIZING);
 			currentDL.call();
@@ -93,6 +95,8 @@ public class SFDownload extends Download {
 					return this;
 				}
 				currentDL = new HTTPDownload(x,target);
+				if (proxy != null);
+					currentDL.setProxy(proxy);
 				currentDL.setReferer(referer);
 				currentDL.addDownloadListener(dlL);
 				currentDL.call();

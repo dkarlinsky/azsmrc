@@ -1,6 +1,7 @@
 package lbms.tools;
 
 import java.io.File;
+import java.net.Proxy;
 import java.net.URL;
 import java.util.List;
 import java.util.Vector;
@@ -27,6 +28,7 @@ public abstract class Download implements Runnable, Callable<Download> {
 	protected String failureReason = "";
 	protected boolean finished = false;
 	protected boolean failed = false;
+	protected Proxy proxy;
 	protected List<DownloadListener> dlListener = new Vector<DownloadListener>();
 
 	/**
@@ -65,6 +67,15 @@ public abstract class Download implements Runnable, Callable<Download> {
 	public Download(URL source, File target) {
 		this.source = source;
 		this.target = target;
+	}
+
+	/**
+	 * Sets the Proxy to use
+	 * 
+	 * @param proxy the proxy to use
+	 */
+	public void setProxy(Proxy proxy) {
+		this.proxy = proxy;
 	}
 
 	/**

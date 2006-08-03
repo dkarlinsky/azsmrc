@@ -38,7 +38,11 @@ public class HTTPDownload extends Download  {
 	public Download call() throws Exception {
 		InputStream is = null;
 		try {
-			HttpURLConnection conn = (HttpURLConnection)source.openConnection();
+			HttpURLConnection conn = null;
+			if (proxy != null)
+				conn = (HttpURLConnection)source.openConnection(proxy);
+			else
+				conn = (HttpURLConnection)source.openConnection();
 			conn.setConnectTimeout(TIMEOUT);
 			conn.setReadTimeout(TIMEOUT);
 			conn.setDoInput(true);
