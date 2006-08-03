@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +51,8 @@ public class Updater {
 	private boolean updateAvailable = false;
 	private boolean failed = false, abort = false;
 	private String lastError = "";
+	private Proxy proxy;
+
 
 	private List<Download> downloads = new Vector<Download>(); //needs to be synchronized
 
@@ -79,7 +82,12 @@ public class Updater {
 				InputStream is = null;
 				FileInputStream fis = null;
 				try {
-					HttpURLConnection conn = (HttpURLConnection)remoteUpdateFile.openConnection();
+					HttpURLConnection conn = null;
+					if (proxy != null)
+						conn = (HttpURLConnection)remoteUpdateFile.openConnection(proxy);
+					else
+						conn = (HttpURLConnection)remoteUpdateFile.openConnection();
+
 					conn.setDoInput(true);
 					is =  conn.getInputStream();
 					if (remoteUpdateFile.toExternalForm().contains(".gz")) {
@@ -219,9 +227,11 @@ public class Updater {
 						switch (u.getType()) {
 						case UpdateFile.TYPE_NORMAL:
 							dl = new HTTPDownload (remoteLoc,localTmp);
+							dl.setProxy(proxy);
 							break;
 						case UpdateFile.TYPE_SF_NET:
 							dl = new SFDownload (remoteLoc,localTmp);
+							dl.setProxy(proxy);
 							break;
 						default:
 							dl=null;
@@ -346,6 +356,12 @@ public class Updater {
 				d.abortDownload();
 	}
 
+	/**
+	 * @param proxy the proxy to use
+	 */
+	public void setProxy(Proxy proxy) {
+		this.proxy = proxy;
+	}
 
 	/**
 	 * @return Returns the localUpdateList.
