@@ -21,7 +21,6 @@ import org.gudy.azureus2.plugins.download.Download;
 import org.gudy.azureus2.plugins.download.DownloadManager;
 import org.gudy.azureus2.plugins.download.DownloadManagerListener;
 import org.gudy.azureus2.plugins.logging.LoggerChannel;
-import org.gudy.azureus2.plugins.torrent.TorrentAttribute;
 import org.gudy.azureus2.plugins.tracker.Tracker;
 import org.gudy.azureus2.plugins.tracker.TrackerException;
 import org.gudy.azureus2.plugins.tracker.web.TrackerAuthenticationAdapter;
@@ -136,11 +135,10 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		//add the download listeners to the downloads
 		DownloadManager dm = pluginInterface.getDownloadManager();
 		config.removeInvalidDownloadsFromUsers(dm.getDownloads());
-		final TorrentAttribute ta = pluginInterface.getTorrentManager().getAttribute(TorrentAttribute.TA_CATEGORY);
 		dm.addListener( new DownloadManagerListener()
 				{
 					public void downloadAdded(Download dl) {
-						if (!dl.isComplete() && dl.getAttribute(ta)!= null)	//add only if the download isn't already complete
+						if (!dl.isComplete())	//add only if the download isn't already complete
 							dl.addListener(MultiUserDownloadListener.getInstance()); //attach DownloadListener
 					}
 
