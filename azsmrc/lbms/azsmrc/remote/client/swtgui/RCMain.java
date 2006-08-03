@@ -15,7 +15,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
+import java.net.Proxy;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
@@ -106,6 +108,7 @@ public class RCMain implements Launchable {
 	private boolean connect;
 	private Logger normalLogger, debugLogger;
 	private Updater updater;
+	private Proxy proxy;
 
 	private TrayItem systrayItem;
 	private DownloadManagerShell mainWindow;
@@ -640,6 +643,12 @@ public class RCMain implements Launchable {
 		client.setServer(properties.getProperty("connection_lastURL_0",null));
 		client.setUsername(properties.getProperty("connection_username_0"));
 		client.setPassword(properties.getProperty("connection_password_0"));
+		if (properties.getProperty("connection_proxy_type_0") != null) {
+			Proxy.Type type = Proxy.Type.valueOf(properties.getProperty("connection_proxy_type_0"));
+			InetSocketAddress inetAddress = new InetSocketAddress(properties.getProperty("connection_proxy_url_0"),properties.getPropertyAsInt("connection_proxy_port_0"));
+			proxy = new Proxy(type,inetAddress);
+			client.setProxy(proxy);
+		}
 		client.setFastMode(properties.getPropertyAsBoolean("client.fastmode"));
 		client.addSpeedUpdateListener(new SpeedUpdateListener() {
 			public void setSpeed(final int d, final int u) {
@@ -817,6 +826,7 @@ public class RCMain implements Launchable {
 		SplashScreen.setProgressAndText("Creating Updater.",50);
 		try {
 			updater = new Updater(new URL(RemoteConstants.UPDATE_URL),new File("AzSMRCupdate.xml.gz"),new File(USER_DIR));
+			updater.setProxy(getProxy());
 		} catch (MalformedURLException e2) {
 		}
 		updater.addListener(new UpdateListener() {
@@ -1135,6 +1145,40 @@ public class RCMain implements Launchable {
 		SoundManager.unLoad(Sound.DOWNLOAD_ADDED);
 		SoundManager.unLoad(Sound.DOWNLOADING_FINISHED);
 		SoundManager.unLoad(Sound.SEEDING_FINISHED);
+	}
+
+	/**
+	 * Sets the Proxy for the current session.
+	 * 
+	 * The data will not be saved.
+	 * 
+	 * @param stype Proxy Type {@link http://java.sun.com/j2se/1.5.0/docs/api/java/net/Proxy.Type.html}
+	 * @param url the Proxy url
+	 * @param port the Proxy port
+	 */
+	public void setProxy (String stype, String url, int port) {
+		Proxy.Type type = Proxy.Type.valueOf(stype);
+		InetSocketAddress inetAddress = new InetSocketAddress(url, port);
+		proxy = new Proxy(type,inetAddress);
+		client.setProxy(proxy);
+	}
+
+	/**
+	 * Sets the Proxy for the current session.
+	 * 
+	 * The data will not be saved.
+	 * @param proxy the Proxy to use
+	 */
+	public void setProxy (Proxy proxy) {
+		this.proxy = proxy;
+		client.setProxy(proxy);
+	}
+
+	/**
+	 * @return the proxy
+	 */
+	public Proxy getProxy() {
+		return proxy;
 	}
 
 	private void loadSound (Sound key, String snd) {
