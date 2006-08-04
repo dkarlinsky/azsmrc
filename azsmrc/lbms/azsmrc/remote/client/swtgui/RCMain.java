@@ -643,9 +643,9 @@ public class RCMain implements Launchable {
 		client.setServer(properties.getProperty("connection_lastURL_0",null));
 		client.setUsername(properties.getProperty("connection_username_0"));
 		client.setPassword(properties.getProperty("connection_password_0"));
-		if (properties.getProperty("connection_proxy_type_0") != null) {
-			Proxy.Type type = Proxy.Type.valueOf(properties.getProperty("connection_proxy_type_0"));
-			InetSocketAddress inetAddress = new InetSocketAddress(properties.getProperty("connection_proxy_url_0"),properties.getPropertyAsInt("connection_proxy_port_0"));
+		if (properties.getPropertyAsBoolean("connection.proxy.use")) {
+			Proxy.Type type = Proxy.Type.valueOf(properties.getProperty("connection.proxy.type"));
+			InetSocketAddress inetAddress = new InetSocketAddress(properties.getProperty("connection.proxy.url"),properties.getPropertyAsInt("connection.proxy.port"));
 			proxy = new Proxy(type,inetAddress);
 			client.setProxy(proxy);
 		}
