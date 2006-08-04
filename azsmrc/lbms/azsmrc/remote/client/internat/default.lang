@@ -385,6 +385,7 @@ tab.preferencestab.connection.connection_interval_closed=Update Interval while t
 tab.preferencestab.connection.connection_interval_open=Update Interval while the main window is open (in milliseconds, minimum of 3000 [3 Seconds]):
 tab.preferencestab.connection.fastmode=FastMode:  This mode uses more network bandwidth, but will increase the responsiveness of AzSMRC
 tab.preferencestab.connection.proxy=Proxy
+tab.preferencestab.connection.proxy.help=You need to restart if you change the Proxy Settings.
 tab.preferencestab.connection.proxy.port=Port
 tab.preferencestab.connection.proxy.type=Type
 tab.preferencestab.connection.proxy.type.http=HTTP

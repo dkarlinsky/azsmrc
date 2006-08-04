@@ -25,6 +25,7 @@ import lbms.azsmrc.remote.client.swtgui.container.AddTorrentContainer;
 import lbms.azsmrc.remote.client.torrent.TOTorrentException;
 import lbms.azsmrc.remote.client.torrent.TOTorrentFile;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
+import lbms.azsmrc.shared.SWTSafeRunnable;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
@@ -579,15 +580,23 @@ public class OpenByFileDialog {
 	 * @param display
 	 * @param fileNames
 	 */
-	public static void open(String[] fileNames){
+	public static void open(final String[] fileNames){
 		final Display display = RCMain.getRCMain().getDisplay();
 		if(display == null) return;
-		if (instance == null || instance.shell == null || instance.shell.isDisposed()){
-			new OpenByFileDialog(display, fileNames);
-		} else{
-			instance.shell.setActive();
-			instance.addFileToInstance(fileNames);
-		}
+		display.syncExec(new SWTSafeRunnable() {
+			/* (non-Javadoc)
+			 * @see lbms.azsmrc.shared.SWTSafeRunnable#runSafe()
+			 */
+			@Override
+			public void runSafe() {
+				if (instance == null || instance.shell == null || instance.shell.isDisposed()){
+					new OpenByFileDialog(display, fileNames);
+				} else{
+					instance.shell.setActive();
+					instance.addFileToInstance(fileNames);
+				}
+			}
+		});
 
 
 	}
