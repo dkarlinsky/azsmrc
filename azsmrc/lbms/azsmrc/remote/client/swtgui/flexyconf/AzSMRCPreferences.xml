@@ -11,8 +11,9 @@
 				<Entry index="0" key="connection.proxy.use" label="connection.proxy.use" type="boolean" />
 				<Entry index="1" key="" label="connection.proxy.help" type="label" />
 				<Entry index="2" key="connection.proxy.type" label="connection.proxy.type" type="string" dependsOn="connection.proxy.use">
-					<Option index="0" label="connection.proxy.type.http" value="HTTP" />
-					<Option index="1" label="connection.proxy.type.socks" value="SOCKS" />
+					<Option index="0" label="connection.proxy.type.none" value="DIRECT" />
+					<Option index="1" label="connection.proxy.type.http" value="HTTP" />
+					<Option index="2" label="connection.proxy.type.socks" value="SOCKS" />
 				</Entry>
 				<Entry index="3" key="connection.proxy.url" label="connection.proxy.url" type="string" dependsOn="connection.proxy.use"/>
 				<Entry index="4" key="connection.proxy.port" label="connection.proxy.port" type="integer" dependsOn="connection.proxy.use" validate="1..65536"/>
