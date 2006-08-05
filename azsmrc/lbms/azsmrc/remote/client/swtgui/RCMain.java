@@ -15,8 +15,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.net.Authenticator;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
 import java.net.Proxy;
 import java.net.URL;
 import java.security.cert.X509Certificate;
@@ -647,6 +649,15 @@ public class RCMain implements Launchable {
 			Proxy.Type type = Proxy.Type.valueOf(properties.getProperty("connection.proxy.type"));
 			InetSocketAddress inetAddress = new InetSocketAddress(properties.getProperty("connection.proxy.url"),properties.getPropertyAsInt("connection.proxy.port"));
 			proxy = new Proxy(type,inetAddress);
+			if (properties.getProperty("connection.proxy.username") != null && properties.getProperty("connection.proxy.password") != null) {
+				Authenticator.setDefault(new Authenticator() {
+					PasswordAuthentication pw = new PasswordAuthentication(properties.getProperty("connection.proxy.username"),properties.getProperty("connection.proxy.password").toCharArray());
+
+					protected PasswordAuthentication getPasswordAuthentication() {
+						return pw;
+					}
+				});
+			}
 			client.setProxy(proxy);
 		}
 		client.setFastMode(properties.getPropertyAsBoolean("client.fastmode"));

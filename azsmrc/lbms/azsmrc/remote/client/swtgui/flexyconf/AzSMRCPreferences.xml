@@ -17,6 +17,8 @@
 				</Entry>
 				<Entry index="3" key="connection.proxy.url" label="connection.proxy.url" type="string" dependsOn="connection.proxy.use"/>
 				<Entry index="4" key="connection.proxy.port" label="connection.proxy.port" type="integer" dependsOn="connection.proxy.use" validate="1..65536"/>
+				<Entry index="5" key="connection.proxy.username" label="connection.proxy.username" type="string" dependsOn="connection.proxy.use"/>
+				<Entry index="6" key="connection.proxy.password" label="connection.proxy.password" type="string" dependsOn="connection.proxy.use"/>
 			</Group>
 		</Section>
 		<Section label="mainWindow" index="1">
