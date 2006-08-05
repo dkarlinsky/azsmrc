@@ -33,6 +33,8 @@
 				<Entry key="tray.minimize" label="mainWindow.trayMinimize" type="boolean" index="0"/>
 				<Entry key="tray.exit" label="mainWindow.trayExit" type="boolean" index="1"/>
 			</Group>
+			<Entry key="multiInstance" label="mainWindow.multiInstance" type="boolean" index="6"/>
+			<Entry key="" label="mainWindow.multiInstance.help" type="label" index="7"/>
 		</Section>
 		<Section label="miscellaneous" index="2">
 			<Entry key="popups_enabled" label="miscellaneous.popupsEnabled" type="boolean" index="0"/>

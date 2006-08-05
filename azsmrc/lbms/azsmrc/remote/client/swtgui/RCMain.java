@@ -259,7 +259,7 @@ public class RCMain implements Launchable {
 					|| properties.getProperty("connection_lastURL_0", "").equals("")) {
 				connect = false;
 			} else {
-				updateTimer(properties.getPropertyAsBoolean("auto_open", true));
+				updateTimer(properties.getPropertyAsBoolean("auto_open"));
 				client.getDownloadManager().update(true);
 			}
 		}
@@ -331,7 +331,7 @@ public class RCMain implements Launchable {
 
 		//Open mainWindow if AutoOpen is true
 
-		if(properties.getPropertyAsBoolean("auto_open", true)){
+		if(properties.getPropertyAsBoolean("auto_open")){
 			if (mainWindow == null) {
 				mainWindow = new DownloadManagerShell();
 			}
@@ -359,7 +359,7 @@ public class RCMain implements Launchable {
 		final MenuItem quickMenuItem = new MenuItem(menu, SWT.CASCADE);
 		quickMenuItem.setText(I18N.translate(PFX + "traymenu.quickmenu"));
 
-		final Menu quickMenu = new Menu(addMenuItem);
+		final Menu quickMenu = new Menu(quickMenuItem);
 		quickMenuItem.setMenu(quickMenu);
 
 		final MenuItem pauseDownloads_1min = new MenuItem(quickMenu,SWT.PUSH);
@@ -572,7 +572,7 @@ public class RCMain implements Launchable {
 		System.out.println("Checking javaw.exe.manifest");
 		javawExeManifest();
 
-		if(properties.getPropertyAsBoolean("show_splash",true)){
+		if(properties.getPropertyAsBoolean("show_splash")){
 			SplashScreen.open(display, 20);
 		}
 		SplashScreen.setProgressAndText("Creating Logger.",10);
@@ -640,7 +640,7 @@ public class RCMain implements Launchable {
 		SplashScreen.setProgressAndText("Creating Client.",30);
 		client = new Client();
 		client.setDebugLogger(debugLogger);
-		client.setServer(properties.getProperty("connection_lastURL_0",null));
+		client.setServer(properties.getProperty("connection_lastURL_0"));
 		client.setUsername(properties.getProperty("connection_username_0"));
 		client.setPassword(properties.getProperty("connection_password_0"));
 		if (properties.getPropertyAsBoolean("connection.proxy.use")) {
@@ -887,7 +887,7 @@ public class RCMain implements Launchable {
 				UpdateProgressDialog.initialize(dls);
 			}
 		});
-		if (properties.getPropertyAsBoolean("update.autocheck", true)) {
+		if (properties.getPropertyAsBoolean("update.autocheck")) {
 			long lastcheck = properties.getPropertyAsLong("update.lastcheck");
 			if (System.currentTimeMillis()-lastcheck > 1000*60*60*24) {
 				if (mainWindow != null) {
@@ -970,7 +970,7 @@ public class RCMain implements Launchable {
 		if (updateTimer != null) updateTimer.cancel();
 		debugLogger.finer("Changing Timer: "+(open?"GUI mode":"Tray mode"));
 		if (open) {
-			updateTimer = timer.addPeriodicEvent(properties.getPropertyAsLong("connection_interval_open",5000)+delay,
+			updateTimer = timer.addPeriodicEvent(properties.getPropertyAsLong("connection_interval_open")+delay,
 				new TimerEventPerformer() {
 				public void perform(TimerEvent event) {
 					debugLogger.finest("Timer: GUI mode");
@@ -979,7 +979,7 @@ public class RCMain implements Launchable {
 			});
 		}
 		else {
-			updateTimer = timer.addPeriodicEvent(properties.getPropertyAsLong("connection_interval_closed",15000)+delay,
+			updateTimer = timer.addPeriodicEvent(properties.getPropertyAsLong("connection_interval_closed")+delay,
 				new TimerEventPerformer() {
 				public void perform(TimerEvent event) {
 					debugLogger.finest("Timer: Tray mode");
