@@ -1105,16 +1105,10 @@ public class RCMain implements Launchable {
 	public void javawExeManifest() {
 		if (!(RemoteConstants.isWindowsXP || RemoteConstants.isWindows2003) ) {
 			manifestInUse = false;
-			return;
-		}
-		File fDest = new File(System.getProperty("java.home")
-				+ "\\bin\\javaw.exe.manifest");
-		File fOrigin = new File("javaw.exe.manifest");
-		if (!fDest.exists() && fOrigin.exists()) {
-			FileUtil.copyFile(fOrigin, fDest);
-			manifestInUse = false;
-		} else if (fDest.exists())
+		} else {
+			//due to the new exe we don't need the check anymore
 			manifestInUse = true;
+		}
 	}
 
 	/**
