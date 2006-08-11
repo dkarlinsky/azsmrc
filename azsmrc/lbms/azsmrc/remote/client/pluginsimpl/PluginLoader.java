@@ -1,6 +1,3 @@
-/**
- * 
- */
 package lbms.azsmrc.remote.client.pluginsimpl;
 
 import java.io.File;
@@ -23,14 +20,9 @@ import lbms.tools.launcher.SystemProperties;
  * @author Damokles
  *
  */
-public class PluginLauncher {
+public class PluginLoader {
 
-
-	public static void launch () {
-
-	}
-
-	private static void	findPlugins(PluginManagerImpl manager) {
+	public static void	findAndLoadPlugins(PluginManagerImpl manager) {
 
 		File	app_dir	 = getApplicationFile("plugins");
 
@@ -60,7 +52,25 @@ public class PluginLauncher {
 				continue;
 			}
 
-			try{
+			File[] pluginContents = plugin_dir.listFiles();
+
+			boolean	looks_like_plugin	= false;
+
+			for (int j=0;j<pluginContents.length;i++){
+
+				String	name = pluginContents[j].getName().toLowerCase();
+
+				if ( name.endsWith( ".jar") || name.equals( "plugin.properties" )){
+
+					looks_like_plugin = true;
+
+					break;
+				}
+			}
+
+			if (!looks_like_plugin) continue;
+
+			try {
 
 				ClassLoader	root_cl = getRootClassLoader(new File("."));
 
@@ -80,7 +90,7 @@ public class PluginLauncher {
 				// if properties file exists on its own then override any properties file
 				// potentially held within a jar
 
-				if ( properties_file.exists()){
+				if ( properties_file.exists()) {
 
 					FileInputStream	fis = null;
 
@@ -96,7 +106,7 @@ public class PluginLauncher {
 							fis.close();
 						}
 					}
-				}else{
+				} else {
 
 					if ( classLoader instanceof URLClassLoader ){
 
@@ -119,11 +129,11 @@ public class PluginLauncher {
 
 				Plugin	    plugin	= (Plugin) c.newInstance();
 
-				if ( plugin instanceof Plugin ){
+				if ( plugin instanceof Plugin ) {
 
 					manager.addPlugin(plugin, props, plugin_dir.getCanonicalPath());
 				}
-			}catch( Throwable e ){
+			}catch( Throwable e ) {
 
 				System.out.println( "Load of Launchable in '" + app_dir + "' fails");
 				e.printStackTrace();
@@ -135,16 +145,16 @@ public class PluginLauncher {
 	getRootClassLoader(
 			File		dir )
 	{
-		ClassLoader root_class_loader = PluginLauncher.class.getClassLoader();
+		ClassLoader root_class_loader = PluginLoader.class.getClassLoader();
 		dir = new File( dir, "shared" );
 		if ( dir.exists() && dir.isDirectory()){
 
 			File[]	files = dir.listFiles();
 
-			if ( files != null ){
+			if ( files != null ) {
 				files = getHighestJarVersions(files);
 
-				for (int i=0;i<files.length;i++){
+				for (int i=0;i<files.length;i++) {
 					root_class_loader = addFileToClassPath(root_class_loader,
 							root_class_loader, files[i] );
 				}
@@ -155,18 +165,18 @@ public class PluginLauncher {
 	}
 
 	private static File
- 	getApplicationFile(
- 		String filename) 
- 	{      
-		 String path = SystemProperties.getApplicationPath();
+	getApplicationFile(
+			String filename)
+	{
+		String path = SystemProperties.getApplicationPath();
 
-		 if (Constants.isOSX ){
+		if (Constants.isOSX ) {
 
-			 path = path + "/" + SystemProperties.getApplicationName() + ".app/Contents/";
-		 }
+			path = path + "/" + SystemProperties.getApplicationName() + ".app/Contents/";
+		}
 
-		 return new File(path, filename);
- 	}
+		return new File(path, filename);
+	}
 
 	public static File[] getHighestJarVersions (File[] files)	// currently the version of last versioned jar found...
 	{
@@ -180,7 +190,7 @@ public class PluginLauncher {
 
 			String	name = f.getName().toLowerCase();
 
-			if ( name.endsWith(".jar")){
+			if ( name.endsWith(".jar") ) {
 				System.out.println("Checking: "+name);
 
 				int cvs_pos = name.lastIndexOf("_cvs");
@@ -204,7 +214,7 @@ public class PluginLauncher {
 					prefix = name.substring(0, name.indexOf('.'));
 					version = "-1.0";
 
-				}else{
+				} else {
 					prefix = name.substring(0,sep_pos);
 
 					version = name.substring(sep_pos+1, (cvs_pos <= 0) ? name.length()-4 : cvs_pos);
@@ -215,7 +225,7 @@ public class PluginLauncher {
 
 					version_map.put( prefix, version );
 
-				}else{
+				} else {
 
 					if ( compareVersions( prev_version, version ) < 0 ){
 
@@ -261,8 +271,8 @@ public class PluginLauncher {
 
 	public static int
 	compareVersions(
-		String		version_1,
-		String		version_2 )
+			String		version_1,
+			String		version_2 )
 	{
 		try{
 			if ( version_1.startsWith("." )){
@@ -313,50 +323,50 @@ public class PluginLauncher {
 		}
 	}
 
-	 public static ClassLoader 
-		addFileToClassPath(
+	public static ClassLoader
+	addFileToClassPath(
 			ClassLoader		root,
 			ClassLoader		classLoader,
 			File 			f)
-		{
-		  if ( 	f.exists() &&
-				  (!f.isDirectory())&&
-				  f.getName().endsWith(".jar")){
+	{
+		if ( 	f.exists() &&
+				(!f.isDirectory())&&
+				f.getName().endsWith(".jar")){
 
-			  try {
+			try {
 
-					  // URL classloader doesn't seem to delegate to parent classloader properly
-					  // so if you get a chain of them then it fails to find things. Here we
-					  // make sure that all of our added URLs end up within a single URLClassloader
-					  // with its parent being the one that loaded this class itself
+				// URL classloader doesn't seem to delegate to parent classloader properly
+				// so if you get a chain of them then it fails to find things. Here we
+				// make sure that all of our added URLs end up within a single URLClassloader
+				// with its parent being the one that loaded this class itself
 
-				  if ( classLoader instanceof URLClassLoader ){
+				if ( classLoader instanceof URLClassLoader ){
 
-					  URL[]	old = ((URLClassLoader)classLoader).getURLs();
+					URL[]	old = ((URLClassLoader)classLoader).getURLs();
 
-					  URL[]	new_urls = new URL[old.length+1];
+					URL[]	new_urls = new URL[old.length+1];
 
-					  System.arraycopy( old, 0, new_urls, 0, old.length );
+					System.arraycopy( old, 0, new_urls, 0, old.length );
 
-					  new_urls[new_urls.length-1]= f.toURL();
+					new_urls[new_urls.length-1]= f.toURL();
 
-					  classLoader = new URLClassLoader(
-										  new_urls,
-	  									classLoader==root?
-	  											classLoader:
-	  											classLoader.getParent());
-				  }else{
+					classLoader = new URLClassLoader(
+							new_urls,
+							classLoader==root?
+									classLoader:
+										classLoader.getParent());
+				}else{
 
-					  classLoader = new URLClassLoader(new URL[]{f.toURL()},classLoader);
-				  }
-			  }catch( Exception e){
+					classLoader = new URLClassLoader(new URL[]{f.toURL()},classLoader);
+				}
+			}catch( Exception e){
 
-					  // don't use Debug/lglogger here as we can be called before AZ has been initialised
+				// don't use Debug/lglogger here as we can be called before AZ has been initialised
 
-				  e.printStackTrace();
-			  }
-			 }
-
-		  return( classLoader );
+				e.printStackTrace();
+			}
 		}
+
+		return( classLoader );
+	}
 }

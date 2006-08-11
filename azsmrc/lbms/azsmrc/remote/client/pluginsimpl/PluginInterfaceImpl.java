@@ -97,4 +97,10 @@ public class PluginInterfaceImpl implements PluginInterface {
 	public String getPluginVersion() {
 		return version;
 	}
+
+	//--------------------------------------------------//
+
+	public void initializePlugin() {
+		plugin.initialize(this);
+	}
 }
