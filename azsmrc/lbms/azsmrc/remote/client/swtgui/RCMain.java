@@ -62,7 +62,6 @@ import lbms.azsmrc.remote.client.swtgui.sound.Sound;
 import lbms.azsmrc.remote.client.swtgui.sound.SoundException;
 import lbms.azsmrc.remote.client.swtgui.sound.SoundManager;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
-import lbms.azsmrc.remote.client.util.FileUtil;
 import lbms.azsmrc.remote.client.util.Timer;
 import lbms.azsmrc.remote.client.util.TimerEvent;
 import lbms.azsmrc.remote.client.util.TimerEventPerformer;
@@ -294,11 +293,10 @@ public class RCMain implements Launchable {
 		}*/
 
 		final Tray systray = display.getSystemTray ();
+		if (systray != null) {
 		systrayItem = new TrayItem (systray, SWT.NONE);
-		setTrayIcon(0);
 
 		//Listener for the system tray
-
 
 		systrayItem.addSelectionListener(new SelectionListener()
 				{
@@ -330,7 +328,9 @@ public class RCMain implements Launchable {
 
 					}
 				});
+		}
 
+		setTrayIcon(0);
 		//Open mainWindow if AutoOpen is true
 
 		if(properties.getPropertyAsBoolean("auto_open")){
@@ -509,12 +509,13 @@ public class RCMain implements Launchable {
 				properties.setProperty("popups_enabled", silentItem.getSelection());
 			}
 		});
-
-		systrayItem.addListener (SWT.MenuDetect, new Listener () {
-			public void handleEvent (Event event) {
-				menu.setVisible (true);
-			}
-		});
+		if (systrayItem != null) {
+			systrayItem.addListener (SWT.MenuDetect, new Listener () {
+				public void handleEvent (Event event) {
+					menu.setVisible (true);
+				}
+			});
+		}
 
 		//Add in the clipboard monitor
 		addAWTClipboardMonitor();
