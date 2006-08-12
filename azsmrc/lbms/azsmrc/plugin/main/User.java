@@ -247,4 +247,12 @@ public class User extends lbms.azsmrc.shared.User {
 		event.setAttribute("message", e);
 		eventQueue.offer(event);
 	}
+
+	public void eventPluginMessage (String targetID, Element e) {
+		Element event = getEventElement();
+		event.setAttribute("type", Integer.toString(RemoteConstants.EV_PLUGIN_MESSAGE));
+		event.setAttribute("targetID", targetID);
+		event.addContent(e);
+		eventQueue.offer(event);
+	}
 }

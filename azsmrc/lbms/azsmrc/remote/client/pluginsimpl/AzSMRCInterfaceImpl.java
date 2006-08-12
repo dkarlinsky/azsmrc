@@ -1,6 +1,3 @@
-/**
- * 
- */
 package lbms.azsmrc.remote.client.pluginsimpl;
 
 import lbms.azsmrc.remote.client.plugins.AzSMRCInterface;

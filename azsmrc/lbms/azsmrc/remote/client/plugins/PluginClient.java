@@ -1,7 +1,6 @@
-/**
- * 
- */
 package lbms.azsmrc.remote.client.plugins;
+
+import lbms.azsmrc.remote.client.plugins.event.PluginClientListener;
 
 import org.jdom.Element;
 
@@ -37,4 +36,18 @@ public interface PluginClient {
 	 * @param params array of Parameters supported are: boolean, int, long, float, double, String
 	 */
 	public void sendIPCCall (String pluginID, String senderID, String method, Object[] params);
+
+	/**
+	 * Adds a PluginClientListener
+	 * 
+	 * @param listener Listener to add
+	 */
+	public void addListener (PluginClientListener listener);
+
+	/**
+	 * Removes a PluginClientListener
+	 * 
+	 * @param listener Listener to remove
+	 */
+	public void removeListener (PluginClientListener listener);
 }
