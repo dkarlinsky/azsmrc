@@ -73,6 +73,8 @@ public class PluginLoader {
 
 			try {
 
+				System.out.println("Checking dir for Plugins: "+plugin_dir.getCanonicalPath());
+
 				ClassLoader	root_cl = getRootClassLoader(new File("."));
 
 				ClassLoader classLoader = root_cl;
@@ -86,7 +88,7 @@ public class PluginLoader {
 
 				Properties props = new Properties();
 
-				File	properties_file = new File( app_dir, "plugin.properties");
+				File properties_file = new File( plugin_dir, "plugin.properties");
 
 				// if properties file exists on its own then override any properties file
 				// potentially held within a jar
@@ -137,6 +139,7 @@ public class PluginLoader {
 
 				String plugin_class = props.getProperty( "azsmrc.plugin.class");
 
+//				if (plugin_class == null) continue;
 				// don't support multiple Launchables
 
 				Class c = classLoader.loadClass(plugin_class);
@@ -149,7 +152,7 @@ public class PluginLoader {
 				}
 			}catch( Throwable e ) {
 
-				System.out.println( "Load of Launchable in '" + app_dir + "' fails");
+				System.out.println( "Load of Plugin in '" + app_dir + "' fails");
 				e.printStackTrace();
 			}
 		}

@@ -12,6 +12,7 @@ import lbms.azsmrc.remote.client.plugins.PluginInterface;
 import lbms.azsmrc.remote.client.plugins.PluginManager;
 import lbms.azsmrc.remote.client.plugins.event.PluginListener;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
+import lbms.azsmrc.remote.client.swtgui.SplashScreen;
 
 /**
  * @author Damokles
@@ -26,10 +27,10 @@ public class PluginManagerImpl implements PluginManager {
 
 	private List<PluginListener> listeners = new ArrayList<PluginListener>();
 
-	public PluginInterfaceImpl addPlugin (Plugin plug, Properties props,String dir) {
+	public PluginInterfaceImpl addPlugin (Plugin plug, Properties props, String dir) {
 		PluginInterfaceImpl pI = new PluginInterfaceImpl (this ,
-				plug, props.getProperty("plugin.id"), props.getProperty("plugin.version"), dir);
-		pluginMap.put(pI.getPluginId(), pI);
+				plug, props.getProperty("plugin.id"), props.getProperty("plugin.name"), props.getProperty("plugin.version"), dir);
+		pluginMap.put(pI.getPluginID(), pI);
 		return pI;
 	}
 
@@ -98,6 +99,7 @@ public class PluginManagerImpl implements PluginManager {
 
 		for (PluginInterfaceImpl pi:pluginMap.values()) {
 			try {
+				SplashScreen.setText("Initializing Plugin: "+pi.getPluginName());
 				pi.initializePlugin();
 			} catch (Throwable e) {
 				e.printStackTrace();

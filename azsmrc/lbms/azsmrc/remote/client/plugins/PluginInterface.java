@@ -18,4 +18,12 @@ public interface PluginInterface {
 	public Plugin getPlugin();
 
 	public IPCInterface getIPCInterface();
+
+	public String getPluginDir();
+
+	public String getPluginID();
+
+	public String getPluginVersion();
+
+	public String getPluginName();
 }

@@ -24,14 +24,16 @@ public class PluginInterfaceImpl implements PluginInterface {
 	private String id;
 	private String version;
 	private String pluginDir;
+	private String name;
 	private IPCInterface ipcInterface;
 	private PluginConfigImpl config;
 	private File configFile;
 
-	public PluginInterfaceImpl(PluginManagerImpl manager, Plugin plugin, String id, String version, String pluginDir) {
+	public PluginInterfaceImpl(PluginManagerImpl manager, Plugin plugin, String id, String name, String version, String pluginDir) {
 		this.manager = manager;
 		this.plugin = plugin;
 		this.id = id;
+		this.name = name;
 		this.version = version;
 		this.pluginDir = pluginDir;
 	}
@@ -82,7 +84,7 @@ public class PluginInterfaceImpl implements PluginInterface {
 	/**
 	 * @return the id
 	 */
-	public String getPluginId() {
+	public String getPluginID() {
 		return id;
 	}
 
@@ -98,6 +100,13 @@ public class PluginInterfaceImpl implements PluginInterface {
 	 */
 	public String getPluginVersion() {
 		return version;
+	}
+
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.plugins.PluginInterface#getPluginName()
+	 */
+	public String getPluginName() {
+		return name;
 	}
 
 	/**

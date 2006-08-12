@@ -48,6 +48,8 @@ import lbms.azsmrc.remote.client.events.ExceptionListener;
 import lbms.azsmrc.remote.client.events.HTTPErrorListener;
 import lbms.azsmrc.remote.client.events.SpeedUpdateListener;
 import lbms.azsmrc.remote.client.internat.I18N;
+import lbms.azsmrc.remote.client.pluginsimpl.PluginLoader;
+import lbms.azsmrc.remote.client.pluginsimpl.PluginManagerImpl;
 import lbms.azsmrc.remote.client.swtgui.container.DownloadContainer;
 import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ErrorDialog;
@@ -110,6 +112,7 @@ public class RCMain implements Launchable {
 	private Logger normalLogger, debugLogger;
 	private Updater updater;
 	private Proxy proxy;
+	private PluginManagerImpl pluginManager;
 
 	private TrayItem systrayItem;
 	private DownloadManagerShell mainWindow;
@@ -604,7 +607,7 @@ public class RCMain implements Launchable {
 		normalLogger.addHandler(consoleHandler);
 		debugLogger.addHandler(consoleHandler);
 
-		SplashScreen.setProgressAndText("Loading I18N.",20);
+		SplashScreen.setProgressAndText("Loading I18N.",15);
 		try {
 			I18N.setDefault("lbms/azsmrc/remote/client/internat/default.lang");
 			if (properties.getProperty("language") != null) {
@@ -621,17 +624,9 @@ public class RCMain implements Launchable {
 			e1.printStackTrace();
 		}
 
-		/*try {
-			FileHandler fh = new FileHandler(USER_DIR+FSEP+"debug.log",1024*1024,2,true);
-			fh.setLevel(Level.parse(properties.getProperty("debugLevel", "WARNING")));
-			debugLogger.addHandler(fh);
-		} catch (SecurityException e1) {
-			debugLogger.log(Level.WARNING, e1.getMessage(), e1);
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			debugLogger.log(Level.WARNING, e1.getMessage(), e1);
-			e1.printStackTrace();
-		}*/
+		pluginManager = new PluginManagerImpl();
+
+		PluginLoader.findAndLoadPlugins(pluginManager, getProperties());
 
 		SESecurityManager.getSingleton().addSecurityListner(new SESecurityManagerListener() {
 			public boolean trustCertificate(String ressource, X509Certificate x509_cert) {
@@ -640,7 +635,7 @@ public class RCMain implements Launchable {
 				return true;
 			}
 		});
-		SplashScreen.setProgressAndText("Creating Client.",30);
+		SplashScreen.setProgressAndText("Creating Client.",25);
 		client = new Client();
 		client.setDebugLogger(debugLogger);
 		client.setServer(properties.getProperty("connection_lastURL_0"));
@@ -835,7 +830,7 @@ public class RCMain implements Launchable {
 		});
 
 
-		SplashScreen.setProgressAndText("Creating Updater.",50);
+		SplashScreen.setProgressAndText("Creating Updater.",40);
 		try {
 			updater = new Updater(new URL(RemoteConstants.UPDATE_URL),new File("AzSMRCupdate.xml.gz"),new File(USER_DIR));
 			updater.setProxy(getProxy());
@@ -910,10 +905,12 @@ public class RCMain implements Launchable {
 				properties.setProperty("update.lastcheck",System.currentTimeMillis());
 			}
 		}
-		SplashScreen.setProgressAndText("Loading Sounds.",60);
+		SplashScreen.setProgressAndText("Loading Sounds.",50);
 		loadSounds();
-		SplashScreen.setProgressAndText("Creating Timer.",65);
+		SplashScreen.setProgressAndText("Creating Timer.",55);
 		timer = new Timer("Main Timer",5);
+		SplashScreen.setProgressAndText("Initializing Plugins.",60);
+		pluginManager.initialize(this);
 		SplashScreen.setProgressAndText("Finished Startup.",70);
 	}
 
