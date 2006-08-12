@@ -448,5 +448,13 @@ public class ResponseManager {
 				return Constants.UPDATE_TRACKER;
 			}
 		});
+		addHandler("ipcCall", new ResponseHandler() {
+			public long handleRequest(Element xmlResponse) throws IOException {
+				client.callIPCResponseListeners	(Integer.parseInt(xmlResponse.getAttributeValue("status")),
+						xmlResponse.getAttributeValue("senderID"),	xmlResponse.getAttributeValue("pluginID"),
+						xmlResponse.getAttributeValue("method"), xmlResponse.getChildren());
+				return 0;
+			}
+		});
 	}
 }

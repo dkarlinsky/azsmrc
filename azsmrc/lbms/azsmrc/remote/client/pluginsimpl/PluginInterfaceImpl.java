@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import lbms.azsmrc.remote.client.plugins.AzSMRCInterface;
 import lbms.azsmrc.remote.client.plugins.Plugin;
+import lbms.azsmrc.remote.client.plugins.PluginClient;
 import lbms.azsmrc.remote.client.plugins.PluginConfig;
 import lbms.azsmrc.remote.client.plugins.PluginInterface;
 import lbms.azsmrc.remote.client.plugins.PluginManager;
@@ -96,6 +98,26 @@ public class PluginInterfaceImpl implements PluginInterface {
 	 */
 	public String getPluginVersion() {
 		return version;
+	}
+
+	/**
+	 * Returns the AzSMRC interface.
+	 * 
+	 * You can use popup windows and set the Statusbar text with it.
+	 * 
+	 * @return AzSMRC interface
+	 */
+	public AzSMRCInterface getAzSMRCInterface () {
+		return manager.getAzsmrcInterface();
+	}
+
+	/**
+	 * The Plugin client is the Transport to Azureus
+	 * 
+	 * @return PluginClient 
+	 */
+	public PluginClient getPluginClient () {
+		return manager.getPluginClient();
 	}
 
 	//--------------------------------------------------//

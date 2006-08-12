@@ -17,6 +17,7 @@ import lbms.azsmrc.remote.client.swtgui.sound.Sound;
 import lbms.azsmrc.remote.client.swtgui.sound.SoundManager;
 import lbms.azsmrc.remote.client.util.TimerEvent;
 import lbms.azsmrc.remote.client.util.TimerEventPerformer;
+import lbms.azsmrc.shared.SWTSafeRunnable;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
@@ -109,9 +110,9 @@ public class MessageDialog {
 		this.display = display;
 		this.steps = steps;
 		messageDiags.add(this);
-		display.asyncExec(new Runnable (){
+		display.asyncExec(new SWTSafeRunnable (){
 
-			public void run() {
+			public void runSafe() {
 
 				popupImage = new Image(display, ImageRepository.getImage("popup"), SWT.IMAGE_COPY);
 				splash = new Shell(SWT.ON_TOP);
@@ -258,8 +259,8 @@ public class MessageDialog {
 	public void hideShell() {
 		if (timerEvent != null) timerEvent.cancel();
 		messageDiags.remove(this);
-		display.asyncExec(new Runnable() {
-			public void run() {
+		display.asyncExec(new SWTSafeRunnable() {
+			public void runSafe() {
 				try{
 					Rectangle splashRect = splash.getBounds();
 					Rectangle displayRect = display.getClientArea();
@@ -300,8 +301,8 @@ public class MessageDialog {
 	public void killShell() {
 		if (timerEvent != null) timerEvent.cancel();
 		messageDiags.remove(this);
-		display.asyncExec(new Runnable() {
-			public void run() {
+		display.asyncExec(new SWTSafeRunnable() {
+			public void runSafe() {
 				splash.close();
 				popupImage.dispose();
 			}
