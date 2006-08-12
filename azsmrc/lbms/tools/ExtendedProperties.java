@@ -1,6 +1,3 @@
-/**
- * 
- */
 package lbms.tools;
 
 import java.util.Properties;
@@ -36,15 +33,38 @@ public class ExtendedProperties extends Properties {
 		super(defaults);
 	}
 
-	/* (non-Javadoc)
-	 * @see lbms.tools.Config#getPropertyAsBoolean(java.lang.String)
+	/**
+	 * Checks if a Key exists
+	 * 
+	 * @param key
+	 * @return true if exists
+	 */
+	public boolean propertyExists (String key) {
+		return getProperty(key) != null;
+	}
+
+	/**
+	 * Searches for the property with the specified key in this property list.
+	 * If the key is not found in this property list, the default property list,
+	 * and its defaults, recursively, are then checked. 
+	 * The method returns false if the property is not found.
+	 * 
+	 * @param key the property key.
+	 * @return
 	 */
 	public boolean getPropertyAsBoolean (String key) {
 		return Boolean.parseBoolean(getProperty(key));
 	}
 
-	/* (non-Javadoc)
-	 * @see lbms.tools.Config#getPropertyAsBoolean(java.lang.String, boolean)
+	/**
+	 * Searches for the property with the specified key in this property list. 
+	 * If the key is not found in this property list, the default property list,
+	 * and its defaults, recursively, are then checked.
+	 * The method returns the default value argument if the property is not found.
+	 * 
+	 * @param key the property key.
+	 * @param def a default value.
+	 * @return
 	 */
 	public boolean getPropertyAsBoolean (String key, boolean def) {
 		String prop = getProperty(key);
@@ -54,8 +74,14 @@ public class ExtendedProperties extends Properties {
 			return Boolean.parseBoolean(getProperty(key));
 	}
 
-	/* (non-Javadoc)
-	 * @see lbms.tools.Config#getPropertyAsInt(java.lang.String)
+	/**
+	 * Searches for the property with the specified key in this property list.
+	 * If the key is not found in this property list, the default property list,
+	 * and its defaults, recursively, are then checked. 
+	 * The method returns 0 if the property is not found.
+	 *
+	 * @param key the property key.
+	 * @return
 	 */
 	public int getPropertyAsInt (String key) {
 		String prop = getProperty(key);
@@ -68,8 +94,15 @@ public class ExtendedProperties extends Properties {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see lbms.tools.Config#getPropertyAsInt(java.lang.String, int)
+	/**
+	 * Searches for the property with the specified key in this property list. 
+	 * If the key is not found in this property list, the default property list,
+	 * and its defaults, recursively, are then checked.
+	 * The method returns the default value argument if the property is not found.
+	 * 
+	 * @param key the property key.
+	 * @param def a default value.
+	 * @return
 	 */
 	public int getPropertyAsInt (String key, int def) {
 		String prop = getProperty(key);
@@ -82,8 +115,14 @@ public class ExtendedProperties extends Properties {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see lbms.tools.Config#getPropertyAsLong(java.lang.String)
+	/**
+	 * Searches for the property with the specified key in this property list.
+	 * If the key is not found in this property list, the default property list,
+	 * and its defaults, recursively, are then checked. 
+	 * The method returns 0 if the property is not found.
+	 * 
+	 * @param key the property key.
+	 * @return
 	 */
 	public long getPropertyAsLong (String key) {
 		String prop = getProperty(key);
@@ -96,8 +135,15 @@ public class ExtendedProperties extends Properties {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see lbms.tools.Config#getPropertyAsLong(java.lang.String, long)
+	/**
+	 * Searches for the property with the specified key in this property list. 
+	 * If the key is not found in this property list, the default property list,
+	 * and its defaults, recursively, are then checked.
+	 * The method returns the default value argument if the property is not found.
+	 * 
+	 * @param key the property key.
+	 * @param def a default value.
+	 * @return
 	 */
 	public long getPropertyAsLong (String key, long def) {
 		String prop = getProperty(key);
@@ -110,8 +156,14 @@ public class ExtendedProperties extends Properties {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see lbms.tools.Config#getPropertyAsFloat(java.lang.String)
+	/**
+	 * Searches for the property with the specified key in this property list.
+	 * If the key is not found in this property list, the default property list,
+	 * and its defaults, recursively, are then checked. 
+	 * The method returns 0 if the property is not found.
+	 *
+	 * @param key the property key.
+	 * @return
 	 */
 	public float getPropertyAsFloat (String key) {
 		String prop = getProperty(key);
@@ -124,8 +176,15 @@ public class ExtendedProperties extends Properties {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see lbms.tools.Config#getPropertyAsFloat(java.lang.String, float)
+	/**
+	 * Searches for the property with the specified key in this property list. 
+	 * If the key is not found in this property list, the default property list,
+	 * and its defaults, recursively, are then checked.
+	 * The method returns the default value argument if the property is not found.
+	 * 
+	 * @param key the property key.
+	 * @param def a default value.
+	 * @return
 	 */
 	public float getPropertyAsFloat (String key, float def) {
 		String prop = getProperty(key);
@@ -138,8 +197,14 @@ public class ExtendedProperties extends Properties {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see lbms.tools.Config#getPropertyAsDouble(java.lang.String)
+	/**
+	 * Searches for the property with the specified key in this property list.
+	 * If the key is not found in this property list, the default property list,
+	 * and its defaults, recursively, are then checked. 
+	 * The method returns 0 if the property is not found.
+	 *
+	 * @param key the property key.
+	 * @return
 	 */
 	public double getPropertyAsDouble (String key) {
 		String prop = getProperty(key);
@@ -152,8 +217,15 @@ public class ExtendedProperties extends Properties {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see lbms.tools.Config#getPropertyAsDouble(java.lang.String, int)
+	/**
+	 * Searches for the property with the specified key in this property list. 
+	 * If the key is not found in this property list, the default property list,
+	 * and its defaults, recursively, are then checked.
+	 * The method returns the default value argument if the property is not found.
+	 * 
+	 * @param key the property key.
+	 * @param def a default value.
+	 * @return
 	 */
 	public double getPropertyAsDouble (String key, int def) {
 		String prop = getProperty(key);
@@ -166,36 +238,46 @@ public class ExtendedProperties extends Properties {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see lbms.tools.Config#setProperty(java.lang.String, boolean)
+	/**
+	 * @param key the key to be placed into this property list.
+	 * @param value the value corresponding to key.
+	 * @return previous value
 	 */
 	public void setProperty (String key, boolean value) {
 		setProperty(key, Boolean.toString(value));
 	}
 
-	/* (non-Javadoc)
-	 * @see lbms.tools.Config#setProperty(java.lang.String, int)
+	/**
+	 * @param key the key to be placed into this property list.
+	 * @param value the value corresponding to key.
+	 * @return previous value
 	 */
 	public void setProperty (String key, int value) {
 		setProperty(key, Integer.toString(value));
 	}
 
-	/* (non-Javadoc)
-	 * @see lbms.tools.Config#setProperty(java.lang.String, long)
+	/**
+	 * @param key the key to be placed into this property list.
+	 * @param value the value corresponding to key.
+	 * @return previous value
 	 */
 	public void setProperty (String key, long value) {
 		setProperty(key, Long.toString(value));
 	}
 
-	/* (non-Javadoc)
-	 * @see lbms.tools.Config#setProperty(java.lang.String, float)
+	/**
+	 * @param key the key to be placed into this property list.
+	 * @param value the value corresponding to key.
+	 * @return previous value
 	 */
 	public void setProperty (String key, float value) {
 		setProperty(key, Float.toString(value));
 	}
 
-	/* (non-Javadoc)
-	 * @see lbms.tools.Config#setProperty(java.lang.String, java.lang.Double)
+	/**
+	 * @param key the key to be placed into this property list.
+	 * @param value the value corresponding to key.
+	 * @return previous value
 	 */
 	public void setProperty (String key, Double value) {
 		setProperty(key, Double.toString(value));
