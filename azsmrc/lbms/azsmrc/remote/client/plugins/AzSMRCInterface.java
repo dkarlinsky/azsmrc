@@ -7,10 +7,28 @@ package lbms.azsmrc.remote.client.plugins;
  */
 public interface AzSMRCInterface {
 
+	/**
+	 * Opens a Message Popup.
+	 * 
+	 * @param title
+	 * @param message
+	 */
 	public void popupMessage(String title, String message);
 
+	/**
+	 * Opens a Warning Popup.
+	 * 
+	 * @param title
+	 * @param message
+	 */
 	public void popupWarning(String title, String message);
 
+	/**
+	 * Opens an Error Popup.
+	 * 
+	 * @param title
+	 * @param message
+	 */
 	public void popupError(String title, String message);
 
 	/**
@@ -25,5 +43,10 @@ public interface AzSMRCInterface {
 	 * @param color
 	 */
 	public void setStatusBarText (String text, int color);
+
+	/**
+	 * @return username or null if no user is active
+	 */
+	public String getCurrentUsername();
 
 }

@@ -61,4 +61,10 @@ public class AzSMRCInterfaceImpl implements AzSMRCInterface {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.plugins.AzSMRCInterface#getCurrentUsername()
+	 */
+	public String getCurrentUsername() {
+		return rcMain.getClient().getUsername();
+	}
 }

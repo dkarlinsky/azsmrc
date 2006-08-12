@@ -13,6 +13,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 import lbms.azsmrc.remote.client.plugins.Plugin;
+import lbms.tools.ExtendedProperties;
 import lbms.tools.launcher.Constants;
 import lbms.tools.launcher.SystemProperties;
 
@@ -22,7 +23,7 @@ import lbms.tools.launcher.SystemProperties;
  */
 public class PluginLoader {
 
-	public static void	findAndLoadPlugins(PluginManagerImpl manager) {
+	public static void	findAndLoadPlugins(PluginManagerImpl manager, ExtendedProperties azsmrcProps) {
 
 		File	app_dir	 = getApplicationFile("plugins");
 
@@ -85,7 +86,7 @@ public class PluginLoader {
 
 				Properties props = new Properties();
 
-				File	properties_file = new File( app_dir, "launch.properties");
+				File	properties_file = new File( app_dir, "plugin.properties");
 
 				// if properties file exists on its own then override any properties file
 				// potentially held within a jar
@@ -121,7 +122,20 @@ public class PluginLoader {
 					}
 				}
 
-				String plugin_class = (String)props.get( "azsmrc.plugin.class");
+				String pluginID = props.getProperty("plugin.id");
+
+				if (azsmrcProps.propertyExists("plugins."+pluginID+".load")) {
+					//if we don't want to load this plugin continue
+					if (!azsmrcProps.getPropertyAsBoolean("plugins."+pluginID+".load")) {
+						System.out.println( "Skipping load of "+pluginID);
+						continue;
+					}
+				} else {
+					//add the plugin to the load list
+					azsmrcProps.setProperty("plugins."+pluginID+".load", true);
+				}
+
+				String plugin_class = props.getProperty( "azsmrc.plugin.class");
 
 				// don't support multiple Launchables
 
