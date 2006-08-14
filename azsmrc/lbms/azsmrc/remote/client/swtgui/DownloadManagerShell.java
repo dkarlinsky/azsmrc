@@ -1170,7 +1170,11 @@ public class DownloadManagerShell {
 			}
 		});
 
-
+		downloadsTable.addListener(SWT.MouseEnter, new Listener(){
+			public void handleEvent(Event arg0) {
+				downloadsTable.setFocus();
+			}
+		});
 
 		//add menu to downloadsTable for downloads management
 		addDownloadManagerMenu(downloadsTable);
@@ -1334,6 +1338,11 @@ public class DownloadManagerShell {
 
 		});
 
+		seedsTable.addListener(SWT.MouseEnter, new Listener(){
+			public void handleEvent(Event arg0) {
+				seedsTable.setFocus();
+			}
+		});
 
 		seedsTable.addMouseListener(new MouseAdapter() {
 			public void mouseDown(MouseEvent e) {
