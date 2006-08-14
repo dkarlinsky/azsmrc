@@ -1998,7 +1998,7 @@ public class DownloadManagerShell {
 					RCMain.getRCMain().getClient().transactionStart();
 					for(TableItem item : items){
 						Container container = (Container)item.getData();
-						container.getDownload().setForceStart(forceStart.getSelection());
+						container.getDownload().setForceStart(!container.getDownload().isForceStart());
 					}
 					RCMain.getRCMain().getClient().transactionCommit();
 				}
@@ -2479,7 +2479,7 @@ public class DownloadManagerShell {
 					stop.setEnabled(true);
 					queue.setEnabled(true);
 					remove.setEnabled(true);
-					forceStart.setEnabled(false);
+					forceStart.setEnabled(true);
 					forceStart.setSelection(false);
 					itemUpSpeed.setEnabled(false);
 					itemDownSpeed.setEnabled(false);
