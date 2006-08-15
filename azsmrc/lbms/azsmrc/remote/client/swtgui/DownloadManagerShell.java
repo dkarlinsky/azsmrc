@@ -1170,11 +1170,6 @@ public class DownloadManagerShell {
 			}
 		});
 
-		downloadsTable.addListener(SWT.MouseEnter, new Listener(){
-			public void handleEvent(Event arg0) {
-				downloadsTable.setFocus();
-			}
-		});
 
 		//add menu to downloadsTable for downloads management
 		addDownloadManagerMenu(downloadsTable);
@@ -1338,11 +1333,6 @@ public class DownloadManagerShell {
 
 		});
 
-		seedsTable.addListener(SWT.MouseEnter, new Listener(){
-			public void handleEvent(Event arg0) {
-				seedsTable.setFocus();
-			}
-		});
 
 		seedsTable.addMouseListener(new MouseAdapter() {
 			public void mouseDown(MouseEvent e) {
@@ -2904,7 +2894,7 @@ public class DownloadManagerShell {
 	/**
 	 * This listener will set the data to the "comparator" on Table for
 	 * each give int column from RemoteConstants
-	 * 
+	 *
 	 * @param table
 	 * @param column (from RemoteConstants)
 	 * @return
