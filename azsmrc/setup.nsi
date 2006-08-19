@@ -83,12 +83,12 @@ Section SWT SEC0001
 SectionEnd
 !endif
 
-SectionGroup Links SECG0001
-Section "Add QuickLaunch Icon" SEC0003
+SectionGroup Shortcuts SECG0001
+Section "Add QuickLaunch Shortcut" SEC0003
 	CreateShortcut "$QUICKLAUNCH\AzSMRC.lnk" $INSTDIR\AzSMRC.exe
 SectionEnd
 
-Section "Add Desktop Icon" SEC0004
+Section "Add Desktop Shortcut" SEC0004
 	CreateShortcut "$DESKTOP\AzSMRC.lnk" $INSTDIR\AzSMRC.exe
 SectionEnd
 SectionGroupEnd
@@ -124,8 +124,9 @@ Section -post SEC0002
 	WriteUninstaller $INSTDIR\uninstall.exe
 	!insertmacro MUI_STARTMENU_WRITE_BEGIN Application
 	SetOutPath $SMPROGRAMS\$StartMenuGroup
-	CreateShortcut "$SMPROGRAMS\$StartMenuGroup\Uninstall $(^Name).lnk" $INSTDIR\uninstall.exe
 	CreateShortcut "$SMPROGRAMS\$StartMenuGroup\AzSMRC.lnk" $INSTDIR\AzSMRC.exe
+	CreateShortcut "$SMPROGRAMS\$StartMenuGroup\Readme.lnk" $INSTDIR\Readme.txt
+	CreateShortcut "$SMPROGRAMS\$StartMenuGroup\Uninstall $(^Name).lnk" $INSTDIR\uninstall.exe
 	!insertmacro MUI_STARTMENU_WRITE_END
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" DisplayName "$(^Name)"
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" DisplayIcon $INSTDIR\uninstall.exe
@@ -160,8 +161,6 @@ Section /o un.Main UNSEC0000
 	Delete /REBOOTOK $INSTDIR\Readme.txt
 	Delete /REBOOTOK $INSTDIR\AzSMRCupdate.xml.gz
 	Delete /REBOOTOK $INSTDIR\launch.properties
-	Delete /REBOOTOK "$QUICKLAUNCH\AzSMRC.lnk"
-	Delete /REBOOTOK "$DESKTOP\AzSMRC.lnk"
 
 	#SWT
 	Delete /REBOOTOK $INSTDIR\swt-win32-3232.dll
@@ -196,6 +195,9 @@ Section un.post UNSEC0002
 	DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)"
 	Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\Uninstall $(^Name).lnk"
 	Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\AzSMRC.lnk"
+	Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\Readme.lnk"
+	Delete /REBOOTOK "$QUICKLAUNCH\AzSMRC.lnk"
+	Delete /REBOOTOK "$DESKTOP\AzSMRC.lnk"
 	Delete /REBOOTOK $INSTDIR\uninstall.exe
 	DeleteRegValue HKLM "${REGKEY}" StartMenuGroup
 	DeleteRegValue HKLM "${REGKEY}" Path
