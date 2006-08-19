@@ -79,6 +79,7 @@ public class Client {
 	private Timer timer;
 	private int failedConnections;
 	private Logger debug;
+	private boolean connect;
 
 	//special send variables
 	private boolean updateDownloads;
@@ -152,6 +153,26 @@ public class Client {
 		tracker 			= new TrackerImpl (this);
 		downloadManager.clear();
 		failedConnections 	= 0;
+		connect = false;
+	}
+
+	/**
+	 * If you want to use any send* methods you need to connect first.
+	 */
+	public void connect() {
+		connect = true;
+	}
+
+	/**
+	 * Disconnect.
+	 */
+	public void disconnect() {
+		connect = false;
+		callConnectionListener(ConnectionListener.ST_DISCONNECTED);
+	}
+
+	public boolean isConnected() {
+		return connect;
 	}
 
 	/**
@@ -192,6 +213,7 @@ public class Client {
 	 */
 	private void send() {
 		if (transaction) return;
+		if (!connect) return;
 		new Thread(new Runnable() {
 			public void run() {
 				if (!semaphore.tryAcquire()) {
@@ -240,6 +262,7 @@ public class Client {
 	 * @param req the Document to send
 	 */
 	private void sendHttpRequest(Document req) {
+		if (!connect) return;
 		if (server == null) return;
 		InputStream is = null;
 		GZIPOutputStream gos = null;
@@ -311,12 +334,12 @@ public class Client {
 				}
 		}catch (MalformedURLException e) {
 			failedConnections++;
-			callConnectionListener(ConnectionListener.ST_DISCONNECTED);
+			callConnectionListener(ConnectionListener.ST_CONNECTION_ERROR);
 			callExceptionListener(e, true);
 			e.printStackTrace();
 		} catch (IOException e) {
 			failedConnections++;
-			callConnectionListener(ConnectionListener.ST_DISCONNECTED);
+			callConnectionListener(ConnectionListener.ST_CONNECTION_ERROR);
 			if (connection != null) {
 				try {
 					callHTTPErrorListener(connection.getResponseCode());

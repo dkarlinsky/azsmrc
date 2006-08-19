@@ -47,6 +47,13 @@ public class PluginClientImpl implements PluginClient, ClientEventListener {
 	}
 
 	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.plugins.PluginClient#isConnected()
+	 */
+	public boolean isConnected() {
+		return client.isConnected();
+	}
+
+	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.plugins.PluginClient#addListener(lbms.azsmrc.remote.client.plugins.event.PluginClientListener)
 	 */
 	public void addListener(PluginClientListener listener) {

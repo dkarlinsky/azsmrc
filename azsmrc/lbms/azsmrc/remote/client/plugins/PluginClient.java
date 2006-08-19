@@ -38,6 +38,15 @@ public interface PluginClient {
 	public void sendIPCCall (String pluginID, String senderID, String method, Object[] params);
 
 	/**
+	 * You need to be connected to communicate with the server.
+	 * 
+	 * You should check this before you send any requests.
+	 * 
+	 * @return true if connected
+	 */
+	public boolean isConnected();
+
+	/**
 	 * Adds a PluginClientListener
 	 * 
 	 * @param listener Listener to add

@@ -953,6 +953,7 @@ public class RCMain implements Launchable {
 	public void connect(boolean open) {
 		debugLogger.finer("Connect!");
 		connect = true;
+		client.connect();
 		/*client.sendGetPluginsFlexyConf();*/
 		client.getDownloadManager().update(true);
 		updateTimer(open);
@@ -961,6 +962,7 @@ public class RCMain implements Launchable {
 	public void disconnect() {
 		debugLogger.finer("Disconnect!");
 		connect = false;
+		client.disconnect();
 		stopUpdateTimer();
 	}
 

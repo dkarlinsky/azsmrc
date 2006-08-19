@@ -7,14 +7,16 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import lbms.azsmrc.remote.client.Client;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByFileDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByURLDialog;
+import lbms.azsmrc.remote.client.swtgui.dialogs.ScrapeDialog;
 import lbms.azsmrc.shared.RemoteConstants;
+import lbms.tools.HTTPDownload;
 
 
 /**
@@ -128,7 +130,7 @@ public class StartServer {
 			return;
 		}
 
-		boolean	open	= true;
+		boolean scrape  = false;
 
 		for (int i = 1; i < args.length; i++) {
 
@@ -146,6 +148,9 @@ public class StartServer {
 
 					continue;
 
+				} else if (arg.equalsIgnoreCase("--scrape")) {
+					scrape = true;
+					continue;
 				}
 			}
 
@@ -186,7 +191,7 @@ public class StartServer {
 
 				if (!coreStarted) {
 
-					queuedTorrents.add( new Object[]{ file_name, new Boolean( open )});
+					queuedTorrents.add( new Object[]{ file_name, new Boolean( scrape )});
 
 					queued = true;
 				}
@@ -195,7 +200,7 @@ public class StartServer {
 
 			if ( !queued ){
 
-				handleFile( file_name, open );
+				handleFile( file_name, scrape );
 			}
 		}
 	}
@@ -206,28 +211,45 @@ public class StartServer {
 			Object[]	entry = (Object[])queuedTorrents.get(i);
 
 			String	file_name 	= (String)entry[0];
-			boolean	open		= ((Boolean)entry[1]).booleanValue();
+			boolean	scrape		= ((Boolean)entry[1]).booleanValue();
 
-			handleFile(file_name, open);
+			handleFile(file_name, scrape);
 		}
 	}
 
-	private void handleFile(String file_name, boolean open) {
+	private void handleFile(final String file_name, boolean scrape) {
 		try {
-			if ( open ){
+			if ( scrape ){
+				if( file_name.toUpperCase().startsWith( "HTTP:" ) || file_name.toUpperCase().startsWith( "MAGNET:" ) ) {
+					if (file_name.toUpperCase().startsWith( "MAGNET:" )) return; //magnet links are not supported
+					Thread t = new Thread (new Runnable() {
+						public void run() {
+
+							try {
+								File torFile = File.createTempFile("AzSMRC_tmp", ".torrent");
+								HTTPDownload dl = new HTTPDownload(new URL(file_name),torFile);
+								dl.call();
+								torFile.deleteOnExit();
+								if (!dl.hasFailed()) {
+									ScrapeDialog.openFileAndScrape(torFile);
+								}
+							} catch (Throwable e) {
+								e.printStackTrace();
+							}
+						}
+					});
+					t.setDaemon(true);
+					t.setPriority(Thread.MIN_PRIORITY);
+					t.start();
+				}
+				else
+					ScrapeDialog.openFileAndScrape(new File(file_name));
+
+			} else {
 				if( file_name.toUpperCase().startsWith( "HTTP:" ) || file_name.toUpperCase().startsWith( "MAGNET:" ) )
 					OpenByURLDialog.openWithURL(file_name);
 				else
 					OpenByFileDialog.open(new String[] {file_name});
-
-			} else {
-				Client client = RCMain.getRCMain().getClient();
-				if (client != null) {
-					if( file_name.toUpperCase().startsWith( "HTTP:" ) || file_name.toUpperCase().startsWith( "MAGNET:" ) )
-						client.getDownloadManager().addDownload(file_name);
-					else
-						client.getDownloadManager().addDownload(new File(file_name));
-				}
 			}
 		} catch (Throwable e) {
 
