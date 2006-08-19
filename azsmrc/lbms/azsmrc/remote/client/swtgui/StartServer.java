@@ -125,7 +125,7 @@ public class StartServer {
 	}
 
 
-	private void processArgs(String args[]) {
+	public void processArgs(String args[]) {
 		if (args.length < 1 || !args[0].equals( "args" )){
 			return;
 		}
@@ -156,7 +156,7 @@ public class StartServer {
 
 			String file_name = arg;
 
-			if( file_name.toUpperCase().startsWith( "HTTP:" ) || file_name.toUpperCase().startsWith( "MAGNET:" ) ) {
+			if( file_name.toUpperCase().startsWith( "HTTP" ) || file_name.toUpperCase().startsWith( "MAGNET:" ) ) {
 
 				System.out.println("StartServer: args[" + i
 						+ "] handling as a URI: " + file_name);
@@ -185,22 +185,15 @@ public class StartServer {
 				}
 			}
 
-			boolean	queued = false;
 
-			try {
+			if (!coreStarted) {
 
-				if (!coreStarted) {
+				queuedTorrents.add( new Object[]{ file_name, new Boolean( scrape )});
 
-					queuedTorrents.add( new Object[]{ file_name, new Boolean( scrape )});
-
-					queued = true;
-				}
-			} finally {
-			}
-
-			if ( !queued ){
+			} else {
 
 				handleFile( file_name, scrape );
+
 			}
 		}
 	}
@@ -220,7 +213,7 @@ public class StartServer {
 	private void handleFile(final String file_name, boolean scrape) {
 		try {
 			if ( scrape ){
-				if( file_name.toUpperCase().startsWith( "HTTP:" ) || file_name.toUpperCase().startsWith( "MAGNET:" ) ) {
+				if( file_name.toUpperCase().startsWith( "HTTP" ) || file_name.toUpperCase().startsWith( "MAGNET:" ) ) {
 					if (file_name.toUpperCase().startsWith( "MAGNET:" )) return; //magnet links are not supported
 					Thread t = new Thread (new Runnable() {
 						public void run() {
@@ -246,7 +239,7 @@ public class StartServer {
 					ScrapeDialog.openFileAndScrape(new File(file_name));
 
 			} else {
-				if( file_name.toUpperCase().startsWith( "HTTP:" ) || file_name.toUpperCase().startsWith( "MAGNET:" ) )
+				if( file_name.toUpperCase().startsWith( "HTTP" ) || file_name.toUpperCase().startsWith( "MAGNET:" ) )
 					OpenByURLDialog.openWithURL(file_name);
 				else
 					OpenByFileDialog.open(new String[] {file_name});

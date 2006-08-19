@@ -183,47 +183,8 @@ public class RCMain implements Launchable {
 
 		startServer = new StartServer();
 
-		for (int i=0;i<args.length;i++){
-
-			String	arg = args[i];
-
-			if ( arg.equalsIgnoreCase( "--closedown" )){
-				closedown	= true;
-				break;
-			}
-			// Sometimes Windows use filename in 8.3 form and cannot
-			// match .torrent extension. To solve this, canonical path
-			// is used to get back the long form
-
-			String filename = arg;
-
-			if( filename.toUpperCase().startsWith( "HTTP:" ) ||
-					filename.toUpperCase().startsWith( "HTTPS:" ) ||
-					filename.toUpperCase().startsWith( "MAGNET:" ) ) {
-				System.out.println("Main::main: args[" + i
-						+ "] handling as a URI: " + filename);
-				continue;  //URIs cannot be checked as a .torrent file
-			}
-
-			try{
-				File	file = new File(filename);
-
-				if ( !file.exists()){
-
-					throw( new Exception("File not found" ));
-				}
-
-				args[i] = file.getCanonicalPath();
-
-				System.out.println("Main::main: args[" + i
-						+ "] exists = " + new File(filename).exists());
-
-			}catch( Throwable e ){
-				System.out.println(
-						"Failed to access torrent file '" + filename
-						+ "'. Ensure sufficient temporary "
-						+ "file space available (check browser cache usage).");
-			}
+		if  (args.length > 0 && args[0].equalsIgnoreCase( "--closedown" )){
+			closedown	= true;
 		}
 
 		boolean another_instance = startServer.getState() != StartServer.STATE_LISTENING;
@@ -236,6 +197,11 @@ public class RCMain implements Launchable {
 				String msg = "There appears to be another program process already listening on socket [127.0.0.1: 6880].\nLoading of torrents via command line parameter will fail until this is fixed.";
 				System.out.println( msg );
 			}
+		} else {
+			String[] args2 = new String[args.length+1];
+			args2[0] = "args";
+			System.arraycopy(args, 0, args2, 1, args.length);
+			startServer.processArgs(args2);
 		}
 
 		if (closedown) return false;
@@ -263,6 +229,7 @@ public class RCMain implements Launchable {
 					|| properties.getProperty("connection_lastURL_0", "").equals("")) {
 				connect = false;
 			} else {
+				connect(false);
 				updateTimer(properties.getPropertyAsBoolean("auto_open"));
 				client.getDownloadManager().update(true);
 			}
@@ -272,7 +239,9 @@ public class RCMain implements Launchable {
 			System.out.println("Crash Detected");
 			ErrorDialog.createAndOpen();
 		}
+		System.out.println("setCoreStarted");
 		startServer.setCoreStarted(true);
+		System.out.println("openQueuedTorrents");
 		startServer.openQueuedTorrents();
 		while (!terminated) { //runnig
 			if (!display.readAndDispatch ()) display.sleep ();
@@ -701,12 +670,10 @@ public class RCMain implements Launchable {
 				if(display != null)
 					display.syncExec(new SWTSafeRunnable() {
 						public void runSafe() {
-							if (state == ST_CONNECTED) setTrayIcon(2);
-							else if(state == ST_CONNECTING)setTrayIcon(1);
-							else setTrayIcon(0);
+							setTrayIcon(state);
 						}
 					});
-				if (state == ST_DISCONNECTED) {
+				if (state == ST_CONNECTION_ERROR) {
 					int delay = client.getFailedConnections()*30000;
 					delay = (delay>120000)?120000:delay;
 					debugLogger.finer("Connection failed "+client.getFailedConnections()+" times, delay: "+(delay/1000)+"sec");
@@ -728,7 +695,7 @@ public class RCMain implements Launchable {
 									+ I18N.translate(PFX + "mainwindow.statusbar.connectionError.failed_part2"));
 							return;
 						}
-				} else if (failedConnection && state == ST_CONNECTED) {
+				} else if (failedConnection && (state == ST_CONNECTED)) {
 					if (mainWindow != null) {
 						updateTimer(true,0);
 						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.connectionSuccessful")
@@ -1085,18 +1052,28 @@ public class RCMain implements Launchable {
 	}
 
 	/**
+	 * Sets the tray Icon
 	 *
-	 * @param connection -- int -- 0 for no connection, 1 for connecting, 2 for connected
+	 * @param connection -- int -- @see ConnectionListener.ST_*
 	 */
-	public void setTrayIcon(int connection){
+	public void setTrayIcon (int connection) {
 		if(systrayItem == null || systrayItem.isDisposed()) return;
-		if(connection==0){
-			systrayItem.setToolTipText(I18N.translate(PFX + "tray.tooltip.notConnected"));
+		switch (connection) {
+		case ConnectionListener.ST_CONNECTION_ERROR:
+			systrayItem.setToolTipText(I18N.translate(PFX + "tray.tooltip.connectionError"));
 			systrayItem.setImage(ImageRepository.getImage("TrayIcon_Red"));
-		}else if(connection == 1){
-			systrayItem.setImage(ImageRepository.getImage("TrayIcon_Connecting"));
+		break;
 
-		}else if(connection == 2){
+		case ConnectionListener.ST_DISCONNECTED:
+			systrayItem.setToolTipText(I18N.translate(PFX + "tray.tooltip.notConnected"));
+			systrayItem.setImage(ImageRepository.getImage("TrayIcon_Disconnected"));
+		break;
+
+		case ConnectionListener.ST_CONNECTING:
+			systrayItem.setImage(ImageRepository.getImage("TrayIcon_Connecting"));
+		break;
+
+		case ConnectionListener.ST_CONNECTED:
 			//systrayItem.setToolTipText("AzMultiUser RC");  //Let the listener do this!
 			systrayItem.setImage(ImageRepository.getImage("TrayIcon_Blue"));
 		}

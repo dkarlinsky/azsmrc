@@ -43,6 +43,8 @@ public class ImageRepository {
 		loadImage(display,"lbms/azsmrc/remote/client/resources/TrayIcon_blue.png","TrayIcon_Blue",255);
 		loadImage(display,"lbms/azsmrc/remote/client/resources/TrayIcon_red.png","TrayIcon_Red",255);
 		loadImage(display,"lbms/azsmrc/remote/client/resources/TrayIcon_connecting.png","TrayIcon_Connecting",255);
+		loadImage(display,"lbms/azsmrc/remote/client/resources/TrayIcon_disconnected.png","TrayIcon_Disconnected",255);
+
 		//Torrent Move Icons
 		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/bottom.png","bottom",255);
 		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/down.png","down",255);

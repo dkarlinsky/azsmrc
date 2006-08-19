@@ -261,6 +261,7 @@ rcmain.mainwindow.statusbar.updateError=Update Error
 rcmain.mainwindow.statusbar.updateException=Update Exception
 rcmain.mainwindow.statusbar.updateFailed=Update Failed
 rcmain.mainwindow.statusbar.updateFinished=Update Finished
+rcmain.tray.tooltip.connectionError=AzSMRC -- Connection Failed
 rcmain.tray.tooltip.notConnected=AzSMRC -- Not Connected
 rcmain.tray.tooltip.part1=seeding,
 rcmain.tray.tooltip.part2=downloading,
