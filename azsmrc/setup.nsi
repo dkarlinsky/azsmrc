@@ -40,7 +40,13 @@ Var StartMenuGroup
 !insertmacro MUI_LANGUAGE English
 
 # Installer attributes
+!ifdef SWT
 OutFile dist\AzSMRC_${VERSION}.exe
+!endif
+!ifndef SWT
+OutFile dist\AzSMRC_${VERSION}_NoSWT.exe
+!endif
+
 InstallDir $PROGRAMFILES\AzSMRC
 CRCCheck on
 XPStyle on
@@ -65,6 +71,7 @@ Section -Main SEC0000
 	WriteRegStr HKLM "${REGKEY}\Components" Main 1
 SectionEnd
 
+!ifdef SWT #only compile if swt is defined
 Section SWT SEC0001
 	SetOutPath $INSTDIR
 	SetOverwrite on
@@ -73,7 +80,43 @@ Section SWT SEC0001
 	File ..\swt-3.2\swt-gdip-win32-3232.dll
 	File ..\swt-3.2\swt-wgl-win32-3232.dll
 	File ..\swt-3.2\swt-win32-3232.dll
-	WriteRegStr HKLM "${REGKEY}\Components" SWT 1
+SectionEnd
+!endif
+
+SectionGroup Links SECG0001
+Section "Add QuickLaunch Icon" SEC0003
+	CreateShortcut "$QUICKLAUNCH\AzSMRC.lnk" $INSTDIR\AzSMRC.exe
+SectionEnd
+
+Section "Add Desktop Icon" SEC0004
+	CreateShortcut "$DESKTOP\AzSMRC.lnk" $INSTDIR\AzSMRC.exe
+SectionEnd
+SectionGroupEnd
+
+Section "Associate with .torrent files" SEC0005
+ ; back up old value of .opt
+!define Index "Line${__LINE__}"
+	ReadRegStr $1 HKCR ".torrent" ""
+	StrCmp $1 "" "${Index}-NoBackup"
+	StrCmp $1 "AzSMRC.Torrent" "${Index}-NoBackup"
+	WriteRegStr HKCR ".torrent" "backup_val" $1
+"${Index}-NoBackup:"
+	WriteRegStr HKCR ".torrent" "" "AzSMRC.Torrent"
+	ReadRegStr $0 HKCR "OptionsFile" ""
+	StrCmp $0 "" 0 "${Index}-Skip"
+	WriteRegStr HKCR "AzSMRC.Torrent" "" "AzSMRC Torrent"
+	WriteRegStr HKCR "AzSMRC.Torrent\shell" "" "open"
+	WriteRegStr HKCR "AzSMRC.Torrent\DefaultIcon" "" "$INSTDIR\AzSMRC.exe,0"
+"${Index}-Skip:"
+	WriteRegStr HKCR "AzSMRC.Torrent\shell\open\command" "" \
+		'$INSTDIR\AzSMRC.exe "%1"'
+	WriteRegStr HKCR "AzSMRC.Torrent\shell\scrape" "" "Scrape Torrent"
+	WriteRegStr HKCR "AzSMRC.Torrent\shell\scrape\command" "" \
+	   '$INSTDIR\AzSMRC.exe --scrape "%1"'
+
+	System::Call 'Shell32::SHChangeNotify(i 0x8000000, i 0, i 0, i 0)'
+!undef Index
+  ; Rest of script 
 SectionEnd
 
 Section -post SEC0002
@@ -82,6 +125,7 @@ Section -post SEC0002
 	!insertmacro MUI_STARTMENU_WRITE_BEGIN Application
 	SetOutPath $SMPROGRAMS\$StartMenuGroup
 	CreateShortcut "$SMPROGRAMS\$StartMenuGroup\Uninstall $(^Name).lnk" $INSTDIR\uninstall.exe
+	CreateShortcut "$SMPROGRAMS\$StartMenuGroup\AzSMRC.lnk" $INSTDIR\AzSMRC.exe
 	!insertmacro MUI_STARTMENU_WRITE_END
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" DisplayName "$(^Name)"
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" DisplayIcon $INSTDIR\uninstall.exe
@@ -104,14 +148,6 @@ done${UNSECTION_ID}:
 !macroend
 
 # Uninstaller sections
-Section /o un.SWT UNSEC0001
-	Delete /REBOOTOK $INSTDIR\swt-win32-3232.dll
-	Delete /REBOOTOK $INSTDIR\swt-wgl-win32-3232.dll
-	Delete /REBOOTOK $INSTDIR\swt-gdip-win32-3232.dll
-	Delete /REBOOTOK $INSTDIR\swt-awt-win32-3232.dll
-	Delete /REBOOTOK $INSTDIR\swt.jar
-	DeleteRegValue HKLM "${REGKEY}\Components" SWT
-SectionEnd
 
 Section /o un.Main UNSEC0000
 	Delete /REBOOTOK $INSTDIR\commons-codec_1.3.jar
@@ -124,12 +160,42 @@ Section /o un.Main UNSEC0000
 	Delete /REBOOTOK $INSTDIR\Readme.txt
 	Delete /REBOOTOK $INSTDIR\AzSMRCupdate.xml.gz
 	Delete /REBOOTOK $INSTDIR\launch.properties
+	Delete /REBOOTOK "$QUICKLAUNCH\AzSMRC.lnk"
+	Delete /REBOOTOK "$DESKTOP\AzSMRC.lnk"
+
+	#SWT
+	Delete /REBOOTOK $INSTDIR\swt-win32-3232.dll
+	Delete /REBOOTOK $INSTDIR\swt-wgl-win32-3232.dll
+	Delete /REBOOTOK $INSTDIR\swt-gdip-win32-3232.dll
+	Delete /REBOOTOK $INSTDIR\swt-awt-win32-3232.dll
+	Delete /REBOOTOK $INSTDIR\swt.jar
+
 	DeleteRegValue HKLM "${REGKEY}\Components" Main
+
+	;start of restore script
+!define Index "Line${__LINE__}"
+	ReadRegStr $1 HKCR ".torrent" ""
+	StrCmp $1 "AzSMRC.Torrent" 0 "${Index}-NoOwn" ; only do this if we own it
+	ReadRegStr $1 HKCR ".torrent" "backup_val"
+	StrCmp $1 "" 0 "${Index}-Restore" ; if backup="" then delete the whole key
+	DeleteRegKey HKCR ".torrent"
+	Goto "${Index}-NoOwn"
+"${Index}-Restore:"
+	WriteRegStr HKCR ".torrent" "" $1
+	DeleteRegValue HKCR ".torrent" "backup_val"
+
+	DeleteRegKey HKCR "AzSMRC.Torrent" ;Delete key with association settings
+
+	System::Call 'Shell32::SHChangeNotify(i 0x8000000, i 0, i 0, i 0)'
+"${Index}-NoOwn:"
+!undef Index
+  ;rest of script 
 SectionEnd
 
 Section un.post UNSEC0002
 	DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)"
 	Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\Uninstall $(^Name).lnk"
+	Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\AzSMRC.lnk"
 	Delete /REBOOTOK $INSTDIR\uninstall.exe
 	DeleteRegValue HKLM "${REGKEY}" StartMenuGroup
 	DeleteRegValue HKLM "${REGKEY}" Path
@@ -149,6 +215,5 @@ Function un.onInit
 	ReadRegStr $INSTDIR HKLM "${REGKEY}" Path
 	ReadRegStr $StartMenuGroup HKLM "${REGKEY}" StartMenuGroup
 	!insertmacro SELECT_UNSECTION Main ${UNSEC0000}
-	!insertmacro SELECT_UNSECTION SWT ${UNSEC0001}
 FunctionEnd
 
