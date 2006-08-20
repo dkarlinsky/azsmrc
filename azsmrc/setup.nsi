@@ -15,6 +15,11 @@ Name AzSMRC
 !define MUI_STARTMENUPAGE_DEFAULT_FOLDER AzSMRC
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
+!define MUI_FINISHPAGE_RUN $INSTDIR\AzSMRC.exe
+!define MUI_FINISHPAGE_SHOWREADME $INSTDIR\Readme.txt
+!define MUI_FINISHPAGE_SHOWREADME_TEXT "Show Readme File"
+!define MUI_FINISHPAGE_LINK "Visit our Website"
+!define MUI_FINISHPAGE_LINK_LOCATION "http://azsmrc.sourceforge.net"
 
 # Included files
 !include Sections.nsh
@@ -72,7 +77,7 @@ Section -Main SEC0000
 SectionEnd
 
 !ifdef SWT #only compile if swt is defined
-Section SWT SEC0001
+Section -SWT SEC0001
 	SetOutPath $INSTDIR
 	SetOverwrite on
 	File ..\swt-3.2\swt.jar
