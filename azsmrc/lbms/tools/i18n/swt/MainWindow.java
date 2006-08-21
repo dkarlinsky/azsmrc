@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableEditor;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -884,6 +886,45 @@ public class MainWindow {
 			}
 
 		});
+
+		mainTable.addKeyListener(new KeyListener(){
+			public void keyPressed(KeyEvent arg0) {
+
+				//CTRL A makes new key, if we have a file open
+				if(arg0.stateMask == SWT.MOD1 && (arg0.keyCode == 'a' || arg0.keyCode == 'A')){
+					if(defaultMap == null) return;
+
+					//Fire new NewDialog
+					try{
+						NewDialog dlog = new NewDialog("Enter New Key and Default Value");
+						if(mainTable.getSelectionCount() == 1){
+							String title = mainTable.getSelection()[0].getText(1);
+							dlog.setTextValue(title, "");
+						}
+
+						String[] newKey = dlog.open();
+						if(newKey[0] == null) return; //User Cancelled
+						if(newKey[0].equalsIgnoreCase("")){
+							MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
+							mb.setText("Error");
+							mb.setMessage("You did not enter a value for the key, please choose Add again and enter a value for the key.");
+							mb.open();
+							return;
+						}
+
+						defaultMap.put(newKey[0], newKey[1]);
+						transMap.put(newKey[0], "");
+						clearTable();
+						isSaved = false;
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+				}
+			}
+
+			public void keyReleased(KeyEvent arg0) {} //Not Used
+		});
+
 
 		final TableEditor editor = new TableEditor (mainTable);
 		editor.horizontalAlignment = SWT.LEFT;
