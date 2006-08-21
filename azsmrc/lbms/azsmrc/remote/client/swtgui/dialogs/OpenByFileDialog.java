@@ -536,24 +536,7 @@ public class OpenByFileDialog {
 
 		// See if we come in with a file already
 		if (filenames != null) {
-			try {
-				for (String filename : filenames) {
-					File test = new File(filename);
-					if (test.isFile() && test.canRead()) {
-						AddTorrentContainer container = new AddTorrentContainer(
-								test);
-						TableItem item = new TableItem(filesTable, SWT.NULL);
-						item.setText(0, container.getName());
-						item.setText(1, container.getFilePath());
-						tMap.put(container.getName(), container);
-						filesTable.setSelection(item);
-						generateDetails(container.getName());
-						lastDir = container.getFilePath();
-					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			addFileToInstance(filenames);
 		}
 
 		// Center Shell and open
