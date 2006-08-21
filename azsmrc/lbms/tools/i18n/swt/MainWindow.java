@@ -48,7 +48,7 @@ public class MainWindow {
 	private Shell shell;
 	private Label currentlyOpened;
 	private Table mainTable;
-	private Button add,save,delete;
+	private Button add,save, saveDefault,delete;
 	private Color backgroundC;
 
 
@@ -652,7 +652,7 @@ public class MainWindow {
 		tableGroup.setLayoutData(gd);
 
 		Composite bComp = new Composite(tableGroup, SWT.NULL);
-		bComp.setLayout(new GridLayout(3,false));
+		bComp.setLayout(new GridLayout(4,false));
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		bComp.setLayoutData(gd);
 
@@ -714,6 +714,31 @@ public class MainWindow {
 
 		});
 		delete.setEnabled(false);
+
+
+		saveDefault = new Button (bComp, SWT.PUSH);
+		saveDefault.setText("Save Default Only");
+		saveDefault.setToolTipText("Save the Default File only");
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		saveDefault.setLayoutData(gd);
+		saveDefault.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				if(currentI18NDefaultFile != null){
+					try {
+						I18NTools.writeToFile(currentI18NDefaultFile, defaultMap);
+						isSaved = true;
+					} catch (IOException e1) {
+						MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
+						mb.setText("Save Error");
+						mb.setMessage("Problems writing I18N File.  IOException error!");
+						mb.open();
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+
+
 
 		save = new Button (bComp, SWT.PUSH);
 		save.setText("Save All");
@@ -1010,7 +1035,7 @@ public class MainWindow {
 												//default is different!
 												defaultMap.put(item.getText(1), text.getText());
 												isSaved = false;
-											}else if(column == 4 && !item.getText(3).equalsIgnoreCase(text.getText())){
+											}else if(column == 3 && !item.getText(3).equalsIgnoreCase(text.getText())){
 												//trans if different!
 												transMap.put(item.getText(1), text.getText());
 												isSaved = false;
@@ -1130,6 +1155,7 @@ public class MainWindow {
 		ETC.getETC().getDisplay().asyncExec(new Runnable(){
 			public void run() {
 				save.setEnabled(bSaveAddButtons);
+				saveDefault.setEnabled(bSaveAddButtons);
 				add.setEnabled(bSaveAddButtons);
 			}
 		});
