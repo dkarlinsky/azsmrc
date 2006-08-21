@@ -66,6 +66,8 @@ public class ConnectionDialog {
 		shell = new Shell(display);
 		shell.setLayout(new GridLayout(1,false));
 		shell.setText(I18N.translate(PFX + "shell.text"));
+		if(!lbms.azsmrc.remote.client.Utilities.isOSX)
+			shell.setImage(ImageRepository.getImage("connect"));
 
 		//Comp on shell
 		Group comp = new Group(shell,SWT.NULL);
