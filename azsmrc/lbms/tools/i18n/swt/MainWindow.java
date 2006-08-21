@@ -386,6 +386,28 @@ public class MainWindow {
 
 		new MenuItem(fileSubmenu, SWT.SEPARATOR);
 
+		//Save Default file only
+		final MenuItem menuDefaultSave = new MenuItem(fileSubmenu, SWT.PUSH);
+		menuDefaultSave.setText ("Save &Default File\tCtrl+D");
+		menuDefaultSave.setAccelerator (SWT.MOD1 + 'D');
+		menuDefaultSave.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				if(currentI18NDefaultFile != null){
+					try {
+						I18NTools.writeToFile(currentI18NDefaultFile, defaultMap);
+						isSaved = true;
+					} catch (IOException e1) {
+						MessageBox mb = new MessageBox(shell,SWT.ICON_ERROR | SWT.OK);
+						mb.setText("Save Error");
+						mb.setMessage("Problems writing I18N File.  IOException error!");
+						mb.open();
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+
+
 		//Save
 		final MenuItem menuSave = new MenuItem(fileSubmenu, SWT.PUSH);
 		menuSave.setText ("&Save Localized File\tCtrl+S");
@@ -592,9 +614,11 @@ public class MainWindow {
 
 				if(isSaved || transMap == null){
 					menuSave.setEnabled(false);
+					menuDefaultSave.setEnabled(false);
 					menuSaveAs.setEnabled(false);
 				}else{
 					menuSave.setEnabled(true);
+					menuDefaultSave.setEnabled(true);
 					menuSaveAs.setEnabled(true);
 				}
 			}
