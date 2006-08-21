@@ -58,9 +58,10 @@ public class NewDialog {
 		textKey.setLayoutData(gridData);
 		textKey.setText(textValue[0]);
 		textKey.selectAll();
+
 		try{
 			if(textKey.getText().lastIndexOf(".") > 0)
-				textKey.setSelection(textKey.getText().lastIndexOf("."),textKey.getText().length());
+				textKey.setSelection(textKey.getText().lastIndexOf(".") + 1,textKey.getText().length());
 		}catch(Exception e){}
 
 
