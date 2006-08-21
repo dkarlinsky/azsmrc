@@ -557,9 +557,7 @@ public class ManageUsersTab {
 					public void handleEvent(Event e) {
 						if(userName.getText().equalsIgnoreCase("")      ||
 								password.getText().equalsIgnoreCase("") ||
-								verify.getText().equalsIgnoreCase("")   ||
-								outputDir.getText().equalsIgnoreCase("")||
-								importDir.getText().equalsIgnoreCase("")){
+								verify.getText().equalsIgnoreCase("")){
 							MessageBox mb = new MessageBox(RCMain.getRCMain().getDisplay().getActiveShell(),SWT.ICON_ERROR);
 							mb.setText(I18N.translate("global.error"));
 							mb.setMessage(I18N.translate(PFX + "addnewuserShell.messagebox.message"));
