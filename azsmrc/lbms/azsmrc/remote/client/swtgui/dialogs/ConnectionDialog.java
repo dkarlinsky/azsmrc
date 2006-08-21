@@ -14,14 +14,16 @@ import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
-import lbms.azsmrc.shared.RemoteConstants;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
@@ -30,6 +32,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 
 public class ConnectionDialog {
 
@@ -186,6 +189,7 @@ public class ConnectionDialog {
 		gridData.widthHint = 100;
 		username_text.setLayoutData(gridData);
 
+
 		if(properties.containsKey("connection_username_0"))
 			username_text.setText(properties.getProperty("connection_username_0"));
 
@@ -201,6 +205,7 @@ public class ConnectionDialog {
 
 		if(properties.containsKey("connection_password_0"))
 			password_text.setText(properties.getProperty("connection_password_0"));
+
 
 		//Fifth and Sixth line
 		save_settings = new Button(comp,SWT.CHECK);
@@ -299,114 +304,10 @@ public class ConnectionDialog {
 		connect.setText(I18N.translate(PFX + "connect.text"));
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		connect.setLayoutData(gridData);
+		connect.setFocus();
 		connect.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
-				if(urlCombo.getText().equalsIgnoreCase("")
-						|| port_text.getText().equalsIgnoreCase("")
-						|| username_text.getText().equalsIgnoreCase("")
-						|| password_text.getText().equalsIgnoreCase("")){
-					MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-					messageBox.setText(I18N.translate("global.error"));
-					messageBox.setMessage(I18N.translate(PFX + "connect.messagebox.message.fillall"));
-					messageBox.open();
-					return;
-				}
-
-				//parse port and see if it is in range
-				int port;
-				try{
-					port = Integer.parseInt(port_text.getText());
-					if(port < 1 || port > 65000 ){
-						MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-						messageBox.setText(I18N.translate("global.error"));
-						messageBox.setMessage(I18N.translate(PFX + "connect.messagebox.message.portrange"));
-						messageBox.open();
-						return;
-					}
-				}catch(Exception f){
-					f.printStackTrace();
-					port = 49009; //default as a fallback although we should never get here
-				}
-
-				//Check the URL
-				String url_string = urlCombo.getText();
-				final URL url;
-				if(use_https.getSelection() && !url_string.startsWith("https://")){
-					if(url_string.startsWith("http://")){
-						url_string = url_string.substring(7);
-					}
-					url_string = "https://" + url_string + ":" + port_text.getText();
-				}else if(!use_https.getSelection() && !url_string.startsWith("http://")){
-					if(url_string.startsWith("https://")){
-						url_string = url_string.substring(8);
-					}
-					url_string = "http://" + url_string + ":" + port_text.getText();
-				}else
-					url_string = url_string + ":" + port_text.getText();
-				try{
-					url = new URL(url_string);
-					//System.out.println(url_string);
-				}catch(Exception f){
-					f.printStackTrace();
-					MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-					messageBox.setText(I18N.translate("global.error"));
-					messageBox.setMessage(I18N.translate(PFX + "connect.messagebox.message.validURL"));
-					messageBox.open();
-					return;
-				}
-				Properties properties = RCMain.getRCMain().getProperties();
-				if(save_settings.getSelection()){
-
-					boolean bpresent = false;
-
-					for(int i = 0; i < 3; i++){
-						if(properties.containsKey("connection_lastURL_" + i)){
-							/*System.out.println("connection_lastURL_" + i + ":  " + properties.getProperty("connection_lastURL_" + i) + " | " + url_string +
-									" || " + properties.getProperty("connection_username_" + i) + " | " + username_text.getText());*/
-							if(properties.getProperty("connection_lastURL_" + i).equalsIgnoreCase(url_string) &&
-									properties.getProperty("connection_username_" + i).equalsIgnoreCase(username_text.getText())){
-								bpresent = true;
-							}
-						}
-					}
-
-					if(!bpresent){
-						if(properties.containsKey("connection_url_1"))
-							shiftProperties(1, 2);
-						if(properties.containsKey("connection_url_0"))
-							shiftProperties(0, 1);
-					}
-
-
-
-					properties.setProperty("connection_url_0", urlCombo.getText());
-
-					properties.setProperty("connection_https_0", Boolean.toString(use_https.getSelection()));
-					properties.setProperty("connection_port_0", port_text.getText());
-					properties.setProperty("connection_lastURL_0", url_string);
-					properties.setProperty("connection_username_0", username_text.getText());
-
-					if(save_password.getSelection()){
-						properties.setProperty("connection_password_0", password_text.getText());
-					}else
-						properties.remove("connection_password_0");
-				}
-				RCMain.getRCMain().saveConfig();
-
-				final String username = username_text.getText();
-				final String password = password_text.getText();
-
-				Client client = RCMain.getRCMain().getClient();
-				client.setServer(url);
-				client.setUsername(username);
-				client.setPassword(password);
-				client.getDownloadManager().update(false);
-				RCMain.getRCMain().connect(true);
-
-				//once connection is established.. send for all the right data
-				RCMain.getRCMain().getMainWindow().initializeConnection();
-
-				shell.close();
+				connectGo();
 			}
 		});
 
@@ -420,6 +321,14 @@ public class ConnectionDialog {
 				shell.close();
 			}
 		});
+
+		//Add a CR listener to everything on comp
+		Control[] controls = comp.getChildren();
+		for(Control control:controls){
+			add_CR_KeyListener(control);
+		}
+
+
 
 		fillCombo();
 
@@ -534,6 +443,143 @@ public class ConnectionDialog {
 		if(containsNumber(0))
 			loadIndex(0);
 	}
+
+
+	private void connectGo(){
+		RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
+
+			public void run() {
+				if(urlCombo.getText().equalsIgnoreCase("")
+						|| port_text.getText().equalsIgnoreCase("")
+						|| username_text.getText().equalsIgnoreCase("")
+						|| password_text.getText().equalsIgnoreCase("")){
+					MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+					messageBox.setText(I18N.translate("global.error"));
+					messageBox.setMessage(I18N.translate(PFX + "connect.messagebox.message.fillall"));
+					messageBox.open();
+					return;
+				}
+
+				//parse port and see if it is in range
+				int port;
+				try{
+					port = Integer.parseInt(port_text.getText());
+					if(port < 1 || port > 65000 ){
+						MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+						messageBox.setText(I18N.translate("global.error"));
+						messageBox.setMessage(I18N.translate(PFX + "connect.messagebox.message.portrange"));
+						messageBox.open();
+						return;
+					}
+				}catch(Exception f){
+					f.printStackTrace();
+					port = 49009; //default as a fallback although we should never get here
+				}
+
+				//Check the URL
+				String url_string = urlCombo.getText();
+				final URL url;
+				if(use_https.getSelection() && !url_string.startsWith("https://")){
+					if(url_string.startsWith("http://")){
+						url_string = url_string.substring(7);
+					}
+					url_string = "https://" + url_string + ":" + port_text.getText();
+				}else if(!use_https.getSelection() && !url_string.startsWith("http://")){
+					if(url_string.startsWith("https://")){
+						url_string = url_string.substring(8);
+					}
+					url_string = "http://" + url_string + ":" + port_text.getText();
+				}else
+					url_string = url_string + ":" + port_text.getText();
+				try{
+					url = new URL(url_string);
+					//System.out.println(url_string);
+				}catch(Exception f){
+					f.printStackTrace();
+					MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+					messageBox.setText(I18N.translate("global.error"));
+					messageBox.setMessage(I18N.translate(PFX + "connect.messagebox.message.validURL"));
+					messageBox.open();
+					return;
+				}
+				Properties properties = RCMain.getRCMain().getProperties();
+				if(save_settings.getSelection()){
+
+					boolean bpresent = false;
+
+					for(int i = 0; i < 3; i++){
+						if(properties.containsKey("connection_lastURL_" + i)){
+							/*System.out.println("connection_lastURL_" + i + ":  " + properties.getProperty("connection_lastURL_" + i) + " | " + url_string +
+									" || " + properties.getProperty("connection_username_" + i) + " | " + username_text.getText());*/
+							if(properties.getProperty("connection_lastURL_" + i).equalsIgnoreCase(url_string) &&
+									properties.getProperty("connection_username_" + i).equalsIgnoreCase(username_text.getText())){
+								bpresent = true;
+							}
+						}
+					}
+
+					if(!bpresent){
+						if(properties.containsKey("connection_url_1"))
+							shiftProperties(1, 2);
+						if(properties.containsKey("connection_url_0"))
+							shiftProperties(0, 1);
+					}
+
+
+
+					properties.setProperty("connection_url_0", urlCombo.getText());
+
+					properties.setProperty("connection_https_0", Boolean.toString(use_https.getSelection()));
+					properties.setProperty("connection_port_0", port_text.getText());
+					properties.setProperty("connection_lastURL_0", url_string);
+					properties.setProperty("connection_username_0", username_text.getText());
+
+					if(save_password.getSelection()){
+						properties.setProperty("connection_password_0", password_text.getText());
+					}else
+						properties.remove("connection_password_0");
+				}
+				RCMain.getRCMain().saveConfig();
+
+				final String username = username_text.getText();
+				final String password = password_text.getText();
+
+				Client client = RCMain.getRCMain().getClient();
+				client.setServer(url);
+				client.setUsername(username);
+				client.setPassword(password);
+				client.getDownloadManager().update(false);
+				RCMain.getRCMain().connect(true);
+
+				//once connection is established.. send for all the right data
+				RCMain.getRCMain().getMainWindow().initializeConnection();
+
+				shell.close();
+			}
+		});
+	}
+
+	private void add_CR_KeyListener(final Control control){
+		RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
+
+			public void run() {
+				control.addKeyListener(new KeyListener(){
+
+					public void keyPressed(KeyEvent arg0) {
+						if(arg0.keyCode == SWT.CR){
+							connectGo();
+						}
+					}
+
+					public void keyReleased(KeyEvent arg0) {}
+
+				});
+
+			}
+
+		});
+	}
+
 
 	/**
 	 * Static open method
