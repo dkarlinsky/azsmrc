@@ -247,9 +247,7 @@ public class GUIUserUtils {
                     public void handleEvent(Event e) {
                         if(userName.getText().equalsIgnoreCase("")      ||
                                 password.getText().equalsIgnoreCase("") ||
-                                verify.getText().equalsIgnoreCase("")   ||
-                                outputDir.getText().equalsIgnoreCase("")||
-                                importDir.getText().equalsIgnoreCase("")){
+                                verify.getText().equalsIgnoreCase("")   ){
                             MessageBox mb = new MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
                             mb.setText("Error");
                             mb.setMessage("Please fill out all of the information.");
