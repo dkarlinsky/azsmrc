@@ -618,6 +618,7 @@ public class OpenByFileDialog {
 						filesTable.setSelection(item);
 						generateDetails(container.getName());
 						lastDir = container.getFilePath();
+						setTotalSize();
 					}
 				}
 			} catch (Exception e) {
