@@ -61,6 +61,7 @@ import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.shared.EncodingUtil;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.azsmrc.shared.SWTSafeRunnable;
+import lbms.tools.ExtendedProperties;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
@@ -260,11 +261,11 @@ public class DownloadManagerShell {
 		menuQuickconnect.setText("&Quickconnect");
 		menuQuickconnect.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
-				Properties properties = RCMain.getRCMain().getProperties();
+				ExtendedProperties properties = RCMain.getRCMain().getProperties();
 				if (
-						properties.getProperty("connection_lastURL_0",null) != null &&
-						properties.getProperty("connection_username_0",null) != null &&
-						properties.getProperty("connection_password_0",null) != null) {
+						properties.getProperty("connection_lastURL_0") != null &&
+						properties.getProperty("connection_username_0") != null &&
+						properties.getProperty("connection_password_0") != null) {
 					RCMain.getRCMain().connect(true);
 					initializeConnection();
 				} else
@@ -430,7 +431,7 @@ public class DownloadManagerShell {
 		menuUpdate.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
 				RCMain.getRCMain().getUpdater().checkForUpdates(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("update.beta", "false")));
-				RCMain.getRCMain().getProperties().setProperty("update.lastcheck",Long.toString(System.currentTimeMillis()));
+				RCMain.getRCMain().getProperties().setProperty("update.lastcheck",System.currentTimeMillis());
 				RCMain.getRCMain().saveConfig();
 			}
 		});
@@ -919,14 +920,14 @@ public class DownloadManagerShell {
 							if(myTorrents != null || !myTorrents.isDisposed()){
 								if(bSingleUserMode){
 
-									if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("mainwindow.showHost","false"))){
+									if(RCMain.getRCMain().getProperties().getPropertyAsBoolean("mainwindow.showHost",false)){
 										myTorrents.setText("ALL Torrents: " + RCMain.getRCMain().getClient().getServer().getHost());
 									}else
 										myTorrents.setText("ALL Torrents");
 
 
 								}else if(userLoggedIn != null)
-									if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("mainwindow.showHost","false"))){
+									if(RCMain.getRCMain().getProperties().getPropertyAsBoolean("mainwindow.showHost",false)){
 										myTorrents.setText(userLoggedIn + "'s Torrents: " + RCMain.getRCMain().getClient().getServer().getHost());
 									}else
 										myTorrents.setText(userLoggedIn + "'s Torrents");
@@ -1367,12 +1368,11 @@ public class DownloadManagerShell {
 
 		createDragDrop(seedsTable);
 
-		Properties properties = RCMain.getRCMain().getProperties();
-		if(properties.containsKey("sash0_weight") && properties.containsKey("sash1_weight")){
-			sash.setWeights(new int[] {Integer.parseInt((String)properties.get("sash0_weight")),
-					Integer.parseInt((String)properties.get("sash1_weight"))});
+		ExtendedProperties properties = RCMain.getRCMain().getProperties();
 
-		}
+		sash.setWeights(new int[] {properties.getPropertyAsInt("sash0_weight"),
+					properties.getPropertyAsInt("sash1_weight")});
+
 		String userLoggedIn = RCMain.getRCMain().getClient().getUsername();
 		if(bSingleUserMode)
 			myTorrents.setText("ALL Torrents");
@@ -1661,17 +1661,17 @@ public class DownloadManagerShell {
 
 				int position_x = DOWNLOAD_MANAGER_SHELL.getLocation().x;
 				int position_y = DOWNLOAD_MANAGER_SHELL.getLocation().y;
-				Properties properties = RCMain.getRCMain().getProperties();
+				ExtendedProperties properties = RCMain.getRCMain().getProperties();
 
 				if (!sash.isDisposed()) {
 					int[] weights = sash.getWeights();
-					properties.setProperty("sash0_weight", String.valueOf(weights[0]));
-					properties.setProperty("sash1_weight", String.valueOf(weights[1]));
+					properties.setProperty("sash0_weight", weights[0]);
+					properties.setProperty("sash1_weight", weights[1]);
 				}
-				properties.setProperty("DMS_SIZE_x", String.valueOf(size_x));
-				properties.setProperty("DMS_SIZE_y", String.valueOf(size_y));
-				properties.setProperty("DMS_POSITION_x", String.valueOf(position_x));
-				properties.setProperty("DMS_POSITION_y", String.valueOf(position_y));
+				properties.setProperty("DMS_SIZE_x", size_x);
+				properties.setProperty("DMS_SIZE_y", size_y);
+				properties.setProperty("DMS_POSITION_x", position_x);
+				properties.setProperty("DMS_POSITION_y", position_y);
 
 				//save the downloadsTable column widths
 				if (!downloadsTable.isDisposed()) {
@@ -1696,8 +1696,8 @@ public class DownloadManagerShell {
 				//Save Everything!
 				RCMain.getRCMain().saveConfig();
 
-				if(!Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("tray.exit","true"))){
-					if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("confirm.exit","true"))){
+				if(!RCMain.getRCMain().getProperties().getPropertyAsBoolean("tray.exit")){
+					if(RCMain.getRCMain().getProperties().getPropertyAsBoolean("confirm.exit")){
 						MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
 						messageBox.setText("Confirm Exit");
 						messageBox.setMessage("Are you sure you wish to exit AzSMRC entirely?");
@@ -1732,7 +1732,7 @@ public class DownloadManagerShell {
 			}
 
 			public void shellIconified(ShellEvent arg0) {
-				if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("tray.minimize","true"))){
+				if(RCMain.getRCMain().getProperties().getPropertyAsBoolean("tray.minimize")){
 					DOWNLOAD_MANAGER_SHELL.setVisible(false);
 					RCMain.getRCMain().updateTimer(false);
 				}
@@ -1742,7 +1742,7 @@ public class DownloadManagerShell {
 		});
 
 		//check to see if the console is auto open and open it up if it is
-		if(Boolean.parseBoolean(properties.getProperty("auto_console", "false")))
+		if(properties.getPropertyAsBoolean("auto_console", false))
 			ConsoleTab.open(tabFolder, false);
 
 
@@ -1753,10 +1753,10 @@ public class DownloadManagerShell {
 
 		//open shell
 		properties = RCMain.getRCMain().getProperties();
-		int size_x = Integer.parseInt(properties.getProperty("DMS_SIZE_x"));
-		int size_y = Integer.parseInt(properties.getProperty("DMS_SIZE_y"));
-		int position_x = Integer.parseInt(properties.getProperty("DMS_POSITION_x"));
-		int position_y = Integer.parseInt(properties.getProperty("DMS_POSITION_y"));
+		int size_x =properties.getPropertyAsInt("DMS_SIZE_x");
+		int size_y = properties.getPropertyAsInt("DMS_SIZE_y");
+		int position_x = properties.getPropertyAsInt("DMS_POSITION_x");
+		int position_y = properties.getPropertyAsInt("DMS_POSITION_y");
 		//System.out.println("Open: " + size_x + " : "+size_y + " : " + position_x + " : " + position_y);
 		DOWNLOAD_MANAGER_SHELL.setSize (size_x, size_y);
 		DOWNLOAD_MANAGER_SHELL.setLocation (position_x, position_y);
@@ -2939,7 +2939,7 @@ public class DownloadManagerShell {
 			options |= i;
 		}
 		options |= RemoteConstants.ST_STATE; //set state since we need it
-		RCMain.getRCMain().getProperties().setProperty("transfer_states", Integer.toString(options));
+		RCMain.getRCMain().getProperties().setProperty("transfer_states", options);
 	}
 
 
