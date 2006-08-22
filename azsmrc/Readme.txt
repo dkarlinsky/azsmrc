@@ -28,10 +28,10 @@ AzSMRC is pronounced AzSmirk
 	support (Windows, Linux, MacOSX, etc.)
 
 	Server system:
-	1. A running version of Azureus 2.4.0.3 (currently CVS only) or greater
+	1. A running version of Azureus 2.5.0.0 or greater
 	2. Java 1.5 or greater
 	3. SWT version 3.2 or greater
-		Note:  A fresh installation of Azureus 2.4.0.3 will provide
+		Note:  A fresh installation of Azureus 2.5.0.0 will provide
 		this automatically
 	4. Functioning internet connection with at least one port
 		available for communication to the server
@@ -75,21 +75,26 @@ Installation of AzSMRC comes in two parts:
 		4.	commons-io_1.2.jar
 
 	jdom and commons-codec/io are contained in the pluginLibrary.zip file.
-	Be sure when uncompressing them, to keep the version number as
+	Be sure when uncompressing them, to keep the version number as is
 	Azureus will not load them if they do not have them.
 
 	Finally, restart Azureus
 
 3.2  Installing the remote control program
 
-		1.  Create a directory of your choice and extract the
-			contents of the AzSMRC_xxx.zip as well as clientLibrary.zip there
-		2.  If you did not download the file with the SWT libraries
-			in it, then you will need to manually obtain those and
-			place them in your chosen folder yourself.
+	If you are on Windows you can download the full AzSMRC_x.x.x.exe which
+	includes all necessary files.
 
-			To download visit here:
-			http://download.eclipse.org/eclipse/downloads/index.php
+	If not you have to do following steps:
+
+	1.  Create a directory of your choice and extract the
+		contents of the AzSMRC_xxx.zip as well as clientLibrary.zip there
+	2.  If you did not download the file with the SWT libraries
+		in it, then you will need to manually obtain those and
+		place them in your chosen folder yourself.
+
+		To download visit here:
+		http://download.eclipse.org/eclipse/downloads/index.php
 
 
 4.  Setup
@@ -124,6 +129,7 @@ from there
 If you want to use SSL encrypted communication you need to create a
 SSL certificate first. To do that open Azureus and go to
 Tools->Options->Security and create a certificate.
+You need the tools.jar this files is distributed in the Java SDK.
 If you have done that enable SSL in AzSMRC settings and restart Azureus.
 Don't forget to enable SSL in the client too.
 

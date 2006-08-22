@@ -1756,10 +1756,10 @@ public class DownloadManagerShell {
 			GUI_Utilities.centerShellandOpen(DOWNLOAD_MANAGER_SHELL);
 		else{
 			properties = RCMain.getRCMain().getProperties();
-			int size_x = Integer.parseInt((String)properties.get("DMS_SIZE_x"));
-			int size_y = Integer.parseInt((String)properties.get("DMS_SIZE_y"));
-			int position_x = Integer.parseInt((String)properties.get("DMS_POSITION_x"));
-			int position_y = Integer.parseInt((String)properties.get("DMS_POSITION_y"));
+			int size_x = Integer.parseInt(properties.getProperty("DMS_SIZE_x"));
+			int size_y = Integer.parseInt(properties.getProperty("DMS_SIZE_y"));
+			int position_x = Integer.parseInt(properties.getProperty("DMS_POSITION_x"));
+			int position_y = Integer.parseInt(properties.getProperty("DMS_POSITION_y"));
 			System.out.println("Open: " + size_x + " : "+size_y + " : " + position_x + " : " + position_y);
 			DOWNLOAD_MANAGER_SHELL.setSize (size_x, size_y);
 			DOWNLOAD_MANAGER_SHELL.setLocation (position_x, position_y);
