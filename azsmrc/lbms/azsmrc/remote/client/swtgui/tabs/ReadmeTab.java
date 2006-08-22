@@ -43,6 +43,8 @@ public class ReadmeTab {
 	private String projectpageURL = "http://www.sourceforge.net/projects/azsmrc";
 	private String downloadsURL = "http://sourceforge.net/project/showfiles.php?group_id=163110";
 	private String forumsURL = "http://sourceforge.net/forum/?group_id=163110";
+	private String readmeURL = "http://azsmrc.sourceforge.net/Readme.txt";
+
 
 	//  I18N prefix
 	public static final String PFX = "tab.readmetab.";
@@ -246,6 +248,19 @@ public class ReadmeTab {
 				Program.launch(forumsURL);
 			}
 		});
+
+		Label readme = new Label(inet, SWT.NULL);
+		readme.setText(I18N.translate(PFX + "net.azsmrc_readme.text"));
+		readme.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(SWT.COLOR_DARK_BLUE));
+		readme.setCursor(RCMain.getRCMain().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+		readme.addMouseListener(new MouseListener(){
+			public void mouseDoubleClick(MouseEvent arg0) {}
+			public void mouseDown(MouseEvent arg0) {}
+			public void mouseUp(MouseEvent arg0) {
+				Program.launch(readmeURL);
+			}
+		});
+
 
 		Group gthanks = new Group(infoC,SWT.NONE);
 		gthanks.setText(I18N.translate(PFX + "thanks.group.text"));
