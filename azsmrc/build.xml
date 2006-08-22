@@ -74,6 +74,7 @@
 			<include name="lbms/tools/flexyconf/**/*" />
 			<fileset file="${root.dir}/default.cfg" />
 			<fileset file="${root.dir}/azsmrc.properties" />
+			<fileset file="${root.dir}/log4j.properties" />
 		</jar>
 		<echo message="Creating launcher.jar..." />
 		<jar destfile="${root.dir}/${dist.dir}/launcher.jar" basedir="${root.dir}/${build.dir}" excludes="${dist.jar.excludes}">
