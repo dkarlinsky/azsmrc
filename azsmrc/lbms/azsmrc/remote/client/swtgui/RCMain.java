@@ -266,40 +266,43 @@ public class RCMain implements Launchable {
 
 		final Tray systray = display.getSystemTray ();
 		if (systray != null) {
-		systrayItem = new TrayItem (systray, SWT.NONE);
+			systrayItem = new TrayItem (systray, SWT.NONE);
 
-		//Listener for the system tray
+			//Listener for the system tray
 
-		systrayItem.addSelectionListener(new SelectionListener()
-				{
-					public void widgetDefaultSelected(SelectionEvent arg0) {
-						// this is a double click .. if we ever want to do something with this
-						// do it here
+			systrayItem.addSelectionListener(new SelectionListener()
+			{
+				public void widgetDefaultSelected(SelectionEvent arg0) {
+					// this is a double click .. if we ever want to do something with this
+					// do it here
 
-					}
+				}
 
-					public void widgetSelected(SelectionEvent arg0) {
-						//normal selection is a single click
-						try{
-							Shell dms_shell = getMainWindow().getShell();
-							if(dms_shell.getMinimized()){
-								dms_shell.setMinimized(false);
-								dms_shell.setVisible(true);
+				public void widgetSelected(SelectionEvent arg0) {
+					//normal selection is a single click
+					try{
+						Shell dms_shell = getMainWindow().getShell();
+						if(dms_shell.getMinimized()){
+							dms_shell.setMinimized(false);
+							dms_shell.setVisible(true);
 
-							} else{
-								dms_shell.setMinimized(true);
-								dms_shell.setVisible(false);
-							}
-						}catch(Exception e1){
-							if (mainWindow == null) {
-								mainWindow = new DownloadManagerShell();
-							}
-							mainWindow.open();
-							return;
+						} else{
+							dms_shell.setMinimized(true);
+							dms_shell.setVisible(false);
 						}
-
+					}catch(Exception e1){
+						if (mainWindow == null) {
+							mainWindow = new DownloadManagerShell();
+						}
+						mainWindow.open();
+						return;
 					}
-				});
+
+				}
+			});
+		} else {
+			properties.setProperty("tray.minimize", false);
+			properties.setProperty("tray.exit", false);
 		}
 
 		setTrayIcon(0);
