@@ -22,7 +22,6 @@ import java.util.Properties;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.Semaphore;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,6 +62,7 @@ import lbms.azsmrc.shared.RemoteConstants;
 import lbms.azsmrc.shared.SWTSafeRunnable;
 import lbms.tools.ExtendedProperties;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.custom.CLabel;
@@ -146,7 +146,7 @@ public class DownloadManagerShell {
 		}
 
 		public void positionChanged(Download download, int oldPosition, int newPosition) {
-			debugLogger.finer("Position changed "+download+" "+oldPosition+" -> "+newPosition);
+			logger.debug("Position changed "+download+" "+oldPosition+" -> "+newPosition);
 			redrawTables = true;
 		}
 
@@ -183,13 +183,12 @@ public class DownloadManagerShell {
 	private int upSpeed = 0;
 	private int downSpeed = 0;
 
-	private Logger debugLogger;
+	private static Logger logger = Logger.getLogger("lbms.azsmrc.DownloadManagerShell");;
 
 
 	private int drag_drop_line_start = -1;
 
 	public void open(){
-		debugLogger = RCMain.getRCMain().getDebugLogger();
 		if(DOWNLOAD_MANAGER_SHELL != null && !DOWNLOAD_MANAGER_SHELL.isDisposed()){
 			DOWNLOAD_MANAGER_SHELL.setVisible(true);
 			DOWNLOAD_MANAGER_SHELL.forceFocus();
@@ -785,7 +784,7 @@ public class DownloadManagerShell {
 					String str_minutes = is.open();
 					int mins = Integer.parseInt(str_minutes);
 					RCMain.getRCMain().getClient().getDownloadManager().pauseDownloads(mins*60);
-					RCMain.getRCMain().getNormalLogger().info("Pausing all downloads for " + mins*60  + " seconds (" + mins + " minutes)");
+					logger.info("Pausing all downloads for " + mins*60  + " seconds (" + mins + " minutes)");
 				}catch(Exception ex) {}
 
 
@@ -3157,7 +3156,7 @@ public class DownloadManagerShell {
 
 		}
 		catch( Throwable t ) {
-			RCMain.getRCMain().getDebugLogger().severe("failed to init drag-n-drop + \n" + t);
+			logger.error("failed to init drag-n-drop + \n" + t);
 		}
 	}
 
@@ -3202,7 +3201,7 @@ public class DownloadManagerShell {
 					String filename = source.getAbsolutePath();
 					try {
 						if (!isTorrentFile(filename)) {
-							RCMain.getRCMain().getDebugLogger().info("openDroppedTorrents: file not a torrent file");
+							logger.info("openDroppedTorrents: file not a torrent file");
 
 							//Torrent creation if we ever support that in FF
 							//ShareUtils.shareFile(azureus_core, filename);
@@ -3213,7 +3212,7 @@ public class DownloadManagerShell {
 										bOverrideToStopped);*/
 						}
 					} catch (Exception e) {
-						RCMain.getRCMain().getDebugLogger().info("Torrent open fails for '" + filename + "'\n"  + e.toString());
+						logger.info("Torrent open fails for '" + filename + "'\n"  + e.toString());
 					}
 				} else if (source.isDirectory()) {
 
@@ -3253,18 +3252,18 @@ public class DownloadManagerShell {
 		if (!check.canRead())
 			throw new IOException("File "+filename+" cannot be read.");
 		if (check.isDirectory()){
-			RCMain.getRCMain().getDebugLogger().info("File "+filename+" is a directory.");
+			logger.info("File "+filename+" is a directory.");
 			return false;
 		}
 
 		try {
 			if(!check.isFile()) {
-				RCMain.getRCMain().getDebugLogger().info("Torrent must be a file ('" + check.getName() + "')");
+				logger.info("Torrent must be a file ('" + check.getName() + "')");
 				return false;
 			}
 
 			if ( check.length() == 0 ){
-				RCMain.getRCMain().getDebugLogger().info("Torrent is zero length('" + check.getName() + "')");
+				logger.info("Torrent is zero length('" + check.getName() + "')");
 			}
 
 
@@ -3276,7 +3275,7 @@ public class DownloadManagerShell {
 				//               construct( fis );
 
 			}catch( IOException e ){
-				RCMain.getRCMain().getDebugLogger().info("IO Exception reading torrent ('" + check.getName() + "')");
+				logger.info("IO Exception reading torrent ('" + check.getName() + "')");
 
 			}finally{
 
@@ -3288,7 +3287,7 @@ public class DownloadManagerShell {
 
 					}catch( IOException e ){
 
-						RCMain.getRCMain().getDebugLogger().severe( e.toString() );
+						logger.error( e.toString() );
 						return false;
 					}
 				}

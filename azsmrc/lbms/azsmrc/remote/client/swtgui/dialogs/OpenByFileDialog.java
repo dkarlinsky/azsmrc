@@ -27,6 +27,7 @@ import lbms.azsmrc.remote.client.torrent.TOTorrentFile;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.shared.SWTSafeRunnable;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.custom.SashForm;
@@ -82,6 +83,8 @@ public class OpenByFileDialog {
 	private AddTorrentContainer activeATC;
 
 	private static OpenByFileDialog instance;
+
+	private static Logger logger = Logger.getLogger(OpenByFileDialog.class);
 
 	//private int drag_drop_line_start = -1;
 
@@ -659,8 +662,7 @@ public class OpenByFileDialog {
 			});
 
 		} catch (Throwable t) {
-			RCMain.getRCMain().getDebugLogger().severe(
-					"failed to init drag-n-drop + \n" + t);
+			logger.error("failed to init drag-n-drop + \n" + t);
 		}
 	}
 
@@ -684,11 +686,7 @@ public class OpenByFileDialog {
 					String filename = source.getAbsolutePath();
 					try {
 						if (!DownloadManagerShell.isTorrentFile(filename)) {
-							RCMain
-									.getRCMain()
-									.getDebugLogger()
-									.info(
-											"openDroppedTorrents: file not a torrent file");
+							logger.info("openDroppedTorrents: file not a torrent file");
 
 						} else {
 							// System.out.println("Dropped file IS torrent -- to
@@ -717,8 +715,7 @@ public class OpenByFileDialog {
 							}
 						}
 					} catch (Exception e) {
-						RCMain.getRCMain().getDebugLogger().info(
-								"Torrent open fails for '" + filename + "'\n"
+						logger.info("Torrent open fails for '" + filename + "'\n"
 										+ e.toString());
 					}
 				} else if (source.isDirectory()) {

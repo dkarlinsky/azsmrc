@@ -11,15 +11,19 @@ import java.io.FileWriter;
 import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
 import java.util.Properties;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
+import lbms.azsmrc.shared.SWTSafeRunnable;
 
+import org.apache.log4j.Appender;
+import org.apache.log4j.Layout;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.ErrorHandler;
+import org.apache.log4j.spi.Filter;
+import org.apache.log4j.spi.LoggingEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.custom.CTabFolder;
@@ -81,8 +85,7 @@ public class ConsoleTab {
 	private boolean bShowDebug = true;
 	private boolean bShowNormal = true;
 
-	private Level debugLevel = Level.FINE;
-	private Level normalLevel = Level.FINE;
+	private Level normalLevel = Level.DEBUG;
 
 	private Logger normalLogger;
 	private Logger debugLogger;
@@ -95,27 +98,90 @@ public class ConsoleTab {
 		formatPos = new FieldPosition(0);
 	}
 
-	private final Handler normalConsoleHandler = new Handler() {
-		@Override
-		public void close() throws SecurityException {}
-		@Override
-		public void flush() {}
-		@Override
-		public void publish(LogRecord record) {
-			if (record.getLevel().intValue() >= normalLevel.intValue())
-				addText(record);
-		}
-	};
+	private final Appender consoleAppender = new Appender() {
+		/* (non-Javadoc)
+		 * @see org.apache.log4j.Appender#addFilter(org.apache.log4j.spi.Filter)
+		 */
+		public void addFilter(Filter arg0) {
+			// TODO Auto-generated method stub
 
-	private final Handler debugConsoleHandler = new Handler() {
-		@Override
-		public void close() throws SecurityException {}
-		@Override
-		public void flush() {}
-		@Override
-		public void publish(LogRecord record) {
-			if (record.getLevel().intValue() >= debugLevel.intValue())
-				addText(record);
+		}
+		/* (non-Javadoc)
+		 * @see org.apache.log4j.Appender#clearFilters()
+		 */
+		public void clearFilters() {
+			// TODO Auto-generated method stub
+
+		}
+		/* (non-Javadoc)
+		 * @see org.apache.log4j.Appender#close()
+		 */
+		public void close() {
+			// TODO Auto-generated method stub
+
+		}
+		/* (non-Javadoc)
+		 * @see org.apache.log4j.Appender#doAppend(org.apache.log4j.spi.LoggingEvent)
+		 */
+		public void doAppend(LoggingEvent arg0) {
+			if (arg0.getLevel().toInt() >= normalLevel.toInt())
+				addText(arg0);
+
+		}
+		/* (non-Javadoc)
+		 * @see org.apache.log4j.Appender#getErrorHandler()
+		 */
+		public ErrorHandler getErrorHandler() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		/* (non-Javadoc)
+		 * @see org.apache.log4j.Appender#getFilter()
+		 */
+		public Filter getFilter() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		/* (non-Javadoc)
+		 * @see org.apache.log4j.Appender#getLayout()
+		 */
+		public Layout getLayout() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		/* (non-Javadoc)
+		 * @see org.apache.log4j.Appender#getName()
+		 */
+		public String getName() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		/* (non-Javadoc)
+		 * @see org.apache.log4j.Appender#requiresLayout()
+		 */
+		public boolean requiresLayout() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+		/* (non-Javadoc)
+		 * @see org.apache.log4j.Appender#setErrorHandler(org.apache.log4j.spi.ErrorHandler)
+		 */
+		public void setErrorHandler(ErrorHandler arg0) {
+			// TODO Auto-generated method stub
+
+		}
+		/* (non-Javadoc)
+		 * @see org.apache.log4j.Appender#setLayout(org.apache.log4j.Layout)
+		 */
+		public void setLayout(Layout arg0) {
+			// TODO Auto-generated method stub
+
+		}
+		/* (non-Javadoc)
+		 * @see org.apache.log4j.Appender#setName(java.lang.String)
+		 */
+		public void setName(String arg0) {
+			// TODO Auto-generated method stub
 
 		}
 	};
@@ -124,20 +190,17 @@ public class ConsoleTab {
 	private ConsoleTab(CTabFolder parentTab){
 		final CTabItem detailsTab = new CTabItem(parentTab, SWT.CLOSE);
 		detailsTab.setText(I18N.translate(PFX + "tab.text"));
-		normalLogger = RCMain.getRCMain().getNormalLogger();
-		debugLogger = RCMain.getRCMain().getDebugLogger();
+		normalLogger = Logger.getLogger(RCMain.LOGGER_ROOT);
 
 		final Properties props = RCMain.getRCMain().getProperties();
 
 		bShowDebug = Boolean.parseBoolean(props.getProperty("logger.debug.show", "true"));
 		bShowNormal = Boolean.parseBoolean(props.getProperty("logger.normal.show", "true"));
-		normalLevel = Level.parse(props.getProperty("logger.normal.level", "FINE"));
-		debugLevel = Level.parse(props.getProperty("logger.debug.level", "FINE"));
+		normalLevel = Level.toLevel(props.getProperty("logger.normal.level", "FINE"));
 		PREFERRED_LINES = Integer.parseInt(props.getProperty("console_lines","250"));
 		MAX_LINES = 512 + PREFERRED_LINES;
 
-		if (bShowNormal)	normalLogger.addHandler(normalConsoleHandler);
-		if (bShowDebug) 	debugLogger.addHandler(debugConsoleHandler);
+		if (bShowNormal)	normalLogger.addAppender(consoleAppender);
 
 		final Composite parent = new Composite(parentTab, SWT.NONE);
 		parent.setLayout(new GridLayout(1,false));
@@ -145,8 +208,6 @@ public class ConsoleTab {
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.horizontalSpan = 1;
 		parent.setLayoutData(gridData);
-
-		System.out.println("normal level:" + debugLevel.intValue());
 
 		Composite panel = new Composite(parent,SWT.NULL);
 
@@ -210,12 +271,10 @@ public class ConsoleTab {
 				bPaused = btn.getSelection();
 				if (bPaused) {
 					try{
-						normalLogger.removeHandler(normalConsoleHandler);
-						debugLogger.removeHandler(debugConsoleHandler);
+						normalLogger.removeAppender(consoleAppender);
 					}catch (Exception notToUse){}
 				}else{
-					if (bShowNormal)    normalLogger.addHandler(normalConsoleHandler);
-					if (bShowDebug)     debugLogger.addHandler(debugConsoleHandler);
+					if (bShowNormal)    normalLogger.addAppender(consoleAppender);
 				}
 			}
 		});
@@ -466,7 +525,7 @@ public class ConsoleTab {
 		debuglabel.setLayoutData(gd);
 
 
-		final Combo debugCombo = new Combo(cEnd, SWT.DROP_DOWN | SWT.READ_ONLY);
+		/*final Combo debugCombo = new Combo(cEnd, SWT.DROP_DOWN | SWT.READ_ONLY);
 		debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.7"));
 		debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.6"));
 		debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.5"));
@@ -484,7 +543,7 @@ public class ConsoleTab {
 			public void widgetDefaultSelected(SelectionEvent arg0) {
 			}
 
-		});
+		});*/
 
 		final Label debugColor = new Label(cEnd, SWT.BORDER);
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
@@ -700,26 +759,23 @@ public class ConsoleTab {
 		detailsTab.addDisposeListener(new DisposeListener (){
 
 			public void widgetDisposed(DisposeEvent arg0) {
-				normalLogger.removeHandler(normalConsoleHandler);
-				debugLogger.removeHandler(debugConsoleHandler);
-
+				normalLogger.removeAppender(consoleAppender);
 			}
-
 		});
 
 		detailsTab.setControl(parent);
 		parentTab.setSelection(detailsTab);
 	}
 
-	public void addText(final LogRecord record){
+	public void addText(final LoggingEvent logEvent){
 		if (bPaused)
 			return;
 
 		try {
 			final Display display = RCMain.getRCMain().getDisplay();
 			if(display == null || display.isDisposed()) return;
-			display.asyncExec(new Runnable(){
-				public void run() {
+			display.asyncExec(new SWTSafeRunnable(){
+				public void runSafe() {
 
 					try{
 						if(consoleText == null || consoleText.isDisposed()) return;
@@ -729,9 +785,9 @@ public class ConsoleTab {
 									.getOffsetAtLine(PREFERRED_LINES), "");
 
 						final StringBuffer buf = new StringBuffer();
-						dateFormatter.format(record.getMillis(),buf,formatPos);
-						buf.append("{").append(record.getLoggerName()).append(" : ").append(record.getLevel()).append("} ");
-						buf.append(record.getMessage());
+						dateFormatter.format(logEvent.timeStamp,buf,formatPos);
+						buf.append("{").append(logEvent.getLoggerName()).append(" : ").append(logEvent.getLevel()).append("} ");
+						buf.append(logEvent.getMessage());
 						buf.append('\n');
 
 						if(buf.length() <=0 || buf.length() > 1000) return;
@@ -741,7 +797,7 @@ public class ConsoleTab {
 						int nbLinesNow = consoleText.getLineCount();
 
 
-						if(record.getLevel().intValue() == Level.WARNING.intValue())
+						if(logEvent.getLevel().toInt() == Level.WARN_INT)
 							consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
 									- nbLinesBefore, new Color(RCMain.getRCMain().getDisplay(),
 											GUI_Utilities.getRGB(
@@ -749,7 +805,7 @@ public class ConsoleTab {
 											)
 									)
 							);
-						else if(record.getLevel().intValue() == Level.SEVERE.intValue())
+						else if(logEvent.getLevel().toInt() == Level.ERROR_INT)
 							consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
 									- nbLinesBefore, new Color(RCMain.getRCMain().getDisplay(),
 											GUI_Utilities.getRGB(
@@ -757,7 +813,7 @@ public class ConsoleTab {
 											)
 									)
 							);
-						else if(record.getLoggerName().equalsIgnoreCase("lbms.azsmrc.debug"))
+						else if(logEvent.getLoggerName().equalsIgnoreCase("lbms.azsmrc.debug"))
 							consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
 									- nbLinesBefore, new Color(RCMain.getRCMain().getDisplay(),
 											GUI_Utilities.getRGB(
@@ -765,7 +821,7 @@ public class ConsoleTab {
 											)
 									)
 							);
-						else if(record.getLoggerName().equalsIgnoreCase("lbms.azsmrc.normal"))
+						else if(logEvent.getLoggerName().equalsIgnoreCase("lbms.azsmrc.normal"))
 							consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
 									- nbLinesBefore, new Color(RCMain.getRCMain().getDisplay(),
 											GUI_Utilities.getRGB(
@@ -794,41 +850,41 @@ public class ConsoleTab {
 
 	private int levelToInteger(Level level){
 		int value = 3;
-		int test = level.intValue();
-		if(test == Level.SEVERE.intValue())
+		int test = level.toInt();
+		if(test == Level.FATAL_INT)
 			value = 6;
-		else if(test == Level.WARNING.intValue())
+		else if(test == Level.ERROR_INT)
 			value = 5;
-		else if(test == Level.INFO.intValue())
+		else if(test == Level.WARN_INT)
 			value = 4;
-		else if(test == Level.CONFIG.intValue())
+		else if(test == Level.INFO_INT)
 			value = 3;
-		else if(test == Level.FINE.intValue())
+		else if(test == Level.DEBUG_INT)
 			value = 2;
-		else if(test == Level.FINER.intValue())
+		else if(test == Level.TRACE_INT)
 			value = 1;
-		else if(test == Level.FINEST.intValue())
+		else if(test == Level.ALL_INT)
 			value = 0;
 		return value;
 	}
 
 	private Level integerToLevel(int test){
-		Level level = Level.FINE;
+		Level level = Level.ALL;
 
 		if(test == 6)
-			level = Level.SEVERE;
+			level = Level.FATAL;
 		else if(test == 5)
-			level = Level.WARNING;
+			level = Level.ERROR;
 		else if(test == 4)
-			level = Level.INFO;
+			level = Level.WARN;
 		else if(test == 3)
-			level = Level.CONFIG;
+			level = Level.INFO;
 		else if(test == 2)
-			level = Level.FINE;
+			level = Level.DEBUG;
 		else if(test == 1)
-			level = Level.FINER;
+			level = Level.TRACE;
 		else if(test == 0)
-			level = Level.FINEST;
+			level = Level.ALL;
 		return level;
 	}
 

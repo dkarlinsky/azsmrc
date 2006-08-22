@@ -25,11 +25,6 @@ import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Formatter;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.net.ssl.SSLHandshakeException;
@@ -76,6 +71,9 @@ import lbms.tools.updater.Update;
 import lbms.tools.updater.UpdateListener;
 import lbms.tools.updater.Updater;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.helpers.Loader;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
@@ -94,8 +92,7 @@ import org.jdom.Element;
 
 public class RCMain implements Launchable {
 
-	public static final String LOGGER_NORMAL = "lbms.azsmrc.normal";
-	public static final String LOGGER_DEBUG = "lbms.azsmrc.debug";
+	public static final String LOGGER_ROOT = "lbms.azsmrc";
 	public static final String USER_DIR = System.getProperty("user.dir");
 	public static final String FSEP = System.getProperty("file.separator");
 
@@ -109,7 +106,7 @@ public class RCMain implements Launchable {
 	private Timer timer;
 	private TimerEventPeriodic updateTimer;
 	private boolean connect;
-	private Logger normalLogger, debugLogger;
+	private Logger logger;
 	private Updater updater;
 	private Proxy proxy;
 	private PluginManagerImpl pluginManager;
@@ -464,7 +461,7 @@ public class RCMain implements Launchable {
 					String str_minutes = is.open();
 					int mins = Integer.parseInt(str_minutes);
 					client.getDownloadManager().pauseDownloads(mins*60);
-					normalLogger.info("Pausing all downloads for " + mins*60  + " seconds (" + mins + " minutes)");
+					logger.info("Pausing all downloads for " + mins*60  + " seconds (" + mins + " minutes)");
 				}catch(Exception ex) {}
 
 
@@ -554,30 +551,8 @@ public class RCMain implements Launchable {
 			SplashScreen.open(display, 20);
 		}
 		SplashScreen.setProgressAndText("Creating Logger.",10);
-		normalLogger = Logger.getLogger(LOGGER_NORMAL);
-		debugLogger = Logger.getLogger(LOGGER_DEBUG);
-		normalLogger.setLevel(Level.FINEST);
-		debugLogger.setLevel(Level.FINEST);
-
-		Handler consoleHandler = new Handler() {
-			private Formatter sF = new Formatter() {
-				@Override
-				public String format(LogRecord record) {
-					return record.getMessage();
-				}
-			};
-			@Override
-			public void close() throws SecurityException {}
-			@Override
-			public void flush() {}
-			@Override
-			public void publish(LogRecord record) {
-				System.out.println(sF.format(record));
-			}
-		};
-
-		normalLogger.addHandler(consoleHandler);
-		debugLogger.addHandler(consoleHandler);
+		PropertyConfigurator.configure(Loader.getResource("log4j.properties"));
+		logger = Logger.getLogger(LOGGER_ROOT);
 
 		SplashScreen.setProgressAndText("Loading I18N.",15);
 		try {
@@ -603,13 +578,12 @@ public class RCMain implements Launchable {
 		SESecurityManager.getSingleton().addSecurityListner(new SESecurityManagerListener() {
 			public boolean trustCertificate(String ressource, X509Certificate x509_cert) {
 				// TODO Change it
-				debugLogger.fine("Trusting Certificate: "+ressource);
+				logger.debug("Trusting Certificate: "+ressource);
 				return true;
 			}
 		});
 		SplashScreen.setProgressAndText("Creating Client.",25);
 		client = new Client();
-		client.setDebugLogger(debugLogger);
 		client.setServer(properties.getProperty("connection_lastURL_0"));
 		client.setUsername(properties.getProperty("connection_username_0"));
 		client.setPassword(properties.getProperty("connection_password_0"));
@@ -655,7 +629,7 @@ public class RCMain implements Launchable {
 						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.failed") + " " + statusCode
 								+ I18N.translate(PFX + "mainwindow.statusbar.badUsername_badPassword"), SWT.COLOR_RED);
 					}
-					normalLogger.warning("Connection failed: " + statusCode + " Bad Username or Password");
+					logger.warn("Connection failed: " + statusCode + " Bad Username or Password");
 					MessageDialog.error(display,I18N.translate(PFX + "mainwindow.statusbar.failed")
 							,statusCode + " " + I18N.translate(PFX + "mainwindow.statusbar.badUsername_badPassword"));
 					disconnect();
@@ -663,13 +637,13 @@ public class RCMain implements Launchable {
 					if (mainWindow != null) {
 						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.failed") + " "+statusCode, SWT.COLOR_RED);
 					}
-					normalLogger.warning("Connection failed: "+statusCode);
+					logger.warn("Connection failed: "+statusCode);
 				}
 			}
 		});
 		client.addConnectionListener(new ConnectionListener() {
 			public void connectionState(final int state) {
-				debugLogger.finer("Connection State: "+state);
+				logger.trace("Connection State: "+state);
 				if(display != null)
 					display.syncExec(new SWTSafeRunnable() {
 						public void runSafe() {
@@ -679,7 +653,7 @@ public class RCMain implements Launchable {
 				if (state == ST_CONNECTION_ERROR) {
 					int delay = client.getFailedConnections()*30000;
 					delay = (delay>120000)?120000:delay;
-					debugLogger.finer("Connection failed "+client.getFailedConnections()+" times, delay: "+(delay/1000)+"sec");
+					logger.warn("Connection failed "+client.getFailedConnections()+" times, delay: "+(delay/1000)+"sec");
 					if (mainWindow != null)
 						updateTimer(true,delay);
 					else
@@ -711,11 +685,11 @@ public class RCMain implements Launchable {
 		});
 		client.getDownloadManager().addListener(new DownloadManagerListener() {
 			public void downloadAdded(Download download) {
-				 normalLogger.fine("Download Added: "+download.getName());
+				 logger.info("Download Added: "+download.getName());
 
 			}
 			public void downloadRemoved(Download download) {
-				normalLogger.fine("Download Removed: "+download.getName());
+				logger.info("Download Removed: "+download.getName());
 			};
 		});
 		client.addClientEventListener(new ClientEventListener() {
@@ -732,13 +706,13 @@ public class RCMain implements Launchable {
 					if (event.getAttributeValue("duration") != null) {
 						long duration = Long.parseLong(event.getAttributeValue("duration"));
 						String avgDl = (event.getAttributeValue("avgDownload") != null)?event.getAttributeValue("avgDownload") : "";
-						normalLogger.info(I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+" "+event.getAttributeValue("name")
+						logger.info(I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+" "+event.getAttributeValue("name")
 											+" "+I18N.translate(PFX  + "mainwindow.statusbar.downloadFinishedIn")+DisplayFormatters.formatTime(duration*1000)+" "+avgDl);
 						MessageDialog.message(display,I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished"),
 								event.getAttributeValue("name")+"\n"+I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+DisplayFormatters.formatTime(duration*1000)+" "+avgDl);
 					}
 					else {
-						normalLogger.info(I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+" "+event.getAttributeValue("name"));
+						logger.info(I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+" "+event.getAttributeValue("name"));
 						MessageDialog.message(display,I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished"),event.getAttributeValue("name"));
 					}
 					break;
@@ -747,20 +721,20 @@ public class RCMain implements Launchable {
 					if (mainWindow != null) {
 						mainWindow.setStatusBarText("Download Exception: "+msg, SWT.COLOR_RED);
 					}
-					normalLogger.severe("Download Exception: "+msg);
+					logger.error("Download Exception: "+msg);
 					break;
 
 				case RemoteConstants.EV_EXCEPTION:
 					if (mainWindow != null) {
 						mainWindow.setStatusBarText("Remote Exception: "+msg, SWT.COLOR_RED);
 					}
-					normalLogger.severe(I18N.translate(PFX + "mainwindow.statusbar.remoteException") + " " + msg);
+					logger.error(I18N.translate(PFX + "mainwindow.statusbar.remoteException") + " " + msg);
 					break;
 				case RemoteConstants.EV_UPDATE_AVAILABLE:
 					if (mainWindow != null) {
 						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.remoteUpdateAvailable"), SWT.COLOR_DARK_GREEN);
 					}
-					normalLogger.severe("Remote Update Available");
+					logger.info("Remote Update Available");
 					client.getRemoteUpdateManager().load();
 					break;
 				case RemoteConstants.EV_MESSAGE:
@@ -768,13 +742,13 @@ public class RCMain implements Launchable {
 						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.serverMessage") + ": " + msg);
 					}
 					MessageDialog.message(getDisplay(), I18N.translate(PFX + "mainwindow.statusbar.serverMessage"), msg);
-					normalLogger.info("Server Message: "+msg);
+					logger.debug("Server Message: "+msg);
 					break;
 				case RemoteConstants.EV_ERROR_MESSAGE:
 					if (mainWindow != null) {
 						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.serverErrorMessage") + ": " + msg, SWT.COLOR_RED);
 					}
-					normalLogger.severe("Server ErrorMessage: "+msg);
+					logger.error("Server ErrorMessage: "+msg);
 					MessageDialog.error(getDisplay(), I18N.translate(PFX + "mainwindow.statusbar.serverErrorMessage"), msg);
 					break;
 				}
@@ -785,7 +759,7 @@ public class RCMain implements Launchable {
 				if (e instanceof SSLHandshakeException) {
 					MessageDialog.message(display,true,5000,"Connection Error","Server doesn't support SSL.");
 					disconnect();
-					normalLogger.severe("Connection Error: Server doesn't support SSL.");
+					logger.error("Connection Error: Server doesn't support SSL.");
 				}
 			}
 		});
@@ -813,21 +787,21 @@ public class RCMain implements Launchable {
 				if (mainWindow != null) {
 					mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.updateException") + ": "+e.getLocalizedMessage(),SWT.COLOR_RED);
 				}
-				normalLogger.severe("Update Exception: "+e.getLocalizedMessage());
+				logger.error("Update Exception: "+e.getLocalizedMessage());
 
 			}
 			public void noUpdate() {
 				if (mainWindow != null) {
 					mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.noUpdateAvailable"));
 				}
-				normalLogger.info("No Update Available");
+				logger.info("No Update Available");
 			}
 			public void updateAvailable(final Update update) {
 				if (mainWindow != null) {
 					mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.updateAvailable")
 							+ " " + update.getVersion());
 				}
-				normalLogger.info("Update Available: Version "+update.getVersion());
+				logger.info("Update Available: Version "+update.getVersion());
 				if (properties.getPropertyAsBoolean("update.autoupdate")) {
 					updater.doUpdate();
 				}else{
@@ -844,13 +818,13 @@ public class RCMain implements Launchable {
 					mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.updateFailed")
 							+ ": " + reason,SWT.COLOR_RED);
 				}
-				normalLogger.info("Update Failed: "+reason);
+				logger.info("Update Failed: "+reason);
 			}
 			public void updateFinished() {
 				if (mainWindow != null) {
 					mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.updateFinished"));
 				}
-				normalLogger.info("Update Finished");
+				logger.info("Update Finished");
 			}
 
 			public void updateError(String error) {
@@ -858,7 +832,7 @@ public class RCMain implements Launchable {
 					mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.updateError")
 							+ ": " + error,SWT.COLOR_RED);
 				}
-				normalLogger.info("Update Error: "+error);
+				logger.info("Update Error: "+error);
 			}
 			public void initializeUpdate(lbms.tools.Download[] dls) {
 				UpdateProgressDialog.initialize(dls);
@@ -870,7 +844,7 @@ public class RCMain implements Launchable {
 				if (mainWindow != null) {
 					mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.checking"));
 				}
-				normalLogger.info("Checking for Updates");
+				logger.info("Checking for Updates");
 				updater.checkForUpdates(properties.getPropertyAsBoolean("update.beta"));
 				properties.setProperty("update.lastcheck",System.currentTimeMillis());
 			}
@@ -921,7 +895,7 @@ public class RCMain implements Launchable {
 	}
 
 	public void connect(boolean open) {
-		debugLogger.finer("Connect!");
+		logger.debug("Connect!");
 		connect = true;
 		client.connect();
 		/*client.sendGetPluginsFlexyConf();*/
@@ -930,7 +904,7 @@ public class RCMain implements Launchable {
 	}
 
 	public void disconnect() {
-		debugLogger.finer("Disconnect!");
+		logger.debug("Disconnect!");
 		connect = false;
 		client.disconnect();
 		stopUpdateTimer();
@@ -949,12 +923,12 @@ public class RCMain implements Launchable {
 		if (!connect) return;
 
 		if (updateTimer != null) updateTimer.cancel();
-		debugLogger.finer("Changing Timer: "+(open?"GUI mode":"Tray mode"));
+		logger.debug("Changing Timer: "+(open?"GUI mode":"Tray mode"));
 		if (open) {
 			updateTimer = timer.addPeriodicEvent(properties.getPropertyAsLong("connection_interval_open")+delay,
 				new TimerEventPerformer() {
 				public void perform(TimerEvent event) {
-					debugLogger.finest("Timer: GUI mode");
+					logger.trace("Timer: GUI mode");
 					client.getDownloadManager().update(false);
 				}
 			});
@@ -963,7 +937,7 @@ public class RCMain implements Launchable {
 			updateTimer = timer.addPeriodicEvent(properties.getPropertyAsLong("connection_interval_closed")+delay,
 				new TimerEventPerformer() {
 				public void perform(TimerEvent event) {
-					debugLogger.finest("Timer: Tray mode");
+					logger.trace("Timer: Tray mode");
 					client.sendGetGlobalStats();
 				}
 			});
@@ -1018,20 +992,6 @@ public class RCMain implements Launchable {
 
 	public Timer getMainTimer () {
 		return timer;
-	}
-
-	/**
-	 * @return Returns the debugLogger.
-	 */
-	public Logger getDebugLogger() {
-		return debugLogger;
-	}
-
-	/**
-	 * @return Returns the normalLogger.
-	 */
-	public Logger getNormalLogger() {
-		return normalLogger;
 	}
 
 	public ExtendedProperties getProperties() {
@@ -1168,7 +1128,7 @@ public class RCMain implements Launchable {
 
 	private void loadSound (Sound key, String snd) {
 		if (snd == null || snd.equals("")) {
-			debugLogger.info("Couldn't Load "+key+" because location was empty.");
+			logger.warn("Couldn't Load "+key+" because location was empty.");
 			return;
 		}
 		File sndFile = new File (snd);
@@ -1180,7 +1140,7 @@ public class RCMain implements Launchable {
 				e.printStackTrace();
 			}
 		} else {
-			debugLogger.info("Couldn't Load "+key+" from "+snd);
+			logger.warn("Couldn't Load "+key+" from "+snd);
 		}
 	}
 
@@ -1258,7 +1218,7 @@ public class RCMain implements Launchable {
 								Iterator iter = list.iterator();
 								while(iter.hasNext()){
 									File file = (File) iter.next();
-									debugLogger.fine("*******FILE****" + file.getPath());
+									logger.trace("*******FILE****" + file.getPath());
 								}
 
 							}catch(Exception e){

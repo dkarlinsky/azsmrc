@@ -13,10 +13,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
-import java.util.logging.Formatter;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -48,6 +44,7 @@ import lbms.azsmrc.shared.RemoteConstants;
 import lbms.tools.stats.StatsInputStream;
 import lbms.tools.stats.StatsOutputStream;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -78,7 +75,7 @@ public class Client {
 	private TimerEvent transactionTimeout;
 	private Timer timer;
 	private int failedConnections;
-	private Logger debug;
+	private static Logger logger;
 	private boolean connect;
 
 	//special send variables
@@ -127,23 +124,7 @@ public class Client {
 		timer 	= new Timer("Client Timer",1);
 		ssl 	= false;
 		fastMode = false;
-		debug = Logger.getLogger("lbms.azsmrc.client");
-		debug.addHandler(new Handler() {
-			private Formatter sF = new Formatter() {
-				@Override
-				public String format(LogRecord record) {
-					return record.getMessage();
-				}
-			};
-			@Override
-			public void close() throws SecurityException {}
-			@Override
-			public void flush() {}
-			@Override
-			public void publish(LogRecord record) {
-				System.out.println(sF.format(record));
-			}
-		});
+		logger = Logger.getLogger("lbms.azsmrc.client");
 	}
 
 	private void reset() {
@@ -183,11 +164,11 @@ public class Client {
 	 */
 	public void transactionStart() {
 		transaction = true;
-		debug.fine("Transaction Started");
+		logger.trace("Transaction Started");
 		if (transactionTimeout != null) transactionTimeout.cancel();
 		transactionTimeout = timer.addEvent(System.currentTimeMillis()+TRANSACTION_TIMEOUT, new TimerEventPerformer() {
 			public void perform(TimerEvent event) {
-				debug.warning("Transaction Committed by Timeout.");
+				logger.warn("Transaction Committed by Timeout.");
 				transactionCommit();
 			}
 		});
@@ -201,7 +182,7 @@ public class Client {
 	public void transactionCommit() {
 		if (transactionTimeout != null) transactionTimeout.cancel();
 		transaction = false;
-		debug.fine("Transaction Committed ("+transactionQueue.size()+" items)");
+		logger.trace("Transaction Committed ("+transactionQueue.size()+" items)");
 		send();
 	}
 
@@ -217,7 +198,7 @@ public class Client {
 		new Thread(new Runnable() {
 			public void run() {
 				if (!semaphore.tryAcquire()) {
-					debug.finer("Client connection already established, postponed transfer.");
+					logger.debug("Client connection already established, postponed transfer.");
 					return;
 				}
 				Document reqDoc = new Document();
@@ -249,7 +230,7 @@ public class Client {
 				semaphore.release();
 				//if new elements are in the queue and fastmode is on send again
 				if (fastMode && transactionQueue.peek()!=null) {
-					debug.fine("FastMode Send");
+					logger.debug("FastMode Send");
 					send();
 				}
 			}
@@ -308,11 +289,11 @@ public class Client {
 						is = sis;
 					}
 					try {
-						debug.finest("\nRequest ("+DisplayFormatters.formatByteCountToBase10KBEtc(sos.getBytesWritten())+"):");
+						logger.trace("Request ("+DisplayFormatters.formatByteCountToBase10KBEtc(sos.getBytesWritten())+"):");
 						new XMLOutputter(Format.getPrettyFormat()).output(req, System.out);		//Request
 						SAXBuilder builder = new SAXBuilder();
 						Document xmlDom = builder.build(is);
-						debug.finest("\nResponse ("+DisplayFormatters.formatByteCountToBase10KBEtc(sis.getBytesRead())+" "+(System.currentTimeMillis()-startTime) +"msec):");
+						logger.trace("Response ("+DisplayFormatters.formatByteCountToBase10KBEtc(sis.getBytesRead())+" "+(System.currentTimeMillis()-startTime) +"msec):");
 						new XMLOutputter(Format.getPrettyFormat()).output(xmlDom, System.out);	//Response
 						System.out.println();
 						responseManager.handleResponse(xmlDom);
@@ -326,7 +307,7 @@ public class Client {
 				} catch (SSLException e) {
 					if ( i == 0 ){
 						if ( SESecurityManager.getSingleton().installServerCertificates( server ) != null ){
-							debug.fine("Installing Certificate");
+							logger.debug("Installing Certificate");
 							continue;	// retry with new certificate
 						}
 					}
@@ -1138,15 +1119,6 @@ public class Client {
 			useProxy = true;
 		}
 	}
-
-
-	/**
-	 * @param debug The debug Logger to set.
-	 */
-	public void setDebugLogger(Logger debug) {
-		this.debug = debug;
-	}
-
 
 	/**
 	 * @return Returns the failedConnections.
