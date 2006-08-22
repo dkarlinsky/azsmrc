@@ -430,7 +430,7 @@ public class DownloadManagerShell {
 		menuUpdate.setText("Check for &Updates");
 		menuUpdate.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
-				RCMain.getRCMain().getUpdater().checkForUpdates(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("update.beta", "false")));
+				RCMain.getRCMain().getUpdater().checkForUpdates(RCMain.getRCMain().getProperties().getPropertyAsBoolean("update.beta"));
 				RCMain.getRCMain().getProperties().setProperty("update.lastcheck",System.currentTimeMillis());
 				RCMain.getRCMain().saveConfig();
 			}
@@ -920,14 +920,14 @@ public class DownloadManagerShell {
 							if(myTorrents != null || !myTorrents.isDisposed()){
 								if(bSingleUserMode){
 
-									if(RCMain.getRCMain().getProperties().getPropertyAsBoolean("mainwindow.showHost",false)){
+									if(RCMain.getRCMain().getProperties().getPropertyAsBoolean("mainwindow.showHost")){
 										myTorrents.setText("ALL Torrents: " + RCMain.getRCMain().getClient().getServer().getHost());
 									}else
 										myTorrents.setText("ALL Torrents");
 
 
 								}else if(userLoggedIn != null)
-									if(RCMain.getRCMain().getProperties().getPropertyAsBoolean("mainwindow.showHost",false)){
+									if(RCMain.getRCMain().getProperties().getPropertyAsBoolean("mainwindow.showHost")){
 										myTorrents.setText(userLoggedIn + "'s Torrents: " + RCMain.getRCMain().getClient().getServer().getHost());
 									}else
 										myTorrents.setText(userLoggedIn + "'s Torrents");
