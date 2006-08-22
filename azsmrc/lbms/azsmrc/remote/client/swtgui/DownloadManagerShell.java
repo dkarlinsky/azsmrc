@@ -1752,19 +1752,15 @@ public class DownloadManagerShell {
 		initializeConnection();
 
 		//open shell
-		if(!RCMain.getRCMain().getProperties().containsKey("DMS_SIZE_x"))
-			GUI_Utilities.centerShellandOpen(DOWNLOAD_MANAGER_SHELL);
-		else{
-			properties = RCMain.getRCMain().getProperties();
-			int size_x = Integer.parseInt(properties.getProperty("DMS_SIZE_x"));
-			int size_y = Integer.parseInt(properties.getProperty("DMS_SIZE_y"));
-			int position_x = Integer.parseInt(properties.getProperty("DMS_POSITION_x"));
-			int position_y = Integer.parseInt(properties.getProperty("DMS_POSITION_y"));
-			System.out.println("Open: " + size_x + " : "+size_y + " : " + position_x + " : " + position_y);
-			DOWNLOAD_MANAGER_SHELL.setSize (size_x, size_y);
-			DOWNLOAD_MANAGER_SHELL.setLocation (position_x, position_y);
-			DOWNLOAD_MANAGER_SHELL.open();
-		}
+		properties = RCMain.getRCMain().getProperties();
+		int size_x = Integer.parseInt(properties.getProperty("DMS_SIZE_x"));
+		int size_y = Integer.parseInt(properties.getProperty("DMS_SIZE_y"));
+		int position_x = Integer.parseInt(properties.getProperty("DMS_POSITION_x"));
+		int position_y = Integer.parseInt(properties.getProperty("DMS_POSITION_y"));
+		//System.out.println("Open: " + size_x + " : "+size_y + " : " + position_x + " : " + position_y);
+		DOWNLOAD_MANAGER_SHELL.setSize (size_x, size_y);
+		DOWNLOAD_MANAGER_SHELL.setLocation (position_x, position_y);
+		DOWNLOAD_MANAGER_SHELL.open();
 
 		try {
 			//createDropTarget(DOWNLOAD_MANAGER_SHELL);
