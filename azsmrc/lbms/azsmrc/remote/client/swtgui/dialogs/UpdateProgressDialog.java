@@ -14,6 +14,7 @@ import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.remote.client.util.TimerEvent;
 import lbms.azsmrc.remote.client.util.TimerEventPerformer;
 import lbms.azsmrc.remote.client.util.TimerEventPeriodic;
+import lbms.azsmrc.shared.SWTSafeRunnable;
 import lbms.tools.Download;
 import lbms.tools.DownloadListener;
 import lbms.tools.stats.StatsStreamGlobalManager;
@@ -124,8 +125,8 @@ public class UpdateProgressDialog {
 		speedUpdateTimer = RCMain.getRCMain().getMainTimer().addPeriodicEvent(500, new TimerEventPerformer() {
 			String label = I18N.translate(PFX+"speedPerSec");
 			public void perform(TimerEvent event) {
-				display.asyncExec(new Runnable () {
-					public void run() {
+				display.asyncExec(new SWTSafeRunnable () {
+					public void runSafe() {
 						if(speedLabel != null && !speedLabel.isDisposed()) {
 							speedLabel.setText(label+" "
 									+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(
@@ -203,8 +204,8 @@ public class UpdateProgressDialog {
 	 * @param intStat based on UpdateProgressListener
 	 */
 	public void setStatusLabel(final int intStat){
-		display.syncExec(new Runnable(){
-			public void run() {
+		display.syncExec(new SWTSafeRunnable(){
+			public void runSafe() {
 				if(statusLabel != null && !statusLabel.isDisposed()){
 						statusLabel.setText(I18N.translate(PFX + "status." + intStat));
 				}
@@ -222,8 +223,8 @@ public class UpdateProgressDialog {
 	public static UpdateProgressDialog initialize(Download[] dls) {
 		Display dis = RCMain.getRCMain().getDisplay();
 		final UpdateProgressDialog upd = new UpdateProgressDialog (dls, dis);
-		dis.syncExec(new Runnable() {
-			public void run() {
+		dis.syncExec(new SWTSafeRunnable() {
+			public void runSafe() {
 				upd.createContents();
 				upd.initDownloads();
 			}
@@ -327,8 +328,8 @@ public class UpdateProgressDialog {
 					if (newState == Download.STATE_FINISHED
 							|| newState == Download.STATE_FAILURE
 							|| newState == Download.STATE_ABORTED) {
-						display.asyncExec(new Runnable(){
-							public void run() {
+						display.asyncExec(new SWTSafeRunnable(){
+							public void runSafe() {
 								cancelButton.setEnabled(false);
 							}
 						});
@@ -337,8 +338,8 @@ public class UpdateProgressDialog {
 
 				public void updateLabel() {
 					if(display == null || display.isDisposed()) return;
-					display.asyncExec(new Runnable(){
-						public void run() {
+					display.asyncExec(new SWTSafeRunnable(){
+						public void runSafe() {
 							if(progressLabel != null && !progressLabel.isDisposed()){
 								progressLabel.setText(I18N.translate(PFX + "dlstate."+lastState)+ " - "
 										+ DisplayFormatters.formatByteCountToBase10KBEtc(lastBytesRead)+" / "
