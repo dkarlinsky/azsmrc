@@ -87,8 +87,8 @@ public class ConsoleTab {
 
 	private Level normalLevel = Level.DEBUG;
 
-	private Logger normalLogger;
-	private Logger debugLogger;
+	private Logger rootLogger;
+
 
 	//I18N prefix
 	public static final String PFX = "tab.consoletab.";
@@ -190,7 +190,7 @@ public class ConsoleTab {
 	private ConsoleTab(CTabFolder parentTab){
 		final CTabItem detailsTab = new CTabItem(parentTab, SWT.CLOSE);
 		detailsTab.setText(I18N.translate(PFX + "tab.text"));
-		normalLogger = Logger.getLogger(RCMain.LOGGER_ROOT);
+		rootLogger = Logger.getLogger(RCMain.LOGGER_ROOT);
 
 		final Properties props = RCMain.getRCMain().getProperties();
 
@@ -200,7 +200,7 @@ public class ConsoleTab {
 		PREFERRED_LINES = Integer.parseInt(props.getProperty("console_lines","250"));
 		MAX_LINES = 512 + PREFERRED_LINES;
 
-		if (bShowNormal)	normalLogger.addAppender(consoleAppender);
+		if (bShowNormal)	rootLogger.addAppender(consoleAppender);
 
 		final Composite parent = new Composite(parentTab, SWT.NONE);
 		parent.setLayout(new GridLayout(1,false));
@@ -271,10 +271,10 @@ public class ConsoleTab {
 				bPaused = btn.getSelection();
 				if (bPaused) {
 					try{
-						normalLogger.removeAppender(consoleAppender);
+						rootLogger.removeAppender(consoleAppender);
 					}catch (Exception notToUse){}
 				}else{
-					if (bShowNormal)    normalLogger.addAppender(consoleAppender);
+					if (bShowNormal)    rootLogger.addAppender(consoleAppender);
 				}
 			}
 		});
@@ -464,47 +464,6 @@ public class ConsoleTab {
 
 
 
-		Group cMiddle = new Group(panel, SWT.NULL);
-		layout = new GridLayout();
-		layout.marginHeight = 0;
-		layout.marginWidth = 0;
-		layout.verticalSpacing = 1;
-		cMiddle.setLayout(layout);
-		gd = new GridData(GridData.VERTICAL_ALIGN_FILL);
-		cMiddle.setLayoutData(gd);
-		cMiddle.setText(I18N.translate(PFX + "cMiddle.group.text"));
-
-		Button buttonShowDebug = new Button(cMiddle, SWT.CHECK);
-		buttonShowDebug.setText(I18N.translate(PFX + "cMiddle.buttonShowDebug.text"));
-		gd = new GridData();
-		buttonShowDebug.setLayoutData(gd);
-		buttonShowDebug.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				if (e.widget == null || !(e.widget instanceof Button))
-					return;
-				Button btn = (Button) e.widget;
-				bShowDebug = btn.getSelection();
-				props.setProperty("logger.debug.show", bShowDebug ? "true" : "false");
-				RCMain.getRCMain().saveConfig();
-			}
-		});
-		buttonShowDebug.setSelection(bShowDebug);
-
-		Button buttonShowNormal = new Button(cMiddle, SWT.CHECK);
-		buttonShowNormal.setText(I18N.translate(PFX + "cMiddle.buttonShowNormal.text"));
-		gd = new GridData();
-		buttonShowNormal.setLayoutData(gd);
-		buttonShowNormal.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				if (e.widget == null || !(e.widget instanceof Button))
-					return;
-				Button btn = (Button) e.widget;
-				bShowNormal = btn.getSelection();
-				props.setProperty("logger.normal.show", bShowNormal ? "true" : "false");
-				RCMain.getRCMain().saveConfig();
-			}
-		});
-		buttonShowNormal.setSelection(bShowNormal);
 
 
 		Group cEnd = new Group(panel, SWT.NULL);
@@ -518,71 +477,7 @@ public class ConsoleTab {
 		cEnd.setLayoutData(gd);
 		cEnd.setText(I18N.translate(PFX + "cEnd.group.text"));
 
-		Label debuglabel = new Label(cEnd,SWT.NULL);
-		debuglabel.setText(I18N.translate(PFX + "cEnd.debuglabel.text"));
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 2;
-		debuglabel.setLayoutData(gd);
 
-
-		/*final Combo debugCombo = new Combo(cEnd, SWT.DROP_DOWN | SWT.READ_ONLY);
-		debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.7"));
-		debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.6"));
-		debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.5"));
-		debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.4"));
-		debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.3"));
-		debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.2"));
-		debugCombo.add(I18N.translate(PFX + "cEnd.combo.text.1"));
-		debugCombo.select(levelToInteger(debugLevel));
-		debugCombo.addSelectionListener(new SelectionListener(){
-			public void widgetSelected(SelectionEvent arg0) {
-				debugLevel = integerToLevel(debugCombo.getSelectionIndex());
-				props.setProperty("logger.debug.level", debugLevel.toString());
-				RCMain.getRCMain().saveConfig();
-			}
-			public void widgetDefaultSelected(SelectionEvent arg0) {
-			}
-
-		});*/
-
-		final Label debugColor = new Label(cEnd, SWT.BORDER);
-		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
-		gd.horizontalSpan = 1;
-		gd.widthHint = 20;
-		debugColor.setLayoutData(gd);
-		debugColor.setToolTipText(I18N.translate(PFX + "choose.color.label"));
-		debugColor.setCursor(RCMain.getRCMain().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
-		debugColor.setBackground(
-				new Color(RCMain.getRCMain().getDisplay(),
-						GUI_Utilities.getRGB(
-								RCMain.getRCMain().getProperties().getProperty("debug.color", "r192g192b192")
-						)
-				)
-		);
-
-		debugColor.addMouseListener(new MouseListener(){
-
-			public void mouseDoubleClick(MouseEvent arg0) {
-				RCMain.getRCMain().getProperties().setProperty("debug.color",
-						GUI_Utilities.colorChooserDialog(
-								GUI_Utilities.getRGB(
-										RCMain.getRCMain().getProperties().getProperty("debug.color", "r192g192b192")
-								)
-						)
-				);
-				RCMain.getRCMain().saveConfig();
-				debugColor.setBackground(
-						new Color(RCMain.getRCMain().getDisplay(),
-								GUI_Utilities.getRGB(
-										RCMain.getRCMain().getProperties().getProperty("debug.color", "r192g192b192")
-								)
-						)
-				);
-
-			}
-			public void mouseDown(MouseEvent arg0) {}
-			public void mouseUp(MouseEvent arg0) {}
-		});
 
 
 		Label normallabel = new Label(cEnd,SWT.NULL);
@@ -759,7 +654,7 @@ public class ConsoleTab {
 		detailsTab.addDisposeListener(new DisposeListener (){
 
 			public void widgetDisposed(DisposeEvent arg0) {
-				normalLogger.removeAppender(consoleAppender);
+				rootLogger.removeAppender(consoleAppender);
 			}
 		});
 
@@ -813,15 +708,7 @@ public class ConsoleTab {
 											)
 									)
 							);
-						else if(logEvent.getLoggerName().equalsIgnoreCase("lbms.azsmrc.debug"))
-							consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
-									- nbLinesBefore, new Color(RCMain.getRCMain().getDisplay(),
-											GUI_Utilities.getRGB(
-													RCMain.getRCMain().getProperties().getProperty("debug.color", "r192g192b192")
-											)
-									)
-							);
-						else if(logEvent.getLoggerName().equalsIgnoreCase("lbms.azsmrc.normal"))
+						else
 							consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
 									- nbLinesBefore, new Color(RCMain.getRCMain().getDisplay(),
 											GUI_Utilities.getRGB(
