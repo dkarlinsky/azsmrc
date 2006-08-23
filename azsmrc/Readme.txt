@@ -129,8 +129,8 @@ from there
 If you want to use SSL encrypted communication you need to create a
 SSL certificate first. To do that open Azureus and go to
 Tools->Options->Security and create a certificate.
-You need the tools.jar this files is distributed in the Java SDK.
-If you have done that enable SSL in AzSMRC settings and restart Azureus.
+You will need the tools.jar file that is distributed in the Java SDK.
+If you have done that, enable SSL in AzSMRC settings and restart Azureus.
 Don't forget to enable SSL in the client too.
 
 5.  Manually starting the remote client
@@ -155,6 +155,11 @@ java -classpath launcher.jar lbms.tools.launcher.Launcher
 - If a user is heavily restricted (does not have normal user access) in Windows, then
 the system clipboard monitor feature will not work as that user does not have access
 to the 'system clipboard'
+
+- AzSMRC can now run without the tray icon.  If you are using AzSMRC in this way, be
+sure to not enable "Exiting the main window will send it to the tray" or "Minimizing
+the main window will send it to the tray" in the options as this would hide AzSMRC from
+the user so much so that you would have to kill the AzSMRC process manually.
 
 
 7.	Website
