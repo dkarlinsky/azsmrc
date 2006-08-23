@@ -250,7 +250,6 @@ public class ConsoleTab {
 		});
 
 
-
 		Menu menu = new Menu (panel.getShell(), SWT.POP_UP);
 		MenuItem item1 = new MenuItem (menu, SWT.PUSH);
 		item1.setText (I18N.translate(PFX + "menu.copy"));
@@ -543,7 +542,7 @@ public class ConsoleTab {
 		normalColor.setBackground(
 				new Color(RCMain.getRCMain().getDisplay(),
 						GUI_Utilities.getRGB(
-								RCMain.getRCMain().getProperties().getProperty("normal.color", "r000g255b000")
+								RCMain.getRCMain().getProperties().getProperty("root.color")
 						)
 				)
 		);
@@ -551,10 +550,10 @@ public class ConsoleTab {
 		normalColor.addMouseListener(new MouseListener(){
 
 			public void mouseDoubleClick(MouseEvent arg0) {
-				RCMain.getRCMain().getProperties().setProperty("normal.color",
+				RCMain.getRCMain().getProperties().setProperty("root.color",
 						GUI_Utilities.colorChooserDialog(
 								GUI_Utilities.getRGB(
-										RCMain.getRCMain().getProperties().getProperty("normal.color", "r000g255b000")
+										RCMain.getRCMain().getProperties().getProperty("root.color")
 								)
 						)
 				);
@@ -562,7 +561,7 @@ public class ConsoleTab {
 				normalColor.setBackground(
 						new Color(RCMain.getRCMain().getDisplay(),
 								GUI_Utilities.getRGB(
-										RCMain.getRCMain().getProperties().getProperty("normal.color", "r000g255b000")
+										RCMain.getRCMain().getProperties().getProperty("root.color")
 								)
 						)
 				);
@@ -585,6 +584,52 @@ public class ConsoleTab {
 		gAlert.setLayoutData(gd);
 		gAlert.setText(I18N.translate(PFX + "gAlert.group.text"));
 
+		Label infoL = new Label(gAlert,SWT.NULL);
+		infoL.setText(I18N.translate(PFX + "gAlert.info.text"));
+
+		final Label info = new Label(gAlert,SWT.BORDER);
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
+		gd.horizontalSpan = 1;
+		gd.widthHint = 20;
+		info.setLayoutData(gd);
+		info.setToolTipText(I18N.translate(PFX + "choose.color.label"));
+		info.setCursor(RCMain.getRCMain().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+		info.setBackground(
+				new Color(RCMain.getRCMain().getDisplay(),
+						GUI_Utilities.getRGB(
+								RCMain.getRCMain().getProperties().getProperty("info.color")
+						)
+				)
+		);
+
+		info.addMouseListener(new MouseListener(){
+
+			public void mouseDoubleClick(MouseEvent arg0) {
+				RCMain.getRCMain().getProperties().setProperty("info.color",
+						GUI_Utilities.colorChooserDialog(
+								GUI_Utilities.getRGB(
+										RCMain.getRCMain().getProperties().getProperty("info.color")
+								)
+						)
+				);
+				RCMain.getRCMain().saveConfig();
+				info.setBackground(
+						new Color(RCMain.getRCMain().getDisplay(),
+								GUI_Utilities.getRGB(
+										RCMain.getRCMain().getProperties().getProperty("info.color")
+								)
+						)
+				);
+
+			}
+			public void mouseDown(MouseEvent arg0) {}
+			public void mouseUp(MouseEvent arg0) {}
+		});
+
+
+
+
+
 		Label warningL = new Label(gAlert,SWT.NULL);
 		warningL.setText(I18N.translate(PFX + "gAlert.warning.text"));
 
@@ -598,7 +643,7 @@ public class ConsoleTab {
 		warning.setBackground(
 				new Color(RCMain.getRCMain().getDisplay(),
 						GUI_Utilities.getRGB(
-								RCMain.getRCMain().getProperties().getProperty("warning.color", "r255g255b000")
+								RCMain.getRCMain().getProperties().getProperty("warning.color")
 						)
 				)
 		);
@@ -609,7 +654,7 @@ public class ConsoleTab {
 				RCMain.getRCMain().getProperties().setProperty("warning.color",
 						GUI_Utilities.colorChooserDialog(
 								GUI_Utilities.getRGB(
-										RCMain.getRCMain().getProperties().getProperty("warning.color", "r255g255b000")
+										RCMain.getRCMain().getProperties().getProperty("warning.color")
 								)
 						)
 				);
@@ -617,7 +662,7 @@ public class ConsoleTab {
 				warning.setBackground(
 						new Color(RCMain.getRCMain().getDisplay(),
 								GUI_Utilities.getRGB(
-										RCMain.getRCMain().getProperties().getProperty("warning.color", "r255g255b000")
+										RCMain.getRCMain().getProperties().getProperty("warning.color")
 								)
 						)
 				);
@@ -626,6 +671,10 @@ public class ConsoleTab {
 			public void mouseDown(MouseEvent arg0) {}
 			public void mouseUp(MouseEvent arg0) {}
 		});
+
+
+
+
 
 
 		Label severeL = new Label(gAlert,SWT.NULL);
@@ -641,7 +690,7 @@ public class ConsoleTab {
 		severe.setBackground(
 				new Color(RCMain.getRCMain().getDisplay(),
 						GUI_Utilities.getRGB(
-								RCMain.getRCMain().getProperties().getProperty("severe.color", "r255g000b000")
+								RCMain.getRCMain().getProperties().getProperty("severe.color")
 						)
 				)
 		);
@@ -652,7 +701,7 @@ public class ConsoleTab {
 				RCMain.getRCMain().getProperties().setProperty("severe.color",
 						GUI_Utilities.colorChooserDialog(
 								GUI_Utilities.getRGB(
-										RCMain.getRCMain().getProperties().getProperty("severe.color", "r255g000b000")
+										RCMain.getRCMain().getProperties().getProperty("severe.color")
 								)
 						)
 				);
@@ -660,7 +709,7 @@ public class ConsoleTab {
 				severe.setBackground(
 						new Color(RCMain.getRCMain().getDisplay(),
 								GUI_Utilities.getRGB(
-										RCMain.getRCMain().getProperties().getProperty("severe.color", "r255g000b000")
+										RCMain.getRCMain().getProperties().getProperty("severe.color")
 								)
 						)
 				);
@@ -722,7 +771,7 @@ public class ConsoleTab {
 							consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
 									- nbLinesBefore, new Color(RCMain.getRCMain().getDisplay(),
 											GUI_Utilities.getRGB(
-													RCMain.getRCMain().getProperties().getProperty("warning.color", "r255g255b000")
+													RCMain.getRCMain().getProperties().getProperty("warning.color")
 											)
 									)
 							);
@@ -730,7 +779,16 @@ public class ConsoleTab {
 							consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
 									- nbLinesBefore, new Color(RCMain.getRCMain().getDisplay(),
 											GUI_Utilities.getRGB(
-													RCMain.getRCMain().getProperties().getProperty("severe.color", "r255g000b000")
+													RCMain.getRCMain().getProperties().getProperty("severe.color")
+											)
+									)
+							);
+
+						else if(logEvent.getLevel().toInt() == Level.INFO_INT)
+							consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
+									- nbLinesBefore, new Color(RCMain.getRCMain().getDisplay(),
+											GUI_Utilities.getRGB(
+													RCMain.getRCMain().getProperties().getProperty("info.color")
 											)
 									)
 							);
@@ -738,7 +796,7 @@ public class ConsoleTab {
 							consoleText.setLineBackground(nbLinesBefore - 1, nbLinesNow
 									- nbLinesBefore, new Color(RCMain.getRCMain().getDisplay(),
 											GUI_Utilities.getRGB(
-													RCMain.getRCMain().getProperties().getProperty("normal.color", "r000g255b000")
+													RCMain.getRCMain().getProperties().getProperty("root.color")
 											)
 									)
 							);

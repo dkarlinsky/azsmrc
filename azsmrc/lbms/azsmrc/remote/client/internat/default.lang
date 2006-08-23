@@ -295,6 +295,7 @@ tab.consoletab.cEnd.group.text=Filter amount shown in the console
 tab.consoletab.cEnd.normalLabel.text=Log Level Displayed:
 tab.consoletab.choose.color.label=Double Click to choose color
 tab.consoletab.gAlert.group.text=Alert Color Settings
+tab.consoletab.gAlert.info.text=Info:
 tab.consoletab.gAlert.severe.text=Error:
 tab.consoletab.gAlert.warning.text=Warning:
 tab.consoletab.labelHistory.text=History Size
