@@ -800,8 +800,8 @@ public class ConsoleTab {
 	public static void open(final CTabFolder parentTab, final boolean bIsFocused){
 		Display display = RCMain.getRCMain().getDisplay();
 		if(display == null) return;
-		display.syncExec(new Runnable(){
-			public void run() {
+		display.syncExec(new SWTSafeRunnable(){
+			public void runSafe() {
 				CTabItem[] tabs = parentTab.getItems();
 				for(CTabItem tab:tabs){
 					if(tab.getText().equalsIgnoreCase(I18N.translate(PFX + "tab.text"))){
