@@ -53,6 +53,8 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
@@ -246,6 +248,31 @@ public class ConsoleTab {
 					buttonAutoScroll.setSelection(false);
 			}
 		});
+
+
+
+		Menu menu = new Menu (panel.getShell(), SWT.POP_UP);
+		MenuItem item1 = new MenuItem (menu, SWT.PUSH);
+		item1.setText (I18N.translate(PFX + "menu.copy"));
+		item1.addSelectionListener(new SelectionListener(){
+
+			public void widgetDefaultSelected(SelectionEvent arg0) {}
+
+
+
+			public void widgetSelected(SelectionEvent arg0) {
+				String selection = consoleText.getSelectionText();
+				if (selection.length() == 0) return;
+				RCMain.getRCMain().setAWTClipboardString(selection);
+
+			}
+		});
+
+
+
+
+
+		consoleText.setMenu(menu);
 
 		final Composite cLeft = new Composite(panel, SWT.NULL);
 		GridLayout layout = new GridLayout();

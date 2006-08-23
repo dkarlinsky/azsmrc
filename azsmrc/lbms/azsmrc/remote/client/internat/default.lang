@@ -298,6 +298,7 @@ tab.consoletab.gAlert.group.text=Alert Color Settings
 tab.consoletab.gAlert.severe.text=Error:
 tab.consoletab.gAlert.warning.text=Warning:
 tab.consoletab.labelHistory.text=History Size
+tab.consoletab.menu.copy=Copy Selected Text to Clipboard
 tab.consoletab.tab.text=Console
 tab.consoletab.writeToFile.error.text=Your computer is reporting that the selected file cannot be written to, please retry this operation and select a different file
 tab.consoletab.writeToFile.filedialog.duplicatemessage.button.append=Append
