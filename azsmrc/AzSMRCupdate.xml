@@ -2,15 +2,16 @@
 <Updates>
   <Update url="http://azsmrc.sourceforge.net" version="0.9.8" type="1" importance="50">
     <Changelog>
-      <BugFix>Don't crash anymore if systray is not available</BugFix>
+      <BugFix>AzSMRC will not crash anymore if systray is not available</BugFix>
       <Feature>Open-With support in Windows (it is suggested that you download and install the Setup.exe)</Feature>
-      <Feature>enable to force Single Instance</Feature>
-      <Feature>enhanced SplashScreen</Feature>
-      <Feature>Show average speed in DownloadFinished message</Feature>
+      <Feature>Ability to allow only one instance of AzSMRC to run at any time (Needed for Open-With support)</Feature>
+      <Feature>Enhanced the Splash Screen</Feature>
+      <Feature>Show average speed in Download Finished message</Feature>
       <Feature>Option to pause torrents for a specific time.</Feature>
-      <Feature>new windows AzSMRC.exe --much smaller, own process name</Feature>
+      <Feature>New windows AzSMRC.exe -- File is much smaller and has it's own process name</Feature>
       <Feature>Proxy Support</Feature>
       <Change>Allow for 'ForceStart' of more than one torrent at a time</Change>
+      <Change>Switched logger (console output) over to log4j for better organized and more detailed logging</Change>
     </Changelog>
     <Files>
       <File name="clientLibraries.zip" version="0.9.8" url="http://prdownloads.sourceforge.net/azsmrc/clientLibraries.zip" hash="cffac64429174b5adc11f775a34974ceb5b7c96e" isArchive="true" type="2" size="194216">
