@@ -82,7 +82,7 @@ public class ConsoleTab {
 
 	private boolean bAutoScroll = true;
 
-	private boolean bShowDebug = true;
+
 	private boolean bShowNormal = true;
 
 	private Level normalLevel = Level.DEBUG;
@@ -194,9 +194,8 @@ public class ConsoleTab {
 
 		final Properties props = RCMain.getRCMain().getProperties();
 
-		bShowDebug = Boolean.parseBoolean(props.getProperty("logger.debug.show", "true"));
-		bShowNormal = Boolean.parseBoolean(props.getProperty("logger.normal.show", "true"));
-		normalLevel = Level.toLevel(props.getProperty("logger.normal.level", "FINE"));
+
+		normalLevel = Level.toLevel(props.getProperty("logger.normal.level"));
 		PREFERRED_LINES = Integer.parseInt(props.getProperty("console_lines","250"));
 		MAX_LINES = 512 + PREFERRED_LINES;
 
