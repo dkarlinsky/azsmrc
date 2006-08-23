@@ -65,7 +65,7 @@ Section -Main SEC0000
 	SetOverwrite on
 	File dist\launcher.jar
 	File "dist\AzSMRC_${VERSION}.jar"
-	File AzSMRC.exe
+	File dist\AzSMRC.exe
 	File license.txt
 	File Readme.txt
 	File AzSMRCupdate.xml.gz

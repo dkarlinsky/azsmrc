@@ -106,8 +106,15 @@
 			<fileset file="${dist.dir}/launcher.jar" />
 		</zip>
 	</target>	
+	
+	<target name="createExeFile">
+		<taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask"
+		    classpath="${launch4j.dir}/launch4j.jar:${launch4j.dir}/lib/xstream.jar" />
+		<launch4j configfile="${root.dir}/launch4j.xml" fileVersion="${version}.0" txtFileVersion="${version}.0"
+			productVersion="${version}.0" txtProductVersion="${version}.0" outfile="${dist.dir}/AzSMRC.exe"/>		
+	</target>
 
-	<target name="setupFiles">
+	<target name="setupFiles" depends="createExeFile">
 		<taskdef name="nsis" classname="net.sf.nsisant.Task">
 			<classpath location="${nsisant.dir}/nsisant-1.2.jar"/>
 		</taskdef>
