@@ -643,7 +643,7 @@ public class RCMain implements Launchable {
 		});
 		client.addConnectionListener(new ConnectionListener() {
 			public void connectionState(final int state) {
-				logger.trace("Connection State: "+state);
+				logger.debug("Connection State: "+state);
 				if(display != null)
 					display.syncExec(new SWTSafeRunnable() {
 						public void runSafe() {
@@ -928,7 +928,7 @@ public class RCMain implements Launchable {
 			updateTimer = timer.addPeriodicEvent(properties.getPropertyAsLong("connection_interval_open")+delay,
 				new TimerEventPerformer() {
 				public void perform(TimerEvent event) {
-					logger.trace("Timer: GUI mode");
+					logger.debug("Timer: GUI mode");
 					client.getDownloadManager().update(false);
 				}
 			});
@@ -937,7 +937,7 @@ public class RCMain implements Launchable {
 			updateTimer = timer.addPeriodicEvent(properties.getPropertyAsLong("connection_interval_closed")+delay,
 				new TimerEventPerformer() {
 				public void perform(TimerEvent event) {
-					logger.trace("Timer: Tray mode");
+					logger.debug("Timer: Tray mode");
 					client.sendGetGlobalStats();
 				}
 			});
@@ -1218,7 +1218,7 @@ public class RCMain implements Launchable {
 								Iterator iter = list.iterator();
 								while(iter.hasNext()){
 									File file = (File) iter.next();
-									logger.trace("*******FILE****" + file.getPath());
+									logger.debug("*******FILE****" + file.getPath());
 								}
 
 							}catch(Exception e){

@@ -164,7 +164,7 @@ public class Client {
 	 */
 	public void transactionStart() {
 		transaction = true;
-		logger.trace("Transaction Started");
+		logger.debug("Transaction Started");
 		if (transactionTimeout != null) transactionTimeout.cancel();
 		transactionTimeout = timer.addEvent(System.currentTimeMillis()+TRANSACTION_TIMEOUT, new TimerEventPerformer() {
 			public void perform(TimerEvent event) {
@@ -182,7 +182,7 @@ public class Client {
 	public void transactionCommit() {
 		if (transactionTimeout != null) transactionTimeout.cancel();
 		transaction = false;
-		logger.trace("Transaction Committed ("+transactionQueue.size()+" items)");
+		logger.debug("Transaction Committed ("+transactionQueue.size()+" items)");
 		send();
 	}
 
@@ -289,11 +289,11 @@ public class Client {
 						is = sis;
 					}
 					try {
-						logger.trace("Request ("+DisplayFormatters.formatByteCountToBase10KBEtc(sos.getBytesWritten())+"):");
+						logger.debug("Request ("+DisplayFormatters.formatByteCountToBase10KBEtc(sos.getBytesWritten())+"):");
 						new XMLOutputter(Format.getPrettyFormat()).output(req, System.out);		//Request
 						SAXBuilder builder = new SAXBuilder();
 						Document xmlDom = builder.build(is);
-						logger.trace("Response ("+DisplayFormatters.formatByteCountToBase10KBEtc(sis.getBytesRead())+" "+(System.currentTimeMillis()-startTime) +"msec):");
+						logger.debug("Response ("+DisplayFormatters.formatByteCountToBase10KBEtc(sis.getBytesRead())+" "+(System.currentTimeMillis()-startTime) +"msec):");
 						new XMLOutputter(Format.getPrettyFormat()).output(xmlDom, System.out);	//Response
 						System.out.println();
 						responseManager.handleResponse(xmlDom);
