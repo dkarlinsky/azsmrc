@@ -1798,13 +1798,9 @@ public class DownloadManagerShell {
 	 * @param connection -- int -- 0 for no connection, 1 for connecting, 2 for connected
 	 */
 	public void setConnectionStatusBar(final int connection){
-		try {
-			if(connectionStatusIcon.getDisplay() == null) return;
-		} catch (SWTException e) {
-			e.printStackTrace();
-			return;
-		}
-		connectionStatusIcon.getDisplay().syncExec( new SWTSafeRunnable() {
+ 		Display display = RCMain.getRCMain().getDisplay();
+ 		if(display == null) return;
+		display.syncExec(new SWTSafeRunnable(){
 			public void runSafe() {
 				if(connectionStatusIcon == null || connectionStatusIcon.isDisposed())
 					return;
@@ -1821,7 +1817,8 @@ public class DownloadManagerShell {
 					connectionStatusIcon.setImage(ImageRepository.getImage("connect_established"));
 					connectionStatusIcon.setToolTipText("Connected to server\nDouble-Click for Server Details");
 				}
-			}});
+			}
+		});
 	}
 
 	public void setSSLStatusBar(final boolean benabled, final boolean buse_ssl){
