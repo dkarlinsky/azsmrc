@@ -1369,8 +1369,8 @@ public class DownloadManagerShell {
 
 		ExtendedProperties properties = RCMain.getRCMain().getProperties();
 
-		sash.setWeights(new int[] {properties.getPropertyAsInt("sash0_weight"),
-					properties.getPropertyAsInt("sash1_weight")});
+		sash.setWeights(new int[] {properties.getPropertyAsInt("DMS_SASH_0"),
+					properties.getPropertyAsInt("DMS_SASH_1")});
 
 		String userLoggedIn = RCMain.getRCMain().getClient().getUsername();
 		if(bSingleUserMode)
@@ -1664,8 +1664,8 @@ public class DownloadManagerShell {
 
 				if (!sash.isDisposed()) {
 					int[] weights = sash.getWeights();
-					properties.setProperty("sash0_weight", weights[0]);
-					properties.setProperty("sash1_weight", weights[1]);
+					properties.setProperty("DMS_SASH_0", weights[0]);
+					properties.setProperty("DMS_SASH_1", weights[1]);
 				}
 				properties.setProperty("DMS_SIZE_x", size_x);
 				properties.setProperty("DMS_SIZE_y", size_y);
