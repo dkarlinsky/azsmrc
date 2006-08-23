@@ -6,6 +6,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.FlavorEvent;
 import java.awt.datatransfer.FlavorListener;
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
@@ -1166,6 +1167,17 @@ public class RCMain implements Launchable {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public void setAWTCliboardString (String content) {
+		try {
+			Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			systemClipboard.setContents(new StringSelection(content), null);
+		} catch (HeadlessException e) {
+			e.printStackTrace();
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void addAWTClipboardMonitor(){
