@@ -39,6 +39,7 @@ Var StartMenuGroup
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
 !insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_UNPAGE_COMPONENTS
 !insertmacro MUI_UNPAGE_INSTFILES
 
 # Installer languages
@@ -73,6 +74,7 @@ Section -Main SEC0000
 	File AzSMRC.exe.manifest
 	File lbms\azsmrc\libs\jdom_1.0.jar
 	File lbms\azsmrc\libs\commons-codec_1.3.jar
+	File lbms\azsmrc\libs\log4j_1.2.13.jar
 	WriteRegStr HKLM "${REGKEY}\Components" Main 1
 SectionEnd
 
@@ -155,7 +157,7 @@ done${UNSECTION_ID}:
 
 # Uninstaller sections
 
-Section /o un.Main UNSEC0000
+Section -un.Main UNSEC0000
 	Delete /REBOOTOK $INSTDIR\commons-codec_1.3.jar
 	Delete /REBOOTOK $INSTDIR\jdom_1.0.jar
 	Delete /REBOOTOK "$INSTDIR\AzSMRC_${VERSION}.jar"
@@ -165,7 +167,9 @@ Section /o un.Main UNSEC0000
 	Delete /REBOOTOK $INSTDIR\license.txt
 	Delete /REBOOTOK $INSTDIR\Readme.txt
 	Delete /REBOOTOK $INSTDIR\AzSMRCupdate.xml.gz
+	Delete /REBOOTOK $INSTDIR\log4j_1.2.13.jar
 	Delete /REBOOTOK $INSTDIR\launch.properties
+	Delete /REBOOTOK $INSTDIR\.certs
 
 	#SWT
 	Delete /REBOOTOK $INSTDIR\swt-win32-3232.dll
@@ -196,7 +200,15 @@ Section /o un.Main UNSEC0000
   ;rest of script 
 SectionEnd
 
-Section un.post UNSEC0002
+Section "un.Delete Config" UNSEC0003
+	Delete /REBOOTOK $INSTDIR\config.cfg
+SectionEnd
+
+Section "un.Delete Directory" UNSEC0004
+	RMDir /r $INSTDIR
+SectionEnd
+
+Section -un.post UNSEC0002
 	DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)"
 	Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\Uninstall $(^Name).lnk"
 	Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\AzSMRC.lnk"

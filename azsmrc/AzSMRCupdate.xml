@@ -14,45 +14,15 @@
       <Change>Switched logger (console output) over to log4j for better organized and more detailed logging</Change>
     </Changelog>
     <Files>
-      <File name="clientLibraries.zip" version="0.9.8" url="http://prdownloads.sourceforge.net/azsmrc/clientLibraries.zip" hash="cffac64429174b5adc11f775a34974ceb5b7c96e" isArchive="true" type="2" size="194216">
+      <File name="AzSMRC_0.9.8.jar" version="0.9.8" url="http://prdownloads.sourceforge.net/azsmrc/AzSMRC_0.9.8.jar" hash="1739cabb78c4b49781291959c55d152a8c468da1" type="2" size="1721824" />
+      <File name="Readme.txt" version="0.9.8" hash="1aa61d314888eb7f4828a134d76d6c0a12bd6b0" type="1" size="5864" />
+      <File name="clientLibraries_1.1.zip" version="1.1" url="http://prdownloads.sourceforge.net/azsmrc/AzSMRC_0.9.8.jar" hash="3dcf81e833d7c5386459ec364d856f111b744f2" isArchive="true" type="2" size="518896">
         <File name="jdom_1.0.jar" version="1.0" hash="a2ac1cd690ab4c80defe7f9bce14d35934c35cec" isInArchive="true" type="0" size="153253" />
         <File name="launch.properties" version="0" hash="b481ffdefe4a9297c185ef4804d22424a1fdf49" isInArchive="true" type="0" size="52" />
         <File name="launcher.jar" version="0" hash="4766c8c9727edde385daa0a68c56e74f566f94" isInArchive="true" type="0" size="8287" />
         <File name="commons-codec_1.3.jar" version="1.3" hash="fd32786786e2adb664d5ecc965da47629dca14ba" isInArchive="true" type="0" size="46725" />
+        <File name="log4j_1.2.13.jar" version="1.2.13" hash="8b1b85d04eea979c33109ea4288b7d3f6d355ab" isInArchive="true" type="0" size="358180" />
       </File>
-      <File name="AzSMRC_0.9.8.jar" version="0.9.8" url="http://prdownloads.sourceforge.net/azsmrc/AzSMRC_0.9.8.jar" hash="7ce55e282f1ab3b9a4ba822efba9d32c2a756761" type="2" size="1727392" />
-    </Files>
-  </Update>
-  <Update url="http://azsmrc.sourceforge.net" version="0.9.7" type="1" importance="50">
-    <Changelog>
-      <BugFix>Fix 'Manage Users' so that all features now work</BugFix>
-      <BugFix>Fixed many SWT errors for Update Dialog and ServerUpdate Dialog</BugFix>
-      <BugFix>Fixed the updater so that it works correctly now</BugFix>
-      <BugFix>Fixed many Null Point Errors and Widget is Disposed Errors</BugFix>
-      <Feature>Main tables are now sortable by column</Feature>
-      <Feature>My Tracker tab added to manage shares.  Includes Hosting and Publishing of a torrent file</Feature>
-      <Feature>Added the ability to use sounds</Feature>
-      <Feature>A normal user can now change their password remotely</Feature>
-      <Feature>Added a Scrape and Announce button to the torrent details tab</Feature>
-      <Feature>Double-Clicking on the connection icon or the SSL icon will now open the Server Details tab</Feature>
-      <Change>Display the how long it took to complete the download in the sliding alert window</Change>
-      <Change>Major work on the Downloads and Seeding tables to increase speed and stability</Change>
-      <Change>Tray menu now includes a 'silent mode' to disable all sounds</Change>
-      <Change>Tray menu now includes disable all Popups switch</Change>
-      <Change>Tray menu and ToolBar menu now includes a quick pause feature to pause torrents for a given amount of time</Change>
-      <Change>Added an Update File stats button to the files sub tab of the torrent details</Change>
-      <Change>Enhanced Scrape Dialog some to allow for passing a torrent file to it directly</Change>
-      <Change>Many tweaks to the transfer packages to reduce their size, especially if there are many stopped torrents</Change>
-    </Changelog>
-    <Files>
-      <File name="clientLibraries.zip" version="1.0" url="http://prdownloads.sourceforge.net/azsmrc/clientLibraries.zip" hash="cffac64429174b5adc11f775a34974ceb5b7c96e" isArchive="true" type="2" size="194216">
-        <File name="jdom_1.0.jar" version="1.0" hash="a2ac1cd690ab4c80defe7f9bce14d35934c35cec" isInArchive="true" type="0" size="153253" />
-        <File name="launch.properties" version="0" hash="b481ffdefe4a9297c185ef4804d22424a1fdf49" isInArchive="true" type="0" size="52" />
-        <File name="launcher.jar" version="0" hash="4766c8c9727edde385daa0a68c56e74f566f94" isInArchive="true" type="0" size="8287" />
-        <File name="commons-codec_1.3.jar" version="1.3" hash="fd32786786e2adb664d5ecc965da47629dca14ba" isInArchive="true" type="0" size="46725" />
-      </File>
-      <File name="AzSMRC_0.9.7.jar" version="0.9.7" url="http://prdownloads.sourceforge.net/azsmrc/AzSMRC_0.9.7.jar" hash="449ff54b356b65a80e9548fbf742e77eb6ced2" type="2" size="1693170" />
-      <File name="Readme.txt" version="0.9.7" hash="7260a4c674f803d4630ac45a77b5e4fbee8e886" type="1" size="5337" />
     </Files>
   </Update>
 </Updates>
