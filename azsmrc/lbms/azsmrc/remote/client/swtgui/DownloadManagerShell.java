@@ -1369,8 +1369,8 @@ public class DownloadManagerShell {
 
 		ExtendedProperties properties = RCMain.getRCMain().getProperties();
 
-		sash.setWeights(new int[] {properties.getPropertyAsInt("DMS_SASH_0"),
-					properties.getPropertyAsInt("DMS_SASH_1")});
+		sash.setWeights(new int[] {properties.getPropertyAsInt("dms.sash.0"),
+					properties.getPropertyAsInt("dms.sash.1")});
 
 		String userLoggedIn = RCMain.getRCMain().getClient().getUsername();
 		if(bSingleUserMode)
@@ -1664,13 +1664,13 @@ public class DownloadManagerShell {
 
 				if (!sash.isDisposed()) {
 					int[] weights = sash.getWeights();
-					properties.setProperty("DMS_SASH_0", weights[0]);
-					properties.setProperty("DMS_SASH_1", weights[1]);
+					properties.setProperty("dms.sash.1", weights[0]);
+					properties.setProperty("dms.sash.0", weights[1]);
 				}
-				properties.setProperty("DMS_SIZE_x", size_x);
-				properties.setProperty("DMS_SIZE_y", size_y);
-				properties.setProperty("DMS_POSITION_x", position_x);
-				properties.setProperty("DMS_POSITION_y", position_y);
+				properties.setProperty("dms.size.x", size_x);
+				properties.setProperty("dms.size.y", size_y);
+				properties.setProperty("dms.position.x", position_x);
+				properties.setProperty("dms.position.y", position_y);
 
 				//save the downloadsTable column widths
 				if (!downloadsTable.isDisposed()) {
@@ -1752,10 +1752,10 @@ public class DownloadManagerShell {
 
 		//open shell
 		properties = RCMain.getRCMain().getProperties();
-		int size_x =properties.getPropertyAsInt("DMS_SIZE_x");
-		int size_y = properties.getPropertyAsInt("DMS_SIZE_y");
-		int position_x = properties.getPropertyAsInt("DMS_POSITION_x");
-		int position_y = properties.getPropertyAsInt("DMS_POSITION_y");
+		int size_x =properties.getPropertyAsInt("dms.size.x");
+		int size_y = properties.getPropertyAsInt("dms.size.y");
+		int position_x = properties.getPropertyAsInt("dms.position.x");
+		int position_y = properties.getPropertyAsInt("dms.position.y");
 		//System.out.println("Open: " + size_x + " : "+size_y + " : " + position_x + " : " + position_y);
 		DOWNLOAD_MANAGER_SHELL.setSize (size_x, size_y);
 		DOWNLOAD_MANAGER_SHELL.setLocation (position_x, position_y);
