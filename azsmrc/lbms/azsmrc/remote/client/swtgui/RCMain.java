@@ -1169,7 +1169,7 @@ public class RCMain implements Launchable {
 		return null;
 	}
 
-	public void setAWTCliboardString (String content) {
+	public void setAWTClipboardString (String content) {
 		try {
 			Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 			systemClipboard.setContents(new StringSelection(content), null);
