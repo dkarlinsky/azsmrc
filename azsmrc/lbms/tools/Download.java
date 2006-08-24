@@ -178,6 +178,8 @@ public abstract class Download implements Runnable, Callable<Download> {
 	}
 
 	/**
+	 * The Cookie data to send to the server.
+	 * 
 	 * @param cookie the cookie to set
 	 */
 	public void setCookie(String cookie) {
@@ -185,6 +187,9 @@ public abstract class Download implements Runnable, Callable<Download> {
 	}
 
 	/**
+	 * Gets the Cookie.
+	 * 
+	 * Will be overwritten if the Webserver returns a Cookie
 	 * @return the cookie
 	 */
 	public String getCookie() {

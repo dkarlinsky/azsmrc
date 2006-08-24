@@ -68,6 +68,9 @@ public class HTTPDownload extends Download  {
 			is = sis;
 			String encoding = conn.getHeaderField( "content-encoding");
 			int contentLength = conn.getContentLength();
+			if (conn.getHeaderField("cookie") != null ) {
+				this.cookie = conn.getHeaderField("cookie");
+			}
 
 			boolean	gzip = encoding != null && (encoding.equalsIgnoreCase("gzip") || encoding.equalsIgnoreCase("x-gzip"));
 			boolean	deflate = encoding != null && (encoding.equalsIgnoreCase("deflate") || encoding.equalsIgnoreCase("x-deflate"));

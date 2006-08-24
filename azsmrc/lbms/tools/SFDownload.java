@@ -53,6 +53,7 @@ public class SFDownload extends Download {
 	public Download call() throws Exception {
 		currentDL = new HTTPDownload(this);
 		currentDL.setSource(source);
+		currentDL.setTarget(null); //we want to have the buffer only
 		if (proxy != null);
 			currentDL.setProxy(proxy);
 		try {
@@ -85,6 +86,7 @@ public class SFDownload extends Download {
 			}
 		}
 		String referer = source.toExternalForm();
+		String cookie = currentDL.getCookie();
 		//Downloading file
 		for (URL x:mirrors) {
 			try {
@@ -97,6 +99,7 @@ public class SFDownload extends Download {
 				}
 				currentDL = new HTTPDownload(this);
 				currentDL.setSource(x);
+				currentDL.setCookie(cookie);
 				if (proxy != null);
 					currentDL.setProxy(proxy);
 				currentDL.setReferer(referer);
