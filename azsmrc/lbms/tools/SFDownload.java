@@ -73,7 +73,7 @@ public class SFDownload extends Download {
 			System.out.println(failureReason);
 			throw new Exception ("SFDownload Error occured:"+failureReason);
 		}
-		Matcher sfMirror = mirrorPattern.matcher(currentDL.getBuffer());
+		Matcher sfMirror = mirrorPattern.matcher(currentDL.getBuffer().toString());
 		String fileLocation = source.getPath();
 		//Find mirrors
 		while (sfMirror.find()) {

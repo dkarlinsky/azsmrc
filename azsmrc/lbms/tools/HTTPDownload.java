@@ -1,5 +1,6 @@
 package lbms.tools;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -9,11 +10,17 @@ import java.net.URL;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
+
 import lbms.tools.stats.StatsInputStream;
 
 public class HTTPDownload extends Download  {
 
-	private StringBuffer buffer;
+	private static final int BUFFER_SIZE = 1024;
+
+	private ByteArrayOutputStream buffer;
 
 	public HTTPDownload(URL source, File target) {
 		super(source, target);
@@ -42,10 +49,36 @@ public class HTTPDownload extends Download  {
 		InputStream is = null;
 		try {
 			HttpURLConnection conn = null;
-			if (proxy != null)
-				conn = (HttpURLConnection)source.openConnection(proxy);
-			else
-				conn = (HttpURLConnection)source.openConnection();
+
+			if ( source.getProtocol().equalsIgnoreCase("https")){
+
+				// see ConfigurationChecker for SSL client defaults
+				HttpsURLConnection ssl_con;
+				if (proxy != null)
+					ssl_con = (HttpsURLConnection)source.openConnection(proxy);
+				else
+					ssl_con = (HttpsURLConnection)source.openConnection();
+				// allow for certs that contain IP addresses rather than dns names
+
+				ssl_con.setHostnameVerifier(
+						new HostnameVerifier()
+						{
+							public boolean
+							verify(
+									String		host,
+									SSLSession	session )
+							{
+								return( true );
+							}
+						});
+
+				conn = ssl_con;
+			} else {
+				if (proxy != null)
+					conn = (HttpURLConnection)source.openConnection(proxy);
+				else
+					conn = (HttpURLConnection)source.openConnection();
+			}
 			conn.setConnectTimeout(TIMEOUT);
 			conn.setReadTimeout(TIMEOUT);
 			conn.setDoInput(true);
@@ -63,6 +96,17 @@ public class HTTPDownload extends Download  {
 
 			callStateChanged(STATE_CONNECTING);
 			conn.connect();
+
+			int response = conn.getResponseCode();
+
+			//connection failed
+			if ((response != HttpURLConnection.HTTP_ACCEPTED) && (response != HttpURLConnection.HTTP_OK)) {
+				callStateChanged(STATE_FAILURE);
+				failed = true;
+				failureReason = conn.getResponseMessage();
+				return this;
+			}
+
 
 			StatsInputStream sis = new StatsInputStream (conn.getInputStream());
 			is = sis;
@@ -84,13 +128,13 @@ public class HTTPDownload extends Download  {
 			long last = System.currentTimeMillis();
 			long now;
 
+			byte[] buf = new byte[BUFFER_SIZE];
 			if (target != null) {
 				target.createNewFile();
 				FileOutputStream os = null;
 				try {
 					os = new FileOutputStream(target);
-					int r = is.read();
-					while (r!=-1) {
+					for (int read=is.read(buf);read>0;read=is.read(buf)) {
 						if (abort) {
 							os.close();
 							is.close();
@@ -99,8 +143,7 @@ public class HTTPDownload extends Download  {
 							failureReason = "Aborted by User";
 							return this;
 						}
-						os.write((char)r);
-						r = is.read();
+						os.write(buf,0,read);
 						now = System.currentTimeMillis();
 						if (now-last>=500) {
 							callProgress(sis.getBytesRead(), contentLength);
@@ -112,9 +155,9 @@ public class HTTPDownload extends Download  {
 						os.close();
 				}
 			} else {
-				buffer = new StringBuffer((contentLength>0)?contentLength:4096);
-				int r = is.read();
-				while (r!=-1) {
+
+				buffer = (contentLength > 0 && contentLength < 5242880) ? new ByteArrayOutputStream(contentLength):new ByteArrayOutputStream();
+				for (int read=is.read(buf);read>0;read=is.read(buf)) {
 					if (abort) {
 						is.close();
 						callStateChanged(STATE_ABORTED);
@@ -122,8 +165,7 @@ public class HTTPDownload extends Download  {
 						failureReason = "Aborted by User";
 						return this;
 					}
-					buffer.append((char)r);
-					r = is.read();
+					buffer.write(buf, 0, read);
 					now = System.currentTimeMillis();
 					if (now-last>=500) {
 						callProgress(sis.getBytesRead(), contentLength);
@@ -159,7 +201,7 @@ public class HTTPDownload extends Download  {
 	/**
 	 * @return Returns the buffer.
 	 */
-	public StringBuffer getBuffer() {
+	public ByteArrayOutputStream getBuffer() {
 		return buffer;
 	}
 }
