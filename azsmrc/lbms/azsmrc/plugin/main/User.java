@@ -7,11 +7,13 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
+import lbms.azsmrc.plugin.pluginsupport.PSupportStatusMailer;
 import lbms.azsmrc.shared.EncodingUtil;
 import lbms.azsmrc.shared.RemoteConstants;
 
 import org.gudy.azureus2.plugins.download.Download;
 import org.gudy.azureus2.plugins.download.DownloadException;
+import org.gudy.azureus2.plugins.utils.Formatters;
 import org.jdom.Element;
 
 /**
@@ -187,13 +189,18 @@ public class User extends lbms.azsmrc.shared.User {
 	//--------------------------------------------//
 
 	public void eventDownloadFinished(Download dl) {
+		Formatters formatters = Plugin.getPluginInterface().getUtilities().getFormatters();
+		PSupportStatusMailer mailer = (PSupportStatusMailer)Plugin.getPluginSupport(PSupportStatusMailer.IDENTIFIER);
+		mailer.sendMessage(this, "Download Finished: "+dl.getName(), "Download Finished: "
+				+dl.getName()+"\nTime: "+formatters.formatTimeFromSeconds(dl.getStats().getSecondsDownloading())
+				+"\nAverage Download Speed: "+formatters.formatByteCountToKiBEtcPerSec(dl.getTorrent().getSize()/dl.getStats().getSecondsDownloading()));
 		Element event = getEventElement();
 		event.setAttribute("type", Integer.toString(RemoteConstants.EV_DL_FINISHED));
 		event.setAttribute("name", dl.getName());
 		event.setAttribute("hash", getDlHash(dl));
 		event.setAttribute("duration", Long.toString(dl.getStats().getSecondsDownloading()));
 		if (dl.getTorrent() != null)
-			event.setAttribute("avgDownload", Plugin.getPluginInterface().getUtilities().getFormatters().formatByteCountToKiBEtcPerSec(dl.getTorrent().getSize()/dl.getStats().getSecondsDownloading()));
+			event.setAttribute("avgDownload", formatters.formatByteCountToKiBEtcPerSec(dl.getTorrent().getSize()/dl.getStats().getSecondsDownloading()));
 		removeDownload(dl);
 		eventQueue.offer(event);
 	}

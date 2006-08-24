@@ -2,6 +2,9 @@ package lbms.azsmrc.shared;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.jdom.DataConversionException;
 import org.jdom.Element;
@@ -17,6 +20,7 @@ public class User {
 	protected String outputDir;
 	protected int downloadSlots;
 	protected int userRights;
+	protected Map<String, String> properties = new HashMap<String, String>();
 
 	/**
 	 * Creates a User object and reads the data
@@ -25,29 +29,7 @@ public class User {
 	 * @param userElement
 	 */
 	public User (Element userElement) {
-		try {
-			try {
-				this.username 		= userElement.getAttribute("username").getValue();
-			} catch (NullPointerException e) {};
-			try {
-				this.password 		= userElement.getAttribute("password").getValue();
-			} catch (NullPointerException e) {};
-			try {
-				this.autoImportDir 	= userElement.getAttribute("autoImportDir").getValue();
-			} catch (NullPointerException e) {};
-			try {
-				this.outputDir 		= userElement.getAttribute("outputDir").getValue();
-			} catch (NullPointerException e) {};
-			try {
-				this.downloadSlots 	= userElement.getAttribute("downloadSlots").getIntValue();
-			} catch (NullPointerException e) {};
-			try {
-				this.userRights 	= userElement.getAttribute("userRights").getIntValue();
-			} catch (NullPointerException e) {};
-		} catch (DataConversionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		updateUser(userElement);
 	}
 
 	/**
@@ -102,6 +84,15 @@ public class User {
 				this.userRights 	= userElement.getAttribute("userRights").getIntValue();
 		} catch (DataConversionException e) {
 			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		List<Element> props = userElement.getChildren("Property");
+		try {
+			for (Element e:props) {
+				properties.put(e.getAttributeValue("key"), e.getTextTrim());
+			}
+		} catch (RuntimeException e) {
 			e.printStackTrace();
 		}
 	}
@@ -187,6 +178,15 @@ public class User {
 		user.setAttribute("autoImportDir",autoImportDir);
 		user.setAttribute("downloadSlots",Integer.toString(downloadSlots));
 		user.setAttribute("userRights",Integer.toString(userRights));
+		try {
+			for (String key:properties.keySet()) {
+				Element e = new Element("Property");
+				e.setAttribute("key", key);
+				e.setText(properties.get(key));
+			}
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+		}
 		return user;
 	}
 
@@ -306,5 +306,25 @@ public class User {
 	 */
 	public void setDownloadSlots(int downloadSlots) {
 		this.downloadSlots = downloadSlots;
+	}
+
+	/**
+	 * Gets a Property from the user
+	 * 
+	 * @param key the property key
+	 * @return value or null in nonexistent
+	 */
+	public String getProperty(String key) {
+		return properties.get(key);
+	}
+
+	/**
+	 * Sets a Property for the user
+	 * 
+	 * @param key the property key
+	 * @param value the value to set
+	 */
+	public void setProperty(String key, String value) {
+		properties.put(key, value);
 	}
 }

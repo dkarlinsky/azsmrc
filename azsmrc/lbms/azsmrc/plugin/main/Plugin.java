@@ -3,10 +3,17 @@
  */
 package lbms.azsmrc.plugin.main;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 import java.security.KeyStore;
+import java.util.HashMap;
+import java.util.Map;
 
 import lbms.azsmrc.plugin.gui.View;
+import lbms.azsmrc.plugin.pluginsupport.PSupportStatusMailer;
+import lbms.azsmrc.plugin.pluginsupport.PluginSupport;
 import lbms.azsmrc.plugin.web.RequestManager;
 import lbms.azsmrc.plugin.web.WebRequestHandler;
 import lbms.azsmrc.shared.RemoteConstants;
@@ -17,10 +24,12 @@ import org.gudy.azureus2.core3.util.AEMonitor;
 import org.gudy.azureus2.plugins.PluginConfig;
 import org.gudy.azureus2.plugins.PluginConfigListener;
 import org.gudy.azureus2.plugins.PluginInterface;
+import org.gudy.azureus2.plugins.PluginListener;
 import org.gudy.azureus2.plugins.download.Download;
 import org.gudy.azureus2.plugins.download.DownloadManager;
 import org.gudy.azureus2.plugins.download.DownloadManagerListener;
 import org.gudy.azureus2.plugins.logging.LoggerChannel;
+import org.gudy.azureus2.plugins.logging.LoggerChannelListener;
 import org.gudy.azureus2.plugins.tracker.Tracker;
 import org.gudy.azureus2.plugins.tracker.TrackerException;
 import org.gudy.azureus2.plugins.tracker.web.TrackerAuthenticationAdapter;
@@ -29,6 +38,7 @@ import org.gudy.azureus2.plugins.ui.UIInstance;
 import org.gudy.azureus2.plugins.ui.UIManager;
 import org.gudy.azureus2.plugins.ui.UIManagerListener;
 import org.gudy.azureus2.plugins.ui.model.BasicPluginConfigModel;
+import org.gudy.azureus2.plugins.ui.model.BasicPluginViewModel;
 import org.gudy.azureus2.plugins.update.UpdateCheckInstance;
 import org.gudy.azureus2.plugins.update.UpdateCheckInstanceListener;
 import org.gudy.azureus2.plugins.update.UpdateManager;
@@ -58,6 +68,8 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 	private static UpdateCheckInstance latestUpdate;
 
+	private static Map<String, PluginSupport> pluginSupport = new HashMap<String, PluginSupport>();
+
 	//new API startup code
 	UISWTInstance swtInstance = null;
 	UISWTViewEventListener myView = null;
@@ -86,6 +98,40 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 		//initialize the logger
 		logger = pluginInterface.getLogger().getTimeStampedChannel("AzSMRC");
+		final BasicPluginViewModel	view_model =
+			ui_manager.createBasicPluginViewModel( "AzSMRC Log" );
+
+		logger.addListener(
+				new LoggerChannelListener()
+				{
+					public void
+					messageLogged(
+						int		type,
+						String	content )
+					{
+						view_model.getLogArea().appendText( content + "\n" );
+					}
+
+					public void
+					messageLogged(
+						String		str,
+						Throwable	error )
+					{
+						if ( str.length() > 0 ){
+							view_model.getLogArea().appendText( str + "\n" );
+						}
+
+						StringWriter sw = new StringWriter();
+
+						PrintWriter	pw = new PrintWriter( sw );
+
+						error.printStackTrace( pw );
+
+						pw.flush();
+
+						view_model.getLogArea().appendText( sw.toString() + "\n" );
+					}
+				});
 		UpdateManager um = pluginInterface.getUpdateManager();
 		um.addListener(
 				new UpdateManagerListener()
@@ -243,13 +289,16 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 				addToLog("SSL is supported!");
 			} else {
 				addToLog("SSL is not supported!");
+				config_model.addLabelParameter2("azsmrc.ssl.impossible");
 			}
 
 			if (sslSupported && pluginInterface.getPluginconfig().getPluginBooleanParameter("use_ssl",false)) {
+				config_model.addLabelParameter2("azsmrc.ssl.enabled");
 				context =	pluginInterface.getTracker().createWebContext(
 							pluginInterface.getAzureusName() + " - " + pluginInterface.getPluginName(),
 							pluginInterface.getPluginconfig().getPluginIntParameter("remote_port",49009), Tracker.PR_HTTPS );
 			} else {
+				if (sslSupported) config_model.addLabelParameter2("azsmrc.ssl.possible");
 				context =	pluginInterface.getTracker().createWebContext(
 							pluginInterface.getAzureusName() + " - " + pluginInterface.getPluginName(),
 							pluginInterface.getPluginconfig().getPluginIntParameter("remote_port",49009), Tracker.PR_HTTP );
@@ -289,6 +338,45 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 			addToLog("Web Initialisation Fails",e);
 		}
+
+		//Add Plugin Support
+		pluginSupport.put(PSupportStatusMailer.IDENTIFIER, new PSupportStatusMailer());
+
+		pluginInterface.addListener(new PluginListener() {
+			/* (non-Javadoc)
+			 * @see org.gudy.azureus2.plugins.PluginListener#closedownComplete()
+			 */
+			public void closedownComplete() {
+				// TODO Auto-generated method stub
+
+			}
+			/* (non-Javadoc)
+			 * @see org.gudy.azureus2.plugins.PluginListener#closedownInitiated()
+			 */
+			public void closedownInitiated() {
+				try {
+					config.saveConfigFile();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+			}
+			/* (non-Javadoc)
+			 * @see org.gudy.azureus2.plugins.PluginListener#initializationComplete()
+			 */
+			public void initializationComplete() {
+				for (PluginSupport ps:pluginSupport.values()) {
+					try {
+						ps.initialize(pluginInterface);
+						logger.log("Plugin Support active ["+ps.isActive()+"]: "+ps.getName());
+					} catch (Throwable e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+
+			}
+		});
 
 	}
 
@@ -349,10 +437,13 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 	public static void addToLog(String textToAdd, Exception e){
 		//don't spam console if debug is deaktivated
 		if(!getPluginInterface().getPluginconfig().getPluginBooleanParameter("debug",true)) return;
-		logger.log(textToAdd);
-		logger.log(e.getMessage());
+		logger.log(textToAdd,e);
 		System.out.println(textToAdd);
 		System.out.println(e.getMessage());
+	}
+
+	public static LoggerChannel getLoggerChannel() {
+		return logger;
 	}
 
 
@@ -370,6 +461,10 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 	 */
 	public static UpdateCheckInstance getLatestUpdate() {
 		return latestUpdate;
+	}
+
+	public static PluginSupport getPluginSupport (String key) {
+		return pluginSupport.get(key);
 	}
 
 //EOF
