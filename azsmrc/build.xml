@@ -4,46 +4,46 @@
 	<property file="build.properties" />
 	<property file="azsmrc.properties" />
 	<property name="root.dir" value="." />
-	
+
 	<property name="generic.excludes" value="**/*.jar **/*.txt **/*.jardesc **/.classpath **/.project **/aereg.lib **/aereg.dll **/.svn" />
 	<property name="dist.jar.excludes" value="${generic.excludes} **/*.java " />
-	
-	
+
+
 	<target name="init">
 		<echo message="Preparing to build AzSMRC..." />
 
 		<tstamp />
 		<mkdir dir="${root.dir}/${dist.dir}" />
 		<mkdir dir="${root.dir}/${build.dir}" />
-		
+
 	</target>
-	
+
 	<target name="checkAzFiles">
 		<condition property="azFilesOk">
 			<isfileselected file="${azureus.dir}/org">
-				<type type="dir"/>
+				<type type="dir" />
 			</isfileselected>
 		</condition>
 		<echo message="azFilesOk = ${azFilesOk}" />
 	</target>
 
 	<target name="azLangFiles" depends="checkAzFiles" if="azFilesOk">
-		<taskdef name="linefilter" classname="lbms.tools.anttasks.LineFilter" classpath="${root.dir}/${build.dir}" />		
-		<linefilter source="${azureus.dir}/org/gudy/azureus2/internat" target="${root.dir}/${build.dir}/lbms/azsmrc/remote/client/swtgui/flexyconf" filter="^ConfigView\..+" />		
+		<taskdef name="linefilter" classname="lbms.tools.anttasks.LineFilter" classpath="${root.dir}/${build.dir}" />
+		<linefilter source="${azureus.dir}/org/gudy/azureus2/internat" target="${root.dir}/${build.dir}/lbms/azsmrc/remote/client/swtgui/flexyconf" filter="^ConfigView\..+" />
 	</target>
 
 	<target name="compile" depends="init,checkAzFiles" if="azFilesOk">
 		<echo message="Compiling Source..." />
 		<path id="libs.classpath">
 			<fileset dir="${root.dir}/${libs.dir}" includes="**/*.jar" />
-			<fileset dir="${swt.jar}" includes="swt.jar" />				
-			<fileset dir="${azureus.jar}" includes="Azureus2.jar" />	
-			<dirset dir="${azureus.dir}" includes="*"/>
+			<fileset dir="${swt.jar}" includes="swt.jar" />
+			<fileset dir="${azureus.jar}" includes="Azureus2.jar" />
+			<dirset dir="${azureus.dir}" includes="*" />
 		</path>
 
 		<javac srcdir="${root.dir}" destdir="${root.dir}/${build.dir}" excludes="${generic.excludes}" nowarn="yes" includeAntRuntime="yes" debug="true" debuglevel="lines,vars,source" verbose="yes" optimize="yes">
-			<include name="${source.dir}/**/*"/>
-			<exclude name="${root.dir}/${build.dir}"/>
+			<include name="${source.dir}/**/*" />
+			<exclude name="${root.dir}/${build.dir}" />
 			<classpath refid="libs.classpath" />
 		</javac>
 	</target>
@@ -84,6 +84,25 @@
 				<attribute name="Class-Path" value="launcher.jar" />
 			</manifest>
 		</jar>
+		<echo message="Creating Sources..." />
+		<zip destfile="${root.dir}/${dist.dir}/azsmrcPlugin_${version}_src.zip" basedir="${root.dir}" excludes="${generic.excludes}">
+			<include name="lbms/azsmrc/plugin/**/*" />
+			<include name="lbms/azsmrc/shared/**/*" />
+			<fileset file="${root.dir}/plugin.properties" />
+		</zip>
+		<zip destfile="${root.dir}/${dist.dir}/AzSMRC_${version}_src.zip" basedir="${root.dir}" excludes="${generic.excludes}">
+			<include name="lbms/azsmrc/remote/**/*" />
+			<include name="lbms/azsmrc/shared/**/*" />
+			<include name="lbms/tools/launcher/Launchable.class" />
+			<include name="lbms/tools/updater/*" />
+			<include name="lbms/tools/*" />
+			<include name="lbms/tools/i18n/*" />
+			<include name="lbms/tools/stats/*" />
+			<include name="lbms/tools/flexyconf/**/*" />
+			<fileset file="${root.dir}/default.cfg" />
+			<fileset file="${root.dir}/azsmrc.properties" />
+			<fileset file="${root.dir}/log4j.properties" />
+		</zip>
 	</target>
 
 	<target name="distribute" depends="jar">
@@ -105,27 +124,25 @@
 			<fileset file="${root.dir}/launch.properties" />
 			<fileset file="${dist.dir}/launcher.jar" />
 		</zip>
-	</target>	
-	
+	</target>
+
 	<target name="createExeFile">
-		<taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask"
-		    classpath="${launch4j.dir}/launch4j.jar:${launch4j.dir}/lib/xstream.jar" />
-		<launch4j configfile="${root.dir}/launch4j.xml" fileVersion="${version}.0" txtFileVersion="${version}.0"
-			productVersion="${version}.0" txtProductVersion="${version}.0" outfile="${dist.dir}/AzSMRC.exe"/>		
+		<taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask" classpath="${launch4j.dir}/launch4j.jar:${launch4j.dir}/lib/xstream.jar" />
+		<launch4j configfile="${root.dir}/launch4j.xml" fileVersion="${version}.0" txtFileVersion="${version}.0" productVersion="${version}.0" txtProductVersion="${version}.0" outfile="${dist.dir}/AzSMRC.exe" />
 	</target>
 
 	<target name="setupFiles" depends="createExeFile">
 		<taskdef name="nsis" classname="net.sf.nsisant.Task">
-			<classpath location="${nsisant.dir}/nsisant-1.2.jar"/>
+			<classpath location="${nsisant.dir}/nsisant-1.2.jar" />
 		</taskdef>
 		<!-- grab the NSIS Ant Tasks here http://sourceforge.net/projects/nsisant/ -->
 		<echo message="Creating Setup no SWT version" />
 		<nsis script="setup.nsi" path="C:/Programme/NSIS/">
-			<define name="VERSION" value="${version}"/>
+			<define name="VERSION" value="${version}" />
 		</nsis>
 		<echo message="Creating Setup SWT version" />
 		<nsis script="setup.nsi" path="C:/Programme/NSIS/">
-			<define name="VERSION" value="${version}"/>
+			<define name="VERSION" value="${version}" />
 			<define name="SWT" value="true" />
 		</nsis>
 	</target>
