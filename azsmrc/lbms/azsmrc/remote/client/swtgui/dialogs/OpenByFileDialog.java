@@ -91,7 +91,7 @@ public class OpenByFileDialog {
 	//I18N prefix
 	public static final String PFX = "dialog.openbyfiledialog.";
 
-	private OpenByFileDialog(Display display, final String[] filenames) {
+	private OpenByFileDialog(Display display) {
 		//set the static instance
 		instance = this;
 
@@ -539,11 +539,6 @@ public class OpenByFileDialog {
 			}
 		});
 
-		// See if we come in with a file already
-		if (filenames != null) {
-			addFileToInstance(filenames);
-		}
-
 		// Center Shell and open
 		GUI_Utilities.centerShellandOpen(shell);
 
@@ -558,7 +553,7 @@ public class OpenByFileDialog {
 		final Display display = RCMain.getRCMain().getDisplay();
 		if(display == null) return;
 		if (instance == null || instance.shell == null || instance.shell.isDisposed()){
-			new OpenByFileDialog(display, null);
+			new OpenByFileDialog(display);
 		}else
 			instance.shell.setActive();
 	}
@@ -578,7 +573,8 @@ public class OpenByFileDialog {
 			@Override
 			public void runSafe() {
 				if (instance == null || instance.shell == null || instance.shell.isDisposed()){
-					new OpenByFileDialog(display, fileNames);
+					new OpenByFileDialog(display);
+					instance.addFileToInstance(fileNames);
 				} else{
 					instance.shell.setActive();
 					instance.addFileToInstance(fileNames);
@@ -602,6 +598,7 @@ public class OpenByFileDialog {
 						TableItem item = new TableItem(filesTable, SWT.NULL);
 						item.setText(0, container.getName());
 						item.setText(1, container.getFilePath());
+						item.setData(container);
 						tMap.put(container.getName(), container);
 						filesTable.setSelection(item);
 						generateDetails(container.getName());
@@ -702,6 +699,7 @@ public class OpenByFileDialog {
 
 									item.setText(0, container.getName());
 									item.setText(1, container.getFilePath());
+									item.setData(container);
 
 									tMap.put(container.getName(), container);
 									filesTable.setSelection(item);
