@@ -29,17 +29,18 @@ import java.util.*;
 
 
 
-public class
-Launcher
-{
+public class Launcher {
 
+	public static final String SEP = System.getProperty("file.separator");
+	private static 		String APPLICATION_NAME 		= "AzSMRC";
+	private static String app_name;
 
 	public static void
 	main(
-		final String[]		args )
+			final String[]		args )
 	{
-			// try and infer the application name. this is only required on OSX as the app name
-			// is a component of the "application path" used to find jars etc.
+		// try and infer the application name. this is only required on OSX as the app name
+		// is a component of the "application path" used to find jars etc.
 
 		if ( Constants.isOSX ){
 
@@ -49,7 +50,7 @@ Launcher
 			Java/swt.jar:/Applications/Utilities/Azureus.app/Contents/Resources/
 			Java/swt-pi.jar:/Applications/Utilities/Azureus.app/Contents/Resources/
 			Java/Azureus2.jar:/System/Library/Java
-			*/
+			 */
 
 			String	classpath = System.getProperty("java.class.path");
 
@@ -74,9 +75,7 @@ Launcher
 						start_pos--;
 					}
 
-					String	app_name = classpath.substring( start_pos+1, dot_pos );
-
-					SystemProperties.setApplicationName( app_name );
+					app_name = classpath.substring( start_pos+1, dot_pos );
 				}
 			}
 		}
@@ -102,7 +101,7 @@ Launcher
 
 			}
 		}).start();
-/*
+		/*
 		try{
 				// set default details for restarter
 
@@ -185,11 +184,11 @@ Launcher
 
 
 
- 	private static Launchable[]
-	findLaunchables()
+	private static Launchable[]
+							  findLaunchables()
 	{
-				// CAREFUL - this is called BEFORE any AZ initialisation has been performed and must
-				// therefore NOT use anything that relies on this (such as logging, debug....)
+		// CAREFUL - this is called BEFORE any AZ initialisation has been performed and must
+		// therefore NOT use anything that relies on this (such as logging, debug....)
 
 		List	res = new ArrayList();
 
@@ -213,80 +212,80 @@ Launcher
 			return( new Launchable[0] );
 		}
 
+		try{
+
+			ClassLoader classLoader = Launcher.class.getClassLoader();
+
+
+			// take only the highest version numbers of jars that look versioned
+
+			String[]	file_version 	= {null};
+			String[]	file_id 		= {null};
+
+			files	= getHighestJarVersions( files, file_version, file_id );
+
+			for( int j = 0 ; j < files.length ; j++){
+
+				classLoader = addFileToClassPath(classLoader, files[j]);
+			}
+
+			Properties props = new Properties();
+
+			File	properties_file = new File( app_dir, "launch.properties");
+
+			// if properties file exists on its own then override any properties file
+			// potentially held within a jar
+
+			if ( properties_file.exists()){
+
+				FileInputStream	fis = null;
+
 				try{
+					fis = new FileInputStream( properties_file );
 
-				  ClassLoader classLoader = Launcher.class.getClassLoader();
+					props.load( fis );
 
+				}finally{
 
-					// take only the highest version numbers of jars that look versioned
+					if ( fis != null ){
 
-				String[]	file_version 	= {null};
-				String[]	file_id 		= {null};
-
-				files	= getHighestJarVersions( files, file_version, file_id );
-
-				for( int j = 0 ; j < files.length ; j++){
-
-					classLoader = addFileToClassPath(classLoader, files[j]);
-				}
-
-				Properties props = new Properties();
-
-				File	properties_file = new File( app_dir, "launch.properties");
-
-					// if properties file exists on its own then override any properties file
-					// potentially held within a jar
-
-				  if ( properties_file.exists()){
-
-					  FileInputStream	fis = null;
-
-					  try{
-						  fis = new FileInputStream( properties_file );
-
-						  props.load( fis );
-
-					  }finally{
-
-						  if ( fis != null ){
-
-							  fis.close();
-						  }
-					  }
-				  }else{
-
-					if ( classLoader instanceof URLClassLoader ){
-
-						URLClassLoader	current = (URLClassLoader)classLoader;
-
-						  URL url = current.findResource("launch.properties");
-
-						  if ( url != null ){
-
-							  props.load(url.openStream());
-						  }
-					  }
-				  }
-
-				String launch_class = (String)props.get( "launch.class");
-
-					// don't support multiple Launchables
-
-				if ( launch_class != null && launch_class.indexOf(';') == -1 ){
-					System.out.println("Trying to load: "+launch_class);
-					Class c = classLoader.loadClass(launch_class);
-
-					Launchable launchable = (Launchable) c.newInstance();
-
-					if ( launchable instanceof Launchable ){
-						res.add( launchable );
+						fis.close();
 					}
 				}
-			}catch( Throwable e ){
+			}else{
 
-				System.out.println( "Load of Launchable in '" + app_dir + "' fails");
-				e.printStackTrace();
+				if ( classLoader instanceof URLClassLoader ){
+
+					URLClassLoader	current = (URLClassLoader)classLoader;
+
+					URL url = current.findResource("launch.properties");
+
+					if ( url != null ){
+
+						props.load(url.openStream());
+					}
+				}
 			}
+
+			String launch_class = (String)props.get( "launch.class");
+
+			// don't support multiple Launchables
+
+			if ( launch_class != null && launch_class.indexOf(';') == -1 ){
+				System.out.println("Trying to load: "+launch_class);
+				Class c = classLoader.loadClass(launch_class);
+
+				Launchable launchable = (Launchable) c.newInstance();
+
+				if ( launchable instanceof Launchable ){
+					res.add( launchable );
+				}
+			}
+		}catch( Throwable e ){
+
+			System.out.println( "Load of Launchable in '" + app_dir + "' fails");
+			e.printStackTrace();
+		}
 
 
 		Launchable[]	x = new Launchable[res.size()];
@@ -296,70 +295,70 @@ Launcher
 		return( x );
 	}
 
- 	private static File 
- 	getApplicationFile(
- 		String filename) 
- 	{      
-		 String path = SystemProperties.getApplicationPath();
-
-		 if (Constants.isOSX ){
-
-			 path = path + "/" + SystemProperties.getApplicationName() + ".app/Contents/";
-		 }
-
-		 return new File(path, filename);
- 	}
-
-  	public static File[]
-	getHighestJarVersions(
-		File[]		files,
-		String[]	version_out ,
-		String[]	id_out )	// currently the version of last versioned jar found...
+	private static File
+	getApplicationFile(
+			String filename)
 	{
-  			// WARNING!!!!
-  			// don't use Debug/lglogger here as we can be called before AZ has been initialised
+		String path = getApplicationPath();
 
-  		List	res 		= new ArrayList();
-  		Map		version_map	= new HashMap();
+		if (Constants.isOSX ){
 
-  		for (int i=0;i<files.length;i++){
+			path = path + "/" + (app_name!=null?app_name:APPLICATION_NAME) + ".app/Contents/";
+		}
 
-  			File	f = files[i];
+		return new File(path, filename);
+	}
 
-  			String	name = f.getName().toLowerCase();
+	public static File[]
+					   getHighestJarVersions(
+							   File[]		files,
+							   String[]	version_out ,
+							   String[]	id_out )	// currently the version of last versioned jar found...
+	{
+		// WARNING!!!!
+		// don't use Debug/lglogger here as we can be called before AZ has been initialised
 
-  			if ( name.endsWith(".jar")){
-  				System.out.println("Checking: "+name);
+		List	res 		= new ArrayList();
+		Map		version_map	= new HashMap();
 
-  				int cvs_pos = name.lastIndexOf("_cvs");
+		for (int i=0;i<files.length;i++){
 
-  				int sep_pos;
+			File	f = files[i];
 
-  				if (cvs_pos <= 0)
-  					sep_pos = name.lastIndexOf("_");
-  				else
-  					sep_pos = name.lastIndexOf("_", cvs_pos - 1);
+			String	name = f.getName().toLowerCase();
 
-  				String	prefix;
+			if ( name.endsWith(".jar")){
+				System.out.println("Checking: "+name);
+
+				int cvs_pos = name.lastIndexOf("_cvs");
+
+				int sep_pos;
+
+				if (cvs_pos <= 0)
+					sep_pos = name.lastIndexOf("_");
+				else
+					sep_pos = name.lastIndexOf("_", cvs_pos - 1);
+
+				String	prefix;
 
 				String	version;;
 
 
-  				if ( 	sep_pos == -1 || 
-  						sep_pos == name.length()-1 ||
+				if ( 	sep_pos == -1 ||
+						sep_pos == name.length()-1 ||
 						!Character.isDigit(name.charAt(sep_pos+1))){
 
-  					prefix = name.substring(0, name.indexOf('.'));
-  					version = "-1.0";
+					prefix = name.substring(0, name.indexOf('.'));
+					version = "-1.0";
 
-  				}else{
-  					prefix = name.substring(0,sep_pos);
+				}else{
+					prefix = name.substring(0,sep_pos);
 
-  					version = name.substring(sep_pos+1, (cvs_pos <= 0) ? name.length()-4 : cvs_pos);
-  				}
-  				String	prev_version = (String)version_map.get(prefix);
+					version = name.substring(sep_pos+1, (cvs_pos <= 0) ? name.length()-4 : cvs_pos);
+				}
+				String	prev_version = (String)version_map.get(prefix);
 
-  				if ( prev_version == null ){
+				if ( prev_version == null ){
 
 					version_map.put( prefix, version );
 
@@ -370,98 +369,98 @@ Launcher
 						version_map.put( prefix, version );
 					}
 				}
-   			}
-  		}
+			}
+		}
 
-  		Iterator it = version_map.keySet().iterator();
+		Iterator it = version_map.keySet().iterator();
 
-  		while(it.hasNext()){
+		while(it.hasNext()){
 
-  			String	prefix 	= (String)it.next();
-  			String	version	= (String)version_map.get(prefix);
-  			String	target;
-  			if (version.equalsIgnoreCase("-1.0"))
-  				target = prefix;
-  			else
-  				target = prefix + "_" + version;
+			String	prefix 	= (String)it.next();
+			String	version	= (String)version_map.get(prefix);
+			String	target;
+			if (version.equalsIgnoreCase("-1.0"))
+				target = prefix;
+			else
+				target = prefix + "_" + version;
 
-  			version_out[0] 	= version;
-  			id_out[0]		= prefix;
+			version_out[0] 	= version;
+			id_out[0]		= prefix;
 
-  			for (int i=0;i<files.length;i++){
+			for (int i=0;i<files.length;i++){
 
-  				File	f = files[i];
+				File	f = files[i];
 
-  				String	lc_name = f.getName().toLowerCase();
+				String	lc_name = f.getName().toLowerCase();
 
-  				if ( lc_name.equals( target + ".jar" ) ||
-  					 lc_name.equals( target + "_cvs.jar" )){
-  					System.out.println("Adding "+target+" to classpath");
-  					res.add( f );
-  					break;
-  				}
-  			}
-  		}
+				if ( lc_name.equals( target + ".jar" ) ||
+						lc_name.equals( target + "_cvs.jar" )){
+					System.out.println("Adding "+target+" to classpath");
+					res.add( f );
+					break;
+				}
+			}
+		}
 
 
 
-  		File[]	res_array = new File[res.size()];
+		File[]	res_array = new File[res.size()];
 
-  		res.toArray( res_array );
+		res.toArray( res_array );
 
-  		return( res_array );
-  	}
+		return( res_array );
+	}
 
 	public static ClassLoader
 	addFileToClassPath(
-		ClassLoader		classLoader,
-		File 			f)
+			ClassLoader		classLoader,
+			File 			f)
 	{
-	  if ( 	f.exists() &&
-			  (!f.isDirectory())&&
-			  f.getName().endsWith(".jar")){
+		if ( 	f.exists() &&
+				(!f.isDirectory())&&
+				f.getName().endsWith(".jar")){
 
-		  try {
+			try {
 
-				  // URL classloader doesn't seem to delegate to parent classloader properly
-				  // so if you get a chain of them then it fails to find things. Here we
-				  // make sure that all of our added URLs end up within a single URLClassloader
-				  // with its parent being the one that loaded this class itself
+				// URL classloader doesn't seem to delegate to parent classloader properly
+				// so if you get a chain of them then it fails to find things. Here we
+				// make sure that all of our added URLs end up within a single URLClassloader
+				// with its parent being the one that loaded this class itself
 
-			  if ( classLoader instanceof URLClassLoader ){
+				if ( classLoader instanceof URLClassLoader ){
 
-				  URL[]	old = ((URLClassLoader)classLoader).getURLs();
+					URL[]	old = ((URLClassLoader)classLoader).getURLs();
 
-				  URL[]	new_urls = new URL[old.length+1];
+					URL[]	new_urls = new URL[old.length+1];
 
-				  System.arraycopy( old, 0, new_urls, 0, old.length );
+					System.arraycopy( old, 0, new_urls, 0, old.length );
 
-				  new_urls[new_urls.length-1]= f.toURL();
+					new_urls[new_urls.length-1]= f.toURL();
 
-				  classLoader = new URLClassLoader(
-									  new_urls,
-  									classLoader==Launcher.class.getClassLoader()?
-  											classLoader:
-  											classLoader.getParent());
-			  }else{
+					classLoader = new URLClassLoader(
+							new_urls,
+							classLoader==Launcher.class.getClassLoader()?
+									classLoader:
+										classLoader.getParent());
+				}else{
 
-				  classLoader = new URLClassLoader(new URL[]{f.toURL()},classLoader);
-			  }
-		  }catch( Exception e){
+					classLoader = new URLClassLoader(new URL[]{f.toURL()},classLoader);
+				}
+			}catch( Exception e){
 
-				  // don't use Debug/lglogger here as we can be called before AZ has been initialised
+				// don't use Debug/lglogger here as we can be called before AZ has been initialised
 
-			  e.printStackTrace();
-		  }
-		 }
+				e.printStackTrace();
+			}
+		}
 
-	  return( classLoader );
+		return( classLoader );
 	}
 
 	public static int
 	compareVersions(
-		String		version_1,
-		String		version_2 )
+			String		version_1,
+			String		version_2 )
 	{
 		try{
 			if ( version_1.startsWith("." )){
@@ -510,5 +509,20 @@ Launcher
 
 			return( 0 );
 		}
+	}
+
+	public static String
+	getApplicationPath()
+	{
+
+		String temp_app_path = System.getProperty("azsmrc.install.path", System.getProperty("user.dir"));
+
+		if ( !temp_app_path.endsWith(SEP)){
+
+			temp_app_path += SEP;
+		}
+
+
+		return( temp_app_path );
 	}
 }
