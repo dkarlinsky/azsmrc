@@ -276,8 +276,8 @@ public class OpenByFileDialog {
 
 			public void update(long updateSwitches) {
 				if((updateSwitches & Constants.UPDATE_DRIVE_INFO) != 0){
-					RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
-						public void run() {
+					RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
+						public void runSafe() {
 							try{
 								driveMap = RCMain.getRCMain().getClient().getRemoteInfo().getDriveInfo();
 

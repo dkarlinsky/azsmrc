@@ -26,6 +26,7 @@ import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.container.Container;
+import lbms.azsmrc.shared.SWTSafeRunnable;
 
 public class MoveDataDialog {
 
@@ -58,8 +59,8 @@ public class MoveDataDialog {
 
 				if((updateSwitches & Constants.UPDATE_ADVANCED_STATS) != 0){
 					das = download.getAdvancedStats();
-					RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
-						public void run() {
+					RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
+						public void runSafe() {
 							tDir.setText(das.getSaveDir());
 							gName.layout();
 

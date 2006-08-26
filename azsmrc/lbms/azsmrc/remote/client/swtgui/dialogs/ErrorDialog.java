@@ -10,6 +10,7 @@ import lbms.azsmrc.remote.client.swtgui.ErrorReporter;
 import lbms.azsmrc.remote.client.swtgui.ErrorReporterListener;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
+import lbms.azsmrc.shared.SWTSafeRunnable;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -67,21 +68,21 @@ public class ErrorDialog {
 		er.addListener(new ErrorReporterListener() {
 			public void errorSubmitted(boolean submitted) {
 				if (submitted) {
-					display.asyncExec(new Runnable() {
-						public void run() {
+					display.asyncExec(new SWTSafeRunnable() {
+						public void runSafe() {
 							shell.dispose();
 						}
 					});
 				} else {
-					display.asyncExec(new Runnable() {
-						public void run() {
+					display.asyncExec(new SWTSafeRunnable() {
+						public void runSafe() {
 							MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION | SWT.OK);
 							messageBox.setText(I18N.translate("global.error"));
 							messageBox.setMessage(I18N.translate(PFX + "errorbox.message"));
 							messageBox.open();
 							return;
 						}
-					});					
+					});
 				}
 			}
 		});
@@ -200,25 +201,25 @@ public class ErrorDialog {
 				}
 			}
 		});
-		
+
 		final Button copyToClip = new Button(panel, SWT.PUSH);
 		copyToClip.setText(I18N.translate(PFX + "copyToClip_button.text"));
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		copyToClip.setLayoutData(gridData);
-		
+
 		copyToClip.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
 				try{
 					if(additionalInfoText != null)
 						er.setAdditionalInfo(additionalInfoText.getText());
-					final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();					
+					final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 					clipboard.setContents(new StringSelection(er.getFormattedReport()),null);
 				}catch(Exception e){
 					e.printStackTrace();
 				}
-				
+
 			}
-			
+
 		});
 
 		final Button cancel = new Button(panel, SWT.PUSH);

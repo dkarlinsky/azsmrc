@@ -725,8 +725,8 @@ public class ScrapeDialog {
 
 				});
 
-				Thread scrapeThread = new Thread(new Runnable(){
-					public void run() {
+				Thread scrapeThread = new Thread(new SWTSafeRunnable(){
+					public void runSafe() {
 						scraper.scrape(urlToScrape);
 					}
 				});
