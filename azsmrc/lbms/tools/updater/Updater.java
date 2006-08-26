@@ -100,23 +100,27 @@ public class Updater {
 					} else {
 						choosenUpdate = remoteUpdateList.getLatestStable();
 					}
-					if (currentUpdates!=null && currentUpdates.exists()) {
-						fis = new FileInputStream(currentUpdates);
-						if (currentUpdates.toString().contains(".gz")) {
-							localUpdateList = readCompressedUpdateList(fis);
-						} else {
-							localUpdateList = readUpdateList(fis);
-						}
+					if (choosenUpdate != null) {
+						if (currentUpdates!=null && currentUpdates.exists()) {
+							fis = new FileInputStream(currentUpdates);
+							if (currentUpdates.toString().contains(".gz")) {
+								localUpdateList = readCompressedUpdateList(fis);
+							} else {
+								localUpdateList = readUpdateList(fis);
+							}
 
-						if (localUpdateList.getLatest().compareTo(choosenUpdate) < 0) {
+							if (localUpdateList.getLatest().compareTo(choosenUpdate) < 0) {
+								updateAvailable = true;
+								callListenerUpdate(choosenUpdate);
+							} else {
+								callListenerNoUpdate();
+							}
+						} else {
 							updateAvailable = true;
 							callListenerUpdate(choosenUpdate);
-						} else {
-							callListenerNoUpdate();
 						}
 					} else {
-						updateAvailable = true;
-						callListenerUpdate(choosenUpdate);
+						callListenerNoUpdate();
 					}
 				} catch (IOException e) {
 					callListenerException(e);
