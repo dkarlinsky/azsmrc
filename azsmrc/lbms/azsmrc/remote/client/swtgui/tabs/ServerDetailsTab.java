@@ -16,6 +16,7 @@ import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.remote.client.util.TimerEvent;
 import lbms.azsmrc.remote.client.util.TimerEventPerformer;
 import lbms.azsmrc.remote.client.util.TimerEventPeriodic;
+import lbms.azsmrc.shared.SWTSafeRunnable;
 import lbms.tools.stats.StatsStreamGlobalManager;
 
 import org.eclipse.swt.SWT;
@@ -224,8 +225,8 @@ public class ServerDetailsTab {
 		final TimerEventPeriodic updateTimerEvent =  RCMain.getRCMain().getMainTimer().addPeriodicEvent(1000,
 				new TimerEventPerformer() {
 			public void perform(TimerEvent event) {
-				RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
-					public void run() {
+				RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
+					public void runSafe() {
 						try{
 							totalDown.setText(DisplayFormatters.formatByteCountToBase10KBEtc(StatsStreamGlobalManager.getTotalDownload()));
 							totalUp.setText(DisplayFormatters.formatByteCountToBase10KBEtc(StatsStreamGlobalManager.getTotalUpload()));
@@ -244,8 +245,8 @@ public class ServerDetailsTab {
 
 			public void update(long updateSwitches) {
 				if((updateSwitches & Constants.UPDATE_REMOTE_INFO) != 0){
-					RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
-						public void run() {
+					RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
+						public void runSafe() {
 							try{
 								azVer.setText(RCMain.getRCMain().getClient().getRemoteInfo().getAzureusVersion());
 								plVer.setText(RCMain.getRCMain().getClient().getRemoteInfo().getPluginVersion());
@@ -264,8 +265,8 @@ public class ServerDetailsTab {
 				}
 
 				if((updateSwitches & Constants.UPDATE_DRIVE_INFO) != 0){
-					RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
-						public void run() {
+					RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
+						public void runSafe() {
 							try{
 								Map<String,String> driveMap = RCMain.getRCMain().getClient().getRemoteInfo().getDriveInfo();
 
@@ -316,8 +317,8 @@ public class ServerDetailsTab {
 	public static void open(final CTabFolder parentTab){
 		Display display = RCMain.getRCMain().getDisplay();
 		if(display == null) return;
-		display.asyncExec(new Runnable(){
-			public void run() {
+		display.asyncExec(new SWTSafeRunnable(){
+			public void runSafe() {
 				CTabItem[] tabs = parentTab.getItems();
 				for(CTabItem tab:tabs){
 					if(tab.getText().equalsIgnoreCase(I18N.translate(PFX + "tab.text"))){

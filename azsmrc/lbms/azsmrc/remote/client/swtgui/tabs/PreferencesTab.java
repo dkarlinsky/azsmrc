@@ -21,6 +21,7 @@ import lbms.azsmrc.remote.client.swtgui.dialogs.SSLCertWizard;
 import lbms.azsmrc.remote.client.swtgui.sound.Sound;
 import lbms.azsmrc.remote.client.swtgui.sound.SoundManager;
 import lbms.azsmrc.shared.RemoteConstants;
+import lbms.azsmrc.shared.SWTSafeRunnable;
 import lbms.tools.flexyconf.ContentProvider;
 import lbms.tools.flexyconf.Entry;
 import lbms.tools.flexyconf.FCInterface;
@@ -79,8 +80,8 @@ public class PreferencesTab {
 
 		public void coreParameter(final String key,final  String value,final  int type) {
 			azProps.setProperty(key, value);
-			RCMain.getRCMain().getDisplay().syncExec(new Runnable() {
-				public void run() {
+			RCMain.getRCMain().getDisplay().syncExec(new SWTSafeRunnable() {
+				public void runSafe() {
 					fc.getFCInterface().getEntryUpdateListener().updated(key, value);
 				}
 			});
@@ -680,9 +681,9 @@ public class PreferencesTab {
 					if(key.equalsIgnoreCase("singleUserMode")){
 						Display display = RCMain.getRCMain().getDisplay();
 						if(display != null && !display.isDisposed()){
-							display.asyncExec(new Runnable(){
+							display.asyncExec(new SWTSafeRunnable(){
 
-								public void run() {
+								public void runSafe() {
 									if(pluginLabel != null && !pluginLabel.isDisposed())
 										pluginLabel.setText(I18N.translate(PFX + "pluginSettings.statusLabel.connected"));
 									if(singleUser != null && !singleUser.isDisposed()){

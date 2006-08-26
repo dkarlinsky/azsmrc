@@ -13,6 +13,7 @@ import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
+import lbms.azsmrc.shared.SWTSafeRunnable;
 
 
 import org.eclipse.swt.SWT;
@@ -59,9 +60,9 @@ public class MyTracker {
 			public void update(long updateSwitches) {
 				if ((updateSwitches & Constants.UPDATE_TRACKER) != 0){
 					torrents = RCMain.getRCMain().getClient().getTracker().getTorrents();
-					RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
+					RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
 
-						public void run() {
+						public void runSafe() {
 							if(table != null && !table.isDisposed()){
 								table.clearAll();
 								table.setItemCount(torrents.length);
@@ -82,9 +83,9 @@ public class MyTracker {
 
 			public void torrentAdded(TrackerTorrent torrent) {
 				torrents = RCMain.getRCMain().getClient().getTracker().getTorrents();
-				RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
+				RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
 
-					public void run() {
+					public void runSafe() {
 						if(table != null && !table.isDisposed()){
 							table.clearAll();
 							table.setItemCount(torrents.length);
@@ -101,9 +102,9 @@ public class MyTracker {
 
 			public void torrentRemoved(TrackerTorrent torrent) {
 				torrents = RCMain.getRCMain().getClient().getTracker().getTorrents();
-				RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
+				RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
 
-					public void run() {
+					public void runSafe() {
 						if(table != null && !table.isDisposed()){
 							table.clearAll();
 							table.setItemCount(torrents.length);
@@ -438,8 +439,8 @@ public class MyTracker {
 
 
 	private void setButtons(final boolean bOn){
-		RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
-			public void run() {
+		RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
+			public void runSafe() {
 				if(stop != null || !stop.isDisposed())
 					stop.setEnabled(bOn);
 				if(start != null || !start.isDisposed())
@@ -466,8 +467,8 @@ public class MyTracker {
 	public static void open(final CTabFolder parentTab){
 		Display display = RCMain.getRCMain().getDisplay();
 		if(display == null) return;
-		display.asyncExec(new Runnable(){
-			public void run() {
+		display.asyncExec(new SWTSafeRunnable(){
+			public void runSafe() {
 				CTabItem[] tabs = parentTab.getItems();
 				for(CTabItem tab:tabs){
 					if(tab.getText().equalsIgnoreCase(I18N.translate(PFX + "tab.text"))){

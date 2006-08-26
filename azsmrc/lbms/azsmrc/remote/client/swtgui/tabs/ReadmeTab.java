@@ -10,6 +10,7 @@ import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.dialogs.AmazonDialog;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
+import lbms.azsmrc.shared.SWTSafeRunnable;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -285,8 +286,8 @@ public class ReadmeTab {
 	public static void open(final CTabFolder parentTab){
 		Display display = RCMain.getRCMain().getDisplay();
 		if(display == null) return;
-		display.asyncExec(new Runnable(){
-			public void run() {
+		display.asyncExec(new SWTSafeRunnable(){
+			public void runSafe() {
 				CTabItem[] tabs = parentTab.getItems();
 				for(CTabItem tab:tabs){
 					if(tab.getText().equalsIgnoreCase(I18N.translate(PFX + "tab.text"))){

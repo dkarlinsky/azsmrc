@@ -18,6 +18,7 @@ import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.shared.DuplicatedUserException;
 import lbms.azsmrc.shared.RemoteConstants;
+import lbms.azsmrc.shared.SWTSafeRunnable;
 import lbms.azsmrc.shared.UserNotFoundException;
 
 
@@ -151,8 +152,8 @@ public class ManageUsersTab {
 		//Listener for add user
 		final Listener addNew_listener = new Listener() {
 			public void handleEvent(Event e) {
-				RCMain.getRCMain().getDisplay().asyncExec(new Runnable (){
-					public void run () {
+				RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable (){
+					public void runSafe () {
 						addNewUser();
 					}
 				});
@@ -165,8 +166,8 @@ public class ManageUsersTab {
 		//Listener for delete user
 		final Listener deleteUser_listener = new Listener() {
 			public void handleEvent(Event e) {
-				RCMain.getRCMain().getDisplay().asyncExec(new Runnable (){
-					public void run () {
+				RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable (){
+					public void runSafe () {
 						//Pull the selected items
 						TableItem[] items = userTable.getSelection();
 
@@ -366,8 +367,8 @@ public class ManageUsersTab {
 	 */
 	public void redrawTable(){
 		// Reset the data so that the SWT.Virtual picks up the array
-		RCMain.getRCMain().getDisplay().syncExec(new Runnable() {
-			public void run() {
+		RCMain.getRCMain().getDisplay().syncExec(new SWTSafeRunnable() {
+			public void runSafe() {
 				if (userTable == null || userTable.isDisposed())
 					return;
 
@@ -394,8 +395,8 @@ public class ManageUsersTab {
 	public void addNewUser(){
 		if(RCMain.getRCMain().getDisplay()==null && RCMain.getRCMain().getDisplay().isDisposed())
 			return;
-		RCMain.getRCMain().getDisplay().asyncExec( new Runnable() {
-			public void run() {
+		RCMain.getRCMain().getDisplay().asyncExec( new SWTSafeRunnable() {
+			public void runSafe() {
 				//Shell Initialize
 
 				final Shell shell = new Shell(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
@@ -678,8 +679,8 @@ public class ManageUsersTab {
 	public void changePassword(final String user){
 		if(RCMain.getRCMain().getDisplay()==null && RCMain.getRCMain().getDisplay().isDisposed())
 			return;
-		RCMain.getRCMain().getDisplay().asyncExec( new Runnable() {
-			public void run() {
+		RCMain.getRCMain().getDisplay().asyncExec( new SWTSafeRunnable() {
+			public void runSafe() {
 				//Shell Initialize
 
 				final Shell shell = new Shell(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
@@ -856,8 +857,8 @@ public class ManageUsersTab {
 	public void editUserInfo(final String userN){
 		if(RCMain.getRCMain().getDisplay()==null && RCMain.getRCMain().getDisplay().isDisposed())
 			return;
-		RCMain.getRCMain().getDisplay().asyncExec( new Runnable() {
-			public void run() {
+		RCMain.getRCMain().getDisplay().asyncExec( new SWTSafeRunnable() {
+			public void runSafe() {
 				//Shell Initialize
 				User user = null;
 				try {
@@ -1063,8 +1064,8 @@ public class ManageUsersTab {
 	public static void open(final CTabFolder parentTab){
 		Display display = RCMain.getRCMain().getDisplay();
 		if(display == null) return;
-		display.asyncExec(new Runnable(){
-			public void run() {
+		display.asyncExec(new SWTSafeRunnable(){
+			public void runSafe() {
 				CTabItem[] tabs = parentTab.getItems();
 				for(CTabItem tab:tabs){
 					if(tab.getText().equalsIgnoreCase(I18N.translate(PFX + "tab.text"))){

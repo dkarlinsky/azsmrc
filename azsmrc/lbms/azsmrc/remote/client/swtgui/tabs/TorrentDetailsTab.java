@@ -23,6 +23,7 @@ import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.shared.EncodingUtil;
+import lbms.azsmrc.shared.SWTSafeRunnable;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -79,8 +80,8 @@ public class TorrentDetailsTab {
 	public static void open(final CTabFolder parentTab, final Download _download){
 		Display display = RCMain.getRCMain().getDisplay();
 		if(display == null) return;
-		display.asyncExec(new Runnable(){
-			public void run() {
+		display.asyncExec(new SWTSafeRunnable(){
+			public void runSafe() {
 				CTabItem[] tabs = parentTab.getItems();
 				for(CTabItem tab:tabs){
 					if(tab.getText().equalsIgnoreCase(_download.getName())){
@@ -548,9 +549,9 @@ public class TorrentDetailsTab {
 
 	private void update_elements(){
 		if(RCMain.getRCMain().getDisplay() == null || RCMain.getRCMain().getDisplay().isDisposed()) return;
-		RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
+		RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
 
-			public void run() {
+			public void runSafe() {
 				//----Put all update elements here-----\\
 
 				//composite 1
@@ -828,8 +829,8 @@ public class TorrentDetailsTab {
 	 */
 	public void redrawTable(){
 		// Reset the data so that the SWT.Virtual picks up the array
-		RCMain.getRCMain().getDisplay().syncExec(new Runnable() {
-			public void run() {
+		RCMain.getRCMain().getDisplay().syncExec(new SWTSafeRunnable() {
+			public void runSafe() {
 				if (filesTable == null || filesTable.isDisposed())
 					return;
 
