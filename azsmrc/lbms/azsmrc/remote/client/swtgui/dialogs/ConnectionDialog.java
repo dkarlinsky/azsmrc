@@ -14,6 +14,7 @@ import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
+import lbms.azsmrc.shared.SWTSafeRunnable;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
@@ -448,9 +449,9 @@ public class ConnectionDialog {
 
 
 	private void connectGo(){
-		RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
+		RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
 
-			public void run() {
+			public void runSafe() {
 				if(urlCombo.getText().equalsIgnoreCase("")
 						|| port_text.getText().equalsIgnoreCase("")
 						|| username_text.getText().equalsIgnoreCase("")
@@ -562,9 +563,9 @@ public class ConnectionDialog {
 	}
 
 	private void add_CR_KeyListener(final Control control){
-		RCMain.getRCMain().getDisplay().asyncExec(new Runnable(){
+		RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
 
-			public void run() {
+			public void runSafe() {
 				control.addKeyListener(new KeyListener(){
 
 					public void keyPressed(KeyEvent arg0) {
