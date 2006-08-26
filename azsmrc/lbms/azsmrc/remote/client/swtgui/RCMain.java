@@ -610,9 +610,33 @@ public class RCMain implements Launchable {
 					display.syncExec(new SWTSafeRunnable() {
 						public void runSafe() {
 							//setTrayToolTip("AzSMRC: D:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d)+" - U:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u));
-							setTrayToolTip(client.getDownloadManager().getSeedingDownloadsOnly().length + " "
+							int downloading 	= 0;
+							int downloadqueue	= 0;
+							int seeding 		= 0;
+							int seedqueue 		= 0;
+							Download[] dlList = client.getDownloadManager().getDownloads();
+							for (int i = 0;i<dlList.length;i++) {
+								switch (dlList[i].getState()) {
+								case Download.ST_SEEDING:
+									seeding++;
+									break;
+								case Download.ST_DOWNLOADING:
+									downloading++;
+									break;
+								default:
+									if (dlList[i].isComplete()) {
+										seedqueue++;
+									} else {
+										downloadqueue++;
+									}
+									break;
+								}
+							}
+
+
+							setTrayToolTip(seeding + " ("+ seedqueue+") "
 									+ I18N.translate(PFX + "tray.tooltip.part1") + " "
-									+ client.getDownloadManager().getDownloadsOnly().length + " "
+									+ downloading + " ("+ downloadqueue+") "
 									+ I18N.translate(PFX + "tray.tooltip.part2") + "\n"
 									+ I18N.translate(PFX + "tray.tooltip.part3")
 									+ " "+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d)

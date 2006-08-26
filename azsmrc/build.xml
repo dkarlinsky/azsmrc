@@ -105,24 +105,23 @@
 		</zip>
 	</target>
 
-	<target name="distribute" depends="jar">
+	<target name="distribute" depends="jar, createExeFile">
 		<zip destfile="${root.dir}/${dist.dir}/AzSMRC_${version}.zip">
-			<fileset file="${root.dir}/Readme.txt" />
-			<fileset file="${root.dir}/AzSMRCupdate.xml.gz" />
-			<fileset file="${root.dir}/changelog.txt" />
-			<fileset file="${dist.dir}/AzSMRC_${version}.jar" />
-			<fileset file="${root.dir}/launch.properties" />
-			<fileset file="${dist.dir}/launcher.jar" />
-		</zip>
-		<zip destfile="${root.dir}/${dist.dir}/AzSMRC_${version}_win.zip">
 			<fileset file="${root.dir}/Readme.txt" />
 			<fileset file="${root.dir}/javaw.exe.manifest" />
 			<fileset file="${root.dir}/AzSMRCupdate.xml.gz" />
 			<fileset file="${root.dir}/changelog.txt" />
 			<fileset file="${dist.dir}/AzSMRC_${version}.jar" />
-			<fileset file="${root.dir}/AzSMRC.exe" />
+			<fileset file="${dist.dir}/AzSMRC.exe" />
 			<fileset file="${root.dir}/launch.properties" />
 			<fileset file="${dist.dir}/launcher.jar" />
+		</zip>
+		<zip destfile="${root.dir}/${dist.dir}/azsmrcPlugin_${version}.zip">
+			<fileset file="${dist.dir}/azsmrcPlugin_${version}.jar" />
+			<fileset file="${root.dir}/lbms/azsmrc/libs/commons-codec_1.3.jar" />
+			<fileset file="${root.dir}/lbms/azsmrc/libs/commons-io_1.2.jar" />
+			<fileset file="${root.dir}/lbms/azsmrc/libs/jdom_1.0.jar" />
+			<fileset file="${root.dir}/Readme.txt" />
 		</zip>
 	</target>
 

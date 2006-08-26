@@ -115,7 +115,7 @@ public class DownloadManagerImpl implements DownloadManager {
 	public Download[] getSeedingDownloadsOnly() {
 		List<Download> dl = new ArrayList<Download>();
 		for (Download d:downloads.values()) {
-			if ((d.getState()== Download.ST_SEEDING || d.isComplete()) && d.getState() != Download.ST_STOPPED)
+			if ((d.getState()== Download.ST_SEEDING || (d.isComplete()) && d.getState() != Download.ST_STOPPED))
 				dl.add(d);
 		}
 		return dl.toArray(emptyDlArray);
