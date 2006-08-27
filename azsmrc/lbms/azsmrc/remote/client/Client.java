@@ -28,7 +28,7 @@ import lbms.azsmrc.remote.client.events.ExceptionListener;
 import lbms.azsmrc.remote.client.events.HTTPErrorListener;
 import lbms.azsmrc.remote.client.events.IPCResponseListener;
 import lbms.azsmrc.remote.client.events.ParameterListener;
-import lbms.azsmrc.remote.client.events.SpeedUpdateListener;
+import lbms.azsmrc.remote.client.events.GlobalStatsListener;
 import lbms.azsmrc.remote.client.impl.DownloadManagerImpl;
 import lbms.azsmrc.remote.client.impl.RemoteInfoImpl;
 import lbms.azsmrc.remote.client.impl.RemoteUpdateManagerImpl;
@@ -92,7 +92,7 @@ public class Client {
 
 	//use Vector of Collections.synchronizedList here
 	private List<ClientUpdateListener> 	clientUpdateListeners	= new ArrayList<ClientUpdateListener>();
-	private List<SpeedUpdateListener> 	speedUpdateListners		= new ArrayList<SpeedUpdateListener>();
+	private List<GlobalStatsListener> 	globalStatsListners		= new ArrayList<GlobalStatsListener>();
 	private List<ExceptionListener> 	exceptionListeners		= new ArrayList<ExceptionListener>();
 	private List<ConnectionListener> 	connectionListeners		= new ArrayList<ConnectionListener>();
 	private List<ClientEventListener> 	eventListeners			= new ArrayList<ClientEventListener>();
@@ -858,17 +858,17 @@ public class Client {
 
 	}
 
-	public void addSpeedUpdateListener (SpeedUpdateListener listener) {
-		speedUpdateListners.add(listener);
+	public void addGlobalStatsListener (GlobalStatsListener listener) {
+		globalStatsListners.add(listener);
 	}
 
-	public void removeSpeedUpdateListener (SpeedUpdateListener listener) {
-		speedUpdateListners.remove(listener);
+	public void removeGlobalStatsListener (GlobalStatsListener listener) {
+		globalStatsListners.remove(listener);
 	}
 
-	protected void callSpeedUpdateListener(int d, int u) {
-		for (int i=0;i<speedUpdateListners.size();i++)
-			speedUpdateListners.get(i).setSpeed(d, u);
+	protected void callGlobalStatsListener(int d, int u, int s, int sq, int dl, int dlq) {
+		for (int i=0;i<globalStatsListners.size();i++)
+			globalStatsListners.get(i).updateStats(d, u, s, sq, dl, dlq);
 	}
 
 	public void addExceptionListener (ExceptionListener listener) {

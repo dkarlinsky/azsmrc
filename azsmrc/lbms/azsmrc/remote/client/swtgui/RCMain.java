@@ -42,7 +42,7 @@ import lbms.azsmrc.remote.client.events.ConnectionListener;
 import lbms.azsmrc.remote.client.events.DownloadManagerListener;
 import lbms.azsmrc.remote.client.events.ExceptionListener;
 import lbms.azsmrc.remote.client.events.HTTPErrorListener;
-import lbms.azsmrc.remote.client.events.SpeedUpdateListener;
+import lbms.azsmrc.remote.client.events.GlobalStatsListener;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.pluginsimpl.PluginLoader;
 import lbms.azsmrc.remote.client.pluginsimpl.PluginManagerImpl;
@@ -604,35 +604,12 @@ public class RCMain implements Launchable {
 			client.setProxy(proxy);
 		}
 		client.setFastMode(properties.getPropertyAsBoolean("client.fastmode"));
-		client.addSpeedUpdateListener(new SpeedUpdateListener() {
-			public void setSpeed(final int d, final int u) {
+		client.addGlobalStatsListener(new GlobalStatsListener() {
+			public void updateStats(final int d, final int u, final int seeding, final int seedqueue, final int downloading, final int downloadqueue) {
 				if(display != null)
 					display.syncExec(new SWTSafeRunnable() {
 						public void runSafe() {
 							//setTrayToolTip("AzSMRC: D:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d)+" - U:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u));
-							int downloading 	= 0;
-							int downloadqueue	= 0;
-							int seeding 		= 0;
-							int seedqueue 		= 0;
-							Download[] dlList = client.getDownloadManager().getDownloads();
-							for (int i = 0;i<dlList.length;i++) {
-								switch (dlList[i].getState()) {
-								case Download.ST_SEEDING:
-									seeding++;
-									break;
-								case Download.ST_DOWNLOADING:
-									downloading++;
-									break;
-								default:
-									if (dlList[i].isComplete()) {
-										seedqueue++;
-									} else {
-										downloadqueue++;
-									}
-									break;
-								}
-							}
-
 
 							setTrayToolTip(seeding + " ("+ seedqueue+") "
 									+ I18N.translate(PFX + "tray.tooltip.part1") + " "

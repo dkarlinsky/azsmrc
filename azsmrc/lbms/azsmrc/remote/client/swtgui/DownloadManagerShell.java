@@ -35,7 +35,7 @@ import lbms.azsmrc.remote.client.events.ConnectionListener;
 import lbms.azsmrc.remote.client.events.DownloadListener;
 import lbms.azsmrc.remote.client.events.DownloadManagerListener;
 import lbms.azsmrc.remote.client.events.ParameterListener;
-import lbms.azsmrc.remote.client.events.SpeedUpdateListener;
+import lbms.azsmrc.remote.client.events.GlobalStatsListener;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.container.Container;
 import lbms.azsmrc.remote.client.swtgui.container.DownloadContainer;
@@ -886,15 +886,15 @@ public class DownloadManagerShell {
 
 		//-------------------  Listeners for the shell ---------------------\\
 
-		final SpeedUpdateListener sul = new SpeedUpdateListener() {
-			public void setSpeed(final int d, final int u) {
+		final GlobalStatsListener sul = new GlobalStatsListener() {
+			public void updateStats(final int d, final int u, int s, int sq, int dl, int dlq) {
 				upSpeed = u;
 				downSpeed = d;
 				refreshStatusBar();
 			}
 		};
 
-		RCMain.getRCMain().getClient().addSpeedUpdateListener(sul);
+		RCMain.getRCMain().getClient().addGlobalStatsListener(sul);
 
 		final ConnectionListener cl = new ConnectionListener() {
 

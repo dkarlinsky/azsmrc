@@ -1039,10 +1039,42 @@ public class RequestManager {
 			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {
 				PluginInterface pluginInterface = Plugin.getPluginInterface();
 
+				int downloading 	= 0;
+				int downloadqueue	= 0;
+				int seeding 		= 0;
+				int seedqueue 		= 0;
+				Download[] dlList = pluginInterface.getDownloadManager().getDownloads();
+				for (int i = 0;i<dlList.length;i++) {
+					switch (dlList[i].getState()) {
+					case Download.ST_SEEDING:
+						seeding++;
+						break;
+					case Download.ST_DOWNLOADING:
+						downloading++;
+						break;
+					default:
+						if (dlList[i].isComplete()) {
+							seedqueue++;
+						} else {
+							downloadqueue++;
+						}
+						break;
+					}
+				}
+
 				response.setAttribute("receiveRate",
 						Integer.toString(pluginInterface.getDownloadManager().getStats().getDataReceiveRate()));
 				response.setAttribute("sendRate",
 						Integer.toString(pluginInterface.getDownloadManager().getStats().getDataSendRate()));
+
+				response.setAttribute("seeding",
+						Integer.toString(seeding));
+				response.setAttribute("seedqueue",
+						Integer.toString(seedqueue));
+				response.setAttribute("downloading",
+						Integer.toString(downloading));
+				response.setAttribute("downloadqueue",
+						Integer.toString(downloadqueue));
 				return true;
 			}
 		});

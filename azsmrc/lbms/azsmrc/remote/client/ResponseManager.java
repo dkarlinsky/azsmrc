@@ -276,6 +276,7 @@ public class ResponseManager {
 		addHandler("globalStats", new ResponseHandler() {
 			public long handleRequest(Element xmlResponse) throws IOException {
 				int receiveRate = 0,sendRate = 0;
+				int s = 0, sq = 0, d = 0, dq = 0;
 				try {
 					sendRate = xmlResponse.getAttribute("sendRate").getIntValue();
 					receiveRate = xmlResponse.getAttribute("receiveRate").getIntValue();
@@ -283,7 +284,17 @@ public class ResponseManager {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				client.callSpeedUpdateListener(receiveRate,sendRate);
+				if (xmlResponse.getAttribute("seeding") != null)
+				try {
+					s = xmlResponse.getAttribute("seeding").getIntValue();
+					sq = xmlResponse.getAttribute("seedqueue").getIntValue();
+					d = xmlResponse.getAttribute("downloading").getIntValue();
+					dq = xmlResponse.getAttribute("downloadqueue").getIntValue();
+				} catch (DataConversionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				client.callGlobalStatsListener(receiveRate,sendRate,s,sq,d,dq);
 				return 0;
 			}
 		});
