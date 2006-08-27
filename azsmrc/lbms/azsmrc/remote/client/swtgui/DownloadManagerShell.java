@@ -1235,12 +1235,10 @@ public class DownloadManagerShell {
 						setTorrentMoveButtons(false,false,false,false);
 					}else{
 						TableItem[] items = downloadsTable.getSelection();
-						if(items.length > 1) return;
-
+						if(items.length != 1) return;
 						Container dc = (Container)items[0].getData();
 						//check for dupicate happens IN the tab open now
 						TorrentDetailsTab.open(tabFolder,dc.getDownload());
-
 					}
 
 				}
