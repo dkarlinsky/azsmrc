@@ -16,8 +16,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -37,6 +39,8 @@ import lbms.azsmrc.remote.client.events.DownloadManagerListener;
 import lbms.azsmrc.remote.client.events.ParameterListener;
 import lbms.azsmrc.remote.client.events.GlobalStatsListener;
 import lbms.azsmrc.remote.client.internat.I18N;
+import lbms.azsmrc.remote.client.plugins.ui.swt.AbstractIView;
+import lbms.azsmrc.remote.client.plugins.ui.swt.Tab;
 import lbms.azsmrc.remote.client.swtgui.container.Container;
 import lbms.azsmrc.remote.client.swtgui.container.DownloadContainer;
 import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
@@ -122,7 +126,7 @@ public class DownloadManagerShell {
 	private CTabItem myTorrents;
 	private MenuItem moveData;
 
-
+	Map pluginTabs = new HashMap();
 
 	private DownloadListener dlL = new DownloadListener(){
 
@@ -3331,6 +3335,14 @@ public class DownloadManagerShell {
 
 	}
 
+	/**
+	 * Returns the number of tabs currently open in the tabFolder
+	 * @return int count
+	 */
+	public CTabFolder getTabFolder(){
+		 return tabFolder;
+	}
+
 	public int[] getSeedsDownloadsCount(){
 		return new int[]{seedsMap.size(), downloadsMap.size()};
 	}
@@ -3371,4 +3383,25 @@ public class DownloadManagerShell {
 			return pt;
 		}
 	}
+
+	/**
+	 * Open a plugin view
+	 * @param view
+	 * @param name
+	 */
+	  protected void openPluginView(final AbstractIView view, final String name) {
+		  Display display = RCMain.getRCMain().getDisplay();
+		  if (display == null || display.isDisposed()) return;
+		  display.asyncExec(new SWTSafeRunnable() {
+				public void runSafe() {
+					Tab tab = (Tab) pluginTabs.get(name);
+					if (tab != null) {
+						tab.setFocus();
+					} else {
+						tab = new Tab(view);
+						pluginTabs.put(name, tab);
+					}
+				}
+			});
+		}
 }//EOF
