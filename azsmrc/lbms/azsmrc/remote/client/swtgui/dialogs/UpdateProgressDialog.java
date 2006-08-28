@@ -328,6 +328,7 @@ public class UpdateProgressDialog {
 					if (newState == Download.STATE_FINISHED
 							|| newState == Download.STATE_FAILURE
 							|| newState == Download.STATE_ABORTED) {
+						if(display == null || display.isDisposed()) return;
 						display.asyncExec(new SWTSafeRunnable(){
 							public void runSafe() {
 								cancelButton.setEnabled(false);
