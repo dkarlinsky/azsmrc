@@ -58,22 +58,27 @@ class RangeValidator extends Validator {
 
 	@Override
 	public boolean validate(String value) {
-		switch (type) {
-		case Entry.TYPE_FLOAT:
-			{
-				double x = Double.parseDouble(value);
-				if (x > Float.MAX_VALUE || x < Float.MIN_VALUE) return false;
+		try {
+			switch (type) {
+			case Entry.TYPE_FLOAT:
+				{
+					double x = Double.parseDouble(value);
+					if (x > Float.MAX_VALUE || x < Float.MIN_VALUE) return false;
+				}
+			case Entry.TYPE_DOUBLE:
+				return validate(Double.parseDouble(value));
+			case Entry.TYPE_INT:
+				{
+					long x = Long.parseLong(value);
+					if (x > Integer.MAX_VALUE || x < Integer.MIN_VALUE) return false;
+				}
+			case Entry.TYPE_LONG:
+				return validate(Long.parseLong(value));
+			default:
+				return false;
 			}
-		case Entry.TYPE_DOUBLE:
-			return validate(Double.parseDouble(value));
-		case Entry.TYPE_INT:
-			{
-				long x = Long.parseLong(value);
-				if (x > Integer.MAX_VALUE || x < Integer.MIN_VALUE) return false;
-			}
-		case Entry.TYPE_LONG:
-			return validate(Long.parseLong(value));
-		default:
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
 			return false;
 		}
 	}
