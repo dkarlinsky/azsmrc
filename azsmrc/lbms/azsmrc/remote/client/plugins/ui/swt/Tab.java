@@ -299,7 +299,7 @@ public class Tab {
 			IView view = views[i];
 
 			try {
-				view.updateLanguage();
+				//view.updateLanguage();
 				view.refresh();
 			}
 			catch (Exception e) {
@@ -428,14 +428,14 @@ public class Tab {
 
 		if (view != null) {
 			try {
-				if(view instanceof UISWTPluginView) {
+			/*	if(view instanceof UISWTPluginView) {
 					//TODO -- we need a way to remove the plugins here
 					//mainwindow.removeActivePluginView(((UISWTPluginView)view).getPluginViewName());
 				}
 				if(view instanceof UISWTView)
 					//mainwindow.removeActivePluginView(((UISWTView)view).getViewID());
 
-				view.delete();
+				view.delete();*/
 			} catch (Exception e) {
 				logger.debug(e);
 			}
@@ -471,11 +471,11 @@ public class Tab {
 		tabs.remove(tabItem);
 		try {
 			if (localView != null) {
-				if(localView instanceof UISWTPluginView) {
+				/*if(localView instanceof UISWTPluginView) {
 					//TODO -- again.. we need a way to get rid of the view
 					//mainwindow.removeActivePluginView(((UISWTPluginView)localView).getPluginViewName());
 				}
-
+*/
 				localView.delete();
 			}
 			tabItem.dispose();

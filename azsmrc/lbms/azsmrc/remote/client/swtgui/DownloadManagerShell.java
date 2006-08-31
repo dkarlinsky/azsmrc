@@ -118,6 +118,8 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class DownloadManagerShell {
 
+	private static final long DONATION_INTERVAL = 24*60*60*1000;
+
 	private Shell DOWNLOAD_MANAGER_SHELL;
 	private Table downloadsTable, seedsTable;
 	private Semaphore semaphore = new Semaphore(1);
@@ -1767,6 +1769,10 @@ public class DownloadManagerShell {
 			//createDropTarget(DOWNLOAD_MANAGER_SHELL);
 		} catch (Throwable e) {
 			e.printStackTrace();
+		}
+
+		if (RCMain.getRCMain().getRunTime()-properties.getPropertyAsLong("lastDonationQuestion")>DONATION_INTERVAL) {
+			properties.setProperty("lastDonationQuestion",RCMain.getRCMain().getRunTime());
 		}
 
 		if (RCMain.getRCMain().connected())

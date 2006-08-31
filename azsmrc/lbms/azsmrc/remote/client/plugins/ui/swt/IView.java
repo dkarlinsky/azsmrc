@@ -87,35 +87,4 @@ public interface IView {
    * @return the full title for the view
    */
   public String getFullTitle();
-
-  /**
-   * Called when the language needs updating
-   *
-   */
-  public void updateLanguage();
-
-
-/*  *//**
-   * Called when Azureus generates Diagnostics.
-   * Write any diagnostic information you want to the writer. 
-   * 
-   * @param writer
-   * @since 2.3.0.4
-   *//*
-  // XXX Introduced IndentWriter to plugins..
-  public void
-  generateDiagnostics(
-		IndentWriter	writer );*/
-
-
-  /**
-   * Called when the selected dataSource has changed.
-   * If this view is dependent upon a selected datasource, implement this 
-   * function and update your view.
-   * 
-   * @param newDataSource null if no datasource is selected.  May be an array
-   *                       of Object[] if multiple dataSources are selected
-   * @since 2.3.0.7
-   */
-  public void dataSourceChanged(Object newDataSource);
 }

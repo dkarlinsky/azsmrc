@@ -1,7 +1,6 @@
-/**
- * 
- */
 package lbms.azsmrc.remote.client.plugins.ui.swt;
+
+import org.eclipse.swt.widgets.Display;
 
 /**
  * @author Damokles
@@ -9,7 +8,10 @@ package lbms.azsmrc.remote.client.plugins.ui.swt;
  */
 public interface UISWTManager {
 
-	public void addPluginView (UISWTPluginView handler);
+	public void addPluginView(ViewID parentID, String viewID, UIPluginEventListener view);
 
-	public void removePluginView (UISWTPluginView handler);
+	public void openMainView (String viewID);
+
+	public Display getDisplay();
+
 }

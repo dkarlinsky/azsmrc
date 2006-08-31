@@ -1,12 +1,10 @@
 package lbms.azsmrc.remote.client.pluginsimpl;
 
 import lbms.azsmrc.remote.client.plugins.ui.swt.AbstractIView;
+import lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginEvent;
+import lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginEventListener;
 import lbms.azsmrc.remote.client.plugins.ui.swt.UIRuntimeException;
-import lbms.azsmrc.remote.client.plugins.ui.swt.UISWTView;
-import lbms.azsmrc.remote.client.plugins.ui.swt.UISWTViewEvent;
-import lbms.azsmrc.remote.client.plugins.ui.swt.UISWTViewEventListener;
-import lbms.azsmrc.remote.client.pluginsimpl.ui.swt.UISWTViewEventImpl;
-
+import lbms.azsmrc.remote.client.pluginsimpl.ui.swt.UIPluginEventImpl;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
@@ -17,21 +15,16 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-
-
-
-
-
 /**
- * @author TuxPaper
+ * @author Damokles
  *
  */
-public class UISWTViewImpl extends AbstractIView implements UISWTView {
+public class UISWTViewImpl extends AbstractIView {
 	public static final String CFG_PREFIX = "Views.plugins.";
 
 	private Object dataSource = null;
 
-	private final UISWTViewEventListener eventListener;
+	private final UIPluginEventListener eventListener;
 
 	private Composite composite;
 
@@ -50,15 +43,15 @@ public class UISWTViewImpl extends AbstractIView implements UISWTView {
 	 * @param sViewID
 	 * @param eventListener
 	 */
-	public UISWTViewImpl(String sParentID, String sViewID, UISWTViewEventListener eventListener)
+	public UISWTViewImpl(String sParentID, String sViewID, UIPluginEventListener eventListener)
 	throws Exception {
 		this.sParentID = sParentID;
 		this.sViewID = sViewID;
 		this.eventListener = eventListener;
 		logger = Logger.getLogger(UISWTViewImpl.class);
 
-		if (!eventListener.eventOccurred(new UISWTViewEventImpl(this,
-				UISWTViewEvent.TYPE_CREATE, this)))
+		if (!eventListener.eventOccurred(new UIPluginEventImpl(this,
+				UIPluginEvent.TYPE_CREATE, this)))
 			throw new Exception();
 	}
 
@@ -90,7 +83,7 @@ public class UISWTViewImpl extends AbstractIView implements UISWTView {
 
 	public void triggerEvent(int eventType, Object data) {
 		try {
-			eventListener.eventOccurred(new UISWTViewEventImpl(this, eventType, data));
+			eventListener.eventOccurred(new UIPluginEventImpl(this, eventType, data));
 		} catch (Throwable t) {
 			throw (new UIRuntimeException("UISWTView.triggerEvent:: ViewID="
 					+ sViewID + "; EventID=" + eventType + "; data=" + data, t));
@@ -109,11 +102,11 @@ public class UISWTViewImpl extends AbstractIView implements UISWTView {
 	public void dataSourceChanged(Object newDataSource) {
 		dataSource = newDataSource;
 
-		triggerEvent(UISWTViewEvent.TYPE_DATASOURCE_CHANGED, newDataSource);
+		triggerEvent(UIPluginEvent.TYPE_DATASOURCE_CHANGED, newDataSource);
 	}
 
 	public void delete() {
-		triggerEvent(UISWTViewEvent.TYPE_DESTROY, null);
+		triggerEvent(UIPluginEvent.TYPE_DESTROY, null);
 		super.delete();
 	}
 
@@ -150,7 +143,7 @@ public class UISWTViewImpl extends AbstractIView implements UISWTView {
 		GridData gridData = new GridData(GridData.FILL_BOTH);
 		composite.setLayoutData(gridData);
 
-		triggerEvent(UISWTViewEvent.TYPE_INITIALIZE, composite);
+		triggerEvent(UIPluginEvent.TYPE_INITIALIZE, composite);
 
 		if (composite.getLayout() instanceof GridLayout) {
 			// Force children to have GridData layoutdata.
@@ -177,20 +170,20 @@ public class UISWTViewImpl extends AbstractIView implements UISWTView {
 		if (composite != null) {
 			composite.addListener(SWT.Activate, new Listener() {
 				public void handleEvent(Event event) {
-					triggerEvent(UISWTViewEvent.TYPE_FOCUSGAINED, null);
+					triggerEvent(UIPluginEvent.TYPE_FOCUSGAINED, null);
 				}
 			});
 
 			composite.addListener(SWT.Deactivate, new Listener() {
 				public void handleEvent(Event event) {
-					triggerEvent(UISWTViewEvent.TYPE_FOCUSLOST, null);
+					triggerEvent(UIPluginEvent.TYPE_FOCUSLOST, null);
 				}
 			});
 		}
 	}
 
 	public void refresh() {
-		triggerEvent(UISWTViewEvent.TYPE_REFRESH, null);
+		triggerEvent(UIPluginEvent.TYPE_REFRESH, null);
 	}
 
 
@@ -203,10 +196,5 @@ public class UISWTViewImpl extends AbstractIView implements UISWTView {
 	public String getShortTitle() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	public void updateLanguage() {
-		// TODO Auto-generated method stub
-
 	}
 }

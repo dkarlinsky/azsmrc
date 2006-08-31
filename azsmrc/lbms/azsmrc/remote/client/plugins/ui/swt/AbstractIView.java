@@ -66,41 +66,4 @@ public abstract class AbstractIView implements IView {
 
 	 return( key.replace( '.', ' ' ));	// support old plugins
   }
-
-/*  *//**
-   * Called in order to set / update the short title of this view.  When the 
-   * view is being displayed in a tab, the short title is used for the tab's
-   * text.
-   * 
-   * By default, this function will return the full title. If the full title
-   * is over 30 characters, it will be trimmed and "..." will be added
-   * 
-   * @return A short title for the view
-   *//*
-  public final String getShortTitle() {
-	String shortTitle = getFullTitle();
-	if(shortTitle != null && shortTitle.length() > 30) {
-	  shortTitle = shortTitle.substring(0,30) + "...";
-	}
-	return shortTitle;
-	}*/
-
-  // IconBarEnabler
-  public boolean isEnabled(String itemKey) {
-	return false;
-  }
-
-  // IconBarEnabler
-  public boolean isSelected(String itemKey) {
-	return false;
-  }
-
-  // IconBarEnabler
-  public void itemActivated(String itemKey) {   
-  }
-
-
-
-  public void dataSourceChanged(Object newDataSource) {
-  }
 }
