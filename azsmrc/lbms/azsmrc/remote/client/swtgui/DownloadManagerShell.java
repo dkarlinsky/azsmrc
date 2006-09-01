@@ -1708,11 +1708,12 @@ public class DownloadManagerShell {
 						if(colWidth == 0){
 							b_ok = false;
 							break;
-						}
-						if(b_ok)
+						}else
 							seed_column_list.add(colWidth);
+
 					}
-					properties.setProperty("seedsTable.columns.widths", EncodingUtil.IntListToString(seed_column_list));
+					if(b_ok)
+						properties.setProperty("seedsTable.columns.widths", EncodingUtil.IntListToString(seed_column_list));
 				}
 
 				//Save Everything!
