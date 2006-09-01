@@ -1463,6 +1463,27 @@ public class RequestManager {
 				return false;
 			}
 		});
+		addHandler("listPlugins", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, final User user) throws IOException {
+				if (user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+					PluginInterface pi = Plugin.getPluginInterface();
+					PluginInterface[] piList = pi.getPluginManager().getPluginInterfaces();
+					for (PluginInterface plug:piList) {
+						Element pe = new Element("Plugin");
+						pe.setAttribute("id", plug.getPluginID());
+						pe.setAttribute("name", plug.getPluginName());
+						pe.setAttribute("version", plug.getPluginVersion());
+						pe.setAttribute("dir", plug.getPluginDirectoryName());
+						pe.setAttribute("disabled", Boolean.toString(plug.isDisabled()));
+						pe.setAttribute("builtin", Boolean.toString(plug.isBuiltIn()));
+						pe.setAttribute("operational", Boolean.toString(plug.isBuiltIn()));
+						pe.setAttribute("mandatory", Boolean.toString(plug.isMandatory()));
+						pe.setAttribute("unloadable", Boolean.toString(plug.isUnloadable()));
+					}
+				}
+				return false;
+			}
+		});
 		/*addHandler("getPluginsFlexyConfig", new RequestHandler() {
 			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {
 				System.out.println("Creating PluginFlexyConf");
