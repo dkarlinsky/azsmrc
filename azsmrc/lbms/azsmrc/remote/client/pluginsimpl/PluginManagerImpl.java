@@ -11,6 +11,7 @@ import lbms.azsmrc.remote.client.plugins.Plugin;
 import lbms.azsmrc.remote.client.plugins.PluginInterface;
 import lbms.azsmrc.remote.client.plugins.PluginManager;
 import lbms.azsmrc.remote.client.plugins.event.PluginListener;
+import lbms.azsmrc.remote.client.pluginsimpl.ui.swt.UISWTManagerImpl;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.SplashScreen;
 
@@ -24,6 +25,7 @@ public class PluginManagerImpl implements PluginManager {
 	private PluginInterface[] emptyArray = new PluginInterface[0];
 	private AzSMRCInterface azsmrcInterface;
 	private PluginClientImpl plClient;
+	private UISWTManagerImpl uiManager;
 
 	private List<PluginListener> listeners = new ArrayList<PluginListener>();
 
@@ -96,6 +98,7 @@ public class PluginManagerImpl implements PluginManager {
 	public void initialize (RCMain rcMain) {
 		this.plClient = new PluginClientImpl(rcMain.getClient());
 		this.azsmrcInterface = new AzSMRCInterfaceImpl(rcMain);
+		this.uiManager = new UISWTManagerImpl();
 
 		for (PluginInterfaceImpl pi:pluginMap.values()) {
 			try {
@@ -105,6 +108,10 @@ public class PluginManagerImpl implements PluginManager {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public UISWTManagerImpl getUIManager() {
+		return uiManager;
 	}
 
 }
