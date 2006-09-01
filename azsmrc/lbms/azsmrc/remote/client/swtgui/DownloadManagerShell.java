@@ -1681,7 +1681,10 @@ public class DownloadManagerShell {
 					TableColumn[] columns = downloadsTable.getColumns();
 					List<Integer> dl_column_list = new ArrayList<Integer>();
 					for (TableColumn column:columns){
-						dl_column_list.add(column.getWidth());
+						int colWidth = column.getWidth();
+						//if it is 0, somthing is wrong.. resave it as 50
+						if(colWidth == 0) colWidth = 50;
+						dl_column_list.add(colWidth);
 					}
 					properties.setProperty("downloadsTable.columns.widths", EncodingUtil.IntListToString(dl_column_list));
 				}
@@ -1691,7 +1694,10 @@ public class DownloadManagerShell {
 					TableColumn[] seed_columns = seedsTable.getColumns();
 					List<Integer> seed_column_list = new ArrayList<Integer>();
 					for (TableColumn column:seed_columns){
-						seed_column_list.add(column.getWidth());
+						int colWidth = column.getWidth();
+						//if it is 0, somthing is wrong.. resave it as 50
+						if(colWidth == 0) colWidth = 50;
+						seed_column_list.add(colWidth);
 					}
 					properties.setProperty("seedsTable.columns.widths", EncodingUtil.IntListToString(seed_column_list));
 				}
