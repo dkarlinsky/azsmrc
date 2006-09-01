@@ -1,6 +1,3 @@
-/**
- *
- */
 package lbms.azsmrc.remote.client.swtgui.dialogs;
 
 import java.util.ArrayList;
@@ -30,6 +27,8 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
@@ -180,8 +179,7 @@ public class UpdateProgressDialog {
 			}
 		});
 
-
-		RCMain.getRCMain().getUpdater().addProgressListener(new UpdateProgressListener() {
+		final UpdateProgressListener upl = new UpdateProgressListener() {
 			/* (non-Javadoc)
 			 * @see lbms.tools.updater.UpdateProgressListener#stateChanged(int)
 			 */
@@ -191,9 +189,26 @@ public class UpdateProgressDialog {
 					|| state == UpdateProgressListener.STATE_ERROR)
 					speedUpdateTimer.cancel();
 			}
+		};
+
+		RCMain.getRCMain().getUpdater().addProgressListener(upl);
+
+		shell.addShellListener(new ShellAdapter() {
+			/* (non-Javadoc)
+			 * @see org.eclipse.swt.events.ShellAdapter#shellClosed(org.eclipse.swt.events.ShellEvent)
+			 */
+			@Override
+			public void shellClosed(ShellEvent e) {
+				super.shellClosed(e);
+				RCMain.getRCMain().getUpdater().removeProgressListener(upl);
+				for (DownloadContainer dc : dcs)
+					dc.shellClosed();
+				if(ltGray != null && !ltGray.isDisposed())
+					ltGray.dispose();
+				if(handCursor != null && !handCursor.isDisposed())
+					handCursor.dispose();
+			}
 		});
-
-
 
 		//open shell
 		GUI_Utilities.centerShellOpenAndFocus(shell);
@@ -236,6 +251,7 @@ public class UpdateProgressDialog {
 		Download dl;
 		Composite comp;
 		Composite self;
+		DownloadListener dll;
 
 
 		DownloadContainer (Download d, Composite cmp) {
@@ -306,7 +322,7 @@ public class UpdateProgressDialog {
 			comp.layout();
 			comp.getParent().layout();
 
-			dl.addDownloadListener(new DownloadListener() {
+			dll = new DownloadListener() {
 				long lastBytesRead;
 				long lastBytesTotal;
 				int lastState;
@@ -353,7 +369,14 @@ public class UpdateProgressDialog {
 						}
 					});
 				}//End of UpdateLabel()
-			});
+			};
+
+			dl.addDownloadListener(dll);
+		}
+
+		public void shellClosed() {
+			if (dl != null)
+				dl.removeDownloadListener(dll);
 		}
 	}
 }
