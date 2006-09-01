@@ -1,9 +1,11 @@
 package lbms.azsmrc.remote.client.impl;
 
+import java.util.List;
 import java.util.Map;
 
 import lbms.azsmrc.remote.client.Client;
 import lbms.azsmrc.remote.client.RemoteInfo;
+import lbms.azsmrc.remote.client.RemotePlugin;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.dialogs.MessageDialog;
@@ -16,6 +18,7 @@ public class RemoteInfoImpl implements RemoteInfo {
 	private String azureusVersion = "";
 	private String pluginVersion = "";
 	private Map<String, String> driveInfo;
+	private List<RemotePlugin> remotePlugins;
 
 	public RemoteInfoImpl (Client c) {
 		client = c;
@@ -89,5 +92,12 @@ public class RemoteInfoImpl implements RemoteInfo {
 		loading = true;
 		client.sendGetDriveInfo();
 		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.RemoteInfo#getRemotePlugins()
+	 */
+	public List<RemotePlugin> getRemotePlugins() {
+		return remotePlugins;
 	}
 }
