@@ -5,7 +5,6 @@ package lbms.azsmrc.remote.client.pluginsimpl.ui.swt;
 
 import org.eclipse.swt.widgets.Composite;
 
-import lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginEvent;
 import lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginEventListener;
 import lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginView;
 import lbms.azsmrc.remote.client.plugins.ui.swt.ViewID;
@@ -18,6 +17,7 @@ public class UIPluginViewImpl implements UIPluginView {
 
 	private UIPluginEventListener listener;
 	private ViewID viewID;
+	private Composite composite;
 
 	public UIPluginViewImpl(ViewID viewID, UIPluginEventListener listener) {
 		super();
@@ -29,7 +29,7 @@ public class UIPluginViewImpl implements UIPluginView {
 	 * @see lbms.azsmrc.remote.client.plugins.ui.swt.IView#initialize(org.eclipse.swt.widgets.Composite)
 	 */
 	public void initialize(Composite composite) {
-		// TODO Auto-generated method stub
+		this.composite = composite;
 
 	}
 
@@ -37,16 +37,14 @@ public class UIPluginViewImpl implements UIPluginView {
 	 * @see lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginView#getViewID()
 	 */
 	public ViewID getViewID() {
-		// TODO Auto-generated method stub
-		return null;
+		return viewID;
 	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.plugins.ui.swt.IView#getComposite()
 	 */
 	public Composite getComposite() {
-		// TODO Auto-generated method stub
-		return null;
+		return composite;
 	}
 
 	/* (non-Javadoc)

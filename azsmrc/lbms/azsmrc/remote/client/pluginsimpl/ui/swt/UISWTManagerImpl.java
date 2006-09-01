@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.eclipse.swt.widgets.Display;
 
+import lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginEvent;
 import lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginEventListener;
 import lbms.azsmrc.remote.client.plugins.ui.swt.UISWTManager;
 import lbms.azsmrc.remote.client.plugins.ui.swt.ViewID;
@@ -41,14 +42,33 @@ public class UISWTManagerImpl implements UISWTManager {
 		}
 	}
 
-	public UIPluginViewImpl getView (ViewID parentID, String viewID) {
-		if (!views.containsKey(parentID)) return null;
-		else return views.get(parentID).get(viewID);
+	public UIPluginViewImpl getViewInstance (ViewID parentID, String viewID, Object datasource) {
+		if (!eventListener.containsKey(parentID)) return null;
+
+		UIPluginEventListener eListener = eventListener.get(parentID).get(viewID);
+		if (eListener == null) return null;
+
+		boolean create = eListener.eventOccurred(new UIPluginEventImpl(null,UIPluginEvent.TYPE_CREATE,datasource));
+
+		if (!views.containsKey(parentID))
+			views.put(parentID, new HashMap<String, UIPluginViewImpl>());
+		Map<String, UIPluginViewImpl> map = views.get(parentID);
+
+		//create a new Instance everytime
+		if (create) {
+			UIPluginViewImpl pv = new UIPluginViewImpl(parentID,eListener);
+			if (!map.containsKey(viewID)) map.put(viewID, pv);
+			return pv;
+		} else if (!map.containsKey(viewID)) {
+				UIPluginViewImpl pv = new UIPluginViewImpl(parentID,eListener);
+				map.put(viewID, pv);
+				return pv;
+		} else return null;
 	}
 
-	public UIPluginViewImpl[] getViews (ViewID parentID) {
-		if (!views.containsKey(parentID)) return new UIPluginViewImpl[0];
-		else return views.get(parentID).values().toArray(new UIPluginViewImpl[0]);
+	public String[] getViewsIDs (ViewID parentID) {
+		if (!views.containsKey(parentID)) return new String[0];
+		else return views.get(parentID).keySet().toArray(new String[0]);
 	}
 
 	/* (non-Javadoc)
