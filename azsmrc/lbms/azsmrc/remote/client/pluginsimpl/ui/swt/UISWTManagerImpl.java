@@ -15,26 +15,29 @@ import lbms.azsmrc.remote.client.plugins.ui.swt.ViewID;
  */
 public class UISWTManagerImpl implements UISWTManager {
 
+	private Map<ViewID, Map<String, UIPluginEventListener>> eventListener = new HashMap<ViewID, Map<String, UIPluginEventListener>>();
 	private Map<ViewID, Map<String, UIPluginViewImpl>> views = new HashMap<ViewID, Map<String, UIPluginViewImpl>>();
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.plugins.ui.swt.UISWTManager#addUIEventHandler(lbms.azsmrc.remote.client.plugins.ui.swt.UISWTPluginEventHandler)
 	 */
 	public void addPluginView(ViewID parentID, String viewID, UIPluginEventListener eListener) {
-		if (!views.containsKey(parentID))
-			views.put(parentID, new HashMap<String, UIPluginViewImpl>());
-		Map<String, UIPluginViewImpl> map = views.get(parentID);
-		UIPluginViewImpl v = new UIPluginViewImpl (parentID,viewID,eListener);
-		map.put(viewID, v);
+		if (!eventListener.containsKey(parentID))
+			eventListener.put(parentID, new HashMap<String, UIPluginEventListener>());
+		Map<String, UIPluginEventListener> map = eventListener.get(parentID);
+		map.put(viewID, eListener);
 	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.plugins.ui.swt.UISWTManager#removeUIEventHandler(lbms.azsmrc.remote.client.plugins.ui.swt.UISWTPluginEventHandler)
 	 */
 	public void removePluginView(ViewID parentID, String viewID) {
-		if (views.containsKey(parentID)) {
-			Map<String, UIPluginViewImpl> map = views.get(parentID);
-			map.remove(viewID);
+		if (eventListener.containsKey(parentID)) {
+			eventListener.get(parentID).remove(viewID);
+			if (views.containsKey(parentID)) {
+				Map<String, UIPluginViewImpl> map = views.get(parentID);
+				map.remove(viewID);
+			}
 		}
 	}
 

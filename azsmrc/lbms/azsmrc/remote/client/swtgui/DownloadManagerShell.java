@@ -40,7 +40,7 @@ import lbms.azsmrc.remote.client.events.ParameterListener;
 import lbms.azsmrc.remote.client.events.GlobalStatsListener;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.plugins.ui.swt.AbstractIView;
-import lbms.azsmrc.remote.client.plugins.ui.swt.Tab;
+import lbms.azsmrc.remote.client.plugins.ui.swt.IView;
 import lbms.azsmrc.remote.client.swtgui.container.Container;
 import lbms.azsmrc.remote.client.swtgui.container.DownloadContainer;
 import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
@@ -3401,18 +3401,12 @@ public class DownloadManagerShell {
 	 * @param view
 	 * @param name
 	 */
-	  protected void openPluginView(final AbstractIView view, final String name) {
+	  protected void openPluginView(final IView view, final String name) {
 		  Display display = RCMain.getRCMain().getDisplay();
 		  if (display == null || display.isDisposed()) return;
 		  display.asyncExec(new SWTSafeRunnable() {
 				public void runSafe() {
-					Tab tab = (Tab) pluginTabs.get(name);
-					if (tab != null) {
-						tab.setFocus();
-					} else {
-						tab = new Tab(view);
-						pluginTabs.put(name, tab);
-					}
+
 				}
 			});
 		}

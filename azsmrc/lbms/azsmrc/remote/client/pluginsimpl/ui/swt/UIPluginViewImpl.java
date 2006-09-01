@@ -5,6 +5,7 @@ package lbms.azsmrc.remote.client.pluginsimpl.ui.swt;
 
 import org.eclipse.swt.widgets.Composite;
 
+import lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginEvent;
 import lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginEventListener;
 import lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginView;
 import lbms.azsmrc.remote.client.plugins.ui.swt.ViewID;
@@ -15,21 +16,33 @@ import lbms.azsmrc.remote.client.plugins.ui.swt.ViewID;
  */
 public class UIPluginViewImpl implements UIPluginView {
 
-	private String id;
-	private ViewID parentID;
 	private UIPluginEventListener listener;
+	private ViewID viewID;
 
-
-
-	public UIPluginViewImpl(ViewID parentID, String id, UIPluginEventListener listener) {
+	public UIPluginViewImpl(ViewID viewID, UIPluginEventListener listener) {
 		super();
-		this.parentID = parentID;
-		this.id = id;
+		this.viewID = viewID;
 		this.listener = listener;
 	}
 
 	/* (non-Javadoc)
-	 * @see lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginView#getComposite()
+	 * @see lbms.azsmrc.remote.client.plugins.ui.swt.IView#initialize(org.eclipse.swt.widgets.Composite)
+	 */
+	public void initialize(Composite composite) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginView#getViewID()
+	 */
+	public ViewID getViewID() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.plugins.ui.swt.IView#getComposite()
 	 */
 	public Composite getComposite() {
 		// TODO Auto-generated method stub
@@ -37,35 +50,47 @@ public class UIPluginViewImpl implements UIPluginView {
 	}
 
 	/* (non-Javadoc)
-	 * @see lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginView#getID()
+	 * @see lbms.azsmrc.remote.client.plugins.ui.swt.IView#delete()
 	 */
-	public String getID() {
+	public void delete() {
+		// TODO Auto-generated method stub
+
+	}
+
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.plugins.ui.swt.IView#getData()
+	 */
+	public String getData() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	/* (non-Javadoc)
-	 * @see lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginView#getParent()
+	 * @see lbms.azsmrc.remote.client.plugins.ui.swt.IView#getFullTitle()
 	 */
-	public ViewID getParent() {
+	public String getFullTitle() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	/* (non-Javadoc)
-	 * @see lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginView#initialize(org.eclipse.swt.widgets.Composite)
+	 * @see lbms.azsmrc.remote.client.plugins.ui.swt.IView#getShortTitle()
 	 */
-	public void initialize(Composite parent) {
+	public String getShortTitle() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.plugins.ui.swt.IView#refresh()
+	 */
+	public void refresh() {
 		// TODO Auto-generated method stub
 
 	}
 
-	/* (non-Javadoc)
-	 * @see lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginView#destroy()
-	 */
-	public void destroy() {
-		// TODO Auto-generated method stub
-
+	private void triggerEvent (Object data, int type, Object dataSource) {
+		listener.eventOccurred(new UIPluginEventImpl(data,type,dataSource));
 	}
 
 }

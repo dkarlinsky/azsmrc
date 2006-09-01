@@ -1,23 +1,12 @@
-/**
- * 
- */
 package lbms.azsmrc.remote.client.plugins.ui.swt;
 
-import org.eclipse.swt.widgets.Composite;
 
 /**
  * @author Damokles
  *
  */
-public interface UIPluginView {
+public interface UIPluginView extends IView {
 
-	public void initialize(Composite parent);
+	public ViewID getViewID();
 
-	public String getID ();
-
-	public ViewID getParent();
-
-	public Composite getComposite();
-
-	public void destroy();
 }
