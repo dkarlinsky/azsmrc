@@ -457,12 +457,12 @@ public class DownloadManagerShell {
 		//-----Plugin Submenu
 
 		String[] pluginIDs = RCMain.getRCMain().getPluginManagerImpl().getUIManager().getViewsIDs(ViewID.MAIN);
-		for(String pluginID:pluginIDs){
+		for(final String pluginID:pluginIDs){
 			MenuItem pluginMenuItem = new MenuItem(pluginSubmenu, SWT.PUSH);
 			pluginMenuItem.setText(pluginID);
 			pluginMenuItem.addListener(SWT.Selection, new Listener(){
 				public void handleEvent(Event e){
-					//TODO  Open tab when selected
+					RCMain.getRCMain().getPluginManagerImpl().getUIManager().openMainView(pluginID);
 				}
 			});
 		}
@@ -1835,7 +1835,7 @@ public class DownloadManagerShell {
 		if (RCMain.getRCMain().connected())
 			RCMain.getRCMain().updateTimer(true);
 
-		//---------- Plugin Initialization -------------------\\
+/*		//---------- Plugin Initialization -------------------\\
 
 		//Now that all GUI components are up, we need to bring up the plugin tabs
 		PluginManagerImpl pm = RCMain.getRCMain().getPluginManagerImpl();
@@ -1865,7 +1865,8 @@ public class DownloadManagerShell {
 
 			//This looks just like above but does not involve the composite?
 			RCMain.getRCMain().getPluginManagerImpl().getUIManager().addPluginView(ViewID.MAIN, viewIDString,uiPEL);
-		}
+			RCMain.getRCMain().getPluginManagerImpl().getUIManager().getViewInstance(parentID, viewID, datasource)
+		}*/
 
 
 		//addView(ViewID.MAIN, "MyID", Eventlistener);
@@ -3488,7 +3489,17 @@ public class DownloadManagerShell {
 	 * @param pluginViewID string
 	 * @return Composite for the plugin
 	 */
-	  protected Composite openPluginView(final String pluginViewID) {
+	  public void openPluginView(final String pluginViewID) {
+
+		  //Pull the pluginManager
+		  PluginManagerImpl pm = RCMain.getRCMain().getPluginManagerImpl();
+
+		  //pull a view instance
+		  final UIPluginViewImpl vi = pm.getUIManager().getViewInstance(ViewID.MAIN, pluginViewID, null);
+
+		  //the vi can be null, so check if the vi is null and if so return
+		  if(vi == null) return;
+
 		  //add in the plugin's ctabitem and make it a closable tab
 		  CTabItem pluginTab = new CTabItem(tabFolder, SWT.CLOSE);
 		  pluginTab.setText(pluginViewID);
@@ -3497,7 +3508,7 @@ public class DownloadManagerShell {
 		  pluginTab.addDisposeListener(new DisposeListener(){
 
 			public void widgetDisposed(DisposeEvent arg0) {
-				// TODO Alert appropriate container that the tab is gone!
+				vi.delete();
 			}
 		  });
 
@@ -3510,7 +3521,15 @@ public class DownloadManagerShell {
 		  GridData gd = new GridData(GridData.FILL_BOTH);
 		  comp.setLayoutData(gd);
 
-		  return comp;
+		  //assign this comp to the new tab
+		  pluginTab.setControl(comp);
+
+		  //focus the tab
+		  tabFolder.setSelection(pluginTab);
+
+		  //Now we have a comp.. so pass it to the vi
+		  vi.initialize(comp);
+
 	  }
 
 }//EOF

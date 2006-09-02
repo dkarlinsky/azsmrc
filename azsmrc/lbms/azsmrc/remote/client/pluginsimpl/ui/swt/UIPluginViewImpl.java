@@ -1,10 +1,13 @@
 /**
- * 
+ *
  */
 package lbms.azsmrc.remote.client.pluginsimpl.ui.swt;
 
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 
+import lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginEvent;
 import lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginEventListener;
 import lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginView;
 import lbms.azsmrc.remote.client.plugins.ui.swt.ViewID;
@@ -28,9 +31,15 @@ public class UIPluginViewImpl implements UIPluginView {
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.plugins.ui.swt.IView#initialize(org.eclipse.swt.widgets.Composite)
 	 */
-	public void initialize(Composite composite) {
-		this.composite = composite;
+	public void initialize(Composite _composite) {
+		this.composite = _composite;
 
+		//Listener to trigger dispose
+		this.composite.addDisposeListener(new DisposeListener(){
+			public void widgetDisposed(DisposeEvent arg0) {
+				delete();
+			}
+		});
 	}
 
 	/* (non-Javadoc)
@@ -51,8 +60,8 @@ public class UIPluginViewImpl implements UIPluginView {
 	 * @see lbms.azsmrc.remote.client.plugins.ui.swt.IView#delete()
 	 */
 	public void delete() {
-		// TODO Auto-generated method stub
-
+		triggerEvent(composite,UIPluginEvent.TYPE_DESTROY,null);
+		if(composite != null || !composite.isDisposed()) composite.dispose();
 	}
 
 	/* (non-Javadoc)
