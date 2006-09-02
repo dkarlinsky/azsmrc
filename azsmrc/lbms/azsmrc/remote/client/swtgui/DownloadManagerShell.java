@@ -456,8 +456,9 @@ public class DownloadManagerShell {
 
 		//-----Plugin Submenu
 
-		String[] pluginIDs = RCMain.getRCMain().getPluginManagerImpl().getUIManager().getViewsIDs(ViewID.MAIN);
+		String[] pluginIDs = RCMain.getRCMain().getPluginManagerImpl().getUIManager().getViewIDs(ViewID.MAIN);
 		for(final String pluginID:pluginIDs){
+			logger.debug("Adding Plugin Item: "+pluginID);
 			MenuItem pluginMenuItem = new MenuItem(pluginSubmenu, SWT.PUSH);
 			pluginMenuItem.setText(pluginID);
 			pluginMenuItem.addListener(SWT.Selection, new Listener(){
@@ -845,7 +846,7 @@ public class DownloadManagerShell {
 					tbmenu.setLocation (pt.x, pt.y);
 					tbmenu.setVisible (true);
 				}else
-				RCMain.getRCMain().getClient().getDownloadManager().pauseDownloads();
+					RCMain.getRCMain().getClient().getDownloadManager().pauseDownloads();
 			}
 		});
 
@@ -1411,7 +1412,7 @@ public class DownloadManagerShell {
 		ExtendedProperties properties = RCMain.getRCMain().getProperties();
 
 		sash.setWeights(new int[] {properties.getPropertyAsInt("dms.sash.0"),
-					properties.getPropertyAsInt("dms.sash.1")});
+				properties.getPropertyAsInt("dms.sash.1")});
 
 		String userLoggedIn = RCMain.getRCMain().getClient().getUsername();
 		if(bSingleUserMode)
@@ -1835,7 +1836,7 @@ public class DownloadManagerShell {
 		if (RCMain.getRCMain().connected())
 			RCMain.getRCMain().updateTimer(true);
 
-/*		//---------- Plugin Initialization -------------------\\
+		/*		//---------- Plugin Initialization -------------------\\
 
 		//Now that all GUI components are up, we need to bring up the plugin tabs
 		PluginManagerImpl pm = RCMain.getRCMain().getPluginManagerImpl();
@@ -1900,8 +1901,8 @@ public class DownloadManagerShell {
 	 * @param connection -- int -- 0 for no connection, 1 for connecting, 2 for connected
 	 */
 	public void setConnectionStatusBar(final int connection){
- 		Display display = RCMain.getRCMain().getDisplay();
- 		if(display == null) return;
+		Display display = RCMain.getRCMain().getDisplay();
+		if(display == null) return;
 		display.syncExec(new SWTSafeRunnable(){
 			public void runSafe() {
 				if(connectionStatusIcon == null || connectionStatusIcon.isDisposed())
@@ -1944,7 +1945,7 @@ public class DownloadManagerShell {
 				}
 			}
 		});
-		}
+	}
 
 
 	public void setTorrentMoveButtons(final boolean bTop, final boolean bUp, final boolean bDown, final boolean bBottom){
@@ -3440,7 +3441,7 @@ public class DownloadManagerShell {
 	 * @return int count
 	 */
 	public CTabFolder getTabFolder(){
-		 return tabFolder;
+		return tabFolder;
 	}
 
 	public int[] getSeedsDownloadsCount(){
@@ -3489,47 +3490,47 @@ public class DownloadManagerShell {
 	 * @param pluginViewID string
 	 * @return Composite for the plugin
 	 */
-	  public void openPluginView(final String pluginViewID) {
+	public void openPluginView(final String pluginViewID) {
 
-		  //Pull the pluginManager
-		  PluginManagerImpl pm = RCMain.getRCMain().getPluginManagerImpl();
+		//Pull the pluginManager
+		PluginManagerImpl pm = RCMain.getRCMain().getPluginManagerImpl();
 
-		  //pull a view instance
-		  final UIPluginViewImpl vi = pm.getUIManager().getViewInstance(ViewID.MAIN, pluginViewID, null);
+		//pull a view instance
+		final UIPluginViewImpl vi = pm.getUIManager().getViewInstance(ViewID.MAIN, pluginViewID, null);
 
-		  //the vi can be null, so check if the vi is null and if so return
-		  if(vi == null) return;
+		//the vi can be null, so check if the vi is null and if so return
+		if(vi == null) return;
 
-		  //add in the plugin's ctabitem and make it a closable tab
-		  CTabItem pluginTab = new CTabItem(tabFolder, SWT.CLOSE);
-		  pluginTab.setText(pluginViewID);
+		//add in the plugin's ctabitem and make it a closable tab
+		CTabItem pluginTab = new CTabItem(tabFolder, SWT.CLOSE);
+		pluginTab.setText(pluginViewID);
 
 
-		  pluginTab.addDisposeListener(new DisposeListener(){
+		pluginTab.addDisposeListener(new DisposeListener(){
 
 			public void widgetDisposed(DisposeEvent arg0) {
 				vi.delete();
 			}
-		  });
+		});
 
-		  Composite comp = new Composite(tabFolder, SWT.NULL);
-		  GridLayout gl = new GridLayout();
-		  gl.numColumns = 1;
-		  gl.marginTop = 0;
-		  gl.marginWidth = 0;
-		  comp.setLayout(gl);
-		  GridData gd = new GridData(GridData.FILL_BOTH);
-		  comp.setLayoutData(gd);
+		Composite comp = new Composite(tabFolder, SWT.NULL);
+		GridLayout gl = new GridLayout();
+		gl.numColumns = 1;
+		gl.marginTop = 0;
+		gl.marginWidth = 0;
+		comp.setLayout(gl);
+		GridData gd = new GridData(GridData.FILL_BOTH);
+		comp.setLayoutData(gd);
 
-		  //assign this comp to the new tab
-		  pluginTab.setControl(comp);
+		//assign this comp to the new tab
+		pluginTab.setControl(comp);
 
-		  //focus the tab
-		  tabFolder.setSelection(pluginTab);
+		//focus the tab
+		tabFolder.setSelection(pluginTab);
 
-		  //Now we have a comp.. so pass it to the vi
-		  vi.initialize(comp);
+		//Now we have a comp.. so pass it to the vi
+		vi.initialize(comp);
 
-	  }
+	}
 
 }//EOF

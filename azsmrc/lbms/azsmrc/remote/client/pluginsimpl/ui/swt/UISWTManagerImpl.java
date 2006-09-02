@@ -9,6 +9,8 @@ import lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginEvent;
 import lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginEventListener;
 import lbms.azsmrc.remote.client.plugins.ui.swt.UISWTManager;
 import lbms.azsmrc.remote.client.plugins.ui.swt.ViewID;
+import lbms.azsmrc.remote.client.swtgui.DownloadManagerShell;
+import lbms.azsmrc.remote.client.swtgui.RCMain;
 
 /**
  * @author Damokles
@@ -66,9 +68,9 @@ public class UISWTManagerImpl implements UISWTManager {
 		} else return null;
 	}
 
-	public String[] getViewsIDs (ViewID parentID) {
-		if (!views.containsKey(parentID)) return new String[0];
-		else return views.get(parentID).keySet().toArray(new String[0]);
+	public String[] getViewIDs (ViewID parentID) {
+		if (!eventListener.containsKey(parentID)) return new String[0];
+		else return eventListener.get(parentID).keySet().toArray(new String[0]);
 	}
 
 	/* (non-Javadoc)
@@ -76,14 +78,17 @@ public class UISWTManagerImpl implements UISWTManager {
 	 */
 	public Display getDisplay() {
 		// TODO Auto-generated method stub
-		return null;
+		return RCMain.getRCMain().getDisplay();
 	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.plugins.ui.swt.UISWTManager#openMainView(java.lang.String)
 	 */
 	public void openMainView(String viewID) {
-		// TODO Auto-generated method stub
+		DownloadManagerShell dms = RCMain.getRCMain().getMainWindow();
+		if (dms != null) {
+			dms.openPluginView(viewID);
+		}
 
 	}
 }

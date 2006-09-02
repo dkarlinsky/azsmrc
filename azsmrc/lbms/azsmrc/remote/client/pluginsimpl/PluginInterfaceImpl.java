@@ -11,6 +11,7 @@ import lbms.azsmrc.remote.client.plugins.PluginConfig;
 import lbms.azsmrc.remote.client.plugins.PluginInterface;
 import lbms.azsmrc.remote.client.plugins.PluginManager;
 import lbms.azsmrc.remote.client.plugins.ipc.IPCInterface;
+import lbms.azsmrc.remote.client.plugins.ui.swt.UISWTManager;
 import lbms.azsmrc.remote.client.pluginsimpl.ipc.IPCInterfaceImpl;
 
 /**
@@ -127,6 +128,13 @@ public class PluginInterfaceImpl implements PluginInterface {
 	 */
 	public PluginClient getPluginClient () {
 		return manager.getPluginClient();
+	}
+
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.plugins.PluginInterface#getUIManager()
+	 */
+	public UISWTManager getUIManager() {
+		return manager.getUIManager();
 	}
 
 	//--------------------------------------------------//

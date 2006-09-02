@@ -40,6 +40,7 @@ public class UIPluginViewImpl implements UIPluginView {
 				delete();
 			}
 		});
+		triggerEvent(_composite, UIPluginEvent.TYPE_INITIALIZE, null);
 	}
 
 	/* (non-Javadoc)
@@ -92,7 +93,7 @@ public class UIPluginViewImpl implements UIPluginView {
 	 * @see lbms.azsmrc.remote.client.plugins.ui.swt.IView#refresh()
 	 */
 	public void refresh() {
-		// TODO Auto-generated method stub
+		triggerEvent(null, UIPluginEvent.TYPE_REFRESH, null);
 
 	}
 
