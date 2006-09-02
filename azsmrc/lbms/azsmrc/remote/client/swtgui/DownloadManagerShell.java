@@ -39,8 +39,12 @@ import lbms.azsmrc.remote.client.events.DownloadManagerListener;
 import lbms.azsmrc.remote.client.events.ParameterListener;
 import lbms.azsmrc.remote.client.events.GlobalStatsListener;
 import lbms.azsmrc.remote.client.internat.I18N;
-import lbms.azsmrc.remote.client.plugins.ui.swt.AbstractIView;
 import lbms.azsmrc.remote.client.plugins.ui.swt.IView;
+import lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginEvent;
+import lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginEventListener;
+import lbms.azsmrc.remote.client.plugins.ui.swt.ViewID;
+import lbms.azsmrc.remote.client.pluginsimpl.PluginManagerImpl;
+import lbms.azsmrc.remote.client.pluginsimpl.ui.swt.UIPluginViewImpl;
 import lbms.azsmrc.remote.client.swtgui.container.Container;
 import lbms.azsmrc.remote.client.swtgui.container.DownloadContainer;
 import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
@@ -85,6 +89,8 @@ import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.MouseAdapter;
@@ -241,6 +247,13 @@ public class DownloadManagerShell {
 
 		Menu toolSubmenu = new Menu (DOWNLOAD_MANAGER_SHELL, SWT.DROP_DOWN);
 		toolItem.setMenu (toolSubmenu);
+
+
+		MenuItem pluginItem = new MenuItem(menuBar, SWT.CASCADE);
+		pluginItem.setText("&Plugins");
+
+		Menu pluginSubmenu = new Menu(DOWNLOAD_MANAGER_SHELL, SWT.DROP_DOWN);
+		pluginItem.setMenu(pluginSubmenu);
 
 
 		MenuItem helpItem = new MenuItem(menuBar,SWT.CASCADE);
@@ -440,6 +453,30 @@ public class DownloadManagerShell {
 				RCMain.getRCMain().saveConfig();
 			}
 		});
+
+		//-----Plugin Submenu
+
+		String[] pluginIDs = RCMain.getRCMain().getPluginManagerImpl().getUIManager().getViewsIDs(ViewID.MAIN);
+		for(String pluginID:pluginIDs){
+			MenuItem pluginMenuItem = new MenuItem(pluginSubmenu, SWT.PUSH);
+			pluginMenuItem.setText(pluginID);
+			pluginMenuItem.addListener(SWT.Selection, new Listener(){
+				public void handleEvent(Event e){
+					//TODO  Open tab when selected
+				}
+			});
+		}
+
+
+
+		menuMyShares = new MenuItem(toolSubmenu, SWT.PUSH);
+		menuMyShares.setText("&My Tracker");
+		menuMyShares.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event e){
+				MyTracker.open(tabFolder);
+			}
+		});
+
 
 
 		//-----Help Submenu
@@ -1797,6 +1834,42 @@ public class DownloadManagerShell {
 
 		if (RCMain.getRCMain().connected())
 			RCMain.getRCMain().updateTimer(true);
+
+		//---------- Plugin Initialization -------------------\\
+
+		//Now that all GUI components are up, we need to bring up the plugin tabs
+		PluginManagerImpl pm = RCMain.getRCMain().getPluginManagerImpl();
+
+		String[] viewIDs = pm.getUIManager().getViewsIDs(ViewID.MAIN);
+		for(String viewIDString:viewIDs){
+			//TODO  Make this work
+
+			//I'm confused
+			//From what I can tell.. it looks like I need a listener to use in initializing the UIPluginViewImpl & in addPluginView???
+			//TODO -- ask Leonard
+
+
+			UIPluginEventListener uiPEL = new UIPluginEventListener(){
+
+				public boolean eventOccurred(UIPluginEvent event) {
+					System.out.println(event);
+					return false;
+				}
+
+			};
+
+			//Why is there 2 that look like they are doing the same thing
+			//Ask Leonard
+			UIPluginViewImpl pluginView = new UIPluginViewImpl(ViewID.MAIN, uiPEL);
+			pluginView.initialize(openPluginView(viewIDString));
+
+			//This looks just like above but does not involve the composite?
+			RCMain.getRCMain().getPluginManagerImpl().getUIManager().addPluginView(ViewID.MAIN, viewIDString,uiPEL);
+		}
+
+
+		//addView(ViewID.MAIN, "MyID", Eventlistener);
+
 	}
 
 	public void close_shell () {
@@ -3412,16 +3485,32 @@ public class DownloadManagerShell {
 
 	/**
 	 * Open a plugin view
-	 * @param view
-	 * @param name
+	 * @param pluginViewID string
+	 * @return Composite for the plugin
 	 */
-	  protected void openPluginView(final IView view, final String name) {
-		  Display display = RCMain.getRCMain().getDisplay();
-		  if (display == null || display.isDisposed()) return;
-		  display.asyncExec(new SWTSafeRunnable() {
-				public void runSafe() {
+	  protected Composite openPluginView(final String pluginViewID) {
+		  //add in the plugin's ctabitem and make it a closable tab
+		  CTabItem pluginTab = new CTabItem(tabFolder, SWT.CLOSE);
+		  pluginTab.setText(pluginViewID);
 
-				}
-			});
-		}
+
+		  pluginTab.addDisposeListener(new DisposeListener(){
+
+			public void widgetDisposed(DisposeEvent arg0) {
+				// TODO Alert appropriate container that the tab is gone!
+			}
+		  });
+
+		  Composite comp = new Composite(tabFolder, SWT.NULL);
+		  GridLayout gl = new GridLayout();
+		  gl.numColumns = 1;
+		  gl.marginTop = 0;
+		  gl.marginWidth = 0;
+		  comp.setLayout(gl);
+		  GridData gd = new GridData(GridData.FILL_BOTH);
+		  comp.setLayoutData(gd);
+
+		  return comp;
+	  }
+
 }//EOF
