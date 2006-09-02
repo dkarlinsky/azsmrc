@@ -18,5 +18,5 @@ public interface IPCResponseListener {
 	 * @param method the method that was called
 	 * @param parameter null or a  parameter Element
 	 */
-	public void handleResponse (int status, String senderID, String pluginID, String method, Element parameter);
+	public void handleIPCResponse (int status, String senderID, String pluginID, String method, Element parameter);
 }

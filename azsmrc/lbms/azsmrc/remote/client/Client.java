@@ -976,7 +976,7 @@ public class Client {
 
 	protected void callIPCResponseListeners (int status, String senderID, String pluginID, String method, Element response) {
 		for (int i=0;i<ipcResponseListeners.size();i++)
-			ipcResponseListeners.get(i).handleResponse(status, senderID, pluginID, method, response);
+			ipcResponseListeners.get(i).handleIPCResponse(status, senderID, pluginID, method, response);
 	}
 
 	//---------------------------------------------------------//

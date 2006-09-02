@@ -3,6 +3,7 @@ package lbms.azsmrc.remote.client.pluginsimpl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.jdom.Element;
 
 import lbms.azsmrc.remote.client.Client;
@@ -18,6 +19,7 @@ import lbms.azsmrc.remote.client.plugins.event.PluginClientListener;
 public class PluginClientImpl implements PluginClient, ClientEventListener, IPCResponseListener {
 
 	private Client client;
+	private static Logger logger = Logger.getLogger(PluginClientImpl.class);
 	private Map<String, PluginClientListener> listeners = new HashMap<String, PluginClientListener>();
 
 	public PluginClientImpl (Client client) {
@@ -46,6 +48,7 @@ public class PluginClientImpl implements PluginClient, ClientEventListener, IPCR
 	public void sendIPCCall(String pluginID, String senderID, String method,
 			Object[] params) {
 		client.sendIPCCall(pluginID, senderID, method, params);
+		logger.debug("PluginIPCCall: pid ["+pluginID+"] sid ["+senderID+"] method ["+method+"]");
 	}
 
 	/* (non-Javadoc)
@@ -76,16 +79,26 @@ public class PluginClientImpl implements PluginClient, ClientEventListener, IPCR
 		String id = event.getAttributeValue("targetID");
 		if (id == null) return;
 		if (listeners.containsKey(id)) {
-			listeners.get(id).handleRemoteEvent((Element)event.getChildren().get(0));
+			try {
+				listeners.get(id).handleRemoteEvent((Element)event.getChildren().get(0));
+			} catch (Throwable e) {
+				logger.warn("PluginClient Handle Event Exception: ", e);
+				e.printStackTrace();
+			}
 		}
 	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.events.IPCResponseListener#handleResponse(int, java.lang.String, java.lang.String, java.lang.String, org.jdom.Element)
 	 */
-	public void handleResponse(int status, String senderID, String pluginID, String method, Element parameter) {
+	public void handleIPCResponse(int status, String senderID, String pluginID, String method, Element parameter) {
 		if (listeners.containsKey(pluginID)) {
-			listeners.get(pluginID).handleIPCResponse(status, senderID, pluginID, method, parameter);
+			try {
+				listeners.get(pluginID).handleIPCResponse(status, senderID, pluginID, method, parameter);
+			} catch (Throwable e) {
+				logger.warn("PluginClient IPC Handler Exception: ", e);
+				e.printStackTrace();
+			}
 		}
 	}
 }
