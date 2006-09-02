@@ -1096,9 +1096,9 @@ public class RCMain implements Launchable {
 
 	/**
 	 * Sets the Proxy for the current session.
-	 * 
+	 *
 	 * The data will not be saved.
-	 * 
+	 *
 	 * @param stype Proxy Type {@link http://java.sun.com/j2se/1.5.0/docs/api/java/net/Proxy.Type.html}
 	 * @param url the Proxy url
 	 * @param port the Proxy port
@@ -1112,7 +1112,7 @@ public class RCMain implements Launchable {
 
 	/**
 	 * Sets the Proxy for the current session.
-	 * 
+	 *
 	 * The data will not be saved.
 	 * @param proxy the Proxy to use
 	 */
@@ -1247,5 +1247,14 @@ public class RCMain implements Launchable {
 			}
 
 		});
+	}
+
+
+	/**
+	 * Returns the intialized PluginManagerImpl used in RCMain
+	 * @return PluginManagerImpl
+	 */
+	public PluginManagerImpl getPluginManagerImpl(){
+		return pluginManager;
 	}
 }//EOF
