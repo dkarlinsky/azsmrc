@@ -61,10 +61,8 @@ public class UISWTManagerImpl implements UISWTManager {
 			UIPluginViewImpl pv = new UIPluginViewImpl(parentID,eListener);
 			if (!map.containsKey(viewID)) map.put(viewID, pv);
 			return pv;
-		} else if (!map.containsKey(viewID)) {
-				UIPluginViewImpl pv = new UIPluginViewImpl(parentID,eListener);
-				map.put(viewID, pv);
-				return pv;
+		} else if (map.containsKey(viewID)) {
+				return map.get(viewID);
 		} else return null;
 	}
 

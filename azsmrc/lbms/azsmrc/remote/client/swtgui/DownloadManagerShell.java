@@ -3530,6 +3530,7 @@ public class DownloadManagerShell {
 
 		//Now we have a comp.. so pass it to the vi
 		vi.initialize(comp);
+		comp.layout();
 
 	}
 
