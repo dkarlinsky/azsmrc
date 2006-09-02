@@ -7,6 +7,7 @@ import org.jdom.Element;
 
 import lbms.azsmrc.remote.client.Client;
 import lbms.azsmrc.remote.client.events.ClientEventListener;
+import lbms.azsmrc.remote.client.events.IPCResponseListener;
 import lbms.azsmrc.remote.client.plugins.PluginClient;
 import lbms.azsmrc.remote.client.plugins.event.PluginClientListener;
 
@@ -14,13 +15,14 @@ import lbms.azsmrc.remote.client.plugins.event.PluginClientListener;
  * @author Damokles
  *
  */
-public class PluginClientImpl implements PluginClient, ClientEventListener {
+public class PluginClientImpl implements PluginClient, ClientEventListener, IPCResponseListener {
 
 	private Client client;
 	private Map<String, PluginClientListener> listeners = new HashMap<String, PluginClientListener>();
 
 	public PluginClientImpl (Client client) {
 		this.client = client;
+		client.addIPCResponseListener(this);
 	}
 
 	/* (non-Javadoc)
@@ -75,6 +77,15 @@ public class PluginClientImpl implements PluginClient, ClientEventListener {
 		if (id == null) return;
 		if (listeners.containsKey(id)) {
 			listeners.get(id).handleRemoteEvent((Element)event.getChildren().get(0));
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.events.IPCResponseListener#handleResponse(int, java.lang.String, java.lang.String, java.lang.String, org.jdom.Element)
+	 */
+	public void handleResponse(int status, String senderID, String pluginID, String method, Element parameter) {
+		if (listeners.containsKey(pluginID)) {
+			listeners.get(pluginID).handleIPCResponse(status, senderID, pluginID, method, parameter);
 		}
 	}
 }

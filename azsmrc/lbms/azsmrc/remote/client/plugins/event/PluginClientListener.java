@@ -1,7 +1,5 @@
 package lbms.azsmrc.remote.client.plugins.event;
 
-import java.util.List;
-
 import org.jdom.Element;
 
 /**
@@ -24,9 +22,9 @@ public interface PluginClientListener {
 	 * @param senderID the ID of the caller
 	 * @param pluginID the called pluginID
 	 * @param method the method that was called
-	 * @param parameter null or a list of parameters
+	 * @param parameter null or a  parameter Element
 	 */
-	public void handleIPCResponse (int status, String senderID, String pluginID, String method, List<Element> parameter);
+	public void handleIPCResponse (int status, String senderID, String pluginID, String method, Element parameter);
 
 	/**
 	 * This way the remote Client can tell the local one something.

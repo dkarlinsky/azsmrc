@@ -463,7 +463,7 @@ public class ResponseManager {
 			public long handleRequest(Element xmlResponse) throws IOException {
 				client.callIPCResponseListeners	(Integer.parseInt(xmlResponse.getAttributeValue("status")),
 						xmlResponse.getAttributeValue("senderID"),	xmlResponse.getAttributeValue("pluginID"),
-						xmlResponse.getAttributeValue("method"), xmlResponse.getChildren());
+						xmlResponse.getAttributeValue("method"), xmlResponse.getChild("Result"));
 				return 0;
 			}
 		});
