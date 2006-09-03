@@ -29,7 +29,7 @@ public class PluginLoader {
 
 		if ( !( app_dir.exists()) && app_dir.isDirectory()){
 
-			System.out.println(  "Application dir '" + app_dir + "' not found" );
+			System.out.println(  "Plugin dir '" + app_dir + "' not found" );
 
 			return;
 		} else {
@@ -40,7 +40,7 @@ public class PluginLoader {
 
 		if ( plugins == null || plugins.length == 0 ){
 
-			System.out.println(  "Application dir '" + app_dir + "' empty" );
+			System.out.println(  "Plugin dir '" + app_dir + "' empty" );
 
 			return;
 		}
@@ -79,11 +79,10 @@ public class PluginLoader {
 
 				ClassLoader classLoader = root_cl;
 
-				plugins	= getHighestJarVersions( plugins);
+				File[] pluginjars	= getHighestJarVersions( plugins[i].listFiles());
 
-				for( int j = 0 ; j < plugins.length ; j++){
-
-					classLoader = addFileToClassPath(root_cl,classLoader, plugins[j]);
+				for( int j = 0 ; j < pluginjars.length ; j++){
+					classLoader = addFileToClassPath(root_cl,classLoader, pluginjars[j]);
 				}
 
 				Properties props = new Properties();
@@ -102,7 +101,7 @@ public class PluginLoader {
 
 						props.load( fis );
 
-					}finally{
+					} finally {
 
 						if ( fis != null ){
 
@@ -110,7 +109,6 @@ public class PluginLoader {
 						}
 					}
 				} else {
-
 					if ( classLoader instanceof URLClassLoader ){
 
 						URLClassLoader	current = (URLClassLoader)classLoader;
@@ -120,6 +118,8 @@ public class PluginLoader {
 						if ( url != null ){
 
 							props.load(url.openStream());
+						} else {
+							System.out.println("Failed to load Properties from jar.");
 						}
 					}
 				}
@@ -152,7 +152,7 @@ public class PluginLoader {
 				}
 			}catch( Throwable e ) {
 
-				System.out.println( "Load of Plugin in '" + app_dir + "' fails");
+				System.out.println( "Load of Plugin in '" + plugin_dir + "' fails");
 				e.printStackTrace();
 			}
 		}
@@ -272,7 +272,7 @@ public class PluginLoader {
 
 				if ( lc_name.equals( target + ".jar" ) ||
 						lc_name.equals( target + "_cvs.jar" )){
-					System.out.println("Adding "+target+" to classpath");
+					System.out.println("Adding "+target+" to PluginClasspath.");
 					res.add( f );
 					break;
 				}
