@@ -190,6 +190,13 @@ public class ErrorReporter {
 		return systemInfo;
 	}
 
+	/**
+	 * @return the hash
+	 */
+	public String getErrorID() {
+		return hash;
+	}
+
 	public void addListener (ErrorReporterListener l) {
 		listener.add(l);
 	}

@@ -3492,8 +3492,8 @@ public class DownloadManagerShell {
 	 */
 	public void openPluginView(final String pluginViewID) {
 
-		//check if already open
-		if (openPluginViews.contains(pluginViewID)) return;
+		//check if already open and return
+		if (!openPluginViews.add(pluginViewID)) return;
 
 		//Pull the pluginManager
 		PluginManagerImpl pm = RCMain.getRCMain().getPluginManagerImpl();
@@ -3507,9 +3507,6 @@ public class DownloadManagerShell {
 		//add in the plugin's ctabitem and make it a closable tab
 		CTabItem pluginTab = new CTabItem(tabFolder, SWT.CLOSE);
 		pluginTab.setText(pluginViewID);
-
-		//add to open views
-		openPluginViews.add(pluginViewID);
 
 		pluginTab.addDisposeListener(new DisposeListener(){
 
