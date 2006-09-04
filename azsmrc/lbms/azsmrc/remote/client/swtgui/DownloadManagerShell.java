@@ -17,10 +17,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.Semaphore;
@@ -36,12 +38,9 @@ import lbms.azsmrc.remote.client.events.ClientUpdateListener;
 import lbms.azsmrc.remote.client.events.ConnectionListener;
 import lbms.azsmrc.remote.client.events.DownloadListener;
 import lbms.azsmrc.remote.client.events.DownloadManagerListener;
-import lbms.azsmrc.remote.client.events.ParameterListener;
 import lbms.azsmrc.remote.client.events.GlobalStatsListener;
+import lbms.azsmrc.remote.client.events.ParameterListener;
 import lbms.azsmrc.remote.client.internat.I18N;
-import lbms.azsmrc.remote.client.plugins.ui.swt.IView;
-import lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginEvent;
-import lbms.azsmrc.remote.client.plugins.ui.swt.UIPluginEventListener;
 import lbms.azsmrc.remote.client.plugins.ui.swt.ViewID;
 import lbms.azsmrc.remote.client.pluginsimpl.PluginManagerImpl;
 import lbms.azsmrc.remote.client.pluginsimpl.ui.swt.UIPluginViewImpl;
@@ -196,6 +195,7 @@ public class DownloadManagerShell {
 	private int downSpeed = 0;
 
 	private static Logger logger = Logger.getLogger("lbms.azsmrc.DownloadManagerShell");;
+	private Set<String> openPluginViews = new HashSet<String>();
 
 
 	private int drag_drop_line_start = -1;
@@ -3492,6 +3492,9 @@ public class DownloadManagerShell {
 	 */
 	public void openPluginView(final String pluginViewID) {
 
+		//check if already open
+		if (openPluginViews.contains(pluginViewID)) return;
+
 		//Pull the pluginManager
 		PluginManagerImpl pm = RCMain.getRCMain().getPluginManagerImpl();
 
@@ -3505,10 +3508,14 @@ public class DownloadManagerShell {
 		CTabItem pluginTab = new CTabItem(tabFolder, SWT.CLOSE);
 		pluginTab.setText(pluginViewID);
 
+		//add to open views
+		openPluginViews.add(pluginViewID);
 
 		pluginTab.addDisposeListener(new DisposeListener(){
 
 			public void widgetDisposed(DisposeEvent arg0) {
+				//remove from open views
+				openPluginViews.remove(pluginViewID);
 				vi.delete();
 			}
 		});
