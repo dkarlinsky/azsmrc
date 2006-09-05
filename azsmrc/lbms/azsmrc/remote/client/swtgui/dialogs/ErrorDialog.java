@@ -33,6 +33,8 @@ public class ErrorDialog {
 	private String errorLog;
 
 	private String systemInfo;
+	
+	private String errorID;
 
 	private String title;
 
@@ -48,11 +50,12 @@ public class ErrorDialog {
 		er = new ErrorReporter();
 
 		this.systemInfo = er.getSystemInfo();
-
+		this.errorID = er.getErrorID();
+		
 		this.errorLog = er.getErrorLog();
 		if(errorLog == null || errorLog.equalsIgnoreCase(""))
 			errorLog = "The error that triggered this did not get reported in the error log file.";
-
+		
 	}
 
 	public void open() {
@@ -106,6 +109,14 @@ public class ErrorDialog {
 		gridData.heightHint = 75;
 		text.setLayoutData(gridData);
 		text.setText(errorLog);
+		
+		Label errorIDTextLabel = new Label(shell,SWT.NULL);
+		errorIDTextLabel.setText(I18N.translate(PFX + "errorIDTextLabel.text"));		
+		
+		final Text errorIDText = new Text(shell, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
+		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		errorIDText.setLayoutData(gridData);
+		errorIDText.setText(errorID);
 
 		Label sysTextLabel = new Label(shell, SWT.NULL);
 		sysTextLabel.setText(I18N.translate(PFX + "sysTextLabel.text"));
