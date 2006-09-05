@@ -524,7 +524,21 @@ public class DownloadManagerShell {
 						properties.getProperty("connection_password_0",null) != null) {
 					RCMain.getRCMain().connect(true);
 					initializeConnection();
-				} else
+				} else if (
+						properties.getProperty("connection_lastURL_0",null) != null &&
+						properties.getProperty("connection_username_0",null) != null){
+					InputShell is = new InputShell("Enter Password", "Please enter password for user: "+
+							properties.getProperty("connection_username_0") +
+							" connecting to server: " +
+							properties.getProperty("connection_lastURL_0"));
+					is.setIsPassword(true);
+					String pw = is.open();
+					if(pw != null){
+						RCMain.getRCMain().getClient().setPassword(pw);
+						RCMain.getRCMain().connect(true);
+						initializeConnection();
+					}
+				}else
 					ConnectionDialog.open(RCMain.getRCMain().getDisplay());
 			}
 		});
