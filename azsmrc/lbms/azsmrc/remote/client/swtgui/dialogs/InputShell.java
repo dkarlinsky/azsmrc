@@ -24,6 +24,10 @@ public class InputShell {
 
 	private String textValue;
 
+	private Text text;
+
+	private boolean bIsPassword = false;
+
 
 	public InputShell(String Title, String Labeltext) {
 		this.sTitleKey = Title;
@@ -53,7 +57,11 @@ public class InputShell {
 		gridData.widthHint = 200;
 		label.setLayoutData(gridData);
 
-		final Text text = new Text(shell, SWT.BORDER);
+		if(this.bIsPassword){
+			text = new Text(shell, SWT.BORDER);
+		}else{
+			text = new Text(shell, SWT.BORDER | SWT.PASSWORD);
+		}
 		gridData = new GridData();
 		gridData.widthHint = 300;
 		text.setLayoutData(gridData);
@@ -127,6 +135,13 @@ public class InputShell {
 		return textValue;
 	}
 
+	/**
+	 * Ability to set the input as a password "*" input.. must be set before open()
+	 * @param _bIsPassword
+	 */
+	public void setIsPassword(boolean _bIsPassword){
+		this.bIsPassword = _bIsPassword;
+	}
 
 }
 
