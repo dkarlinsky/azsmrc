@@ -58,9 +58,9 @@ public class InputShell {
 		label.setLayoutData(gridData);
 
 		if(this.bIsPassword){
-			text = new Text(shell, SWT.BORDER);
-		}else{
 			text = new Text(shell, SWT.BORDER | SWT.PASSWORD);
+		}else{
+			text = new Text(shell, SWT.BORDER);
 		}
 		gridData = new GridData();
 		gridData.widthHint = 300;
