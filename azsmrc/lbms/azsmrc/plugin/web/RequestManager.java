@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -50,8 +49,9 @@ import org.gudy.azureus2.plugins.tracker.TrackerException;
 import org.gudy.azureus2.plugins.tracker.TrackerTorrent;
 import org.gudy.azureus2.plugins.tracker.TrackerTorrentRemovalVetoException;
 import org.gudy.azureus2.plugins.tracker.web.TrackerWebPageResponse;
-import org.gudy.azureus2.plugins.ui.config.ConfigSection;
 import org.gudy.azureus2.plugins.ui.config.Parameter;
+import org.gudy.azureus2.plugins.ui.model.BasicPluginConfigModel;
+import org.gudy.azureus2.plugins.ui.model.PluginConfigModel;
 import org.gudy.azureus2.plugins.update.Update;
 import org.gudy.azureus2.plugins.update.UpdateCheckInstance;
 import org.gudy.azureus2.plugins.update.UpdateException;
@@ -60,14 +60,11 @@ import org.gudy.azureus2.plugins.utils.UTTimerEventPerformer;
 import org.gudy.azureus2.plugins.utils.resourcedownloader.ResourceDownloader;
 import org.gudy.azureus2.plugins.utils.resourcedownloader.ResourceDownloaderException;
 import org.gudy.azureus2.pluginsimpl.local.ui.config.BooleanParameterImpl;
-import org.gudy.azureus2.pluginsimpl.local.ui.config.ConfigSectionRepository;
 import org.gudy.azureus2.pluginsimpl.local.ui.config.DirectoryParameterImpl;
 import org.gudy.azureus2.pluginsimpl.local.ui.config.FileParameter;
 import org.gudy.azureus2.pluginsimpl.local.ui.config.IntParameterImpl;
 import org.gudy.azureus2.pluginsimpl.local.ui.config.ParameterImpl;
-import org.gudy.azureus2.pluginsimpl.local.ui.config.ParameterRepository;
 import org.gudy.azureus2.pluginsimpl.local.ui.config.StringParameterImpl;
-import org.gudy.azureus2.pluginsimpl.local.ui.model.BasicPluginConfigModelImpl;
 import org.gudy.azureus2.ui.swt.views.ConfigView;
 import org.jdom.DataConversionException;
 import org.jdom.Document;
@@ -82,6 +79,8 @@ public class RequestManager {
 	private Map<String, Integer[]> downloadControlList = new HashMap<String, Integer[]>();
 	private DownloadContainerManager dcm;
 	private UTTimerEvent resumeTask;
+	private TorrentAttribute taCateory;
+	private TorrentAttribute taUser;
 
 	private boolean restart = false;
 
@@ -93,7 +92,8 @@ public class RequestManager {
 	}
 
 	public void initialize (PluginInterface pi) {
-		System.out.println("AzSMRC: adding DownloadWillBeAddedListener");
+		taCateory = pi.getTorrentManager().getAttribute(TorrentAttribute.TA_CATEGORY);
+		taUser = pi.getTorrentManager().getPluginAttribute("User");
 		dcm = new DownloadContainerManager(pi.getDownloadManager());
 		pi.getDownloadManager().addDownloadWillBeAddedListener(new DownloadWillBeAddedListener() {
 			public void initialised(Download dl) {
@@ -440,7 +440,7 @@ public class RequestManager {
 						public void run() {
 							try {
 								TorrentManager torrentManager = Plugin.getPluginInterface().getTorrentManager();
-								TorrentAttribute ta = torrentManager.getAttribute(TorrentAttribute.TA_CATEGORY);
+
 								String username = xmlRequest.getAttributeValue("username");
 								String password = xmlRequest.getAttributeValue("password");
 								Torrent newTorrent = null;
@@ -470,11 +470,17 @@ public class RequestManager {
 											}
 										}
 										user.eventDownloadFinished(dl);
-									} else if (dl.getAttribute(ta) == null) {
-										dl.setAttribute(ta, user.getUsername());
+									} else if (dl.getAttribute(taUser) == null) {
+										dl.setAttribute(taUser, user.getUsername());
 										dl.addListener(MultiUserDownloadListener.getInstance());
+										if (Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("useUsernamesAsCategory", false)) {
+											dl.setAttribute(taCateory, user.getUsername());
+										}
 									} else {
-										dl.setAttribute(ta, MultiUser.SHARED_CAT_NAME);
+										dl.setAttribute(taUser, MultiUser.SHARED_USER_NAME);
+										if (Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("useUsernamesAsCategory", false)) {
+											dl.setAttribute(taCateory, MultiUser.SHARED_CAT_NAME);
+										}
 									}
 								}
 							} catch (MalformedURLException e) {
@@ -1484,77 +1490,82 @@ public class RequestManager {
 				return false;
 			}
 		});
-		/*addHandler("getPluginsFlexyConfig", new RequestHandler() {
+		addHandler("getPluginsFlexyConfig", new RequestHandler() {
 			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {
-				System.out.println("Creating PluginFlexyConf");
-				Element fc = new Element("FlexyConfiguration");
+				try {
+					System.out.println("Creating PluginFlexyConf");
+					Element fc = new Element("FlexyConfiguration");
 
-				int index = 0;
+					int index = 0;
 
-				List<ConfigSection> pluginSections = ConfigSectionRepository.getInstance().getList();
-				System.out.println("PluginFlexyConf Size1: "+pluginSections.size());
-				for (Object o:pluginSections) {
-					System.out.println(o.getClass());
-					if (o instanceof BasicPluginConfigModelImpl) {
-						BasicPluginConfigModelImpl pluginModel = (BasicPluginConfigModelImpl) o;
-						Parameter[] parameters = pluginModel.getParameters();
-						Element pluginSection = new Element ("Section");
-						pluginSection.setAttribute("index", Integer.toString(index));
-						String name = ((ConfigSection)o).configSectionGetName();
-						String	section_key = name;
-						System.out.println("PluginFlexyConf Adding: "+name);
+					PluginConfigModel[] pluginSections = Plugin.getPluginInterface().getUIManager().getPluginConfigModels();
+					System.out.println("PluginFlexyConf Size1: "+pluginSections.length);
+					for (PluginConfigModel o:pluginSections) {
+						System.out.println(o.getClass());
+						if (o instanceof BasicPluginConfigModel) {
+							BasicPluginConfigModel pluginModel = (BasicPluginConfigModel) o;
+							Parameter[] parameters = pluginModel.getParameters();
+							Element pluginSection = new Element ("Section");
+							pluginSection.setAttribute("index", Integer.toString(index));
+							String name = MessageText.getString("ConfigView.section." +pluginModel.getSection());
+							String	section_key = name;
+							System.out.println("PluginFlexyConf Adding: "+name);
 
-						// if resource exists without prefix then use it as plugins don't
-						// need to start with the prefix
+							// if resource exists without prefix then use it as plugins don't
+							// need to start with the prefix
 
-						if ( !MessageText.keyExists(section_key)){
-							section_key = ConfigView.sSectionPrefix + name;
+							if ( !MessageText.keyExists(section_key)){
+								section_key = ConfigView.sSectionPrefix + name;
+							}
+							pluginSection.setAttribute("label",MessageText.getString(section_key));
+							index++;
+							parameterArrayToEntry(pluginSection, parameters);
 						}
-						pluginSection.setAttribute("label",MessageText.getString(section_key));
-						index++;
+					}
+
+
+					/*ParameterRepository repository = ParameterRepository.getInstance();
+
+					String[] names = repository.getNames();
+
+					Arrays.sort(names);
+					System.out.println("PluginFlexyConf Size2: "+names.length);
+
+					for (int i = 0; i < names.length; i++) {
+						String pluginName = names[i];
+						System.out.println("PluginFlexyConf Adding: "+pluginName);
+						Parameter[] parameters = repository.getParameterBlock(pluginName);
+						Element pluginSection = new Element ("Section");
+						pluginSection.setAttribute("index", Integer.toString(i+index));
+						fc.addContent(pluginSection);
+
+						// Note: 2070's plugin documentation for PluginInterface.addConfigUIParameters
+						//       said to pass <"ConfigView.plugins." + displayName>.  This was
+						//       never implemented in 2070.  2070 read the key <displayName> without
+						//       the prefix.
+						//
+						//       2071+ uses <sSectionPrefix ("ConfigView.section.plugins.") + pluginName>
+						//       and falls back to <displayName>.  Since
+						//       <"ConfigView.plugins." + displayName> was never implemented in the
+						//       first place, a check for it has not been created
+						boolean bUsePrefix = MessageText.keyExists(ConfigView.sSectionPrefix
+								+ "plugins." + pluginName);
+						if (bUsePrefix) {
+							pluginSection.setAttribute("label", MessageText.getString(ConfigView.sSectionPrefix
+								+ "plugins." + pluginName));
+						} else {
+							pluginSection.setAttribute("label",MessageText.getString(pluginName));
+						}
 						parameterArrayToEntry(pluginSection, parameters);
-					}
+					}*/
+					response.addContent(fc);
+					return true;
+				} catch (RuntimeException e) {
+					e.printStackTrace();
+					return false;
 				}
-
-
-				ParameterRepository repository = ParameterRepository.getInstance();
-
-				String[] names = repository.getNames();
-
-				Arrays.sort(names);
-				System.out.println("PluginFlexyConf Size2: "+names.length);
-
-				for (int i = 0; i < names.length; i++) {
-					String pluginName = names[i];
-					System.out.println("PluginFlexyConf Adding: "+pluginName);
-					Parameter[] parameters = repository.getParameterBlock(pluginName);
-					Element pluginSection = new Element ("Section");
-					pluginSection.setAttribute("index", Integer.toString(i+index));
-					fc.addContent(pluginSection);
-
-					// Note: 2070's plugin documentation for PluginInterface.addConfigUIParameters
-					//       said to pass <"ConfigView.plugins." + displayName>.  This was
-					//       never implemented in 2070.  2070 read the key <displayName> without
-					//       the prefix.
-					//
-					//       2071+ uses <sSectionPrefix ("ConfigView.section.plugins.") + pluginName>
-					//       and falls back to <displayName>.  Since
-					//       <"ConfigView.plugins." + displayName> was never implemented in the
-					//       first place, a check for it has not been created
-					boolean bUsePrefix = MessageText.keyExists(ConfigView.sSectionPrefix
-							+ "plugins." + pluginName);
-					if (bUsePrefix) {
-						pluginSection.setAttribute("label", MessageText.getString(ConfigView.sSectionPrefix
-							+ "plugins." + pluginName));
-					} else {
-						pluginSection.setAttribute("label",MessageText.getString(pluginName));
-					}
-					parameterArrayToEntry(pluginSection, parameters);
-				}
-				response.addContent(fc);
-				return true;
 			}
-		});*/
+		});
 
 		addHandler("hostTorrent", new RequestHandler() {
 			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {

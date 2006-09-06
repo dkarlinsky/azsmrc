@@ -14,7 +14,8 @@ import org.gudy.azureus2.plugins.torrent.TorrentAttribute;
 public class MultiUserDownloadListener implements org.gudy.azureus2.plugins.download.DownloadListener {
 
 	static private MultiUserDownloadListener instance = new MultiUserDownloadListener();
-	static private TorrentAttribute ta = Plugin.getPluginInterface().getTorrentManager().getAttribute(TorrentAttribute.TA_CATEGORY);
+	//static private TorrentAttribute taCategory = Plugin.getPluginInterface().getTorrentManager().getAttribute(TorrentAttribute.TA_CATEGORY);
+	static private TorrentAttribute taUser = Plugin.getPluginInterface().getTorrentManager().getPluginAttribute("User");
 
 	private MultiUserDownloadListener() {}
 
@@ -27,12 +28,12 @@ public class MultiUserDownloadListener implements org.gudy.azureus2.plugins.down
 
 	public void stateChanged(final Download download, int old_state, int new_state) {
 		if (old_state == Download.ST_DOWNLOADING && download.isComplete()) {
-			String cat = download.getAttribute(ta);
+			String user_attrib = download.getAttribute(taUser);
 			download.removeListener(this); //remove after trigger
-			final boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);if (cat != null) {
+			final boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);if (user_attrib != null) {
 				try {
 					if (!download.getSavePath().contains(COConfigurationManager.getStringParameter("Default save path"))) return;//not in standart save path
-					if (cat.equalsIgnoreCase(MultiUser.SHARED_CAT_NAME) ) { //Multiple owner
+					if (user_attrib.equalsIgnoreCase(MultiUser.SHARED_USER_NAME) ) { //Multiple owner
 						DiskManagerFileInfo[] fileInfo = download.getDiskManagerFileInfo();
 						final File[] files = new File[fileInfo.length];
 						for (int i=0;i<files.length;i++) {
@@ -71,13 +72,13 @@ public class MultiUserDownloadListener implements org.gudy.azureus2.plugins.down
 							}
 						}
 					} else { //only a Single Download owner
-						User user = Plugin.getXMLConfig().getUser(cat);
+						User user = Plugin.getXMLConfig().getUser(user_attrib);
 						download.moveDataFiles(new File(user.getOutputDir()));
 						download.moveTorrentFile(new File(user.getOutputDir()));
 						if (!singleUser)user.eventDownloadFinished(download);
 					}
 				} catch (UserNotFoundException e) {
-					Plugin.addToLog("Cannot find a User associated with this Download "+download.getName()+"; Category: "+cat);
+					Plugin.addToLog("Cannot find a User associated with this Download "+download.getName()+"; Category: "+user_attrib);
 				} catch (DownloadException e) {
 					Plugin.addToLog(e.getMessage());
 				}

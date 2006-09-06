@@ -88,6 +88,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		config_model.addBooleanParameter2("azsmrc_military_time","azsmrc.military.time",false);
 		config_model.addBooleanParameter2("azsmrc_auto_open","azsmrc.auto.open",true);
 		config_model.addBooleanParameter2("singleUserMode", "azsmrc.singleusermode", false);
+		config_model.addBooleanParameter2("useUsernamesAsCategory", "azsmrc.usernameCategory", false);
 		config_model.addBooleanParameter2("disableAutoImport", "azsmrc.disable.auto.import", false);
 		config_model.addBooleanParameter2("use_ssl","azsmrc.use.ssl",false);
 		config_model.addIntParameter2("remote_port", "azsmrc.remote.port", 49009);

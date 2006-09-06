@@ -92,7 +92,7 @@ public class WebRequestHandler	/*extends WebPlugin*/ implements TrackerWebPageGe
 
 		torrent_categories = pluginInterface.getTorrentManager().getAttribute(TorrentAttribute.TA_CATEGORY);
 		///////////////////////////////
-		file_root = utilities.getAzureusUserDir() + File.separator + "plugins" + File.separator + "azsmrc" + File.separator + "web";
+		file_root = pluginInterface.getPluginDirectoryName() + File.separator + "web";
 
 		Plugin.addToLog(file_root);
 		welcome_files = new File[welcome_pages.length];
