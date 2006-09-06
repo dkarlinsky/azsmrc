@@ -222,7 +222,7 @@ public class ScrapeDialog {
 		torrentTable.addListener(SWT.MouseDoubleClick, new Listener(){
 			public void handleEvent(Event arg0) {
 				TableItem[] items = torrentTable.getSelection();
-				if(items.length > 1) return;
+				if(items.length != 1) return;
 				CTabItem[] tabs = tabFolder.getItems();
 				for(CTabItem item:tabs){
 					if(item.getText().equalsIgnoreCase(items[0].getText(0))){
@@ -821,7 +821,7 @@ public class ScrapeDialog {
 
 	/**
 	 * Clears the main table so that .setData can redraw everything
-	 * 
+	 *
 	 */
 	private void redrawTable() {
 		Display display = RCMain.getRCMain().getDisplay();
