@@ -161,8 +161,10 @@ public class Client {
 	 * 
 	 * A transaction will queue all requests while until it is commited
 	 * or send by timeout.
+	 * @return true if a transaction was active already
 	 */
-	public void transactionStart() {
+	public boolean transactionStart() {
+		boolean old = transaction;
 		transaction = true;
 		logger.debug("Transaction Started");
 		if (transactionTimeout != null) transactionTimeout.cancel();
@@ -172,6 +174,7 @@ public class Client {
 				transactionCommit();
 			}
 		});
+		return old;
 	}
 
 	/**
@@ -655,6 +658,23 @@ public class Client {
 
 	public void sendGetRemoteInfo() {
 		Element sendElement = getSendElement("getRemoteInfo");
+		enqueue(sendElement);
+	}
+
+	public void sendListPlugins() {
+		Element sendElement = getSendElement("listPlugins");
+		enqueue(sendElement);
+	}
+
+	public void sendSetPluginDisable(String id, boolean disable) {
+		Element sendElement = getSendElement("listPlugins");
+		sendElement.setAttribute("pluginID", id);
+		sendElement.setAttribute("disable", Boolean.toString(disable));
+		enqueue(sendElement);
+	}
+
+	public void sendGetPluginsFlexyConfig() {
+		Element sendElement = getSendElement("getPluginsFlexyConfig");
 		enqueue(sendElement);
 	}
 

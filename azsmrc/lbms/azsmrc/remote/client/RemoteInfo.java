@@ -1,7 +1,8 @@
 package lbms.azsmrc.remote.client;
 
-import java.util.List;
 import java.util.Map;
+
+import org.jdom.Element;
 
 public interface RemoteInfo {
 
@@ -11,5 +12,6 @@ public interface RemoteInfo {
 	public boolean refreshDriveInfo();
 	public Map<String, String> getDriveInfo();
 
-	public List<RemotePlugin> getRemotePlugins();
+	public RemotePlugin[] getRemotePlugins();
+	public Element getPluginsFlexyConf();
 }

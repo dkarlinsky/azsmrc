@@ -1485,6 +1485,19 @@ public class RequestManager {
 						pe.setAttribute("operational", Boolean.toString(plug.isBuiltIn()));
 						pe.setAttribute("mandatory", Boolean.toString(plug.isMandatory()));
 						pe.setAttribute("unloadable", Boolean.toString(plug.isUnloadable()));
+						response.addContent(pe);
+					}
+				}
+				return true;
+			}
+		});
+		addHandler("setPluginDisable", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, final User user) throws IOException {
+				if (user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+					PluginInterface pi = Plugin.getPluginInterface();
+					PluginInterface piTarget = pi.getPluginManager().getPluginInterfaceByID(xmlRequest.getAttributeValue("pluginID"));
+					if (piTarget != null) {
+						pi.setDisabled(Boolean.parseBoolean(xmlRequest.getAttributeValue("disable")));
 					}
 				}
 				return false;
@@ -1520,6 +1533,7 @@ public class RequestManager {
 							pluginSection.setAttribute("label",MessageText.getString(section_key));
 							index++;
 							parameterArrayToEntry(pluginSection, parameters);
+							fc.addContent(pluginSection);
 						}
 					}
 

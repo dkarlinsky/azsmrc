@@ -14,6 +14,7 @@ import lbms.azsmrc.remote.client.impl.DownloadImpl;
 import lbms.azsmrc.remote.client.impl.DownloadManagerImpl;
 import lbms.azsmrc.remote.client.impl.DownloadStatsImpl;
 import lbms.azsmrc.remote.client.impl.RemoteInfoImpl;
+import lbms.azsmrc.remote.client.impl.RemotePluginImpl;
 import lbms.azsmrc.remote.client.impl.RemoteUpdateImpl;
 import lbms.azsmrc.remote.client.impl.RemoteUpdateManagerImpl;
 import lbms.azsmrc.remote.client.impl.TrackerImpl;
@@ -379,6 +380,28 @@ public class ResponseManager {
 				ri.setAzureusVersion(xmlResponse.getAttributeValue("azureusVersion"));
 				ri.setPluginVersion(xmlResponse.getAttributeValue("pluginVersion"));
 				ri.setLoaded(true);
+				return Constants.UPDATE_REMOTE_INFO;
+			}
+		});
+		addHandler("listPlugins", new ResponseHandler() {
+			public long handleRequest(Element xmlResponse) throws IOException{
+				RemoteInfoImpl ri = client.getRemoteInfoImpl();
+				List<RemotePluginImpl> rPlugins = new ArrayList<RemotePluginImpl>();
+				List<Element> plugsE = xmlResponse.getChildren("Plugin");
+				for (Element pe : plugsE ) {
+					RemotePluginImpl rp = new RemotePluginImpl(client);
+					rp.implSetId(pe.getAttributeValue("id"));
+					rp.implSetDir(pe.getAttributeValue("dir"));
+					rp.implSetName(pe.getAttributeValue("name"));
+					rp.implSetVersion(pe.getAttributeValue("version"));
+					rp.implSetDisabled(Boolean.parseBoolean(pe.getAttributeValue("disabled")));
+					rp.implSetBuiltIn(Boolean.parseBoolean(pe.getAttributeValue("builtin")));
+					rp.implSetMandatory(Boolean.parseBoolean(pe.getAttributeValue("mandatory")));
+					rp.implSetOperational(Boolean.parseBoolean(pe.getAttributeValue("operational")));
+					rp.implSetUnloadable(Boolean.parseBoolean(pe.getAttributeValue("unloadable")));
+					rPlugins.add(rp);
+				}
+				ri.setRemotePlugins(rPlugins.toArray(new RemotePluginImpl[rPlugins.size()]));
 				return Constants.UPDATE_REMOTE_INFO;
 			}
 		});
