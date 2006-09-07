@@ -51,4 +51,8 @@ public abstract class AbstractEntryContainer {
 			return entries.get(key);
 		else return null;
 	}
+
+	protected void addEntry (Entry e) {
+		entries.put(e.getKey(), e);
+	}
 }

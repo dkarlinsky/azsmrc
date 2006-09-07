@@ -13,14 +13,25 @@ public class Section extends AbstractEntryContainer implements Comparable<Sectio
 	private List<Group> groups = new ArrayList<Group>();
 	private String label;
 	private FCInterface fci;
-	private DisplayAdapterSection displayAdapter;
+	//private DisplayAdapterSection displayAdapter;
 	private int index;
 
-	public Section () {
-
+	protected Section (String label) {
+		this.label = label;
 	}
 
-	public Section (Element e, FCInterface fci) {
+	public Section (String label, Section parent) {
+		this.label = label;
+		this.fci = parent.getFCInterface();
+		parent.addSubSection(this);
+	}
+
+	protected Section (String label, FCInterface fci) {
+		this.label = label;
+		this.fci = fci;
+	}
+
+	protected Section (Element e, FCInterface fci) {
 		this.fci = fci;
 		label = e.getAttributeValue("label");
 		String indexString = e.getAttributeValue("index");
@@ -77,6 +88,22 @@ public class Section extends AbstractEntryContainer implements Comparable<Sectio
 			}
 			return null;
 		}
+	}
+
+	private void addSubSection (Section s) {
+		children.add(s);
+	}
+
+	protected void addGroup (Group g) {
+		groups.add(g);
+	}
+
+	/* (non-Javadoc)
+	 * @see lbms.tools.flexyconf.AbstractEntryContainer#addEntry(lbms.tools.flexyconf.Entry)
+	 */
+	@Override
+	protected void addEntry(Entry e) {
+		super.addEntry(e);
 	}
 
 	/**

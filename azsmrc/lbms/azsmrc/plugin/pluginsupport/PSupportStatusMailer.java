@@ -1,6 +1,11 @@
 package lbms.azsmrc.plugin.pluginsupport;
 
+import lbms.azsmrc.plugin.main.Plugin;
 import lbms.azsmrc.plugin.main.User;
+import lbms.tools.flexyconf.Entry;
+import lbms.tools.flexyconf.InvalidRuleException;
+import lbms.tools.flexyconf.InvalidTypeException;
+import lbms.tools.flexyconf.Section;
 
 import org.gudy.azureus2.plugins.PluginInterface;
 import org.gudy.azureus2.plugins.ipc.IPCException;
@@ -56,6 +61,18 @@ public class PSupportStatusMailer implements PluginSupport {
 	 */
 	public void initialize(PluginInterface pi) {
 		PluginInterface target = pi.getPluginManager().getPluginInterfaceByID(SUPPORTED_PLUGIN_ID);
+		Section confSection = Plugin.addPSConfigSection("StatusMailerSupport");
+		Entry mailE = new Entry("eMail","azsmrc.pluginsupport.config.email",Entry.TYPE_STRING,confSection);
+		try {
+			//only accept valid email addresses
+			mailE.setRule("^[\\w-\\.]+@(?:[\\w-]+\\.)+[\\w-]{2,4}$");
+		} catch (InvalidRuleException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidTypeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		if (target == null) {
 			active = false;
 			return;

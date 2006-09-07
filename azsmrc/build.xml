@@ -60,6 +60,7 @@
 		<jar destfile="${root.dir}/${dist.dir}/azsmrcPlugin_${version}.jar" basedir="${root.dir}/${build.dir}" excludes="${dist.jar.excludes}">
 			<include name="lbms/azsmrc/plugin/**/*" />
 			<include name="lbms/azsmrc/shared/**/*" />
+			<include name="lbms/tools/flexyconf/**/*" />
 			<fileset file="${root.dir}/plugin.properties" />
 		</jar>
 		<echo message="Creating AzSMRC_${version}.jar..." />
@@ -88,6 +89,7 @@
 		<zip destfile="${root.dir}/${dist.dir}/azsmrcPlugin_${version}_src.zip" basedir="${root.dir}" excludes="${generic.excludes}">
 			<include name="lbms/azsmrc/plugin/**/*" />
 			<include name="lbms/azsmrc/shared/**/*" />
+			<include name="lbms/tools/flexyconf/**/*" />
 			<fileset file="${root.dir}/plugin.properties" />
 		</zip>
 		<zip destfile="${root.dir}/${dist.dir}/AzSMRC_${version}_src.zip" basedir="${root.dir}" excludes="${generic.excludes}">

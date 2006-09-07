@@ -11,7 +11,14 @@ public class Group extends AbstractEntryContainer implements ConfigEntity {
 	private String label;
 	private int index;
 
-	public Group (Element e, Section parent, FCInterface fci) {
+	public Group (Section parent, String label) {
+		this.section = parent;
+		this.label = label;
+		this.fci = parent.getFCInterface();
+		parent.addGroup(this);
+	}
+
+	protected Group (Element e, Section parent, FCInterface fci) {
 		this.fci = fci;
 		this.section = parent;
 		label = e.getAttributeValue("label");
@@ -52,6 +59,10 @@ public class Group extends AbstractEntryContainer implements ConfigEntity {
 	 */
 	public String getLabel() {
 		return fci.getI18NProvider().translate(label);
+	}
+
+	public Section getParent () {
+		return section;
 	}
 
 

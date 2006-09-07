@@ -18,6 +18,8 @@ import lbms.azsmrc.plugin.web.RequestManager;
 import lbms.azsmrc.plugin.web.WebRequestHandler;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.azsmrc.shared.UserNotFoundException;
+import lbms.tools.flexyconf.FlexyConfiguration;
+import lbms.tools.flexyconf.Section;
 
 import org.eclipse.swt.widgets.Display;
 import org.gudy.azureus2.core3.util.AEMonitor;
@@ -69,6 +71,8 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 	private static UpdateCheckInstance latestUpdate;
 
 	private static Map<String, PluginSupport> pluginSupport = new HashMap<String, PluginSupport>();
+	private static FlexyConfiguration psFlexyConfig;
+	private static Map<String,Section> psSections = new HashMap<String, Section>();
 
 	//new API startup code
 	UISWTInstance swtInstance = null;
@@ -466,6 +470,21 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 	public static PluginSupport getPluginSupport (String key) {
 		return pluginSupport.get(key);
+	}
+
+	public static Section addPSConfigSection (String label) {
+		label = "azsmrc.pluginsupport."+label;
+		if (psSections.containsKey(label))
+			return psSections.get(label);
+		else {
+			Section s = new Section(label,psFlexyConfig.getRootSection());
+			psSections.put(label, s);
+			return s;
+		}
+	}
+
+	public FlexyConfiguration getPSFlexyConf() {
+		return psFlexyConfig;
 	}
 
 //EOF

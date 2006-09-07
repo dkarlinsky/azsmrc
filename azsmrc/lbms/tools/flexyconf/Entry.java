@@ -35,11 +35,24 @@ public class Entry implements ConfigEntity {
 	private SortedSet<Option> options = new TreeSet<Option>();
 	private boolean option, negativeDepend;
 
-	public Entry () {
-
+	public Entry (String key, String label, int type, Section parent) {
+		this.key = key;
+		this.type = type;
+		this.section = parent;
+		this.fci = parent.getFCInterface();
+		parent.addEntry(this);
 	}
 
-	public Entry (Element e, Section parent, FCInterface fci) {
+	public Entry (String key, String label, int type, Group group) {
+		this.key = key;
+		this.type = type;
+		this.section = group.getParent();
+		this.fci = section.getFCInterface();
+		section.addEntry(this);
+		group.addEntry(this);
+	}
+
+	protected Entry (Element e, Section parent, FCInterface fci) {
 		this.fci = fci;
 		this.section = parent;
 		readFromElement(e);
@@ -294,4 +307,53 @@ public class Entry implements ConfigEntity {
 	public Option[] getOptions() {
 		return options.toArray(Option.EMPTY_OPT_ARRAY);
 	}
+
+	/**
+	 * @param label the label to set
+	 */
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
+	/**
+	 * @param option the option to set
+	 */
+	public void setOption(boolean option) {
+		this.option = option;
+	}
+
+	/**
+	 * @param options the options to set
+	 */
+	public void setOptions(SortedSet<Option> options) {
+		this.options = options;
+	}
+
+	/**
+	 * @param rule the rule to set
+	 */
+	public void setRule(String rule) throws InvalidRuleException, InvalidTypeException {
+		this.rule = rule;
+		validator = Validator.getValidator(rule, type);
+	}
+
+	/**
+	 * @param section the section to set
+	 */
+	protected void setSection(Section section) {
+		this.section = section;
+	}
+
+	/**
+	 * @param dependsOn the dependsOn to set
+	 */
+	public void setDependsOn(String dependsOn) {
+		this.dependsOn = dependsOn;
+		if (dependsOn!=null && dependsOn.indexOf('^') ==0) {
+			negativeDepend = true;
+			this.dependsOn = dependsOn.substring(1);
+		}
+	}
+
+
 }
