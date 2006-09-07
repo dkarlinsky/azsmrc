@@ -1508,11 +1508,17 @@ public class RequestManager {
 				try {
 					System.out.println("Creating PluginFlexyConf");
 					Element fc = new Element("FlexyConfiguration");
+					Element rootSection = new Element ("Section");
+					rootSection.setAttribute("label", "PluginConfig");
+					fc.addContent(rootSection);
 
 					int index = 0;
 
 					PluginConfigModel[] pluginSections = Plugin.getPluginInterface().getUIManager().getPluginConfigModels();
-					System.out.println("PluginFlexyConf Size1: "+pluginSections.length);
+					System.out.println("PluginFlexyConf Size: "+pluginSections.length);
+
+					if (pluginSections.length == 0) return false; //don't reply if we don't have any ConfigModels
+
 					for (PluginConfigModel o:pluginSections) {
 						System.out.println(o.getClass());
 						if (o instanceof BasicPluginConfigModel) {
@@ -1533,7 +1539,7 @@ public class RequestManager {
 							pluginSection.setAttribute("label",MessageText.getString(section_key));
 							index++;
 							parameterArrayToEntry(pluginSection, parameters);
-							fc.addContent(pluginSection);
+							rootSection.addContent(pluginSection);
 						}
 					}
 
