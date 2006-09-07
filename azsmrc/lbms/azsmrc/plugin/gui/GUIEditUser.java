@@ -68,7 +68,8 @@ public class GUIEditUser {
 		//Sash
 		final SashForm sash = new SashForm(parent,SWT.HORIZONTAL);
 		gridData = new GridData(GridData.FILL_BOTH);
-		gridData.horizontalSpan = 2;
+		gridData.widthHint = 600;
+		gridData.heightHint = 400;
 		sash.setLayoutData(gridData);
 		sash.setLayout(new GridLayout(1,false));
 
