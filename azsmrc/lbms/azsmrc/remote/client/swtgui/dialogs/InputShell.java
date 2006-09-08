@@ -47,6 +47,9 @@ public class InputShell {
 		shell.setText(sTitleKey);
 
 
+		if(!lbms.azsmrc.remote.client.Utilities.isOSX)
+			shell.setImage(display.getSystemImage(SWT.ICON_QUESTION));
+
 		GridLayout layout = new GridLayout();
 		shell.setLayout(layout);
 
