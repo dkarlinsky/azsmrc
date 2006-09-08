@@ -82,6 +82,10 @@ public class UpdateProgressDialog {
 		shell.setLayout(new GridLayout(2,false));
 		shell.setText(I18N.translate(PFX + "shell.text"));
 
+		if(!lbms.azsmrc.remote.client.Utilities.isOSX)
+			shell.setImage(ImageRepository.getImage("TrayIcon_Blue"));
+
+
 		picLabel = new Label(shell,SWT.NULL);
 		picLabel.setImage(display.getSystemImage(SWT.ICON_INFORMATION));
 
