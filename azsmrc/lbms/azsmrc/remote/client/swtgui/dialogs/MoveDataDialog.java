@@ -24,6 +24,7 @@ import lbms.azsmrc.remote.client.DownloadAdvancedStats;
 import lbms.azsmrc.remote.client.events.ClientUpdateListener;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
+import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.container.Container;
 import lbms.azsmrc.shared.SWTSafeRunnable;
@@ -85,6 +86,8 @@ public class MoveDataDialog {
 			}
 		});
 
+		if(!lbms.azsmrc.remote.client.Utilities.isOSX)
+			shell.setImage(ImageRepository.getImage("open_by_file"));
 
 		//Main Composite on shell
 		Composite parent = new Composite(shell,SWT.NULL);
