@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lbms.azsmrc.remote.client.internat.I18N;
+import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.container.DownloadContainer;
@@ -117,6 +118,9 @@ public class TableColumnEditorDialog {
 
 		GridLayout layout = new GridLayout();
 		shell.setLayout (layout);
+
+		if(!lbms.azsmrc.remote.client.Utilities.isOSX)
+			shell.setImage(ImageRepository.getImage("TrayIcon_Blue"));
 
 		GridData gridData;
 
