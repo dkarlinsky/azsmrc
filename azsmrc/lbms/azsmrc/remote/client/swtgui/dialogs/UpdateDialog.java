@@ -5,6 +5,7 @@ import java.util.List;
 
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
+import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.shared.SWTSafeRunnable;
 import lbms.tools.updater.Changelog;
@@ -52,6 +53,9 @@ public class UpdateDialog{
 					dialogShell = new Shell(parent);
 					dialogShell.setLayout(new GridLayout(2,false));
 					dialogShell.setText(I18N.translate(PFX + "shell.text"));
+
+					if(!lbms.azsmrc.remote.client.Utilities.isOSX)
+						dialogShell.setImage(ImageRepository.getImage("TrayIcon_Blue"));
 
 
 					long totalSize = 0;
