@@ -16,6 +16,7 @@ import lbms.azsmrc.remote.client.RemoteUpdateManager;
 import lbms.azsmrc.remote.client.events.ClientUpdateListener;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
+import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.shared.SWTSafeRunnable;
 
@@ -86,6 +87,9 @@ public class ServerUpdateDialog {
 		shell = new Shell(RCMain.getRCMain().getDisplay());
 		shell.setLayout(new GridLayout(1,false));
 		shell.setText(I18N.translate(PFX + "shell.text"));
+
+		if(!lbms.azsmrc.remote.client.Utilities.isOSX)
+			shell.setImage(ImageRepository.getImage("TrayIcon_Blue"));
 
 		//Comp on shell
 		Composite comp = new Composite(shell,SWT.NULL);
