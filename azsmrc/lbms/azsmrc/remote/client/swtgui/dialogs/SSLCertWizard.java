@@ -3,6 +3,7 @@ package lbms.azsmrc.remote.client.swtgui.dialogs;
 
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
+import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.shared.RemoteConstants;
 
@@ -44,6 +45,9 @@ public class SSLCertWizard {
 		shell = new Shell(display);
 		shell.setLayout(new GridLayout(1,false));
 		shell.setText(I18N.translate(PFX + "shell.text"));
+
+		if(!lbms.azsmrc.remote.client.Utilities.isOSX)
+			shell.setImage(ImageRepository.getImage("TrayIcon_Blue"));
 
 		parent = new Composite(shell,SWT.BORDER);
 		parent.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
