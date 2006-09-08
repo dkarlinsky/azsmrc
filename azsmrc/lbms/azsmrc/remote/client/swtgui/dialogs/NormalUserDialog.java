@@ -3,6 +3,7 @@ package lbms.azsmrc.remote.client.swtgui.dialogs;
 import lbms.azsmrc.remote.client.User;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
+import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.shared.UserNotFoundException;
 
@@ -37,6 +38,10 @@ public class NormalUserDialog {
 
 		shell = new Shell(display.getActiveShell());
 		shell.setText(I18N.translate(PFX + "shell.text"));
+
+		if(!lbms.azsmrc.remote.client.Utilities.isOSX)
+			shell.setImage(ImageRepository.getImage("manager_users"));
+
 		final User user;
 
 		try {
