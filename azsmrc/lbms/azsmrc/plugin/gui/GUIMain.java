@@ -302,10 +302,13 @@ public class GUIMain {
 					/*GUIUserUtils guiUtils = new GUIUserUtils();
 					guiUtils.editUserInfo(items[0].getText(0),isAdmin);*/
 
-					GUIEditUser guieu = new GUIEditUser();
-					guieu.open(null);
-
-					//TODO -- FIX!
+					try {
+						User user = Plugin.getXMLConfig().getUser(items[0].getText(0));
+						GUIEditUser guieu = new GUIEditUser();
+						guieu.open(user);
+					} catch (UserNotFoundException e1) {
+						e1.printStackTrace();
+					}
 				}
 			}
 		});
