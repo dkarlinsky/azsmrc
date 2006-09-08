@@ -38,6 +38,7 @@ public class Entry implements ConfigEntity {
 	public Entry (String key, String label, int type, Section parent) {
 		this.key = key;
 		this.type = type;
+		this.label = label;
 		this.section = parent;
 		this.fci = parent.getFCInterface();
 		parent.addEntry(this);

@@ -1,7 +1,13 @@
 package lbms.azsmrc.plugin.gui;
 
+import lbms.azsmrc.plugin.main.Plugin;
 import lbms.azsmrc.plugin.main.User;
 import lbms.azsmrc.plugin.main.Utilities;
+import lbms.tools.flexyconf.ContentProvider;
+import lbms.tools.flexyconf.FCInterface;
+import lbms.tools.flexyconf.FlexyConfiguration;
+import lbms.tools.flexyconf.I18NProvider;
+import lbms.tools.flexyconf.swt.SWTMenu;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -39,6 +45,7 @@ public class GUIEditUser {
 
 		instance = this;
 		user = _user;
+		System.out.println("USERNAME: "+user);
 
 		//Shell Initialize
 		shell = new Shell(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
@@ -135,7 +142,39 @@ public class GUIEditUser {
 		//pack and open shell
 		Utilities.centerShellandOpen(shell);
 
-
+		FlexyConfiguration fc = Plugin.getPSFlexyConf();
+		FCInterface fci = fc.getFCInterface();
+		fci.setContentProvider(new ContentProvider() {
+			/* (non-Javadoc)
+			 * @see lbms.tools.flexyconf.ContentProvider#getDefaultValue(java.lang.String, int)
+			 */
+			public String getDefaultValue(String key, int type) {
+				return user.getProperty(key);
+			}
+			/* (non-Javadoc)
+			 * @see lbms.tools.flexyconf.ContentProvider#getValue(java.lang.String, int)
+			 */
+			public String getValue(String key, int type) {
+				String v = user.getProperty(key);
+				return (v==null)? "" : v;
+			}
+			/* (non-Javadoc)
+			 * @see lbms.tools.flexyconf.ContentProvider#setValue(java.lang.String, java.lang.String, int)
+			 */
+			public void setValue(String key, String value, int type) {
+				user.setProperty(key, value);
+			}
+		});
+		fci.setI18NProvider(new I18NProvider () {
+			/* (non-Javadoc)
+			 * @see lbms.tools.flexyconf.I18NProvider#translate(java.lang.String)
+			 */
+			public String translate(String key) {
+				return Plugin.getLocaleUtilities().getLocalisedMessageText(key);
+			}
+		});
+		SWTMenu fcm = new SWTMenu (fc,tree,cOptions);
+		fcm.addAsRoot();
 	}
 
 	/**

@@ -477,13 +477,14 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		if (psSections.containsKey(label))
 			return psSections.get(label);
 		else {
-			Section s = new Section(label,psFlexyConfig.getRootSection());
+			Section s = new Section(label,getPSFlexyConf().getRootSection());
 			psSections.put(label, s);
 			return s;
 		}
 	}
 
-	public FlexyConfiguration getPSFlexyConf() {
+	public static FlexyConfiguration getPSFlexyConf() {
+		if (psFlexyConfig == null) psFlexyConfig = new FlexyConfiguration();
 		return psFlexyConfig;
 	}
 

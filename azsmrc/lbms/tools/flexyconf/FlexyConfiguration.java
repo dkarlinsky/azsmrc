@@ -21,6 +21,7 @@ public class FlexyConfiguration {
 	private FCInterface fci;
 
 	public FlexyConfiguration () {
+		fci = new FCInterface (this);
 		rootSection = new Section ("RootSection");
 		rootSection.setFCInterface(getFCInterface());
 	}
