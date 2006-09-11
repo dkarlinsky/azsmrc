@@ -16,6 +16,7 @@ import lbms.azsmrc.remote.client.User;
 
 import lbms.azsmrc.remote.client.events.ParameterListener;
 import lbms.azsmrc.remote.client.internat.I18N;
+import lbms.azsmrc.remote.client.swtgui.ColorUtilities;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.dialogs.SSLCertWizard;
@@ -958,13 +959,13 @@ public class PreferencesTab {
 		loadatstartup.setText(I18N.translate(PFX + "remoteplugins.columns.loadatstartup"));
 		loadatstartup.pack();
 
-		TableColumn type = new TableColumn(rpTable, SWT.LEFT);
+		TableColumn type = new TableColumn(rpTable, SWT.CENTER);
 		type.setText(I18N.translate(PFX + "remoteplugins.columns.type"));
-		type.pack();
+		type.setWidth(70);
 
 		TableColumn name = new TableColumn(rpTable, SWT.LEFT);
 		name.setText(I18N.translate(PFX + "remoteplugins.columns.name"));
-		name.setWidth(150);
+		name.setWidth(175);
 
 		TableColumn version = new TableColumn(rpTable, SWT.LEFT);
 		version.setText(I18N.translate(PFX + "remoteplugins.columns.version"));
@@ -972,7 +973,7 @@ public class PreferencesTab {
 
 		TableColumn directory = new TableColumn(rpTable, SWT.LEFT);
 		directory.setText(I18N.translate(PFX + "remoteplugins.columns.directory"));
-		directory.setWidth(120);
+		directory.setWidth(150);
 
 		TableColumn unloadable = new TableColumn(rpTable, SWT.CENTER);
 		unloadable.setText(I18N.translate(PFX + "remoteplugins.columns.unloadable"));
@@ -984,33 +985,42 @@ public class PreferencesTab {
 			public void handleEvent(Event event) {
 				//Pull table item
 				TableItem item = (TableItem) event.item;
-				//int index = rpTable.indexOf(item);
+				int index = rpTable.indexOf(item);
 
 				RemotePlugin[] plugins = RCMain.getRCMain().getClient().getRemoteInfo().getRemotePlugins();
 				if(plugins == null || plugins.length == 0) return;
-				for(RemotePlugin plugin:plugins){
-					//Column 0 = loadatstartup (checkbox)
-					//Column 1 = type
-					//Column 2 = name
-					//Column 3 = version
-					//Column 4 = directory
-					//Column 5 = unloadable
 
-					item.setChecked(!plugin.isDisabled());
+				RemotePlugin plugin = plugins[index];
 
 
-					if(plugin.isBuiltIn())
-						item.setText(1,I18N.translate(PFX + "remoteplugins.tableitem.builtin"));
-					else
-						item.setText(1,I18N.translate(PFX + "remoteplugins.tableitem.peruser"));
+				if(plugin == null) return;
+
+				//Column 0 = loadatstartup (checkbox)
+				//Column 1 = type
+				//Column 2 = name
+				//Column 3 = version
+				//Column 4 = directory
+				//Column 5 = unloadable
+
+				item.setChecked(!plugin.isDisabled());
 
 
-					item.setText(2, plugin.getPluginName());
-					item.setText(3, plugin.getPluginVersion());
-					item.setText(4, plugin.getPluginDirectoryName());
-					item.setText(5, Boolean.toString(plugin.isUnloadable()));
+				if(plugin.isBuiltIn())
+					item.setText(1,I18N.translate(PFX + "remoteplugins.tableitem.builtin"));
+				else
+					item.setText(1,I18N.translate(PFX + "remoteplugins.tableitem.peruser"));
 
+
+				item.setText(2, plugin.getPluginName());
+				item.setText(3, plugin.getPluginVersion());
+				item.setText(4, plugin.getPluginDirectoryName());
+				item.setText(5, Boolean.toString(plugin.isUnloadable()));
+
+				//color every other one
+				if(index%2!=0){
+					item.setBackground(ColorUtilities.getBackgroundColor());
 				}
+
 
 			}
 		});
@@ -1020,6 +1030,8 @@ public class PreferencesTab {
 		buttonComp.setLayout(new GridLayout(2,false));
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		buttonComp.setLayoutData(gd);
+
+
 
 		//redraw the comp
 		composite.layout();
