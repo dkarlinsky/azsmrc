@@ -373,7 +373,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 				for (PluginSupport ps:pluginSupport.values()) {
 					try {
 						ps.initialize(pluginInterface);
-						logger.log("Plugin Support active ["+ps.isActive()+"]: "+ps.getName());
+						logger.log("Plugin Support for: ["+ps.getName()+"] is active: "+ps.isActive());
 					} catch (Throwable e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

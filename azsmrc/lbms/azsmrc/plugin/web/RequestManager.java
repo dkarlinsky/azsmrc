@@ -281,7 +281,8 @@ public class RequestManager {
 				while (iter.hasNext()) {
 					Parameter parameterToEnable = iter.next();
 					Element entry = parameterToElement.get(parameterToEnable);
-					entry.setAttribute("dependsOn", ((ParameterImpl)parameter).getKey());
+					if (entry != null)
+						entry.setAttribute("dependsOn", ((ParameterImpl)parameter).getKey());
 				}
 
 				List<Parameter> parametersToDisable = ((BooleanParameterImpl) parameter)

@@ -383,6 +383,13 @@ public class ResponseManager {
 				return Constants.UPDATE_REMOTE_INFO;
 			}
 		});
+		addHandler("getPluginsFlexyConfig", new ResponseHandler() {
+			public long handleRequest(Element xmlResponse) throws IOException{
+				RemoteInfoImpl ri = client.getRemoteInfoImpl();
+				ri.setPluginFlexyConf(xmlResponse.getChild("FlexyConfiguration"));
+				return Constants.UPDATE_REMOTE_INFO;
+			}
+		});
 		addHandler("listPlugins", new ResponseHandler() {
 			public long handleRequest(Element xmlResponse) throws IOException{
 				RemoteInfoImpl ri = client.getRemoteInfoImpl();

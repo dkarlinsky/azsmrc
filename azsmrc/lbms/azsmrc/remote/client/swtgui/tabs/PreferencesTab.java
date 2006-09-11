@@ -32,6 +32,7 @@ import lbms.tools.flexyconf.I18NProvider;
 import lbms.tools.flexyconf.swt.SWTMenu;
 import lbms.tools.i18n.I18NTranslator;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -61,10 +62,12 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.jdom.Element;
 
 public class PreferencesTab {
 
 	private static PreferencesTab instance;
+	private static Logger logger = Logger.getLogger(PreferencesTab.class);
 
 	private CTabItem prefsTab;
 
@@ -248,16 +251,78 @@ public class PreferencesTab {
 		tiSound = new TreeItem(menuTree,SWT.NULL);
 		tiSound.setText(I18N.translate(PFX + "sound.treeItem.text"));
 
-		tiRemotePlugins = new TreeItem(menuTree, SWT.NULL);
-		tiRemotePlugins.setText(I18N.translate(PFX + "remoteplugins.treeItem.text"));
-
-
 		User activeUser = RCMain.getRCMain().getClient().getUserManager().getActiveUser();
 
 		if(RCMain.getRCMain().connected()
 				&& activeUser != null
-				&& activeUser.checkAccess(RemoteConstants.RIGHTS_ADMIN))
+				&& activeUser.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+
+			tiRemotePlugins = new TreeItem(menuTree, SWT.NULL);
+			tiRemotePlugins.setText(I18N.translate(PFX + "remoteplugins.treeItem.text"));
+
+			Element rpFlexyConfElement = RCMain.getRCMain().getClient().getRemoteInfo().getPluginsFlexyConf();
+			RCMain.getRCMain().getClient().transactionStart();
+			if (rpFlexyConfElement != null) {
+				FlexyConfiguration rpFC = new FlexyConfiguration (rpFlexyConfElement);
+				FCInterface fci = rpFC.getFCInterface();
+				fci.setI18NProvider(new I18NProvider() {
+					/* (non-Javadoc)
+					 * @see lbms.tools.flexyconf.I18NProvider#translate(java.lang.String)
+					 */
+					public String translate(String key) {
+						if (key != null)
+							return key;
+						else return "";
+					}
+				});
+				fci.setContentProvider(new ContentProvider() {
+
+					public String getDefaultValue(String key, int type) {
+						String v = defaultProperties.getProperty(key);
+						if (v==null) {
+
+							switch (type) {
+							case Entry.TYPE_STRING:
+								return "No Default Found";
+							case Entry.TYPE_BOOLEAN:
+								return "false";
+							default:
+								return "0";
+							}
+						}
+						else return v;
+					}
+					public String getValue(String key, int type) {
+						String v = properties.getProperty(key);
+						if (v==null) {
+							switch (type) {
+							case Entry.TYPE_STRING:
+								return "No Default Found...";
+							case Entry.TYPE_BOOLEAN:
+								return "false";
+							default:
+								return "0";
+							}
+						}
+						else return v;
+					}
+
+					public void setValue(String key, String value, int type) {
+						logger.debug("AzSMRC Conf Set: "+key+" value: "+value+" type: "+type);
+						properties.setProperty(key, value);
+						RCMain.getRCMain().saveConfig();
+					}
+				});
+				fcm = new SWTMenu(fc,menuTree,cOptions);
+				fcm.addAsSubItem(tiRemotePlugins);
+				fc.getRootSection().initAll();
+			}
+
 			initAzFlexyConf();
+			RCMain.getRCMain().getClient().transactionCommit();
+
+		}
+
 
 		// set the first static notes treeItem and draw the cOptions for it
 		try { //it is supported as of SWT3.2
@@ -890,7 +955,6 @@ public class PreferencesTab {
 			fci.setContentProvider(new ContentProvider() {
 
 				public String getDefaultValue(String key, int type) {
-					System.out.println("AzSMRC *DEFAULT* Conf Get Def: "+key+" type: "+ type );
 					String v = defaultProperties.getProperty(key);
 					if (v==null) {
 
@@ -906,7 +970,6 @@ public class PreferencesTab {
 					else return v;
 				}
 				public String getValue(String key, int type) {
-					System.out.println("AzSMRC Conf Get: "+key+" type: "+type );
 					String v = properties.getProperty(key);
 					if (v==null) {
 						switch (type) {
@@ -922,7 +985,7 @@ public class PreferencesTab {
 				}
 
 				public void setValue(String key, String value, int type) {
-					System.out.println("AzSMRC Conf Set: "+key+" value: "+value+" type: "+type);
+					logger.debug("AzSMRC Conf Set: "+key+" value: "+value+" type: "+type);
 					properties.setProperty(key, value);
 					RCMain.getRCMain().saveConfig();
 				}
