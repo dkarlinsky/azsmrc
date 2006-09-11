@@ -18,6 +18,7 @@ import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.dialogs.SSLCertWizard;
+import lbms.azsmrc.remote.client.swtgui.dialogs.ScrapeDialog;
 import lbms.azsmrc.remote.client.swtgui.sound.Sound;
 import lbms.azsmrc.remote.client.swtgui.sound.SoundManager;
 import lbms.azsmrc.shared.RemoteConstants;
@@ -59,6 +60,11 @@ import org.eclipse.swt.widgets.TreeItem;
 
 public class PreferencesTab {
 
+	private static PreferencesTab instance;
+
+	private CTabItem prefsTab;
+
+
 	private Label pluginLabel;
 	private Button singleUser;
 	private Tree menuTree;
@@ -93,8 +99,8 @@ public class PreferencesTab {
 
 
 
-	public PreferencesTab(final CTabFolder parentTab){
-
+	private void loadGUI(final CTabFolder parentTab){
+		instance = this;
 
 		//Open properties for reading and saving
 		properties = RCMain.getRCMain().getProperties();
@@ -115,7 +121,7 @@ public class PreferencesTab {
 
 
 
-		final CTabItem prefsTab = new CTabItem(parentTab, SWT.CLOSE);
+		prefsTab = new CTabItem(parentTab, SWT.CLOSE);
 		prefsTab.setText(I18N.translate(PFX + "tab.text"));
 
 
@@ -919,7 +925,31 @@ public class PreferencesTab {
 		}
 	}
 
+	private void makePluginPreferences(final Composite composite){
+		Control[] controls = composite.getChildren();
+		for(Control control:controls){
+			control.dispose();
+		}
 
 
+	}
 
+	/**
+	 * Opens the scrape dialog with a file already in place
+	 * @param File torrent
+	 */
+	public static void open(final CTabFolder parentTab) {
+		Display display = RCMain.getRCMain().getDisplay();
+		if(display == null || display.isDisposed()) return;
+		display.asyncExec(new SWTSafeRunnable(){
+			public void runSafe() {
+				if (instance == null){
+					PreferencesTab pref = new PreferencesTab();
+					pref.loadGUI(parentTab);
+				}else{
+					parentTab.setSelection(instance.prefsTab);
+				}
+			}
+		});
+	}
 }//EOF

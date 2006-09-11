@@ -429,15 +429,7 @@ public class DownloadManagerShell {
 		menuPrefs.setText("&Preferences");
 		menuPrefs.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
-
-				CTabItem[] tabs = tabFolder.getItems();
-				for(CTabItem tab:tabs){
-					if(tab.getText().equalsIgnoreCase("Preferences")){
-						tabFolder.setSelection(tab);
-						return;
-					}
-				}
-				new PreferencesTab(tabFolder);
+				PreferencesTab.open(tabFolder);
 			}
 		});
 
@@ -885,15 +877,7 @@ public class DownloadManagerShell {
 		preferences.setToolTipText("Open Preferences");
 		preferences.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
-
-				CTabItem[] tabs = tabFolder.getItems();
-				for(CTabItem tab:tabs){
-					if(tab.getText().equalsIgnoreCase("Preferences")){
-						tabFolder.setSelection(tab);
-						return;
-					}
-				}
-				new PreferencesTab(tabFolder);
+				PreferencesTab.open(tabFolder);
 			}
 		});
 
