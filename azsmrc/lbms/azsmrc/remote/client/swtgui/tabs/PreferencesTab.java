@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import lbms.azsmrc.remote.client.Client;
+import lbms.azsmrc.remote.client.RemotePlugin;
 import lbms.azsmrc.remote.client.User;
 
 import lbms.azsmrc.remote.client.events.ParameterListener;
@@ -18,7 +19,6 @@ import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.dialogs.SSLCertWizard;
-import lbms.azsmrc.remote.client.swtgui.dialogs.ScrapeDialog;
 import lbms.azsmrc.remote.client.swtgui.sound.Sound;
 import lbms.azsmrc.remote.client.swtgui.sound.SoundManager;
 import lbms.azsmrc.shared.RemoteConstants;
@@ -54,6 +54,9 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
@@ -69,7 +72,9 @@ public class PreferencesTab {
 	private Button singleUser;
 	private Tree menuTree;
 
-	private TreeItem tiPlugin, tiSound, tiNotes;
+	private Table rpTable;
+
+	private TreeItem tiPlugin, tiSound, tiNotes, tiRemotePlugins;
 
 	private Composite cOptions;
 	private ScrolledComposite sc;
@@ -195,6 +200,8 @@ public class PreferencesTab {
 					makeSoundPreferences(cOptions);
 				}else if(event.item.equals(tiNotes)){
 					makeNotesPreferences(cOptions);
+				}else if(event.item.equals(tiRemotePlugins )){
+					makeRemotePluginPreferences(cOptions);
 				}
 
 			}
@@ -239,6 +246,10 @@ public class PreferencesTab {
 
 		tiSound = new TreeItem(menuTree,SWT.NULL);
 		tiSound.setText(I18N.translate(PFX + "sound.treeItem.text"));
+
+		tiRemotePlugins = new TreeItem(menuTree, SWT.NULL);
+		tiRemotePlugins.setText(I18N.translate(PFX + "remoteplugins.treeItem.text"));
+
 
 		User activeUser = RCMain.getRCMain().getClient().getUserManager().getActiveUser();
 
@@ -925,18 +936,121 @@ public class PreferencesTab {
 		}
 	}
 
-	private void makePluginPreferences(final Composite composite){
+	private void makeRemotePluginPreferences(final Composite composite){
 		Control[] controls = composite.getChildren();
 		for(Control control:controls){
 			control.dispose();
 		}
 
+		Label pluginsIDed = new Label(composite, SWT.NULL);
+		pluginsIDed.setText(I18N.translate(PFX + "remoteplugins.pluginsided.text"));
 
+		//Remote Table Initialization
+		rpTable = new Table(composite, SWT.CHECK | SWT.VIRTUAL | SWT.SINGLE | SWT.FULL_SELECTION | SWT.BORDER);
+		rpTable.setHeaderVisible(true);
+
+		GridData gd = new GridData(GridData.FILL_BOTH);
+		gd.horizontalSpan = 2;
+		rpTable.setLayoutData(gd);
+
+		//columns
+		TableColumn loadatstartup = new TableColumn(rpTable, SWT.CENTER);
+		loadatstartup.setText(I18N.translate(PFX + "remoteplugins.columns.loadatstartup"));
+		loadatstartup.pack();
+
+		TableColumn type = new TableColumn(rpTable, SWT.LEFT);
+		type.setText(I18N.translate(PFX + "remoteplugins.columns.type"));
+		type.pack();
+
+		TableColumn name = new TableColumn(rpTable, SWT.LEFT);
+		name.setText(I18N.translate(PFX + "remoteplugins.columns.name"));
+		name.setWidth(150);
+
+		TableColumn version = new TableColumn(rpTable, SWT.LEFT);
+		version.setText(I18N.translate(PFX + "remoteplugins.columns.version"));
+		version.pack();
+
+		TableColumn directory = new TableColumn(rpTable, SWT.LEFT);
+		directory.setText(I18N.translate(PFX + "remoteplugins.columns.directory"));
+		directory.setWidth(120);
+
+		TableColumn unloadable = new TableColumn(rpTable, SWT.CENTER);
+		unloadable.setText(I18N.translate(PFX + "remoteplugins.columns.unloadable"));
+		unloadable.pack();
+
+
+		//Set Data listener
+		rpTable.addListener(SWT.SetData, new Listener(){
+			public void handleEvent(Event event) {
+				//Pull table item
+				TableItem item = (TableItem) event.item;
+				//int index = rpTable.indexOf(item);
+
+				RemotePlugin[] plugins = RCMain.getRCMain().getClient().getRemoteInfo().getRemotePlugins();
+				if(plugins == null || plugins.length == 0) return;
+				for(RemotePlugin plugin:plugins){
+					//Column 0 = loadatstartup (checkbox)
+					//Column 1 = type
+					//Column 2 = name
+					//Column 3 = version
+					//Column 4 = directory
+					//Column 5 = unloadable
+
+					item.setChecked(!plugin.isDisabled());
+
+
+					if(plugin.isBuiltIn())
+						item.setText(1,I18N.translate(PFX + "remoteplugins.tableitem.builtin"));
+					else
+						item.setText(1,I18N.translate(PFX + "remoteplugins.tableitem.peruser"));
+
+
+					item.setText(2, plugin.getPluginName());
+					item.setText(3, plugin.getPluginVersion());
+					item.setText(4, plugin.getPluginDirectoryName());
+					item.setText(5, Boolean.toString(plugin.isUnloadable()));
+
+				}
+
+			}
+		});
+
+
+		Composite buttonComp = new Composite(composite, SWT.NULL);
+		buttonComp.setLayout(new GridLayout(2,false));
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		buttonComp.setLayoutData(gd);
+
+		//redraw the comp
+		composite.layout();
+
+		//Clear the rptable
+		clearRPTable();
+	}
+
+	private void clearRPTable(){
+		if(rpTable != null || !rpTable.isDisposed()){
+			rpTable.removeAll();
+			int count = RCMain.getRCMain().getClient().getRemoteInfo().getRemotePlugins().length;
+			if(count > 0)
+				rpTable.setItemCount(count);
+			else
+				rpTable.setItemCount(0);
+		}
 	}
 
 	/**
-	 * Opens the scrape dialog with a file already in place
-	 * @param File torrent
+	 * returns the remoteplugintable from the instance
+	 * Caution -- if instance == null then this will be null!
+	 * @return rpTable
+	 */
+	public Table getRemotePluginTable(){
+		return instance.rpTable;
+	}
+
+	/**
+	 * Opens the preference tab
+	 * @param CTabFolder parentTab
 	 */
 	public static void open(final CTabFolder parentTab) {
 		Display display = RCMain.getRCMain().getDisplay();
