@@ -1,6 +1,64 @@
-<html><body>Hallo Welt!!! (Intern)
-	<form action="process.cgi" method="post" enctype="text/plain">
-		<input type="text" name="Request"><br>
-		<input type="submit" value="Senden">
-	</form>	
-	</body></html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>AzSMRC Webinterface</title>
+	<!-- Meta Tags -->
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="content-language" content="de" />
+	<meta name="author" content="Toni Uebernickel - Whitestarprogramming.de" />
+	<meta name="description" content="Webinterface f&#252;r Azureus AzSMRC Plugin" />
+	<meta name="keywords" content="Azureus Webinterface AzSMRC Plugin remote" />
+	<meta name="creation_date" content="04/09/2006" />
+	<!-- Scripts -->
+	<script type="text/javascript" src="js/debugLog.js" />
+	<script type="text/javascript" src="js/registeredRequests.js" />
+	<script type="text/javascript" src="js/handleRequests.js" />
+	<script type="text/javascript" src="js/tabControl.js" />
+	<script type="text/javascript" src="js/azsmrc_main.js" />
+	<!-- Styles -->
+	<link rel="stylesheet" type="text/css" href="css/azsmrc_default.css" title="Standard AzSMRC Style" />
+</head>
+<body onload="initAzSMRCwebUI();">
+	<div id="tab_2" class="tab">
+		<h1>AzSMRC Webinterface</h1>
+		<p>AzSMRC ist eine Remotecontrol f&#252;r Azureus.</p>
+	</div>
+	<div id="topbar">
+		<h2 class="invisible">Menu</h2>
+		<ul id="picmenu" class="menu">
+			<li><img src="img/connect_new.png" alt="Connect to Server" title="Connect to Server" /></li>
+			<li><img src="img/connect_quick_new.png" alt="Quickconnect" title="Quickconnect" /></li>
+			<li><img src="img/logout_new.png" alt="Disconnect from Server" title="Disconnect from Server" /></li>
+			<li class="subbreak"><img src="img/refresh.png" alt="Refresh" title="Refresh" onclick="refreshView();" /></li>
+			<li><img src="img/open_by_file_new.png" alt="Send Torrent File to Server" title="Send Torrent File to Server" /></li>
+			<li class="subbreak"><img src="img/open_by_url_new.png" alt="Send Torrent URL to Server" title="Send Torrent URL to Server" /></li>
+			<li><img src="img/top.png" alt="Set on Top" title="Set on Top" /></li>
+			<li><img src="img/up.png" alt="Set Up" title="Set Up" /></li>
+			<li><img src="img/down.png" alt="Set Down" title="Set Down" /></li>
+			<li class="subbreak"><img src="img/bottom.png" alt="Set on Bottom" title="Set on Bottom" /></li>
+			<!-- Resume, Pause, Delete (img missing)
+			<li><img src="img/connect_new.png" /></li>
+			<li><img src="img/connect_new.png" /></li>
+			<li class="subbreak"><img src="img/connect_new.png" /></li>
+			-->
+			<li><img src="img/tool_pause.png" alt="Pause" title="Pause" /></li>
+			<li class="subbreak"><img src="img/tool_resume.png" alt="Resume" title="Resume" /></li>
+			<li><img src="img/preferences.png" alt="Open Preferences" title="Open Preferences" /></li>
+			<li><img src="img/manage_users.png" alt="Manage Users" title="Manage Users" /></li>
+			<li><img src="img/console.png" alt="Open Console" title="Open Console" /></li>
+			<li><img src="img/information.png" alt="Information" title="Information" /></li>
+		</ul>	
+		<ul id="tabbar" class="menu"><li><span onclick="SendRequestToServer(1); ShowTab(this.getAttribute('tab'));">ALL Torrents</span><img src="img/delete.png" alt="Close Tab" title="Close Tab" onclick="closeTab(this);" /></li><li><span onclick="ShowTab(this.getAttribute('tab'));">About</span><img src="img/delete.png" alt="Close Tab" title="Close Tab" onclick="closeTab(this);" /></li><li><span onclick="ShowTab(this.getAttribute('tab'));">Debug Log</span><img src="img/delete.png" alt="Close Tab" title="Close Tab" onclick="closeTab(this);" /></li></ul>
+	</div>
+	<img src="img/AzSMRC_Splash.png" id="splashscreen" class="invisible" alt="Splashscreen" title="AzSMRC Splashscreen" />
+	<div id="tabcontents">
+		<div id="tab_1"  class="tab">
+			<p>No data given, please refresh.</p>
+		</div>
+		<div id="tab_3" class="tab"><h2>Debug Log</h2><p>Debug Log is empty.</p></div>
+	</div>
+	<div id="statusbar">
+		<span onclick="PingToServer();" id="ping">Ping: undefined</span><span id="requeststatus">no request sent</span><img src="img/connect_established.png" alt="Connection established" title="Connected to Server" />
+	</div>	
+</body>
+</html>
