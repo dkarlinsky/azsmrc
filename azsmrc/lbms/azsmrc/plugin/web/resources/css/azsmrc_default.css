@@ -1,0 +1,192 @@
+/*
+ * Standard CSS file for AzSMRC Webinterface
+ * all objects are sorted ascending
+ */
+/* Elements */
+abbr {
+	border: none;
+	cursor: help;
+	text-decoration: none;
+}
+body, html {
+	background-color: #D0D0D9;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 1em;
+	font-weight: normal;
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+}
+body {
+	padding: 60px 0px 25px 0px;
+}
+body > * {
+	margin: 0px 5px 10px 0px;
+	padding: 0px 0px 0px 10px;
+}
+caption {
+	border-bottom: #888 1px solid;
+	font-size: 0.9em;
+	font-weight: bold;
+	text-align: left;
+	padding: 1px 5% 1px 2%;
+}
+h1 {
+	font-size: 1.5em;
+}
+h2 {
+	font-size: 1.4em;
+}
+h3 {
+	font-size: 1.3em;
+}
+h4 {
+	font-size: 1.2em;
+}
+table {
+	border-color: #888;
+	width: 100%;
+}
+tbody tr td:first-Child, thead tr th:first-Child {
+	padding-left: 5px;
+}
+td, th {
+	text-align: left;
+}
+tbody > tr:hover {
+	background-color: #DDD;
+}
+/* Classes */
+.debuglist {
+	list-style: none outside none;
+	margin: -10px 0px 10px 0px;
+	padding: 0px 0px 0px 25px;
+}
+.debuglist li {
+	font-size: 0.7em;
+	text-indent: -20px;
+}
+.debuglist li:first-Line {
+	text-indent: 0px;
+}
+.invisible {
+	display: none;
+}
+ul.menu {
+	display: block;
+	list-style: none inside none;	
+	height: auto;
+	padding: 0px 0px 0px 0px;
+	vertical-align: top;
+}
+ul.menu img {
+	height: 22px;
+	margin: 0px 5px 0px 0px;
+	width: 22px;
+}
+ul.menu li {
+	display: inline;
+	height: auto;
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+}
+li.subbreak a {
+	border-bottom: #C0C0C0 1px solid;	
+}
+ul.submenu {
+	display: block;
+	position: relative;	
+	vertical-align: top;
+}
+ul.submenu li a {
+	display: block;
+	width: 200px;
+}
+div.tab {
+	display: none;
+}
+/* IDs */
+#picmenu {
+	display: block;
+	background-color: #D0D0D9;
+	height: 22px;
+	margin: 0px 0px 10px 0px;
+	padding: 1px 5% 2px 2%;
+}
+#picmenu img:hover {
+	cursor: pointer;
+}
+#picmenu .subbreak img {
+	border-right: #888 1px solid;
+	padding-right: 2px;
+}
+#splashscreen {
+	left: 50%;
+	margin: -127px 0px 0px -200px;
+	position: absolute;
+	top: 50%;
+	z-index: 10;
+}
+#statusbar {
+	background-color: #D0D0D9;
+	border-top: #C0C0C0 1px solid;
+	bottom: 0px;
+	font-size: 0.8em;
+	height: 17px;
+	margin: 0px 0px 0px 0px;
+	text-align: right;
+	padding: 1px 5% 1px 2%;
+	position: fixed;
+	width: 97%;
+}
+#statusbar * {
+	border-left: #888 1px solid;
+	margin: 0px 0px 0px 0px;
+	padding: 0px 5px 0px 5px;
+	vertical-align: top;
+}
+#statusbar img {
+	height: 16px;
+	width: 16px;
+}
+#tabbar {
+	background-color: #F7EBAB;
+	border-bottom: #C4B878 1px solid;
+	font-size: 0.9em;
+	height: 18px;
+	margin: 0px 0px 10px 0px;
+	padding: 1px 5% 0px 2%;
+}
+#tabbar li {
+	border: #C4B878 1px solid;
+	margin: 0px 10px 0px 0px;
+	padding: 0px 3px 0px 3px;
+	vertical-align: top;
+}
+#tabbar li:hover {
+	border-bottom: #F7EBAB 1px dashed;
+	cursor: pointer;
+}
+#tabbar li.active {
+	border-bottom: #D0D0D9 1px solid;
+}
+#tabbar li span {
+	color: #00f;
+}
+#tabbar img {
+	height: 17px;
+	margin: 0px 0px 1px 4px;
+	vertical-align: bottom;
+	width: 17px;
+}
+#tabbar img:hover {
+	cursor: pointer;
+}
+#topbar {
+	background-color: #D0D0D9;
+	display: block;
+	height: 60px;
+	padding: 0px 0px 0px 0px;
+	position: fixed;
+	top: 0px;
+	width: 100%;
+}
