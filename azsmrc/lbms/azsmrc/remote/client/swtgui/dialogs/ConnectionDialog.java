@@ -452,6 +452,12 @@ public class ConnectionDialog {
 		RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
 
 			public void runSafe() {
+
+				// Add protection as someone got an error.. although I have
+				// NO idea how this was ever disposed!
+				if(urlCombo == null || urlCombo.isDisposed()) return;
+
+
 				if(urlCombo.getText().equalsIgnoreCase("")
 						|| port_text.getText().equalsIgnoreCase("")
 						|| username_text.getText().equalsIgnoreCase("")
