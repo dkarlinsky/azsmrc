@@ -449,7 +449,7 @@ public class ConnectionDialog {
 
 
 	private void connectGo(){
-		RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
+		RCMain.getRCMain().getDisplay().syncExec(new SWTSafeRunnable(){
 
 			public void runSafe() {
 
