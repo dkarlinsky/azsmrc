@@ -1338,6 +1338,9 @@ public class RequestManager {
 					} catch (DataConversionException e) {
 						e.printStackTrace();
 						response.setAttribute("type",Integer.toString(RemoteConstants.PARAMETER_NOT_FOUND));
+					} catch (ClassCastException e) {
+						e.printStackTrace();
+						response.setAttribute("type",Integer.toString(RemoteConstants.PARAMETER_NOT_FOUND));
 					}
 					return true;
 				}
@@ -1527,17 +1530,19 @@ public class RequestManager {
 							Parameter[] parameters = pluginModel.getParameters();
 							Element pluginSection = new Element ("Section");
 							pluginSection.setAttribute("index", Integer.toString(index));
-							String name = MessageText.getString("ConfigView.section." +pluginModel.getSection());
-							String	section_key = name;
-							System.out.println("PluginFlexyConf Adding: "+name);
+							String	section_key = pluginModel.getSection();
 
 							// if resource exists without prefix then use it as plugins don't
 							// need to start with the prefix
 
 							if ( !MessageText.keyExists(section_key)){
-								section_key = ConfigView.sSectionPrefix + name;
+								section_key = ConfigView.sSectionPrefix + section_key;
 							}
-							pluginSection.setAttribute("label",MessageText.getString(section_key));
+							String name = MessageText.getString(section_key);
+
+							System.out.println("PluginFlexyConf Adding: "+name);
+
+							pluginSection.setAttribute("label",name);
 							index++;
 							parameterArrayToEntry(pluginSection, parameters);
 							rootSection.addContent(pluginSection);

@@ -87,6 +87,7 @@ public class PreferencesTab {
 
 	private ParameterListener pl;
 	private FlexyConfiguration fc;
+	private FlexyConfiguration rpFC;
 	private SWTMenu fcm;
 	private Properties azProps = new Properties();
 	private ParameterListener azParam = new ParameterListener() {
@@ -97,7 +98,10 @@ public class PreferencesTab {
 			azProps.setProperty(key, value);
 			RCMain.getRCMain().getDisplay().syncExec(new SWTSafeRunnable() {
 				public void runSafe() {
-					fc.getFCInterface().getEntryUpdateListener().updated(key, value);
+					if (fc != null)
+						fc.getFCInterface().getEntryUpdateListener().updated(key, value);
+					if (rpFC != null)
+						rpFC.getFCInterface().getEntryUpdateListener().updated(key, value);
 				}
 			});
 		}
@@ -263,7 +267,7 @@ public class PreferencesTab {
 			Element rpFlexyConfElement = RCMain.getRCMain().getClient().getRemoteInfo().getPluginsFlexyConf();
 			RCMain.getRCMain().getClient().transactionStart();
 			if (rpFlexyConfElement != null) {
-				FlexyConfiguration rpFC = new FlexyConfiguration (rpFlexyConfElement);
+				rpFC = new FlexyConfiguration (rpFlexyConfElement);
 				FCInterface fci = rpFC.getFCInterface();
 				fci.setI18NProvider(new I18NProvider() {
 					/* (non-Javadoc)
@@ -277,13 +281,15 @@ public class PreferencesTab {
 				});
 				fci.setContentProvider(new ContentProvider() {
 
-					public String getDefaultValue(String key, int type) {
-						String v = defaultProperties.getProperty(key);
-						if (v==null) {
+					Client client = RCMain.getRCMain().getClient();
 
+					public String getDefaultValue(String key, int type) {
+						String v = azProps.getProperty(key);
+						if (v==null) {
+							client.sendGetCoreParameter(key, type);
 							switch (type) {
 							case Entry.TYPE_STRING:
-								return "No Default Found";
+								return "Loading Preferences...";
 							case Entry.TYPE_BOOLEAN:
 								return "false";
 							default:
@@ -293,11 +299,12 @@ public class PreferencesTab {
 						else return v;
 					}
 					public String getValue(String key, int type) {
-						String v = properties.getProperty(key);
+						String v = azProps.getProperty(key);
 						if (v==null) {
+							client.sendGetCoreParameter(key, type);
 							switch (type) {
 							case Entry.TYPE_STRING:
-								return "No Default Found...";
+								return "Loading Preferences...";
 							case Entry.TYPE_BOOLEAN:
 								return "false";
 							default:
@@ -306,16 +313,15 @@ public class PreferencesTab {
 						}
 						else return v;
 					}
-
 					public void setValue(String key, String value, int type) {
-						logger.debug("AzSMRC Conf Set: "+key+" value: "+value+" type: "+type);
-						properties.setProperty(key, value);
-						RCMain.getRCMain().saveConfig();
+						logger.debug("AzConf Set: "+key+" value: "+value+" type: "+type);
+						client.sendSetCoreParameter(key, value, type);
+						azProps.setProperty(key, value);
 					}
 				});
-				fcm = new SWTMenu(fc,menuTree,cOptions);
-				fcm.addAsSubItem(tiRemotePlugins);
-				fc.getRootSection().initAll();
+				SWTMenu rpFCM = new SWTMenu(rpFC,menuTree,cOptions);
+				rpFCM.addAsRoot(tiRemotePlugins);
+				rpFC.getRootSection().initAll();
 			}
 
 			initAzFlexyConf();
@@ -881,7 +887,6 @@ public class PreferencesTab {
 				Client client = RCMain.getRCMain().getClient();
 
 				public String getDefaultValue(String key, int type) {
-					System.out.println("AzConf Get Def: "+key+" type: "+type );
 					String v = azProps.getProperty(key);
 					if (v==null) {
 						client.sendGetCoreParameter(key, type);
@@ -897,7 +902,6 @@ public class PreferencesTab {
 					else return v;
 				}
 				public String getValue(String key, int type) {
-					System.out.println("AzConf Get: "+key+" type: "+type );
 					String v = azProps.getProperty(key);
 					if (v==null) {
 						client.sendGetCoreParameter(key, type);
@@ -913,7 +917,7 @@ public class PreferencesTab {
 					else return v;
 				}
 				public void setValue(String key, String value, int type) {
-					System.out.println("AzConf Set: "+key+" value: "+value+" type: "+type);
+					logger.debug("AzConf Set: "+key+" value: "+value+" type: "+type);
 					client.sendSetCoreParameter(key, value, type);
 					azProps.setProperty(key, value);
 				}

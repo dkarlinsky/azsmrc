@@ -41,14 +41,18 @@ public class SWTSection implements DisplayAdapterSection {
 		}
 	}
 
-	private SWTSection (Section s, TreeItem t, Composite c) {
+	private SWTSection (Section s, TreeItem t, Composite c, boolean root) {
 		try {
 			section = s;
 			comp = c;
-			treeItem = new TreeItem(t,SWT.None);
-			treeItem.setText(s.getLabel());
-			treeItem.setData(section.getFCInterface().getDomain()+"_SWTSection", this);
-			addSubSections(treeItem, c);
+			if (!root) {
+				treeItem = new TreeItem(t,SWT.None);
+				treeItem.setText(s.getLabel());
+				treeItem.setData(section.getFCInterface().getDomain()+"_SWTSection", this);
+				addSubSections(treeItem, c);
+			} else {
+				addSubSections(t, c);
+			}
 		} catch (SWTException e) {
 			e.printStackTrace();
 		}
@@ -110,13 +114,18 @@ public class SWTSection implements DisplayAdapterSection {
 		return sect;
 	}
 
+	public static SWTSection addAsRoot (Section s, TreeItem t, Composite c) {
+		SWTSection sect = new SWTSection(s,t,c,true);
+		return sect;
+	}
+
 	public static SWTSection addAsChild (Section s, Tree t, Composite c) {
 		SWTSection sect = new SWTSection(s,t,c,false);
 		return sect;
 	}
 
 	public static SWTSection addAsChild (Section s, TreeItem t, Composite c) {
-		SWTSection sect = new SWTSection(s,t,c);
+		SWTSection sect = new SWTSection(s,t,c,false);
 		return sect;
 	}
 }

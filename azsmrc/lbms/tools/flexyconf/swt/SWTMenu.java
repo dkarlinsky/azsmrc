@@ -39,6 +39,10 @@ public class SWTMenu implements DisplayAdapter {
 	public void addAsSubItem() {
 		SWTSection.addAsChild(fc.getRootSection(), tree, target);
 	}
+	
+	public void addAsRoot (TreeItem item) {
+		SWTSection.addAsRoot(fc.getRootSection(), item, target);
+	}
 
 	public void addAsSubItem(TreeItem item) {
 		SWTSection.addAsChild(fc.getRootSection(), item, target);
