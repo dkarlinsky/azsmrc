@@ -41,6 +41,7 @@ import org.gudy.azureus2.plugins.ui.UIManager;
 import org.gudy.azureus2.plugins.ui.UIManagerListener;
 import org.gudy.azureus2.plugins.ui.model.BasicPluginConfigModel;
 import org.gudy.azureus2.plugins.ui.model.BasicPluginViewModel;
+import org.gudy.azureus2.plugins.update.Update;
 import org.gudy.azureus2.plugins.update.UpdateCheckInstance;
 import org.gudy.azureus2.plugins.update.UpdateCheckInstanceListener;
 import org.gudy.azureus2.plugins.update.UpdateManager;
@@ -155,6 +156,15 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 							public void complete(UpdateCheckInstance instance) {
 								//return if update list is 0
 								if (instance.getUpdates().length == 0) return;
+
+								//ignore updates with no downloaders
+								Update[] upd = instance.getUpdates();
+								int c = 0;
+								for (int i=0;i<upd.length;i++) {
+									if (upd[i].getDownloaders().length == 0) c++;
+								}
+								if (c == upd.length) return;
+
 								latestUpdate = instance;
 
 								User[] users = config.getUsers();
