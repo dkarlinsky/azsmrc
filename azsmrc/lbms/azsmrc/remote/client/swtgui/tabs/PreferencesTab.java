@@ -152,6 +152,7 @@ public class PreferencesTab {
 			public void widgetDisposed(DisposeEvent arg0) {
 				if(pl != null) RCMain.getRCMain().getClient().removeParameterListener(pl);
 				closeAzFlexyConf();
+				instance = null;
 			}
 
 		});
