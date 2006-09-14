@@ -1,7 +1,5 @@
-var Server = "http://blackhawk.serveftp.com:49009/"; // server uri
-// static while developing can be easily set to dynamic through confirmation or form requesting
-// has to be accessable in any way for the client
-/* request XML sent to Server
+var Server = window.location.href;
+/* example request XML sent to Server
 <?xml version="1.0" encoding="UTF-8"?>
 <Request version="1.0">
   <Query switch="Ping" />
@@ -40,7 +38,9 @@ function getRequestOptions(request) {
 	switch (request) {
 		case "listTransfers":
 		// static for testings
-			options = ' options="3184"';
+			// standard options
+			// 2^0+2^1+2^2+2^3+2^4+2^5+2^6+2^7+2^9+2^11+2^12+2^13+2^16+2^17+2^21
+			options = ' options="2308863"';
 			return options;			
 		break;
 		default:
@@ -48,20 +48,35 @@ function getRequestOptions(request) {
 		break;
 	}
 }
-function initAzSMRCwebUI() {
+function initAzSMRCwebUI() {	
 	initDebugLog()
 	//showSplashScreen();
 	initTabControl();
 	PingToServer();
 }
 function PingToServer() {
+	document.getElementById("ping").firstChild.data = "Ping: no response";
 	SendRequestToServer(0);
 }
 function refreshView() {
-
+	switch (tabs[activeTab]) {
+		case "listTransfers":
+			SendRequestToServer(1);
+		break;
+		case "debug":
+			clearDebugLog();
+		break;
+		default: 
+			PingToServer();
+		break;
+	}
 }
 function removeSplashScreen() {
 	document.getElementById("splashscreen").style.display = "none";
+}
+function round(val,dig) {
+	var fac = Math.pow(10,dig);
+	return Math.round(val*fac)/fac;
 }
 function SendRequestToServer(request) {
 	request = registeredRequests[request];

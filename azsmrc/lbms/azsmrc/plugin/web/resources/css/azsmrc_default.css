@@ -32,15 +32,23 @@ caption {
 }
 h1 {
 	font-size: 1.5em;
+	margin: 0px 5px 10px 0px;
 }
 h2 {
 	font-size: 1.4em;
+	margin: 0px 5px 10px 0px;
 }
 h3 {
 	font-size: 1.3em;
+	margin: 0px 5px 10px 0px;
 }
 h4 {
 	font-size: 1.2em;
+	margin: 0px 5px 10px 0px;
+}
+p {
+	font-size: 0.9em;
+	margin: 0px 5px 10px 0px;
 }
 table {
 	border-color: #888;
@@ -50,7 +58,11 @@ tbody tr td:first-Child, thead tr th:first-Child {
 	padding-left: 5px;
 }
 td, th {
+	font-size: 0.8em;
+	padding: 0px 2px 0px 2px;
 	text-align: left;
+	vertical-align: top;
+	white-space: nowrap;
 }
 tbody > tr:hover {
 	background-color: #DDD;
