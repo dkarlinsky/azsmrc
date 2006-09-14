@@ -10,7 +10,6 @@ import lbms.tools.flexyconf.Section;
 import org.gudy.azureus2.plugins.PluginInterface;
 import org.gudy.azureus2.plugins.ipc.IPCException;
 import org.gudy.azureus2.plugins.ipc.IPCInterface;
-import org.jdom.Element;
 
 /**
  * @author Damokles
@@ -24,15 +23,6 @@ public class PSupportStatusMailer implements PluginSupport {
 	private final static String NAME = "Status Mailer Support";
 	private final static String MIN_VERSION = "0.8.0";
 	private IPCInterface ipc;
-
-
-	/* (non-Javadoc)
-	 * @see lbms.azsmrc.plugin.pluginsupport.PluginSupport#getFlexyConf()
-	 */
-	public Element getFlexyConf() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.plugin.pluginsupport.PluginSupport#getMinPluginVersion()

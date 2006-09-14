@@ -4,7 +4,6 @@
 package lbms.azsmrc.plugin.pluginsupport;
 
 import org.gudy.azureus2.plugins.PluginInterface;
-import org.jdom.Element;
 
 /**
  * @author Damokles
@@ -45,9 +44,4 @@ public interface PluginSupport {
 	 * @return whether this PluginSupporter can be configured using FlexyConf
 	 */
 	public boolean isConfigurable();
-
-	/**
-	 * @return the FlexyConf Root Section for this plugin
-	 */
-	public Element getFlexyConf();
 }
