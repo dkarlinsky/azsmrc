@@ -21,7 +21,7 @@ public class PSupportStatusMailer implements PluginSupport {
 	private boolean active;
 	private final static String SUPPORTED_PLUGIN_ID = "azstatusmailer";
 	private final static String NAME = "Status Mailer Support";
-	private final static String MIN_VERSION = "0.8.0";
+	private final static String MIN_VERSION = "0.7.1";
 	private IPCInterface ipc;
 
 	/* (non-Javadoc)
@@ -52,16 +52,16 @@ public class PSupportStatusMailer implements PluginSupport {
 	public void initialize(PluginInterface pi) {
 		PluginInterface target = pi.getPluginManager().getPluginInterfaceByID(SUPPORTED_PLUGIN_ID);
 		Section confSection = Plugin.addPSConfigSection("StatusMailerSupport");
+		new Entry("","azsmrc.pluginsupport.config.statusMailerSupport.info",Entry.TYPE_LABEL,confSection);
 		new Entry("eMailNotification","azsmrc.pluginsupport.config.emailnotify",Entry.TYPE_BOOLEAN,confSection);
 		Entry mailE = new Entry("eMail","azsmrc.pluginsupport.config.email",Entry.TYPE_STRING,confSection);
+		mailE.setDependsOn("eMailNotification");
 		try {
 			//only accept valid email addresses
 			mailE.setRule("^[\\w-\\.]+@(?:[\\w-]+\\.)+[\\w-]{2,4}$");
 		} catch (InvalidRuleException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvalidTypeException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		if (target == null) {

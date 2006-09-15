@@ -41,6 +41,7 @@ public class Entry implements ConfigEntity {
 		this.label = label;
 		this.section = parent;
 		this.fci = parent.getFCInterface();
+		this.index = parent.getEntries().length;
 		parent.addEntry(this);
 	}
 
@@ -51,6 +52,7 @@ public class Entry implements ConfigEntity {
 		this.fci = section.getFCInterface();
 		section.addEntry(this);
 		group.addEntry(this);
+		this.index = group.getEntries().length;
 	}
 
 	protected Entry (Element e, Section parent, FCInterface fci) {
