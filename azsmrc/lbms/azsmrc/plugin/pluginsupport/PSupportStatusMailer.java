@@ -52,6 +52,7 @@ public class PSupportStatusMailer implements PluginSupport {
 	public void initialize(PluginInterface pi) {
 		PluginInterface target = pi.getPluginManager().getPluginInterfaceByID(SUPPORTED_PLUGIN_ID);
 		Section confSection = Plugin.addPSConfigSection("StatusMailerSupport");
+		new Entry("eMailNotification","azsmrc.pluginsupport.config.emailnotify",Entry.TYPE_BOOLEAN,confSection);
 		Entry mailE = new Entry("eMail","azsmrc.pluginsupport.config.email",Entry.TYPE_STRING,confSection);
 		try {
 			//only accept valid email addresses
@@ -84,21 +85,16 @@ public class PSupportStatusMailer implements PluginSupport {
 		return active;
 	}
 
-	/* (non-Javadoc)
-	 * @see lbms.azsmrc.plugin.pluginsupport.PluginSupport#isConfigurable()
-	 */
-	public boolean isConfigurable() {
-		return true;
-	}
-
 	public void sendMessage(User user,String subject, String msg) {
 		if(!active) return;
-		String targetMail = user.getProperty("eMailAdress");
-		if (targetMail != null)
-		try {
-			ipc.invoke("sendMessage", new Object[] {subject, targetMail, msg});
-		} catch (IPCException e) {
-			e.printStackTrace();
+		if (Boolean.parseBoolean(user.getProperty("eMailNotification"))) {
+			String targetMail = user.getProperty("eMail");
+			if (targetMail != null)
+				try {
+					ipc.invoke("sendMessage", new Object[] {subject, targetMail, msg});
+				} catch (IPCException e) {
+					e.printStackTrace();
+				}
 		}
 	}
 }

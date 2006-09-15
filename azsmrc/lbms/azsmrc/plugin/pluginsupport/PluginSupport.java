@@ -39,9 +39,4 @@ public interface PluginSupport {
 	 * @return whether the supported plugin was found
 	 */
 	public boolean isActive();
-
-	/**
-	 * @return whether this PluginSupporter can be configured using FlexyConf
-	 */
-	public boolean isConfigurable();
 }
