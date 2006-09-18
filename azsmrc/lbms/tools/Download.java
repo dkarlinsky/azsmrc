@@ -230,15 +230,21 @@ public abstract class Download implements Runnable, Callable<Download> {
 	}
 
 	protected void callProgress (long bytesRead, long bytesTotal) {
-		for (DownloadListener l:dlListener) {
-			l.progress(bytesRead, bytesTotal);
+		for (int i=0;i<dlListener.size();i++) {
+			dlListener.get(i).progress(bytesRead, bytesTotal);
 		}
 	}
 
 	protected void callStateChanged (int newS) {
-		for (DownloadListener l:dlListener) {
-			l.stateChanged(state, newS);
+		for (int i=0;i<dlListener.size();i++) {
+			dlListener.get(i).stateChanged(state, newS);
 		}
 		state = newS;
+	}
+
+	protected void callMessage (String msg) {
+		for (int i=0;i<dlListener.size();i++) {
+			dlListener.get(i).debugMsg(msg);
+		}
 	}
 }

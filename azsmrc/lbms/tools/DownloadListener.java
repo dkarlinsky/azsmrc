@@ -13,4 +13,12 @@ public interface DownloadListener {
 	 */
 	public void stateChanged (int oldState, int newState);
 
+
+	/**
+	 * Let the Download report what it is doing.
+	 * 
+	 * @param msg Message
+	 */
+	public void debugMsg (String msg);
+
 }

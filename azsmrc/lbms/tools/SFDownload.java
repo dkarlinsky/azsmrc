@@ -31,6 +31,13 @@ public class SFDownload extends Download {
 			if (newState == STATE_CONNECTING || newState == STATE_DOWNLOADING)
 				callStateChanged(newState);
 		}
+		/* (non-Javadoc)
+		 * @see lbms.tools.DownloadListener#debugMsg(java.lang.String)
+		 */
+		public void debugMsg(String msg) {
+			// TODO Auto-generated method stub
+
+		}
 	};
 
 	public SFDownload(URL source, File target) {
