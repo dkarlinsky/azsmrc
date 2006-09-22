@@ -45,7 +45,7 @@ public class SplashScreen {
 		instance = this;
 
 		//load the image
-		String res = "lbms/azsmrc/remote/client/swtgui/resources/AzSMRC_Splash.png";
+		String res = "lbms/azsmrc/remote/client/swtgui/resources/AzSMRC_Splash_New.png";
 		InputStream is = ImageRepository.class.getClassLoader().getResourceAsStream(res);
 		image = new Image(display,is);
 
