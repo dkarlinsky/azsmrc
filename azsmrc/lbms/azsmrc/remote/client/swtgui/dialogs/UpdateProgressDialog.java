@@ -373,6 +373,12 @@ public class UpdateProgressDialog {
 						}
 					});
 				}//End of UpdateLabel()
+
+				/* (non-Javadoc)
+				 * @see lbms.tools.DownloadListener#debugMsg(java.lang.String)
+				 */
+				public void debugMsg(String msg) {
+				}
 			};
 
 			dl.addDownloadListener(dll);
