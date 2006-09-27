@@ -2,13 +2,14 @@ package lbms.tools;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
@@ -25,16 +26,33 @@ import lbms.tools.stats.StatsInputStream;
  */
 public class TorrentDownload extends Download {
 
+	public static final int RTC_ERROR = -1;
+	public static final int RTC_INIT = 0;
+	public static final int RTC_FILE = 1;
+	public static final int RTC_BUFFER = 2;
+	public static final int RTC_MAGNET = 3;
+
 	private static final int BUFFER_SIZE = 1024;
 
 	private ByteArrayOutputStream buffer;
 
 	private static final String contentType = "application/x-bittorrent";
 
-	private Pattern hrefPattern = Pattern.compile("href\\s*=\\s*(?:\"|')([\\w:/.?&-=%]+)(?:\"|')",Pattern.CASE_INSENSITIVE);
+	private static Pattern hrefPattern = Pattern.compile("href\\s*=\\s*(?:\"|')([\\w:/.?&-=%]+)(?:\"|')",Pattern.CASE_INSENSITIVE);
+
+	private static Pattern torrentHrefPattern = Pattern.compile("href\\s*=\\s*(?:\"|')([\\w:/.?&-=%]+\\.torrent)(?:\"|')",Pattern.CASE_INSENSITIVE);
+	private static Pattern magnetPattern = Pattern.compile("magnet:\\?xt=urn:btih:[A-Za-z2-7]{32}", Pattern.CASE_INSENSITIVE);
+
+	private static Pattern torrentDataPattern = Pattern.compile("^d[0-9]+:.*",Pattern.CASE_INSENSITIVE|Pattern.DOTALL);
+
+	private String torrentLinkIdentifier;
+
+	private int returnCode = RTC_INIT;
+
+	private String magnetURL;
 
 	/**
-	 * 
+	 *
 	 */
 	public TorrentDownload() {
 		// TODO Auto-generated constructor stub
@@ -164,50 +182,24 @@ public class TorrentDownload extends Download {
 			long now;
 
 			byte[] buf = new byte[BUFFER_SIZE];
-			if (target != null) {
-				target.createNewFile();
-				FileOutputStream os = null;
-				try {
-					os = new FileOutputStream(target);
-					for (int read=is.read(buf);read>0;read=is.read(buf)) {
-						if (abort) {
-							os.close();
-							is.close();
-							callStateChanged(STATE_ABORTED);
-							failed = true;
-							failureReason = "Aborted by User";
-							return this;
-						}
-						os.write(buf,0,read);
-						now = System.currentTimeMillis();
-						if (now-last>=500) {
-							callProgress(sis.getBytesRead(), contentLength);
-							last = now;
-						}
-					}
-				} finally {
-					if (os != null)
-						os.close();
-				}
-			} else {
 
-				buffer = (contentLength > 0 && contentLength < 5242880) ? new ByteArrayOutputStream(contentLength):new ByteArrayOutputStream();
-				for (int read=is.read(buf);read>0;read=is.read(buf)) {
-					if (abort) {
-						is.close();
-						callStateChanged(STATE_ABORTED);
-						failed = true;
-						failureReason = "Aborted by User";
-						return this;
-					}
-					buffer.write(buf, 0, read);
-					now = System.currentTimeMillis();
-					if (now-last>=500) {
-						callProgress(sis.getBytesRead(), contentLength);
-						last = now;
-					}
+			buffer = (contentLength > 0 && contentLength < 5242880) ? new ByteArrayOutputStream(contentLength):new ByteArrayOutputStream();
+			for (int read=is.read(buf);read>0;read=is.read(buf)) {
+				if (abort) {
+					is.close();
+					callStateChanged(STATE_ABORTED);
+					failed = true;
+					failureReason = "Aborted by User";
+					return this;
+				}
+				buffer.write(buf, 0, read);
+				now = System.currentTimeMillis();
+				if (now-last>=500) {
+					callProgress(sis.getBytesRead(), contentLength);
+					last = now;
 				}
 			}
+
 			//finally call again
 			callProgress(sis.getBytesRead(), contentLength);
 			if (contentLength>0 && target != null && !(gzip || deflate) && target.length() != contentLength) {
@@ -215,8 +207,50 @@ public class TorrentDownload extends Download {
 				callStateChanged(STATE_FAILURE);
 			}
 			else {
-				finished = true;
-				callStateChanged(STATE_FINISHED);
+				if (isTorrent(buffer.toByteArray())) {
+					if (target != null) {
+						target.createNewFile();
+						FileOutputStream os = null;
+						try {
+							os = new FileOutputStream(target);
+							buffer.writeTo(os);
+						} finally {
+							if (os != null)
+								os.close();
+						}
+					}
+					finished = true;
+					callStateChanged(STATE_FINISHED);
+				} else {
+					//The downloaded Data was not a torrent
+					//assume that it was html
+					try {
+						String html = buffer.toString("UTF-8");
+						Matcher tor = torrentHrefPattern.matcher(html);
+						if (tor.find()) {
+							String torlink = tor.group(1);
+							//set new source and download again
+							URL torURL = resolveRelativeURL(source, torlink);
+							if (isHrefTorrent(torURL)) {
+								source = torURL;
+								return call();
+							}
+						}
+						Matcher magnet = magnetPattern.matcher(html);
+						if (magnet.find()) {
+							magnetURL = magnet.group();
+							returnCode = RTC_MAGNET;
+							finished = true;
+							callStateChanged(STATE_FINISHED);
+							return this;
+						}
+
+					} catch (Exception e) {
+						e.printStackTrace();
+						failed = true;
+						callStateChanged(STATE_FAILURE);
+					}
+				}
 			}
 		} catch (IOException e) {
 			callStateChanged(STATE_FAILURE);
@@ -233,26 +267,54 @@ public class TorrentDownload extends Download {
 		return this;
 	}
 
-	private boolean isHrefTorrent(String href) {
+	private boolean isHrefTorrent(URL target) {
 		try {
-			URLConnection conn = new URL(href).openConnection();
-			if(conn instanceof HttpURLConnection) {
-				((HttpURLConnection)conn).setRequestMethod("HEAD");
-				conn.connect();
-				String ct = conn.getContentType();
-				((HttpURLConnection)conn).disconnect();
-				if(ct != null) {
-					return ct.toLowerCase().startsWith("application/x-bittorrent");
-				}
+			HttpURLConnection conn;
+			if ( target.getProtocol().equalsIgnoreCase("https")){
+
+				// see ConfigurationChecker for SSL client defaults
+				HttpsURLConnection ssl_con;
+				if (proxy != null)
+					ssl_con = (HttpsURLConnection)target.openConnection(proxy);
+				else
+					ssl_con = (HttpsURLConnection)target.openConnection();
+				// allow for certs that contain IP addresses rather than dns names
+
+				ssl_con.setHostnameVerifier(
+						new HostnameVerifier()
+						{
+							public boolean
+							verify(
+									String		host,
+									SSLSession	session )
+							{
+								return( true );
+							}
+						});
+
+				conn = ssl_con;
+			} else {
+				if (proxy != null)
+					conn = (HttpURLConnection)target.openConnection(proxy);
+				else
+					conn = (HttpURLConnection)target.openConnection();
 			}
+
+			conn.setRequestMethod("HEAD");
+			conn.connect();
+			String ct = conn.getContentType();
+			conn.disconnect();
+			if(ct != null) {
+				return ct.toLowerCase().startsWith(contentType);
+			}
+
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
 		return false;
 	}
 
-	protected static URL resolveRelativeURL(String url, String href) throws MalformedURLException {
-		URL u = new URL(url);
+	protected static URL resolveRelativeURL(URL u, String href) throws MalformedURLException {
 		String newUrl = u.getProtocol() + "://" + u.getHost();
 		if(u.getPort() > 0) newUrl += ":" + u.getPort();
 		if(!href.startsWith("/")) { // path relative to current
@@ -269,5 +331,66 @@ public class TorrentDownload extends Download {
 	 */
 	public ByteArrayOutputStream getBuffer() {
 		return buffer;
+	}
+
+	public boolean isTorrent (byte[] x) {
+		//we only need the 10 fist chars
+		byte[] y = new byte[10];
+		System.arraycopy(x, 0, y, 0, 10);
+
+		try {
+			if (torrentDataPattern.matcher(new String (y,"UTF-8")).find()) {
+				return true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
+	public boolean isTorrent (File x) {
+		FileInputStream fis = null;
+		try {
+			fis = new FileInputStream(x);
+
+			//we only need the 10 fist chars
+			byte[] y = new byte[10];
+			fis.read(y);
+
+			if (torrentDataPattern.matcher(new String (y,"UTF-8")).find()) {
+				return true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (fis != null)
+				try {
+					fis.close();
+				} catch (IOException e) {}
+		}
+
+		return false;
+	}
+
+	/**
+	 * @return the magnetURL
+	 */
+	public String getMagnetURL() {
+		return magnetURL;
+	}
+
+	/**
+	 * @return the RTC_* returnCode
+	 */
+	public int getReturnCode() {
+		return returnCode;
+	}
+
+	/**
+	 * @return the torrentLinkIdentifier
+	 */
+	public String getTorrentLinkIdentifier() {
+		return torrentLinkIdentifier;
 	}
 }
