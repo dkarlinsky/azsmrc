@@ -17,18 +17,31 @@ function fetchData(xmlhttp) {
 	addDebugEntry("XML Response: "+xmlhttp.responseText);
 	var results = doc.getElementsByTagName("Result");
 	var result;
+	// setting defaults
+	document.getElementById("eventlist").style.display = "none";
+	document.getElementById("eventstatus").firstChild.data = "no new events";
 	for (var i in results)
 		if (results[i].nodeType == 1) {
 			result = results[i].getAttribute("switch")
 			switch (result) {
+				case "Events":
+					// send events to handlers
+					handleEvents(results[i]);
+				break;
 				case "Ping":
+					var img = document.getElementById("connectionstatus");
 					document.getElementById("ping").firstChild.data = "Ping: "+results[i].firstChild.data;
+					if (results[i].firstChild.data == "Pong") {
+						img.src = "img/connect_established.png";
+						img.setAttribute("alt","Connection established");
+						img.setAttribute("title","Connected to Server");
+					}
 				break;
 				case "listTransfers":
 					handlelistTransfers(doc);
 				break;
 				default:
-					alert("unknown request: aborting");
+					addDebugEntry("unhandled request: "+result+" (aborting)");
 				break;
 			}
 		}	
@@ -55,6 +68,10 @@ function initAzSMRCwebUI() {
 	PingToServer();
 }
 function PingToServer() {
+	var img = document.getElementById("connectionstatus");
+	img.src = "img/connect_no.png";
+	img.setAttribute("alt","Connection not established");
+	img.setAttribute("title","Not connected to Server");
 	document.getElementById("ping").firstChild.data = "Ping: no response";
 	SendRequestToServer(0);
 }

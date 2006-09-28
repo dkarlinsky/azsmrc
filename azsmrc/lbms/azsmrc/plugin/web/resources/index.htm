@@ -50,13 +50,15 @@
 		</ul>	
 		<ul id="tabbar" class="menu"><li><span onclick="ShowTab(this.getAttribute('tab'));">ALL Torrents</span><img src="img/delete.png" alt="Close Tab" title="Close Tab" onclick="closeTab(this);" /></li><li><span onclick="ShowTab(this.getAttribute('tab'));">About</span><img src="img/delete.png" alt="Close Tab" title="Close Tab" onclick="closeTab(this);" /></li><li><span onclick="ShowTab(this.getAttribute('tab'));">Debug Log</span><img src="img/delete.png" alt="Close Tab" title="Close Tab" onclick="closeTab(this);" /></li></ul>
 	</div>
+	<div id="eventlist"><p>No events since last request.</p></div>
 	<img src="img/AzSMRC_Splash.png" id="splashscreen" class="invisible" alt="Splashscreen" title="AzSMRC Splashscreen" />
 	<div id="tabcontents">
-		<div id="tab_0" class="tab"><p>No data given, please refresh.</p></div>
+		<div id="tab_0" class="tab"><p>Detailsselection coming soon!</p><p>No data given, please refresh.</p></div>
 		<div id="tab_2" class="tab"><h2>Debug Log</h2><p>Debug Log is empty.</p></div>
 	</div>
+	<div id="interaction_container"><p>No interaction menu given.</p></div>
 	<div id="statusbar">
-		<span onclick="PingToServer();" id="ping">Ping: undefined</span><span id="requeststatus">no request sent</span><img src="img/connect_established.png" alt="Connection established" title="Connected to Server" />
+		<span id="eventstatus">no new events</span><span onclick="PingToServer();" id="ping">Ping: undefined</span><span id="requeststatus">no request sent</span><img id="connectionstatus" src="img/connect_no.png" alt="Connection not established" title="Not connected to Server" />
 	</div>	
 </body>
 </html>

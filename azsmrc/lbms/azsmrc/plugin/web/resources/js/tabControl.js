@@ -4,7 +4,7 @@ var activeTab = 0;
 var tabCount = 2;
 // available tabs
 var registeredTabs = ["listTransfers", "about", "debug"];
-// open tabs at position
+// open tabs at position (default is set below)
 var tabs = ["listTransfers", "about", "debug"];
 // a example tab (tabbar is list of tabs)
 // <li><span onclick="SendRequestToServer(1);">ALL Torrents</span><img src="img/delete.png" alt="Close Tab" title="Close Tab" onclick="closeTab(this);" /></li>
@@ -27,6 +27,9 @@ function addTab(contentElement) {
 		switch (contentElement) {
 			case "about":
 				label = document.createTextNode("About");
+			break;
+			case "debug":
+				label = document.createTextNode("Debug Log");
 			break;
 			case "listTransfers":
 				label = document.createTextNode("ALL Torrents");			
@@ -56,9 +59,17 @@ function addTab(contentElement) {
 				tabContent.appendChild(head);
 				tabContent.appendChild(p);
 			break;
+			case "debug":
+				var head = document.createElement("h2");
+				head.appendChild(document.createTextNode("Debug Log"));
+				var ul = document.createElement("ul");
+				ul.className = "debuglist";				
+				tabContent.appendChild(head);
+				tabContent.appendChild(ul);
+			break;
 			case "listTransfers":
 				var p = document.createElement("p");
-				p.appendChild(document.createTextNode("Detailsselection coming soon!"));
+				p.appendChild(document.createTextNode("Detailsselection coming soon!"));				
 				tabContent.appendChild(p);
 			break;
 			default:
@@ -81,8 +92,10 @@ function closeTab(tabObj) {
 	if (tabID == activeTab) {
 		//addDebugEntry("closing active tab");
 		var tabbar = document.getElementById("tabbar");
-		activeTab = tabbar.firstChild.getAttribute("tab_control");
-		ShowTab(activeTab);
+		if (tabbar.hasChildNodes()) {
+			activeTab = tabbar.firstChild.getAttribute("tab_control");
+			ShowTab(activeTab);
+		} else activeTab = -1;
 	}
 	tabs[tabID] = "";
 }
@@ -140,8 +153,11 @@ function refreshTabbar() {
 }
 function ShowTab(tab) {
 	var toActivate = document.getElementById("tab_"+tab);
-	document.getElementById("tab_"+activeTab).style.display = "none";
-	toActivate.style.display = "block";
-	activeTab = tab;
-	refreshTabbar();
+	if (toActivate != null) {
+		if (activeTab > -1)
+			document.getElementById("tab_"+activeTab).style.display = "none";
+		toActivate.style.display = "block";
+		activeTab = tab;
+		refreshTabbar();
+	}
 }

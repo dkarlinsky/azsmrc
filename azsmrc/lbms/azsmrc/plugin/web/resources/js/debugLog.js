@@ -1,12 +1,20 @@
 var debugLog;
 function addDebugEntry(debugInfo) {
-	var newEntry = document.createElement("li");
-	newEntry.appendChild(document.createTextNode(debugInfo));
-	debugLog.appendChild(newEntry);
+	debugLog = getTabByContent("debug")
+	if (debugLog) {
+		debugLog = debugLog.lastChild;
+		var newEntry = document.createElement("li");
+		newEntry.appendChild(document.createTextNode(debugInfo));
+		debugLog.appendChild(newEntry);
+	}
 }
 function clearDebugLog() {
-	while (debugLog.firstChild)
-		debugLog.removeChild(debugLog.firstChild);
+	debugLog = getTabByContent("debug")
+	if (debugLog) {
+		debugLog = debugLog.lastChild;
+		while (debugLog.firstChild)
+			debugLog.removeChild(debugLog.firstChild);
+	}
 }
 function initDebugLog() {
 	debugLog = getTabByContent("debug");

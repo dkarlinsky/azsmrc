@@ -51,13 +51,23 @@ p {
 	margin: 0px 5px 10px 0px;
 }
 table {
+	border-collapse: collapse;
 	border-color: #888;
 	width: 100%;
 }
+tbody {
+	border-bottom: #888 1px solid;
+}
 tbody tr td:first-Child, thead tr th:first-Child {
+	border-left-style: solid;
 	padding-left: 5px;
 }
+tbody tr td:last-Child, thead tr th:last-Child {
+	border-right-style: solid;
+}
 td, th {
+	border-left: #888 1px dotted;
+	border-right: #888 1px dotted;
 	font-size: 0.8em;
 	padding: 0px 2px 0px 2px;
 	text-align: left;
@@ -117,6 +127,12 @@ div.tab {
 	display: none;
 }
 /* IDs */
+#eventlist {
+	display: none;
+}
+#interaction_container {
+	display: none;
+}
 #picmenu {
 	display: block;
 	background-color: #D0D0D9;

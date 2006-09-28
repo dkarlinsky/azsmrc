@@ -1,8 +1,10 @@
 // attributes that are allowed to be shown
-var attributes = ["health", "position", "name", "state", "status", "downloaded", "uploaded", "forceStart", "downloadAVG", "uploadAVG", "totalAVG", "elapsedTime", "eta", "availability", "completition", "shareRatio", "tracker", "downloadLimit", "uploadLimit", "total_seeds", "total_leechers", "size", "last_scrape", "next_scrape"];
+var attributes = ["health", "position", "name", "state", "status", "downloaded", "uploaded", "forceStart", "downloadAVG", "uploadAVG", "totalAVG", "elapsedTime", "eta", "availability", "completition", "shareRatio", "tracker", "downloadLimit", "uploadLimit", "total_seeds", "total_leechers", "size", "last_scrape", "next_scrape", "hash"];
 // output strings for attributes
 // empty string defines no output
-var formalAttributes = ["Health", "#", "Name", "", "Status", "Downloaded", "Uploaded", "", "Down Speed", "Up Speed", "Total Speed", "Elapsed time", "ETA", "Availability", "Done", "Share Ratio", "Tracker Status", "max. #DL", "max #UL", "Seeds", "Peers", "Size", "Scrape", "next Scrape"];
+var formalAttributes = ["Health", "#", "Name", "", "Status", "Downloaded", "Uploaded", "", "Down Speed", "Up Speed", "Total Speed", "Elapsed time", "ETA", "Availability", "Done", "Share Ratio", "Tracker Status", "max. #DL", "max #UL", "Seeds", "Peers", "Size", "Scrape", "next Scrape", ""];
+// event types
+var eventTypes = ["unknown", "unknown", "Torrent Remove"];
 // function for output format definitions
 function getAttributeFormat(attributeID, value) {
 	var attribute = attributes[attributeID];
@@ -41,11 +43,96 @@ function getAttributeFormat(attributeID, value) {
 		break;
 	}
 }
+function getEventType(evType) {
+	return eventTypes[evType] ? eventTypes[evType] : eventTypes[0];
+}
+function handleEvents(Events) {
+	addDebugEntry("Handling Events..");
+		// childnodes: <Event ...>
+		var evType = null;
+		var Event, time;
+		
+		var evList = document.getElementById("eventlist");
+		while (evList.firstChild) evList.removeChild(evList.firstChild);
+		var evTable = document.createElement("table");
+		evTable.setAttribute("summary", "Events since last request");
+		evTable.setAttribute("rules", "groups");
+		
+		// static, will be changed to dynamic later
+		var tbody, tr, td;
+		tbody = document.createElement("caption");
+		tbody.appendChild(document.createTextNode("new Events"));
+		evTable.appendChild(tbody);
+		
+		tbody = document.createElement("thead");
+		tr = document.createElement("tr");
+		td = document.createElement("th");
+		td.appendChild(document.createTextNode("Time"));
+		tr.appendChild(td);
+		td = document.createElement("th");
+		td.appendChild(document.createTextNode("Event"));
+		tr.appendChild(td);
+		td = document.createElement("th");
+		td.appendChild(document.createTextNode("Torrent"));
+		tr.appendChild(td);
+		td = document.createElement("th");
+		td.appendChild(document.createTextNode("Hash"));
+		tr.appendChild(td);
+		tbody.appendChild(tr);
+		evTable.appendChild(tbody);
+		
+		tbody = document.createElement("tbody");	
+		addDebugEntry("Events: "+Events.nodeType+" - "+Events.nodeName);
+		Event = Events.firstChild;
+		time = Math.floor(Event.getAttribute("time"));
+		time = new Date(time);
+		addDebugEntry("Event: "+Event.nodeType+" - "+Event.nodeName);
+		tr = document.createElement("tr");
+		td = document.createElement("td");
+		td.appendChild(document.createTextNode(time.toLocaleString()));
+		tr.appendChild(td);
+		td = document.createElement("td");
+		td.appendChild(document.createTextNode(getEventType(Event.getAttribute("type"))));
+		tr.appendChild(td);
+		td = document.createElement("td");
+		td.appendChild(document.createTextNode(Event.getAttribute("name")));
+		tr.appendChild(td);
+		td = document.createElement("td");
+		td.appendChild(document.createTextNode(Event.getAttribute("hash")));
+		tr.appendChild(td);
+		tbody.appendChild(tr);
+		
+		while (Event.nextSibling) {
+			Event = Event.nextSibling;
+			time = Math.floor(Event.getAttribute("time"));
+			time = new Date(time);
+			tr = document.createElement("tr");
+			td = document.createElement("td");
+			td.appendChild(document.createTextNode(time.toLocaleString()));
+			tr.appendChild(td);
+			td = document.createElement("td");
+			td.appendChild(document.createTextNode(getEventType(Event.getAttribute("type"))));
+			tr.appendChild(td);
+			td = document.createElement("td");
+			td.appendChild(document.createTextNode(Event.getAttribute("name")));
+			tr.appendChild(td);
+			td = document.createElement("td");
+			td.appendChild(document.createTextNode(Event.getAttribute("hash")));
+			tr.appendChild(td);
+			tbody.appendChild(tr);
+		}
+		evTable.appendChild(tbody);
+		evList.appendChild(evTable);
+		
+		evList.style.display = "block";
+		document.getElementById("eventstatus").firstChild.data = "new events";
+}
 function handlelistTransfers(xmldoc) {
 	var transfers = xmldoc.getElementsByTagName("Transfers");
 	var transfer = null;
 	var transferDataField = [];
 	var i = 0;
+	var hash = -1;
 	//addDebugEntry("Transfers: "+transfers);
 	for (var t in transfers) 
 		if (transfers[t].nodeType == 1) {
@@ -62,6 +149,8 @@ function handlelistTransfers(xmldoc) {
 					for (var j in attributes)
 						if (transfer.getAttribute(attributes[j]) != null) {
 							transferDataField[i][a] = j;
+							if (attributes[j] == "hash")
+								hash = a;
 							a++;
 						}
 					//addDebugEntry("Attributelist: "+transferDataField[0]);
@@ -91,6 +180,9 @@ function handlelistTransfers(xmldoc) {
 			addTab("listTransfers");
 			list = document.getElementById("tab_"+tabCount);
 		} else	while (list.firstChild) list.removeChild(list.firstChild);
+		var p = document.createElement("p");
+		p.appendChild(document.createTextNode("Detailsselection coming soon!"));				
+		list.appendChild(p);
 		var downloads = document.createElement("table");
 		var uploads = document.createElement("table");
 		var caption, dlbody, ulbody, tr, td;
@@ -133,6 +225,7 @@ function handlelistTransfers(xmldoc) {
 				if (transferDataField[j][isDoneCol] == 1000) activeTable = 1;
 				// fetch
 				tr = document.createElement("tr");
+				tr.setAttribute("hash", transferDataField[j][hash]);
 				for (i in transferDataField[j]) {
 					if (formalAttributes[transferDataField[0][i]] != "") {
 						td = document.createElement("td");
@@ -143,9 +236,13 @@ function handlelistTransfers(xmldoc) {
 				if (activeTable == 0) dlbody.appendChild(tr);
 				else ulbody.appendChild(tr);
 			}
-		downloads.appendChild(dlbody);
-		uploads.appendChild(ulbody);
-		list.appendChild(downloads);
-		list.appendChild(uploads);		
+		if (dlbody.hasChildNodes()) {
+			downloads.appendChild(dlbody);
+			list.appendChild(downloads);
+		}
+		if (ulbody.hasChildNodes()) {
+			uploads.appendChild(ulbody);
+			list.appendChild(uploads);		
+		}
 	}
 }
