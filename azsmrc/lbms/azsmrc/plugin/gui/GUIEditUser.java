@@ -168,7 +168,7 @@ public class GUIEditUser {
 			public void widgetSelected(SelectionEvent arg0) {
 				TreeItem [] selections = tree.getSelection ();
 				if(selections.length != 1) return;
-				if(selections[1].equals(item1)){
+				if(selections[0].equals(item1)){
 					//If true then this is the General Settings
 
 					//First remove all from cOptions
@@ -434,6 +434,9 @@ public class GUIEditUser {
 			}
 
 		});
+		
+		//Redo the composite so the new stuff appears
+		composite.layout();
 
 	}
 		/**
