@@ -20,11 +20,14 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -118,7 +121,7 @@ public class GUIEditUser {
 		});
 
 		//set the sash weight
-		sash.setWeights(new int[] {80,320});
+		sash.setWeights(new int[] {30,70});
 
 
 		//Button comp for below the sash
@@ -155,8 +158,33 @@ public class GUIEditUser {
 		Utilities.centerShellandOpen(shell);
 
 		//Non-Flexy config items
-		TreeItem item = new TreeItem(tree, SWT.NULL);
-		item.setText("General Settings");
+		final TreeItem item1 = new TreeItem(tree, SWT.NULL);
+		item1.setText("General Settings");
+
+		tree.addSelectionListener(new SelectionListener() {
+
+			public void widgetDefaultSelected(SelectionEvent arg0) {}
+
+			public void widgetSelected(SelectionEvent arg0) {
+				TreeItem [] selections = tree.getSelection ();
+				if(selections.length != 1) return;
+				if(selections[1].equals(item1)){
+					//If true then this is the General Settings
+
+					//First remove all from cOptions
+					Control[] controls = cOptions.getChildren();
+					for(Control control:controls)
+						control.dispose();
+
+					//populate cOptions
+					addGeneralItems(cOptions);
+
+				}else{
+					//Flexyconfig stuff..
+				}
+			}
+
+		});
 
 
 		FlexyConfiguration fc = Plugin.getPSFlexyConf();
