@@ -20,6 +20,8 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
@@ -126,11 +128,11 @@ public class GUIEditUser {
 
 		//Button comp for below the sash
 		Composite bComp = new Composite(parent, SWT.NULL);
-		bComp.setLayout(new GridLayout(2,false));
+		bComp.setLayout(new GridLayout(1,false));
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		bComp.setLayoutData(gridData);
 
-		//Save button
+/*		//Save button
 		Button save = new Button(bComp, SWT.PUSH);
 		save.setText("Save");
 		save.addListener(SWT.Selection, new Listener(){
@@ -138,9 +140,9 @@ public class GUIEditUser {
 				// TODO Feed me!
 			}
 		});
+*/
 
-
-		//Cancel button
+		//Close button
 		Button close = new Button(bComp, SWT.PUSH);
 		close.setText("Close");
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
@@ -160,6 +162,9 @@ public class GUIEditUser {
 		//Non-Flexy config items
 		final TreeItem item1 = new TreeItem(tree, SWT.NULL);
 		item1.setText("General Settings");
+
+		tree.setSelection(item1);
+		addGeneralItems(cOptions);
 
 		tree.addSelectionListener(new SelectionListener() {
 
@@ -240,6 +245,36 @@ public class GUIEditUser {
 		userName.setLayoutData( gridData);
 		userName.setText(user.getUsername());
 
+		userName.addFocusListener(new FocusListener() {
+
+			public void focusGained(FocusEvent arg0) {}
+
+			public void focusLost(FocusEvent arg0) {
+				if(userName == null || userName.isDisposed()) return;
+				if(userName.getText().equals(user.getUsername())) return;
+
+				if(userName.getText().length() > 0){
+					try {
+						Plugin.getXMLConfig().renameUser(user.getUsername(),userName.getText());
+						Plugin.getXMLConfig().saveConfigFile();
+					} catch (DuplicatedUserException e) {
+						userName.setText(user.getUsername());
+						MessageBox mb = new MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
+						mb.setText("Error");
+						mb.setMessage("User name already exists.");
+						mb.open();
+						return;
+
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+
+			}
+
+		});
+
+
 		//Combo Stuff
 
 		//combo Label
@@ -255,15 +290,32 @@ public class GUIEditUser {
 
 
 
-			if(user.checkAccess(RemoteConstants.RIGHTS_ADMIN))
-				combo.select(1);
-			else
-				combo.select(0);
+		if(user.checkAccess(RemoteConstants.RIGHTS_ADMIN))
+			combo.select(1);
+		else
+			combo.select(0);
 
 
-		if(!user.checkRight(RemoteConstants.RIGHTS_ADMIN)){
-			combo.setEnabled(false);
+
+		try {
+			if(!Plugin.getXMLConfig().getUser(Plugin.LOGGED_IN_USER).checkRight(RemoteConstants.RIGHTS_ADMIN)){
+				combo.setEnabled(false);
+			}
+		} catch (UserNotFoundException e3) {
+			//The user himself is always logged in to do this, so this error should never happen
+			e3.printStackTrace();
 		}
+
+
+		//Combo Listener to save changes to user
+		combo.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				if(combo.getSelectionIndex() == 1)
+					user.setRight(RemoteConstants.RIGHTS_ADMIN);
+				else
+					user.unsetRight(RemoteConstants.RIGHTS_ADMIN);
+			}
+		});
 
 
 		//---------Directory stuff ------------\\
@@ -295,6 +347,24 @@ public class GUIEditUser {
 
 		outputDir.setText(user.getOutputDir());
 
+		//Listener for manual input of outputDir
+		outputDir.addFocusListener(new FocusListener() {
+
+			public void focusGained(FocusEvent arg0) {}
+
+			public void focusLost(FocusEvent arg0) {
+				if(outputDir == null || outputDir.isDisposed()) return;
+				if(outputDir.getText().equals(user.getOutputDir())) return;
+
+				if(outputDir.getText().length() > 0){
+					user.setOutputDir(outputDir.getText());
+				}
+			}
+		});
+
+
+
+
 		//icon for output directory
 		Label outputDir_icon = new Label(output_comp, SWT.NONE);
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
@@ -314,6 +384,7 @@ public class GUIEditUser {
 					return;
 				}else{
 					outputDir.setText(selectedDir);
+					user.setOutputDir(outputDir.getText());
 				}
 
 
@@ -346,6 +417,27 @@ public class GUIEditUser {
 
 		importDir.setText(user.getAutoImportDir());
 
+
+		//Listener for manual input of outputDir
+		importDir.addFocusListener(new FocusListener() {
+
+			public void focusGained(FocusEvent arg0) {}
+
+			public void focusLost(FocusEvent arg0) {
+				if(importDir == null || importDir.isDisposed()) return;
+				if(importDir.getText().equals(user.getAutoImportDir())) return;
+
+				if(importDir.getText().length() > 0){
+					user.setAutoImportDir(importDir.getText());
+				}
+
+			}
+
+		});
+
+
+
+
 		//icon for output directory
 		Label importDir_icon = new Label(importDir_comp, SWT.NONE);
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
@@ -370,13 +462,14 @@ public class GUIEditUser {
 					mb.open();
 				}else{
 					importDir.setText(selectedDir);
+					user.setAutoImportDir(importDir.getText());
 				}
 
 
 			}
 		});
 
-		//Button for Accept
+/*		//Button for Accept
 		Button commit = new Button(composite, SWT.PUSH);
 		gridData = new GridData(GridData.CENTER);
 		gridData.horizontalSpan = 1;
@@ -433,24 +526,24 @@ public class GUIEditUser {
 				}
 			}
 
-		});
-		
+		});*/
+
 		//Redo the composite so the new stuff appears
 		composite.layout();
 
 	}
-		/**
-		 * Public method to open the dialog
-		 * @param User _user
-		 */
-		public void open(User _user){
-			if(instance == null)
-				loadGUI(_user);
-			else{
-				if(shell != null || !shell.isDisposed())
-					shell.setFocus();
-			}
-
+	/**
+	 * Public method to open the dialog
+	 * @param User _user
+	 */
+	public void open(User _user){
+		if(instance == null)
+			loadGUI(_user);
+		else{
+			if(shell != null || !shell.isDisposed())
+				shell.setFocus();
 		}
 
 	}
+
+}
