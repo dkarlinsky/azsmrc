@@ -2333,7 +2333,7 @@ public class DownloadManagerShell {
 							.getData("maxdl")).intValue();
 
 
-					TableItem[] items = table.getItems();
+					TableItem[] items = table.getSelection();
 					if(items.length == 1){
 						Container container = (Container) items[0].getData();
 						container.getDownload().setMaximumDownloadKBPerSecond(speed);
@@ -2374,7 +2374,7 @@ public class DownloadManagerShell {
 				}
 
 
-				TableItem[] items = table.getItems();
+				TableItem[] items = table.getSelection();
 				if(items.length == 1){
 					Container container = (Container) items[0].getData();
 					container.getDownload().setMaximumDownloadKBPerSecond(newSpeed);
@@ -2409,7 +2409,7 @@ public class DownloadManagerShell {
 							.getData("maxul")).intValue();
 
 
-					TableItem[] items = table.getItems();
+					TableItem[] items = table.getSelection();
 					if(items.length == 1){
 						Container container = (Container) items[0].getData();
 						container.getDownload().setUploadRateLimitBytesPerSecond(speed);
@@ -2449,7 +2449,7 @@ public class DownloadManagerShell {
 					return;
 				}
 
-				TableItem[] items = table.getItems();
+				TableItem[] items = table.getSelection();
 				if(items.length == 1){
 					Container container = (Container) items[0].getData();
 					container.getDownload().setUploadRateLimitBytesPerSecond(newSpeed);
