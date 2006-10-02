@@ -304,8 +304,12 @@ public class GUIMain {
 
 					try {
 						User user = Plugin.getXMLConfig().getUser(items[0].getText(0));
-						GUIEditUser guieu = new GUIEditUser();
-						guieu.open(user);
+						if(currentUser.checkRight(RemoteConstants.RIGHTS_ADMIN) ||
+								user.getUsername().equalsIgnoreCase(currentUser.getUsername())){
+							GUIEditUser guieu = new GUIEditUser();
+							guieu.open(user);
+						}
+
 					} catch (UserNotFoundException e1) {
 						e1.printStackTrace();
 					}
@@ -325,7 +329,7 @@ public class GUIMain {
 
 				TableItem[] item = userTable.getSelection();
 				if(item.length == 1){
-					if(!isAdmin && item[0].getText(0).equalsIgnoreCase(currentUser.getUsername())){
+					if(!isAdmin && item[0].getText(0).equals(currentUser.getUsername())){
 						changePassword.setEnabled(true);
 						editUser.setEnabled(true);
 					}else if(isAdmin){
