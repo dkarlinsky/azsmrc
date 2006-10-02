@@ -335,6 +335,9 @@ public class GUIMain {
 					}else if(isAdmin){
 						changePassword.setEnabled(true);
 						editUser.setEnabled(true);
+					}else{
+						changePassword.setEnabled(false);
+						editUser.setEnabled(false);
 					}
 
 
