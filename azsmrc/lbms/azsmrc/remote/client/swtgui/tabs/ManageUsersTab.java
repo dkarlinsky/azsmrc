@@ -6,6 +6,7 @@
 package lbms.azsmrc.remote.client.swtgui.tabs;
 
 
+import lbms.azsmrc.plugin.main.Plugin;
 import lbms.azsmrc.remote.client.Constants;
 import lbms.azsmrc.remote.client.User;
 import lbms.azsmrc.remote.client.UserManager;
@@ -566,6 +567,13 @@ public class ManageUsersTab {
 							return;
 						}
 
+						if(outputDir.getText().equals("")){
+							MessageBox mb = new MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
+							mb.setText("Error");
+							mb.setMessage("Output directory cannot be empty.");
+							mb.open();
+							return;
+						}
 
 						if(password.getText().equalsIgnoreCase(verify.getText())){
 							try {
