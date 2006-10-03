@@ -11,10 +11,10 @@ import org.apache.commons.codec.binary.Base64;
 
 /**
  * Abstract Class for Downloads.
- * 
+ *
  * Requires Commons-Codec.jar {@link http://jakarta.apache.org/commons/codec/}
- * 
- * 
+ *
+ *
  * @author Damokles
  *
  */
@@ -29,6 +29,7 @@ public abstract class Download implements Runnable, Callable<Download> {
 	public static final int STATE_CONNECTING 	= 2;
 	public static final int STATE_DOWNLOADING 	= 3;
 	public static final int STATE_FINISHED 		= 4;
+	public static final int STATE_RESET 		= 5;
 
 	protected URL source;
 	protected File target;
@@ -60,9 +61,9 @@ public abstract class Download implements Runnable, Callable<Download> {
 
 	/**
 	 * Constructs a new Download.
-	 * 
+	 *
 	 * The contents will be stored in a StringBuffer
-	 * 
+	 *
 	 * @param source
 	 */
 	public Download(URL source) {
@@ -71,9 +72,9 @@ public abstract class Download implements Runnable, Callable<Download> {
 
 	/**
 	 * Constructs a new Download.
-	 * 
+	 *
 	 * The contents will be stored in the target File
-	 * 
+	 *
 	 * @param source URL do download from
 	 * @param target File to write to
 	 */
@@ -84,7 +85,7 @@ public abstract class Download implements Runnable, Callable<Download> {
 
 	/**
 	 * Clone Constructor
-	 * 
+	 *
 	 * @param d Download to clone
 	 */
 	public Download (Download d) {
@@ -112,7 +113,7 @@ public abstract class Download implements Runnable, Callable<Download> {
 
 	/**
 	 * Sets the Proxy to use
-	 * 
+	 *
 	 * @param proxy the proxy to use
 	 */
 	public void setProxy(Proxy proxy) {
@@ -179,7 +180,7 @@ public abstract class Download implements Runnable, Callable<Download> {
 
 	/**
 	 * The Cookie data to send to the server.
-	 * 
+	 *
 	 * @param cookie the cookie to set
 	 */
 	public void setCookie(String cookie) {
@@ -188,7 +189,7 @@ public abstract class Download implements Runnable, Callable<Download> {
 
 	/**
 	 * Gets the Cookie.
-	 * 
+	 *
 	 * Will be overwritten if the Webserver returns a Cookie
 	 * @return the cookie
 	 */
@@ -242,7 +243,7 @@ public abstract class Download implements Runnable, Callable<Download> {
 		state = newS;
 	}
 
-	protected void callMessage (String msg) {
+	protected void debugMsg (String msg) {
 		for (int i=0;i<dlListener.size();i++) {
 			dlListener.get(i).debugMsg(msg);
 		}

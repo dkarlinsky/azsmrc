@@ -38,9 +38,9 @@ public class TorrentDownload extends Download {
 
 	private static final String contentType = "application/x-bittorrent";
 
-	private static Pattern hrefPattern = Pattern.compile("href\\s*=\\s*(?:\"|')([\\w:/.?&-=%]+)(?:\"|')",Pattern.CASE_INSENSITIVE);
+	private static Pattern hrefPattern = Pattern.compile("href\\s*=\\s*(?:\"|')([\\w:/.?&-=%\\[\\]{}\\(\\) ]+)(?:\"|')",Pattern.CASE_INSENSITIVE);
 
-	private static Pattern torrentHrefPattern = Pattern.compile("href\\s*=\\s*(?:\"|')([\\w:/.?&-=%]+\\.torrent)(?:\"|')",Pattern.CASE_INSENSITIVE);
+	private static Pattern torrentHrefPattern = Pattern.compile("href\\s*=\\s*(?:\"|')([\\w:/.?&-=%\\[\\]{}\\(\\) ]+\\.torrent)(?:\"|')",Pattern.CASE_INSENSITIVE);
 	private static Pattern magnetPattern = Pattern.compile("magnet:\\?xt=urn:btih:[A-Za-z2-7]{32}", Pattern.CASE_INSENSITIVE);
 
 	private static Pattern torrentDataPattern = Pattern.compile("^d[0-9]+:.*",Pattern.CASE_INSENSITIVE|Pattern.DOTALL);
@@ -90,7 +90,7 @@ public class TorrentDownload extends Download {
 		try {
 			call();
 		} catch (Exception e) {
-			callMessage(e.getMessage());
+			debugMsg(e.getMessage());
 			e.printStackTrace();
 		}
 	}
@@ -101,6 +101,7 @@ public class TorrentDownload extends Download {
 	public Download call() throws Exception {
 		InputStream is = null;
 		try {
+			debugMsg("TorrentDownloader: starting Download ["+source+"]");
 			HttpURLConnection conn = null;
 
 			if ( source.getProtocol().equalsIgnoreCase("https")){
@@ -156,7 +157,9 @@ public class TorrentDownload extends Download {
 			if ((response != HttpURLConnection.HTTP_ACCEPTED) && (response != HttpURLConnection.HTTP_OK)) {
 				callStateChanged(STATE_FAILURE);
 				failed = true;
-				failureReason = conn.getResponseMessage();
+				failureReason = conn.getResponseMessage() != null ?
+						conn.getResponseMessage() : "Connection Failed unknown problem. ["+response+"]";
+				callStateChanged(STATE_FAILURE);
 				return this;
 			}
 
@@ -183,7 +186,7 @@ public class TorrentDownload extends Download {
 
 			byte[] buf = new byte[BUFFER_SIZE];
 
-			buffer = (contentLength > 0 && contentLength < 5242880) ? new ByteArrayOutputStream(contentLength):new ByteArrayOutputStream();
+			buffer = (contentLength > 0 && contentLength < 5242880) ? new ByteArrayOutputStream(contentLength):new ByteArrayOutputStream(524288);
 			for (int read=is.read(buf);read>0;read=is.read(buf)) {
 				if (abort) {
 					is.close();
@@ -199,11 +202,13 @@ public class TorrentDownload extends Download {
 					last = now;
 				}
 			}
-
+			is.close();
+			conn.disconnect();
 			//finally call again
 			callProgress(sis.getBytesRead(), contentLength);
 			if (contentLength>0 && target != null && !(gzip || deflate) && target.length() != contentLength) {
 				failed = true;
+				failureReason = "Content length doesn't Match.";
 				callStateChanged(STATE_FAILURE);
 			}
 			else {
@@ -218,22 +223,35 @@ public class TorrentDownload extends Download {
 							if (os != null)
 								os.close();
 						}
+						returnCode = RTC_FILE;
+					} else {
+						returnCode = RTC_BUFFER;
 					}
+					debugMsg("TorrentDownloader: Download Successful ["+source+"]");
 					finished = true;
 					callStateChanged(STATE_FINISHED);
 				} else {
 					//The downloaded Data was not a torrent
 					//assume that it was html
+
+					debugMsg("TorrentDownloader: parsing HTML for link ["+source+"]");
 					try {
 						String html = buffer.toString("UTF-8");
 						Matcher tor = torrentHrefPattern.matcher(html);
 						if (tor.find()) {
-							String torlink = tor.group(1);
-							//set new source and download again
-							URL torURL = resolveRelativeURL(source, torlink);
-							if (isHrefTorrent(torURL)) {
-								source = torURL;
-								return call();
+							try {
+								String torlink = tor.group(1);
+								//set new source and download again
+								URL torURL = resolveRelativeURL(source, torlink);
+
+								debugMsg("TorrentDownloader: found Torrent Link ["+torURL+"]");
+								if (isHrefTorrent(torURL)) {
+									source = torURL;
+									callStateChanged(STATE_RESET);
+									return call();
+								}
+							} catch (MalformedURLException e) {
+								e.printStackTrace();
 							}
 						}
 						Matcher magnet = magnetPattern.matcher(html);
@@ -241,21 +259,69 @@ public class TorrentDownload extends Download {
 							magnetURL = magnet.group();
 							returnCode = RTC_MAGNET;
 							finished = true;
+							debugMsg("TorrentDownloader: found Magnet Link ["+source+"]");
 							callStateChanged(STATE_FINISHED);
 							return this;
 						}
 
+						if (torrentLinkIdentifier != null) {
+							debugMsg("TorrentDownloader: trying to use torrentLinkIdentifier ["+torrentLinkIdentifier+"]");
+							Matcher m = Pattern.compile("href\\s*=\\s*(?:\"|')([\\w:/.?&-=%\\[\\]{}\\(\\) ]*"+
+									Pattern.quote(torrentLinkIdentifier)+"[\\w:/.?&-=%\\[\\]{}\\(\\) ]*)(?:\"|')", Pattern.CASE_INSENSITIVE).matcher(html);
+							if (m.find()) {
+								try {
+									String torlink = m.group(1);
+									//set new source and download again
+									URL torURL = resolveRelativeURL(source, torlink);
+									debugMsg("TorrentDownloader: found Torrent Link ["+torURL+"]");
+									if (isHrefTorrent(torURL)) {
+										source = torURL;
+										callStateChanged(STATE_RESET);
+										return call();
+									}
+								} catch (MalformedURLException e) {
+									e.printStackTrace();
+								}
+							} else {
+								debugMsg("TorrentDownloader: failed to find torrent by torrentLinkIdentifier ["+torrentLinkIdentifier+"]");
+							}
+
+						}
+
+						//no direct torrent or magnet link was found
+						debugMsg("TorrentDownloader: parsing all links for torrent ["+source+"]");
+						Matcher links = hrefPattern.matcher(html);
+						while(links.find()) {
+							try {
+								URL torURL = resolveRelativeURL(source, links.group(1));
+								if (isHrefTorrent(torURL)) {
+									setTorrentLinkIdentifier(links.group(1));
+									source = torURL;
+									callStateChanged(STATE_RESET);
+									return call();
+								}
+							} catch (MalformedURLException e) {
+								e.printStackTrace();
+							}
+						}
+						debugMsg("TorrentDownloader: failed to find torrent Link ["+source+"]");
+
+						failed = true;
+						failureReason = "No Torrent Data/Link found";
+						callStateChanged(STATE_FAILURE);
+
 					} catch (Exception e) {
 						e.printStackTrace();
 						failed = true;
+						failureReason = e.getMessage();
 						callStateChanged(STATE_FAILURE);
 					}
 				}
 			}
 		} catch (IOException e) {
-			callStateChanged(STATE_FAILURE);
 			failed = true;
 			failureReason = e.getMessage();
+			callStateChanged(STATE_FAILURE);
 			e.printStackTrace();
 			throw e;
 		} finally {
@@ -315,15 +381,15 @@ public class TorrentDownload extends Download {
 	}
 
 	protected static URL resolveRelativeURL(URL u, String href) throws MalformedURLException {
-		String newUrl = u.getProtocol() + "://" + u.getHost();
+		/*String newUrl = u.getProtocol() + "://" + u.getHost();
 		if(u.getPort() > 0) newUrl += ":" + u.getPort();
 		if(!href.startsWith("/")) { // path relative to current
 			String path = u.getPath(); // e.g /dir/file.php
 			if(path.indexOf("/") > -1) path = path.substring(0, path.lastIndexOf("/") + 1); // strip file part
 			newUrl += path; // append /dir
 			if(!newUrl.endsWith("/")) newUrl += "/";
-		}
-		return new URL(newUrl + href);
+		}*/
+		return new URL(u, href);
 	}
 
 	/**
@@ -393,4 +459,23 @@ public class TorrentDownload extends Download {
 	public String getTorrentLinkIdentifier() {
 		return torrentLinkIdentifier;
 	}
+
+	public void setTorrentLinkIdentifier(String tor) {
+		if (torrentLinkIdentifier == null) {
+			debugMsg("TorrentDownloader: found torrentLinkIdentifier: "+tor);
+			torrentLinkIdentifier = tor;
+		}
+		else {
+			if (torrentLinkIdentifier.equalsIgnoreCase(tor)) return;
+			int i = 0;
+			for (;i<tor.length() && i<torrentLinkIdentifier.length() && tor.charAt(i) == torrentLinkIdentifier.charAt(i);i++);
+			if (i==0) {
+				torrentLinkIdentifier = null;
+			} else {
+				torrentLinkIdentifier = torrentLinkIdentifier.substring(0, i);
+				debugMsg("TorrentDownloader: improved torrentLinkIdentifier: "+torrentLinkIdentifier);
+			}
+		}
+	}
+
 }
