@@ -462,7 +462,6 @@ public class TorrentDownload extends Download {
 
 	public void setTorrentLinkIdentifier(String tor) {
 		if (torrentLinkIdentifier == null) {
-			debugMsg("TorrentDownloader: found torrentLinkIdentifier: "+tor);
 			torrentLinkIdentifier = tor;
 		}
 		else {
