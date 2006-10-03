@@ -370,6 +370,12 @@ public class GUIEditUser {
 
 				if(outputDir.getText().length() > 0){
 					user.setOutputDir(outputDir.getText());
+				}else{
+					MessageBox mb = new MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
+					mb.setText("Error");
+					mb.setMessage("The output directory must be filled out");
+					mb.open();
+					return;
 				}
 			}
 		});
