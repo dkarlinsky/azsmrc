@@ -23,6 +23,7 @@ import lbms.azsmrc.shared.DuplicatedUserException;
 import lbms.azsmrc.shared.EncodingUtil;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.azsmrc.shared.UserNotFoundException;
+import lbms.tools.TorrentDownload;
 
 import org.apache.commons.io.FileSystemUtils;
 import org.gudy.azureus2.core3.config.COConfigurationManager;
@@ -243,7 +244,7 @@ public class RequestManager {
 	/**
 	 * This will convert all Parameters in
 	 * Entries of FlexyConf
-	 * 
+	 *
 	 * @param pluginSection parent to containt the Elements
 	 * @param parameters Parameters to be converted
 	 */
@@ -445,10 +446,21 @@ public class RequestManager {
 								String username = xmlRequest.getAttributeValue("username");
 								String password = xmlRequest.getAttributeValue("password");
 								Torrent newTorrent = null;
-								if (username != null && password != null)
-									newTorrent = torrentManager.getURLDownloader(new URL(url),username,password).download();
-								else
+								if (url.startsWith("magnet")) {
 									newTorrent = torrentManager.getURLDownloader(new URL(url)).download();
+								} else {
+									TorrentDownload tdl = new TorrentDownload(new URL(url));
+									if (username != null && password != null) {
+										tdl.setLogin(username, password);
+									}
+									tdl.run();
+									if (tdl.hasFailed()) {
+										user.eventErrorMessage("Torrent Download failed. Reason: "+tdl.getFailureReason());
+										return;
+									}
+									newTorrent = torrentManager.createFromBEncodedData(tdl.getBuffer().toByteArray());
+								}
+
 								Download dl = Plugin.getPluginInterface().getDownloadManager().addDownload(newTorrent,null,file);
 								if (!user.hasDownload(dl)) {
 									user.addDownload(dl);
