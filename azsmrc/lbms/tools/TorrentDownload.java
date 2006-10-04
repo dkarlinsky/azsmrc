@@ -259,7 +259,7 @@ public class TorrentDownload extends Download {
 							magnetURL = magnet.group();
 							returnCode = RTC_MAGNET;
 							finished = true;
-							debugMsg("TorrentDownloader: found Magnet Link ["+source+"]");
+							debugMsg("TorrentDownloader: found Magnet Link ["+magnetURL+"] from ["+source+"]");
 							callStateChanged(STATE_FINISHED);
 							return this;
 						}

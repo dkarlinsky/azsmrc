@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package lbms.azsmrc.remote.client;
+package lbms.azsmrc.remote.client.plugins.download;
 
 import lbms.azsmrc.remote.client.events.DownloadListener;
 
@@ -51,7 +51,7 @@ import lbms.azsmrc.remote.client.events.DownloadListener;
  */
 
 public interface
-Download extends lbms.azsmrc.remote.client.plugins.download.Download
+Download
 {
   /** waiting to be told to start preparing */
 	public static final int ST_WAITING     = 1;
@@ -167,7 +167,7 @@ Download extends lbms.azsmrc.remote.client.plugins.download.Download
 	/**
 	 * Indicates if the download has completed or not, exluding any files marked
 	 * as Do No Download
-	 *
+	 *  
 	 * @return Download Complete status
 	 * @since 2.1.0.4
 	 */
@@ -256,7 +256,7 @@ Download extends lbms.azsmrc.remote.client.plugins.download.Download
 		/**
 		 * Moves a download and re-orders the others appropriately. Note that setPosition does not do this, it
 		 * merely sets the position thus making it possible, for example, for two downloads to have the same
-		 * position
+		 * position 
 		 * @param position
 		 * @since 2.3.0.7
 		 */

@@ -1,6 +1,6 @@
-package lbms.azsmrc.remote.client;
+package lbms.azsmrc.remote.client.plugins.download;
 
-public interface DownloadFile extends lbms.azsmrc.remote.client.plugins.download.DownloadFile {
+public interface DownloadFile {
 
 	public String getName();
 	public long getLength();

@@ -4,12 +4,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
+
 import lbms.azsmrc.remote.client.plugins.AzSMRCInterface;
 import lbms.azsmrc.remote.client.plugins.Plugin;
 import lbms.azsmrc.remote.client.plugins.PluginClient;
 import lbms.azsmrc.remote.client.plugins.PluginConfig;
 import lbms.azsmrc.remote.client.plugins.PluginInterface;
 import lbms.azsmrc.remote.client.plugins.PluginManager;
+import lbms.azsmrc.remote.client.plugins.download.DownloadManager;
 import lbms.azsmrc.remote.client.plugins.ipc.IPCInterface;
 import lbms.azsmrc.remote.client.plugins.ui.swt.UISWTManager;
 import lbms.azsmrc.remote.client.pluginsimpl.ipc.IPCInterfaceImpl;
@@ -112,9 +115,9 @@ public class PluginInterfaceImpl implements PluginInterface {
 
 	/**
 	 * Returns the AzSMRC interface.
-	 * 
+	 *
 	 * You can use popup windows and set the Statusbar text with it.
-	 * 
+	 *
 	 * @return AzSMRC interface
 	 */
 	public AzSMRCInterface getAzSMRCInterface () {
@@ -123,8 +126,8 @@ public class PluginInterfaceImpl implements PluginInterface {
 
 	/**
 	 * The Plugin client is the Transport to Azureus
-	 * 
-	 * @return PluginClient 
+	 *
+	 * @return PluginClient
 	 */
 	public PluginClient getPluginClient () {
 		return manager.getPluginClient();
@@ -135,6 +138,15 @@ public class PluginInterfaceImpl implements PluginInterface {
 	 */
 	public UISWTManager getUIManager() {
 		return manager.getUIManager();
+	}
+
+	public Logger getLogger() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public DownloadManager getDownloadManager() {
+		return manager.getRcMain().getClient().getDownloadManager();
 	}
 
 	//--------------------------------------------------//

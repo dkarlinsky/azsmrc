@@ -2,7 +2,7 @@
  * File    : DownloadManager.java
  * Created : 06-Jan-2004
  * By      : parg
- *
+ * 
  * Azureus - a Java Bittorrent client
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package lbms.azsmrc.remote.client;
+package lbms.azsmrc.remote.client.plugins.download;
 
 import java.io.File;
 import java.net.URL;
@@ -27,11 +27,11 @@ import java.net.URL;
 import lbms.azsmrc.remote.client.events.DownloadManagerListener;
 
 public interface
-DownloadManager extends lbms.azsmrc.remote.client.plugins.download.DownloadManager
+DownloadManager
 {
 	/**
-	 * add a torrent from a file.
-	 *
+	 * add a torrent from a file. 
+	 * 
 	 * @param torrent_file
 	 */
 	public void
@@ -40,13 +40,13 @@ DownloadManager extends lbms.azsmrc.remote.client.plugins.download.DownloadManag
 
 	/**
 	 * add a torrent from a file and select which files should be downloaded.
-	 *
+	 * 
 	 * fileSelection is an array consisting of 1 and 0, for every file in the torrent
 	 * there has to be either 1 or 0. They have to be in the same order as the torrent
 	 * specifies.
-	 *
+	 * 
 	 * @param torrent_file local torrent file
-	 * @param fileSelection the array selects the downloads 1 is download 0 is DND
+	 * @param fileSelection the array selects the downloads 1 is download 0 is DND 
 	 */
 	public void
 	addDownload(
@@ -65,13 +65,13 @@ DownloadManager extends lbms.azsmrc.remote.client.plugins.download.DownloadManag
 
 	/**
 	 * add a torrent from a file and select which files should be downloaded and specify save dir.
-	 *
+	 * 
 	 * fileSelection is an array consisting of 1 and 0, for every file in the torrent
 	 * there has to be either 1 or 0. They have to be in the same order as the torrent
 	 * specifies.
-	 *
+	 * 
 	 * @param torrent_file local torrent file
-	 * @param fileSelection the array selects the downloads 1 is download 0 is DND
+	 * @param fileSelection the array selects the downloads 1 is download 0 is DND 
 	 * @param fileLocation file save location; null -> default will be used
 	 */
 	public void
@@ -82,7 +82,7 @@ DownloadManager extends lbms.azsmrc.remote.client.plugins.download.DownloadManag
 
 	/**
 	 * This will add a Download via an URL.
-	 *
+	 * 
 	 * @param url TorrentURL
 	 */
 	public void
@@ -91,7 +91,7 @@ DownloadManager extends lbms.azsmrc.remote.client.plugins.download.DownloadManag
 
 	/**
 	 * add a Download via an URL.
-	 *
+	 * 
 	 * @param url TorrentURL
 	 * @param fileLocation file save location; null -> default will be used
 	 */
@@ -103,9 +103,9 @@ DownloadManager extends lbms.azsmrc.remote.client.plugins.download.DownloadManag
 
 	/**
 	 * add a Download via an URL.
-	 *
+	 * 
 	 * You can specify username/password and referer if requiered.
-	 *
+	 * 
 	 * @param url TorrentURL
 	 * @param username maybe null
 	 * @param password maybe null
@@ -168,9 +168,9 @@ DownloadManager extends lbms.azsmrc.remote.client.plugins.download.DownloadManag
 
 	/**
 	 * pause all running downloads.
-	 *
-	 * Will resume after timeout
-	 *
+	 * 
+	 * Will resume after timeout 
+	 * 
 	 * @param timeout in sec
 	 */
 	public void
@@ -222,18 +222,18 @@ DownloadManager extends lbms.azsmrc.remote.client.plugins.download.DownloadManag
 		DownloadManagerListener	l );
 
 	/**
-	 * Will remove all downloads
+	 * Will remove all downloads 
 	 */
 	public void
 	clear();
 
 	/**
 	 * Will request an update from the Az Server.
-	 *
+	 * 
 	 * It uses smart updating, only the differences
 	 * since the last call are updated. If you want a
 	 * full update set full = true;
-	 * @param full whether do a full update or not
+	 * @param full whether do a full update or not 
 	 */
 	public void
 	update (boolean full);

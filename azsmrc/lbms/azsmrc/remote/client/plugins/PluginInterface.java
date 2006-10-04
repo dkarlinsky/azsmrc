@@ -1,8 +1,8 @@
-/**
- * 
- */
 package lbms.azsmrc.remote.client.plugins;
 
+import org.apache.log4j.Logger;
+
+import lbms.azsmrc.remote.client.plugins.download.DownloadManager;
 import lbms.azsmrc.remote.client.plugins.ipc.IPCInterface;
 import lbms.azsmrc.remote.client.plugins.ui.swt.UISWTManager;
 
@@ -33,4 +33,8 @@ public interface PluginInterface {
 	public String getPluginName();
 
 	public UISWTManager getUIManager();
+
+	public DownloadManager getDownloadManager();
+
+	public Logger getLogger();
 }

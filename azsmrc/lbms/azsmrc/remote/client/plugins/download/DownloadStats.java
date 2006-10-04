@@ -2,7 +2,7 @@
  * File    : DownloadStats.java
  * Created : 08-Jan-2004
  * By      : parg
- *
+ * 
  * Azureus - a Java Bittorrent client
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package lbms.azsmrc.remote.client;
+package lbms.azsmrc.remote.client.plugins.download;
 
 /**
  * @author parg
@@ -27,7 +27,7 @@ package lbms.azsmrc.remote.client;
  */
 
 public interface
-DownloadStats extends lbms.azsmrc.remote.client.plugins.download.DownloadStats
+DownloadStats
 {
 	public static final int HEALTH_STOPPED    		= 1;
 	public static final int HEALTH_NO_TRACKER 		= 2;
@@ -83,7 +83,7 @@ DownloadStats extends lbms.azsmrc.remote.client.plugins.download.DownloadStats
 	getUploaded();
 
 	/**
-	 * Gives average number of bytes downloaded in last second
+	 * Gives average number of bytes downloaded in last second 
 	 * @return
    *
    * @since 2.0.7.0
@@ -92,7 +92,7 @@ DownloadStats extends lbms.azsmrc.remote.client.plugins.download.DownloadStats
 	getDownloadAverage();
 
 	/**
-	 * Gives average number of bytes uploaded in last second
+	 * Gives average number of bytes uploaded in last second 
 	 * @return
    *
    * @since 2.0.7.0
@@ -131,7 +131,7 @@ DownloadStats extends lbms.azsmrc.remote.client.plugins.download.DownloadStats
 	getAvailability();
 
 	/**
-	 * returns an indication of the health of the torrent
+	 * returns an indication of the health of the torrent 
 	 * @return	see above HEALTH constants
 	 */
 

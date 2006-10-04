@@ -1,6 +1,6 @@
-package lbms.azsmrc.remote.client;
+package lbms.azsmrc.remote.client.plugins.download;
 
-public interface DownloadAdvancedStats extends lbms.azsmrc.remote.client.plugins.download.DownloadAdvancedStats {
+public interface DownloadAdvancedStats {
 
 
 	public boolean _isLoaded();

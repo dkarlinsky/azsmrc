@@ -26,6 +26,7 @@ public class PluginManagerImpl implements PluginManager {
 	private AzSMRCInterface azsmrcInterface;
 	private PluginClientImpl plClient;
 	private UISWTManagerImpl uiManager;
+	private RCMain rcMain;
 
 	private List<PluginListener> listeners = new ArrayList<PluginListener>();
 
@@ -88,11 +89,15 @@ public class PluginManagerImpl implements PluginManager {
 		return plClient;
 	}
 
+	protected RCMain getRcMain() {
+		return rcMain;
+	}
+
 	/**
 	 * Initializes the Interfaces and Plugins
-	 * 
+	 *
 	 * The Client has to be created before this is called.
-	 * 
+	 *
 	 * @param rcMain
 	 */
 	public void initialize (RCMain rcMain) {
