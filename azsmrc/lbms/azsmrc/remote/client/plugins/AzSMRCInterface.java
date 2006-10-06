@@ -1,5 +1,7 @@
 package lbms.azsmrc.remote.client.plugins;
 
+import java.io.File;
+
 
 /**
  * @author Damokles
@@ -9,7 +11,7 @@ public interface AzSMRCInterface {
 
 	/**
 	 * Opens a Message Popup.
-	 * 
+	 *
 	 * @param title
 	 * @param message
 	 */
@@ -17,7 +19,7 @@ public interface AzSMRCInterface {
 
 	/**
 	 * Opens a Warning Popup.
-	 * 
+	 *
 	 * @param title
 	 * @param message
 	 */
@@ -25,7 +27,7 @@ public interface AzSMRCInterface {
 
 	/**
 	 * Opens an Error Popup.
-	 * 
+	 *
 	 * @param title
 	 * @param message
 	 */
@@ -48,5 +50,17 @@ public interface AzSMRCInterface {
 	 * @return username or null if no user is active
 	 */
 	public String getCurrentUsername();
+
+	/**
+	 * Opens the scrape window with the Torrent.
+	 * @param url the TorrentUrl
+	 */
+	public void scrapeTorrent (String url);
+
+	/**
+	 * Opens the scrape window with the Torrent.
+	 * @param file the TorrentFile
+	 */
+	public void scrapeTorrent (File file);
 
 }

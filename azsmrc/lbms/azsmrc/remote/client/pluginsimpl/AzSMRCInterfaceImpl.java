@@ -1,8 +1,11 @@
 package lbms.azsmrc.remote.client.pluginsimpl;
 
+import java.io.File;
+
 import lbms.azsmrc.remote.client.plugins.AzSMRCInterface;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.dialogs.MessageDialog;
+import lbms.azsmrc.remote.client.swtgui.dialogs.ScrapeDialog;
 
 /**
  * @author Damokles
@@ -66,5 +69,13 @@ public class AzSMRCInterfaceImpl implements AzSMRCInterface {
 	 */
 	public String getCurrentUsername() {
 		return rcMain.getClient().getUsername();
+	}
+
+	public void scrapeTorrent(File file) {
+		ScrapeDialog.openFileAndScrape(file);
+	}
+
+	public void scrapeTorrent(String url) {
+		ScrapeDialog.openURLandScrape(url);
 	}
 }

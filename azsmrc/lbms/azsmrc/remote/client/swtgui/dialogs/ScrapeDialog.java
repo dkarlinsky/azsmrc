@@ -2,6 +2,7 @@ package lbms.azsmrc.remote.client.swtgui.dialogs;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -22,6 +23,7 @@ import lbms.azsmrc.remote.client.torrent.scraper.Scraper;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.shared.EncodingUtil;
 import lbms.azsmrc.shared.SWTSafeRunnable;
+import lbms.tools.TorrentDownload;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -803,6 +805,41 @@ public class ScrapeDialog {
 				instance.redrawTable();
 			}
 		});
+	}
+
+	/**
+	 * Opens the scrape dialog with a Torrent that needs to be downloaded first.
+	 *
+	 * It may fail to download the torrent and to display the scrapeDialog.
+	 * @param urlStr torrent URL
+	 */
+	public static void openURLandScrape (String urlStr) {
+		try {
+			final URL url = new URL (urlStr);
+			Thread t = new Thread (new Runnable() {
+				public void run() {
+					try {
+						File torTemp = File.createTempFile("azsmrc", ".torrent");
+						torTemp.deleteOnExit();
+						TorrentDownload tdl = new TorrentDownload (url,torTemp);
+						if (RCMain.getRCMain().getProxy() != null)
+							tdl.setProxy(RCMain.getRCMain().getProxy());
+						tdl.call();
+						if (!tdl.hasFailed() && tdl.hasFinished()) {
+							openFileAndScrape(torTemp);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+			t.setDaemon(true);
+			t.setPriority(Thread.MIN_PRIORITY);
+			t.start();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 
