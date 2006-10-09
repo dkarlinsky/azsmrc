@@ -22,6 +22,7 @@ import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
@@ -72,7 +73,7 @@ public class SplashScreen {
 				}
 			}
 
-		region.add(new Rectangle (0,300,350,350));
+		region.add(new Rectangle (0, 300,300,150));
 
 
 		//define the shape of the shell using setRegion
@@ -84,6 +85,8 @@ public class SplashScreen {
 				Rectangle bounds = image.getBounds();
 				Point size = splash.getSize();
 				e.gc.drawImage(image, 0, 0, bounds.width, bounds.height, 10, 10, size.x-20, size.y-20);
+				e.gc.setBackground(display.getSystemColor(SWT.COLOR_BLACK));
+				e.gc.fillRectangle(0, 300, 300, 150);
 			}
 		});
 
