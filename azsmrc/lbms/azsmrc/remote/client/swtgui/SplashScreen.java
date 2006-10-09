@@ -10,9 +10,15 @@ import java.io.InputStream;
 import lbms.azsmrc.shared.SWTSafeRunnable;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -45,13 +51,46 @@ public class SplashScreen {
 		instance = this;
 
 		//load the image
-		String res = "lbms/azsmrc/remote/client/swtgui/resources/AzSMRC_Splash_New.png";
+		//String res = "lbms/azsmrc/remote/client/swtgui/resources/AzSMRC_Splash_New.png";
+		String res = "lbms/azsmrc/remote/client/swtgui/resources/frog_alone_test2.png";
 		InputStream is = ImageRepository.class.getClassLoader().getResourceAsStream(res);
 		image = new Image(display,is);
-
+		ImageData data = image.getImageData();
 
 		//The shell with it's FormLayout
-		splash = new Shell(SWT.ON_TOP);
+		splash = new Shell(SWT.ON_TOP | SWT.NO_TRIM | SWT.NO_BACKGROUND);
+
+		//define a region
+		Region region = new Region();
+		Rectangle pixel = new Rectangle(0, 0, 1, 1);
+		for (int y = 0; y < 300; y++) {
+				for (int x = 0; x < 300; x++) {
+					pixel.x = x;
+					pixel.y = y;
+					if(data.getAlpha(x, y) == 255)
+						region.add(pixel);
+				}
+			}
+
+		region.add(new Rectangle (0,300,350,350));
+
+
+		//define the shape of the shell using setRegion
+		splash.setRegion(region);
+		Rectangle size = region.getBounds();
+		splash.setSize(size.width, size.height);
+		splash.addPaintListener(new PaintListener() {
+			public void paintControl(PaintEvent e) {
+				Rectangle bounds = image.getBounds();
+				Point size = splash.getSize();
+				e.gc.drawImage(image, 0, 0, bounds.width, bounds.height, 10, 10, size.x-20, size.y-20);
+			}
+		});
+
+
+
+
+
 		FormLayout layout = new FormLayout();
 		splash.setLayout(layout);
 		splash.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
