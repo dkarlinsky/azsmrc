@@ -107,6 +107,7 @@ public class SplashScreen {
 		bar.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 
 		FormData progressData = new FormData();
+		progressData.width = 300;
 		progressData.left = new FormAttachment(0, 5);
 		progressData.right = new FormAttachment(100, -5);
 		progressData.bottom = new FormAttachment(100, -5);
