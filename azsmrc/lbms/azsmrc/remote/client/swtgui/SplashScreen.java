@@ -22,9 +22,9 @@ import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 
@@ -35,7 +35,7 @@ public class SplashScreen {
 	private ProgressBar bar;
 	private Label status;
 	private Display display;
-	private Shell splash;
+	private Shell splash, statusShell;
 	private Image image;
 
 	/**
@@ -73,7 +73,7 @@ public class SplashScreen {
 				}
 			}
 
-		region.add(new Rectangle (0, 300,300,150));
+
 
 
 		//define the shape of the shell using setRegion
@@ -85,8 +85,6 @@ public class SplashScreen {
 				Rectangle bounds = image.getBounds();
 				Point size = splash.getSize();
 				e.gc.drawImage(image, 0, 0, bounds.width, bounds.height, 10, 10, size.x-20, size.y-20);
-				e.gc.setBackground(display.getSystemColor(SWT.COLOR_BLACK));
-				e.gc.fillRectangle(0, 300, 300, 150);
 			}
 		});
 
@@ -96,10 +94,15 @@ public class SplashScreen {
 
 		FormLayout layout = new FormLayout();
 		splash.setLayout(layout);
-		splash.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+		//splash.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+
+		statusShell = new Shell(display, SWT.ON_TOP);
+
+		statusShell.setLayout(new FormLayout());
+		statusShell.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 
 		//ProgressBar
-		bar = new ProgressBar(splash, SWT.SMOOTH);
+		bar = new ProgressBar(statusShell, SWT.SMOOTH);
 		bar.setMaximum(100);
 		bar.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 
@@ -111,7 +114,7 @@ public class SplashScreen {
 		bar.pack();
 
 		//Status Label for the splash screen
-		status = new Label(splash, SWT.NONE);
+		status = new Label(statusShell, SWT.NONE);
 
 		//increase the size of the font
 		Font initialFont = status.getFont();
@@ -139,12 +142,13 @@ public class SplashScreen {
 
 		FormData labelData = new FormData();
 		labelData.right = new FormAttachment(100, 0);
-		labelData.bottom = new FormAttachment(100, - (bar.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y + 7 /*Size of the Bar*/
-				+  status.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y)); /*Size of the status label*/
+		labelData.bottom = new FormAttachment(100, 0 /*(bar.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y + 7 Size of the Bar
+				+  status.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y)*/); /*Size of the status label*/
 		label.setLayoutData(labelData);
 
 		//pack the shell
 		splash.pack();
+		statusShell.pack();
 	}
 
 
@@ -169,6 +173,7 @@ public class SplashScreen {
 
 	private void close() {
 		splash.close();
+		statusShell.close();
 		image.dispose();
 		instance = null;
 	}
@@ -191,6 +196,21 @@ public class SplashScreen {
 			public void runSafe() {
 				new SplashScreen(_display);
 				GUI_Utilities.centerShellandOpen(instance.splash);
+
+				//open shell
+				instance.statusShell.pack();
+
+				//Center Shell
+				Monitor primary = RCMain.getRCMain().getDisplay().getPrimaryMonitor ();
+				Rectangle bounds = primary.getBounds ();
+				Rectangle rect = instance.statusShell.getBounds ();
+				int x = bounds.x + (bounds.width - rect.width) / 2;
+				//int y = bounds.y +(bounds.height - rect.height) / 2;
+				instance.statusShell.setLocation (x, instance.splash.getLocation().y + 310);
+
+				//open shell
+				instance.statusShell.open();
+
 			}
 		});
 	}
