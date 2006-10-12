@@ -19,24 +19,49 @@
  */
 package lbms.azsmrc.remote.client.swtgui.dialogs;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
-//import lbms.azsmrc.shared.SWTSafeRunnable;
 import lbms.tools.launcher.Constants;
-
-
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.layout.*;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseTrackAdapter;
+import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.program.Program;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
 
 
 
@@ -61,7 +86,7 @@ import org.eclipse.swt.widgets.*;
 public class MessageSlideShell {
 	private static boolean USE_SWT32_BG_SET = true;
 
-	private static final boolean DEBUG = false;
+	private static final boolean DEBUG = true;
 
 	private final static String REGEX_URLHTML = "<A HREF=\"(.+?)\">(.+?)</A>";
 
@@ -86,7 +111,7 @@ public class MessageSlideShell {
 	private final static int DETAILS_HEIGHT = 180;
 
 	/** List of all popups ever created */
-	private static ArrayList historyList = new ArrayList();
+	private static ArrayList<PopupParams> historyList = new ArrayList<PopupParams>();
 
 	/** Current popup being displayed */
 	private static int currentPopupIndex = -1;
@@ -465,13 +490,14 @@ public class MessageSlideShell {
 			btnPrev.setText("< " +  idxHistory );
 			btnPrev.addListener(SWT.MouseUp, new Listener() {
 				public void handleEvent(Event arg0) {
-					disposeShell(shell);
+					if (DEBUG)
+						System.out.println("Prev Pressed");
 					int idx = historyList.indexOf(popupParams) - 1;
 					if (idx >= 0) {
-						PopupParams item = (PopupParams) historyList.get(idx);
+						PopupParams item = historyList.get(idx);
 						showPopup(display, item, false);
-						disposeShell(shell);
 					}
+					disposeShell(shell);
 				}
 			});
 		}
@@ -487,7 +513,7 @@ public class MessageSlideShell {
 					System.out.println("Next Pressed");
 
 				if (idxHistory + 1 < historyList.size()) {
-					showPopup(display, (PopupParams) historyList.get(idxHistory + 1),
+					showPopup(display, historyList.get(idxHistory + 1),
 							false);
 				}
 
