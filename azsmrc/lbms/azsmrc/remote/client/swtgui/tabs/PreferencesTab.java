@@ -1111,7 +1111,12 @@ public class PreferencesTab {
 	private void clearRPTable(){
 		if(rpTable != null || !rpTable.isDisposed()){
 			rpTable.removeAll();
-			int count = RCMain.getRCMain().getClient().getRemoteInfo().getRemotePlugins().length;
+			int count;
+			try{
+				count = RCMain.getRCMain().getClient().getRemoteInfo().getRemotePlugins().length;
+			}catch(Exception e){
+				count = 0;
+			}
 			if(count > 0)
 				rpTable.setItemCount(count);
 			else
