@@ -676,7 +676,7 @@ public class TorrentDetailsTab {
 		String stringColSizes = RCMain.getRCMain().getProperties().getProperty("torrentDetails.filesTable.columns.widths", "null");
 		if(stringColSizes.equalsIgnoreCase("null"))
 			stringColSizes = "[350, 100, 50, 75, 100, 150]";
-		int[] colSize = EncodingUtil.StringToIntArray(stringColSizes);
+		int[] colSize = EncodingUtil.StringToIntArray(stringColSizes,75);
 
 		TableColumn name = new TableColumn(filesTable,SWT.LEFT);
 		name.setText(I18N.translate(PFX + "subtab2.filesTable.column.name"));

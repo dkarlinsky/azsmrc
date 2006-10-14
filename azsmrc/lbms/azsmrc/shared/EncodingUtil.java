@@ -31,11 +31,25 @@ public class EncodingUtil {
 				try{
 					result[i] = Integer.parseInt(parts[i].trim());
 				}catch (Exception e){
-					result[i] = 75;
+					result[i] = 0;
 				}
 			}
 			return result;
 	}
+
+	public static int[] StringToIntArray (String s, int def) {
+		s = s.substring(1, s.length()-1);
+		String[] parts = s.split(",");
+		int[] result = new int[parts.length];
+		for (int i=0;i<parts.length;i++) {
+			try{
+				result[i] = Integer.parseInt(parts[i].trim());
+			}catch (Exception e){
+				result[i] = def;
+			}
+		}
+		return result;
+}
 
 	public static String IntListToString (List<Integer> list) {
 		return ObjectArrayToString(list.toArray(new Integer[] {}));
