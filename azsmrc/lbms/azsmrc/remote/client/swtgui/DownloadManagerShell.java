@@ -1242,6 +1242,10 @@ public class DownloadManagerShell {
 						setToolBarTorrentIcons(false,true,true);
 					}else if(download.getState() == Download.ST_STOPPED){
 						setToolBarTorrentIcons(true,false,true);
+					} else if(download.getState() == Download.ST_ERROR){
+						setToolBarTorrentIcons(false,true,true);
+					} else {
+						setToolBarTorrentIcons(false,false,false);
 					}
 
 
@@ -2655,6 +2659,13 @@ public class DownloadManagerShell {
 
 
 
+	/**
+	 * Sets the Toolbar Icons for Queue Stop and Remove
+	 * 
+	 * @param bQueue true if Queue enabled
+	 * @param bStop true if Stop enabled
+	 * @param bRemove true if Remove enabled
+	 */
 	public void setToolBarTorrentIcons(final boolean bQueue, final boolean bStop, final boolean bRemove){
 		RCMain.getRCMain().getDisplay().syncExec(new SWTSafeRunnable(){
 			public void runSafe() {
