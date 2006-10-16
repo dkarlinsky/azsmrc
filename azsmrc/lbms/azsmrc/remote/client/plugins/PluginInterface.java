@@ -32,6 +32,8 @@ public interface PluginInterface {
 
 	public String getPluginName();
 
+	public String getAzSMRCVersion();
+
 	public UISWTManager getUIManager();
 
 	public DownloadManager getDownloadManager();

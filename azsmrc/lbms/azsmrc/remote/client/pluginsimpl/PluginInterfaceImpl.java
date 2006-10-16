@@ -124,6 +124,13 @@ public class PluginInterfaceImpl implements PluginInterface {
 		return manager.getAzsmrcInterface();
 	}
 
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.plugins.PluginInterface#getAzSMRCVersion()
+	 */
+	public String getAzSMRCVersion() {
+		return manager.getRcMain().getAzsmrcProperties().getProperty("version","x.x");
+	}
+
 	/**
 	 * The Plugin client is the Transport to Azureus
 	 *
