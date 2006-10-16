@@ -101,6 +101,7 @@ public class PluginManagerImpl implements PluginManager {
 	 * @param rcMain
 	 */
 	public void initialize (RCMain rcMain) {
+		this.rcMain = rcMain;
 		this.plClient = new PluginClientImpl(rcMain.getClient());
 		this.azsmrcInterface = new AzSMRCInterfaceImpl(rcMain);
 		this.uiManager = new UISWTManagerImpl();

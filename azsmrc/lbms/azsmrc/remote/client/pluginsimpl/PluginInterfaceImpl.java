@@ -149,7 +149,7 @@ public class PluginInterfaceImpl implements PluginInterface {
 
 	public Logger getLogger() {
 		// TODO Auto-generated method stub
-		return null;
+		return Logger.getLogger("Plugin."+getPluginName());
 	}
 
 	public DownloadManager getDownloadManager() {

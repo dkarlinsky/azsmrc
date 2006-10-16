@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.Authenticator;
+import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
@@ -41,8 +42,8 @@ import lbms.azsmrc.remote.client.events.ClientUpdateListener;
 import lbms.azsmrc.remote.client.events.ConnectionListener;
 import lbms.azsmrc.remote.client.events.DownloadManagerListener;
 import lbms.azsmrc.remote.client.events.ExceptionListener;
-import lbms.azsmrc.remote.client.events.HTTPErrorListener;
 import lbms.azsmrc.remote.client.events.GlobalStatsListener;
+import lbms.azsmrc.remote.client.events.HTTPErrorListener;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.pluginsimpl.PluginLoader;
 import lbms.azsmrc.remote.client.pluginsimpl.PluginManagerImpl;
@@ -51,6 +52,7 @@ import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ErrorDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.InputShell;
 import lbms.azsmrc.remote.client.swtgui.dialogs.MessageDialog;
+import lbms.azsmrc.remote.client.swtgui.dialogs.MotdDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByFileDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByURLDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ServerUpdateDialog;
@@ -847,7 +849,25 @@ public class RCMain implements Launchable {
 					mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.checking"));
 				}
 				logger.info("Checking for Updates");
-				updater.checkForUpdates(properties.getPropertyAsBoolean("update.beta"));
+				boolean newUpdate = false;
+				try {
+					URL url = new URL (RemoteConstants.UPDATE_URL);
+					HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+					conn.setRequestMethod("HEAD");
+					conn.connect();
+					if (!conn.getHeaderField("Last-Modified").equalsIgnoreCase(properties.getProperty("update.Last-Modified", ""))) {
+						properties.setProperty("update.Last-Modified", conn.getHeaderField("Last-Modified"));
+						newUpdate = true;
+					}
+					conn.disconnect();
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				if (newUpdate) {
+					updater.checkForUpdates(properties.getPropertyAsBoolean("update.beta"));
+				}
 				properties.setProperty("update.lastcheck",System.currentTimeMillis());
 			}
 		}
@@ -873,6 +893,30 @@ public class RCMain implements Launchable {
 		saveConfig();
 		ImageRepository.unLoadImages();
 		System.out.println("Shutdown completed");
+	}
+
+	public void checkMotd () {
+		if (properties.getPropertyAsBoolean("motd.disable")) return;
+
+		long lastcheck = properties.getPropertyAsLong("motd.lastcheck");
+		if (System.currentTimeMillis()-lastcheck > 1000*60*60*24) {
+			properties.setProperty("motd.lastcheck", System.currentTimeMillis());
+
+			try {
+				URL url = new URL (RemoteConstants.MOTD_URL);
+				HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+				conn.setRequestMethod("HEAD");
+				conn.connect();
+				if (!conn.getHeaderField("Last-Modified").equalsIgnoreCase(properties.getProperty("motd.Last-Modified", ""))) {
+					properties.setProperty("motd.Last-Modified", conn.getHeaderField("Last-Modified"));
+					MotdDialog.open();
+				}
+				conn.disconnect();
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public long getRunTime() {

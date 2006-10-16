@@ -83,7 +83,7 @@ public class HTTPDownload extends Download  {
 			conn.setReadTimeout(TIMEOUT);
 			conn.setDoInput(true);
 
-			conn.addRequestProperty("Accept-Encoding","gzip, deflate");
+			conn.addRequestProperty("Accept-Encoding","gzip, x-gzip, deflate, x-deflate");
 			conn.addRequestProperty("User-Agent", userAgent);
 			if (referer != null)
 				conn.addRequestProperty("Referer", referer);
