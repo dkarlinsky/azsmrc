@@ -29,6 +29,7 @@ dialog.errordialog.sendemail.text=Send email address with report
 dialog.errordialog.shell.text=Error Report
 dialog.errordialog.sysTextLabel.text=System Information
 dialog.messagedialog.hideall.text=Hide All
+dialog.motd.shell.text=Announcements
 dialog.movedatadialog.move.message=Your move data request has been sent to the server.
 dialog.movedatadialog.move.samelocal.message=You have put in the same directory where the torrent is already stored.
 dialog.movedatadialog.move.title=Request Sent
