@@ -53,7 +53,7 @@ public class SplashScreen {
 
 		//load the image
 		//String res = "lbms/azsmrc/remote/client/swtgui/resources/AzSMRC_Splash_New.png";
-		String res = "lbms/azsmrc/remote/client/swtgui/resources/frog_alone_test2.png";
+		String res = "lbms/azsmrc/remote/client/swtgui/resources/frogandpad.png";
 		InputStream is = ImageRepository.class.getClassLoader().getResourceAsStream(res);
 		image = new Image(display,is);
 		ImageData data = image.getImageData();
@@ -64,8 +64,8 @@ public class SplashScreen {
 		//define a region
 		Region region = new Region();
 		Rectangle pixel = new Rectangle(0, 0, 1, 1);
-		for (int y = 0; y < 300; y++) {
-				for (int x = 0; x < 300; x++) {
+		for (int y = 0; y < 254; y++) {
+				for (int x = 0; x < 350; x++) {
 					pixel.x = x;
 					pixel.y = y;
 					if(data.getAlpha(x, y) == 255)
@@ -107,7 +107,7 @@ public class SplashScreen {
 		bar.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 
 		FormData progressData = new FormData();
-		progressData.width = 300;
+		progressData.width = 350;
 		progressData.left = new FormAttachment(0, 5);
 		progressData.right = new FormAttachment(100, -5);
 		progressData.bottom = new FormAttachment(100, -5);
