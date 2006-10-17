@@ -495,6 +495,7 @@ public class RCMain implements Launchable {
 		//Add in the clipboard monitor
 		addAWTClipboardMonitor();
 		SplashScreen.setProgressAndText("All Done", 100);
+		checkMotd();
 	}
 
 	private void initConfig() {
@@ -902,7 +903,7 @@ public class RCMain implements Launchable {
 		long lastcheck = properties.getPropertyAsLong("motd.lastcheck");
 		if (System.currentTimeMillis()-lastcheck > 1000*60*60*24) {
 			properties.setProperty("motd.lastcheck", System.currentTimeMillis());
-
+			logger.debug("Checking for MOTD");
 			try {
 				URL url = new URL (RemoteConstants.MOTD_URL);
 				HttpURLConnection conn = (HttpURLConnection)url.openConnection();
@@ -910,6 +911,7 @@ public class RCMain implements Launchable {
 				conn.connect();
 				if (!conn.getHeaderField("Last-Modified").equalsIgnoreCase(properties.getProperty("motd.Last-Modified", ""))) {
 					properties.setProperty("motd.Last-Modified", conn.getHeaderField("Last-Modified"));
+					logger.debug("New MOTD found.");
 					MotdDialog.open();
 				}
 				conn.disconnect();
@@ -917,6 +919,8 @@ public class RCMain implements Launchable {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		} else {
+			logger.debug("Skipping MOTD check");
 		}
 	}
 

@@ -57,6 +57,7 @@ public class MotdDialog {
 		};
 		t.setDaemon(true);
 		t.setPriority(Thread.MIN_PRIORITY);
+		t.start();
 	}
 
 
