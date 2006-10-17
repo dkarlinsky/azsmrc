@@ -574,6 +574,7 @@ public class RCMain implements Launchable {
 			e1.printStackTrace();
 		}
 
+		SplashScreen.setProgressAndText("Loading Plugins.",20);
 		pluginManager = new PluginManagerImpl();
 
 		PluginLoader.findAndLoadPlugins(pluginManager, getProperties());

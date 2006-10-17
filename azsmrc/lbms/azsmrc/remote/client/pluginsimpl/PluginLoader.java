@@ -57,7 +57,7 @@ public class PluginLoader {
 
 			boolean	looks_like_plugin	= false;
 
-			for (int j=0;j<pluginContents.length;i++){
+			for (int j=0;j<pluginContents.length;j++){
 
 				String	name = pluginContents[j].getName().toLowerCase();
 
