@@ -49,6 +49,8 @@ public class MotdDialog {
 			public void run() {
 				try {
 					HTTPDownload dl = new HTTPDownload (new URL(RemoteConstants.MOTD_URL));
+					if(RCMain.getRCMain().getProxy() != null)
+						dl.setProxy(RCMain.getRCMain().getProxy());
 					dl.run();
 					if (!dl.hasFailed()) {
 						new MotdDialog(dl.getBuffer().toString("UTF-8"));
