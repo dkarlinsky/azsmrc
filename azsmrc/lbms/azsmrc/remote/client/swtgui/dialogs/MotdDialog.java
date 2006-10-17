@@ -17,8 +17,10 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 
+import lbms.azsmrc.remote.client.Utilities;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
+import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.azsmrc.shared.SWTSafeRunnable;
@@ -76,7 +78,9 @@ public class MotdDialog {
 
 				shell.setText(I18N.translate("dialog.motd.shell.text"));
 
-
+				if(!Utilities.isOSX){
+					shell.setImage(ImageRepository.getImage("TrayIcon_Blue"));
+				}
 
 				GridLayout layout = new GridLayout();
 				shell.setLayout(layout);
