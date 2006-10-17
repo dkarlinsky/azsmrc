@@ -1,8 +1,5 @@
 package lbms.azsmrc.remote.client.swtgui.dialogs;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 
 import org.eclipse.swt.SWT;
@@ -17,13 +14,10 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
-import org.gudy.azureus2.core3.internat.MessageText;
-import org.gudy.azureus2.core3.util.Constants;
-import org.gudy.azureus2.ui.swt.ImageRepository;
-import org.gudy.azureus2.ui.swt.Utils;
-import org.gudy.azureus2.ui.swt.components.shell.ShellFactory;
 
 import lbms.azsmrc.remote.client.internat.I18N;
+import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
+import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.tools.HTTPDownload;
 
@@ -67,14 +61,12 @@ public class MotdDialog {
 
 
 	private void openGUI(){
-		shell = ShellFactory.createShell(SWT.BORDER | SWT.TITLE | SWT.CLOSE | SWT.RESIZE);
-		if(! Constants.isOSX) {
-			shell.setImage(ImageRepository.getImage("azureus"));
-		}
+		display = RCMain.getRCMain().getDisplay();
+		shell = new Shell(display,SWT.BORDER | SWT.TITLE | SWT.CLOSE | SWT.RESIZE);
 
 		shell.setText(I18N.translate("dialog.motd.shell.text"));
 
-		display = shell.getDisplay();
+
 
 		GridLayout layout = new GridLayout();
 		shell.setLayout(layout);
@@ -179,7 +171,7 @@ public class MotdDialog {
 	}
 
 	Button bClose = new Button(shell,SWT.PUSH);
-	bClose.setText(MessageText.getString("Button.close"));
+	bClose.setText(I18N.translate("global.close"));
 	data = new GridData();
 	data.widthHint = 70;
 	data.horizontalAlignment = SWT.RIGHT;
@@ -205,9 +197,9 @@ public class MotdDialog {
 	});
 
 	shell.setSize(500,400);
-	Utils.centreWindow(shell);
+
 	shell.layout();
-	shell.open();
+	GUI_Utilities.centerShellandOpen(shell);
 }
 
 private void close() {
