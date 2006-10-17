@@ -10,6 +10,8 @@ import java.io.InputStream;
 import lbms.azsmrc.shared.SWTSafeRunnable;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Font;
@@ -62,7 +64,7 @@ public class SplashScreen {
 		splash = new Shell(SWT.ON_TOP | SWT.NO_TRIM | SWT.NO_BACKGROUND);
 
 		//define a region
-		Region region = new Region();
+		final Region region = new Region();
 		Rectangle pixel = new Rectangle(0, 0, 1, 1);
 		for (int y = 0; y < 254; y++) {
 				for (int x = 0; x < 350; x++) {
@@ -89,7 +91,15 @@ public class SplashScreen {
 		});
 
 
+		splash.addDisposeListener(new DisposeListener () {
 
+			public void widgetDisposed(DisposeEvent arg0) {
+				region.dispose();
+				statusShell.close();
+				image.dispose();
+				instance = null;
+			}
+		});
 
 
 		FormLayout layout = new FormLayout();
@@ -174,9 +184,8 @@ public class SplashScreen {
 
 	private void close() {
 		splash.close();
-		statusShell.close();
-		image.dispose();
-		instance = null;
+		/*if(!splash.isDisposed())
+			splash.dispose();*/
 	}
 
 	/**
