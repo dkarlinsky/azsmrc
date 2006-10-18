@@ -1598,7 +1598,7 @@ public class RequestManager {
 					}*/
 					response.addContent(fc);
 					return true;
-				} catch (RuntimeException e) {
+				} catch (Throwable e) {
 					e.printStackTrace();
 					return false;
 				}
