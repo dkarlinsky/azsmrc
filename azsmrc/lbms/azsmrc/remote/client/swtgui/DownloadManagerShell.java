@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 import lbms.azsmrc.remote.client.Client;
 import lbms.azsmrc.remote.client.Constants;
 import lbms.azsmrc.remote.client.Download;
+import lbms.azsmrc.remote.client.LoginData;
 import lbms.azsmrc.remote.client.User;
 import lbms.azsmrc.remote.client.Utilities;
 import lbms.azsmrc.remote.client.events.ClientUpdateListener;
@@ -510,28 +511,31 @@ public class DownloadManagerShell {
 		quickconnect.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				Properties properties = RCMain.getRCMain().getProperties();
-				if (
-						properties.getProperty("connection_lastURL_0",null) != null &&
-						properties.getProperty("connection_username_0",null) != null &&
-						properties.getProperty("connection_password_0",null) != null) {
-					RCMain.getRCMain().connect(true);
-					initializeConnection();
-				} else if (
-						properties.getProperty("connection_lastURL_0",null) != null &&
-						properties.getProperty("connection_username_0",null) != null){
-					InputShell is = new InputShell("Enter Password", "Please enter password for user: "+
-							properties.getProperty("connection_username_0") +
-							" connecting to server: " +
-							properties.getProperty("connection_lastURL_0"));
-					is.setIsPassword(true);
-					String pw = is.open();
-					if(pw != null){
-						RCMain.getRCMain().getClient().setPassword(pw);
-						RCMain.getRCMain().connect(true);
-						initializeConnection();
+				if (properties.containsKey("lastConnection")) {
+					try {
+						LoginData login = new LoginData(properties.getProperty("lastConnection", ""));
+						if (login.isComplete()) {
+							RCMain.getRCMain().getClient().setLoginData(login);
+							RCMain.getRCMain().connect(true);
+							initializeConnection();
+						} else if (login.hasUsername() && login.hasHost()){
+							InputShell is = new InputShell("Enter Password", "Please enter password for\nUser: "+
+									login.getUsername() +
+									"\nServer: " +login.getHost());
+							is.setIsPassword(true);
+							String pw = is.open();
+							if(pw != null){
+								RCMain.getRCMain().getClient().setPassword(pw);
+								RCMain.getRCMain().connect(true);
+								initializeConnection();
+							}
+						}else
+							ConnectionDialog.open(RCMain.getRCMain().getDisplay());
+					} catch (MalformedURLException e1) {
+						ConnectionDialog.open(RCMain.getRCMain().getDisplay());
 					}
-				}else
-					ConnectionDialog.open(RCMain.getRCMain().getDisplay());
+
+				}
 			}
 		});
 

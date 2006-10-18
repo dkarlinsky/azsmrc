@@ -34,6 +34,7 @@ import javax.net.ssl.SSLHandshakeException;
 import lbms.azsmrc.remote.client.Client;
 import lbms.azsmrc.remote.client.Constants;
 import lbms.azsmrc.remote.client.Download;
+import lbms.azsmrc.remote.client.LoginData;
 import lbms.azsmrc.remote.client.SESecurityManager;
 import lbms.azsmrc.remote.client.SESecurityManagerListener;
 import lbms.azsmrc.remote.client.Utilities;
@@ -224,14 +225,19 @@ public class RCMain implements Launchable {
 			}
 		});
 		if (connect) {
-			if (properties.getProperty("connection_password_0", "").equals("")
-					|| properties.getProperty("connection_username_0", "").equals("")
-					|| properties.getProperty("connection_lastURL_0", "").equals("")) {
+			try {
+				LoginData login = new LoginData(properties.getProperty("lastConnection",""));
+				if (login.getPassword().equals("")
+						|| login.getUsername().equals("")
+						|| login.getHost().equals("")) {
+					connect = false;
+				} else {
+					connect(false);
+					updateTimer(properties.getPropertyAsBoolean("auto_open"));
+					client.getDownloadManager().update(true);
+				}
+			} catch (MalformedURLException e) {
 				connect = false;
-			} else {
-				connect(false);
-				updateTimer(properties.getPropertyAsBoolean("auto_open"));
-				client.getDownloadManager().update(true);
 			}
 		}
 		File error = new File(System.getProperty("user.dir")+System.getProperty("file.separator")+"error.log");
@@ -588,10 +594,12 @@ public class RCMain implements Launchable {
 			}
 		});
 		SplashScreen.setProgressAndText("Creating Client.",25);
-		client = new Client();
-		client.setServer(properties.getProperty("connection_lastURL_0"));
-		client.setUsername(properties.getProperty("connection_username_0"));
-		client.setPassword(properties.getProperty("connection_password_0"));
+		try {
+			LoginData login = new LoginData(properties.getProperty("lastConnection",""));
+			client = new Client(login);
+		} catch (MalformedURLException e1) {
+			client = new Client();
+		}
 		if (properties.getPropertyAsBoolean("connection.proxy.use")) {
 			Proxy.Type type = Proxy.Type.valueOf(properties.getProperty("connection.proxy.type"));
 			InetSocketAddress inetAddress = new InetSocketAddress(properties.getProperty("connection.proxy.url"),properties.getPropertyAsInt("connection.proxy.port"));

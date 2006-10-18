@@ -113,8 +113,19 @@ public class Client {
 	 * @param server
 	 */
 	public Client(URL server) {
-		this.server = server;
 		init();
+		setServer(server);
+	}
+
+	public Client (LoginData login) {
+		init();
+		setLoginData(login);
+	}
+
+	public void setLoginData (LoginData login) {
+		setServer(login.getURL());
+		username = login.getUsername();
+		password = login.getPassword();
 	}
 
 	private void init() {
