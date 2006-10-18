@@ -515,7 +515,6 @@ public class DownloadManagerShell {
 					try {
 						LoginData login = new LoginData(properties.getProperty("lastConnection", ""));
 						if (login.isComplete()) {
-							RCMain.getRCMain().getClient().setLoginData(login);
 							RCMain.getRCMain().connect(true);
 							initializeConnection();
 						} else if (login.hasUsername() && login.hasHost()){
