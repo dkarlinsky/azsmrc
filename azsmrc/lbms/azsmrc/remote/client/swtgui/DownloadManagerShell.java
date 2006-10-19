@@ -311,7 +311,7 @@ public class DownloadManagerShell {
 		exitItem.setAccelerator (SWT.CTRL + 'Q');
 		exitItem.addListener (SWT.Selection, new Listener () {
 			public void handleEvent (Event e) {
-				if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("confirm.exit","true"))){
+/*				if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("confirm.exit","true"))){
 					MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
 					messageBox.setText("Confirm Exit");
 					messageBox.setMessage("Are you sure?");
@@ -323,9 +323,9 @@ public class DownloadManagerShell {
 					case SWT.CANCEL:
 						break;
 					}
-				}else{
+				}else{*/
 					RCMain.getRCMain().close();
-				}
+				//}
 
 			}
 		});
@@ -1677,93 +1677,82 @@ public class DownloadManagerShell {
 
 			public void shellClosed(ShellEvent event) {
 				event.doit = false;
-				RCMain.getRCMain().updateTimer(false);
-				/*RCMain.getRCMain().getClient().removeSpeedUpdateListener(sul);
-				RCMain.getRCMain().getClient().removeConnectionListener(cl);
-				RCMain.getRCMain().getClient().removeClientUpdateListener(cul);
-				RCMain.getRCMain().getClient().removeParameterListener(pl);
 
-				//Remove all DownloadListeners
-				Set<String> keys = downloadsMap.keySet();
-				for (String key:keys) {
-					DownloadContainer dc = downloadsMap.get(key);
-					dc.dispose();
-					downloadsMap.get(key).getDownload().removeDownloadListener(dlL);
-				}
-				//downloadsMap.clear();
-				//downloadsArray = downloadsMap.values().toArray(emptyArray);
-				keys = seedsMap.keySet();
-				for (String key:keys) {
-					SeedContainer sc = seedsMap.get(key);
-					sc.dispose();
-					seedsMap.get(key).getDownload().removeDownloadListener(dlL);
-				}
-				//seedsMap.clear();
-				//seedsArray = seedsMap.values().toArray(emptyArray);
-				 */
-				//Saving user preferences for the shell and sash
-				int size_x = DOWNLOAD_MANAGER_SHELL.getSize().x;
-				int size_y = DOWNLOAD_MANAGER_SHELL.getSize().y;
-
-				int position_x = DOWNLOAD_MANAGER_SHELL.getLocation().x;
-				int position_y = DOWNLOAD_MANAGER_SHELL.getLocation().y;
-				ExtendedProperties properties = RCMain.getRCMain().getProperties();
-
-				if (!sash.isDisposed()) {
-					int[] weights = sash.getWeights();
-					properties.setProperty("dms.sash.1", weights[0]);
-					properties.setProperty("dms.sash.0", weights[1]);
-				}
-				properties.setProperty("dms.size.x", size_x);
-				properties.setProperty("dms.size.y", size_y);
-				properties.setProperty("dms.position.x", position_x);
-				properties.setProperty("dms.position.y", position_y);
+				//Check to see the configs that we are coming in with
+				boolean sendMainWindowToTray = RCMain.getRCMain().getProperties().getPropertyAsBoolean("tray.exit");
+				boolean confirmExit = RCMain.getRCMain().getProperties().getPropertyAsBoolean("confirm.exit");
 
 
-				boolean b_ok = true;
 
-				//save the downloadsTable column widths
-				if (!downloadsTable.isDisposed()) {
-					b_ok = true;
-					TableColumn[] columns = downloadsTable.getColumns();
-					List<Integer> dl_column_list = new ArrayList<Integer>();
-					for (TableColumn column:columns){
-						int colWidth = column.getWidth();
-						//if it is 0, somthing is wrong.. break out and don't save
-						if(colWidth == 0){
-							b_ok = false;
-							break;
-						}else
-							dl_column_list.add(colWidth);
+				if(!sendMainWindowToTray ){ //This means a true exit from the program
+
+					//-----First we need to save everything for the user---\\
+
+					//Saving user preferences for the shell and sash
+					int size_x = DOWNLOAD_MANAGER_SHELL.getSize().x;
+					int size_y = DOWNLOAD_MANAGER_SHELL.getSize().y;
+
+					int position_x = DOWNLOAD_MANAGER_SHELL.getLocation().x;
+					int position_y = DOWNLOAD_MANAGER_SHELL.getLocation().y;
+					ExtendedProperties properties = RCMain.getRCMain().getProperties();
+
+					if (!sash.isDisposed()) {
+						int[] weights = sash.getWeights();
+						properties.setProperty("dms.sash.1", weights[0]);
+						properties.setProperty("dms.sash.0", weights[1]);
 					}
-					if(b_ok)
-						properties.setProperty("downloadsTable.columns.widths", EncodingUtil.IntListToString(dl_column_list));
-				}
+					properties.setProperty("dms.size.x", size_x);
+					properties.setProperty("dms.size.y", size_y);
+					properties.setProperty("dms.position.x", position_x);
+					properties.setProperty("dms.position.y", position_y);
 
-				//save the seedsTable column widths
-				if (!seedsTable.isDisposed()) {
-					b_ok=true;
-					TableColumn[] seed_columns = seedsTable.getColumns();
-					List<Integer> seed_column_list = new ArrayList<Integer>();
-					for (TableColumn column:seed_columns){
-						int colWidth = column.getWidth();
-						//if it is 0, somthing is wrong.. break out and don't save
-						if(colWidth == 0){
-							b_ok = false;
-							break;
-						}else
-							seed_column_list.add(colWidth);
 
+					boolean b_ok = true;
+
+					//save the downloadsTable column widths
+					if (!downloadsTable.isDisposed()) {
+						b_ok = true;
+						TableColumn[] columns = downloadsTable.getColumns();
+						List<Integer> dl_column_list = new ArrayList<Integer>();
+						for (TableColumn column:columns){
+							int colWidth = column.getWidth();
+							//if it is 0, somthing is wrong.. break out and don't save
+							if(colWidth == 0){
+								b_ok = false;
+								break;
+							}else
+								dl_column_list.add(colWidth);
+						}
+						if(b_ok)
+							properties.setProperty("downloadsTable.columns.widths", EncodingUtil.IntListToString(dl_column_list));
 					}
-					if(b_ok)
-						properties.setProperty("seedsTable.columns.widths", EncodingUtil.IntListToString(seed_column_list));
-				}
 
-				//Save Everything!
-				RCMain.getRCMain().saveConfig();
+					//save the seedsTable column widths
+					if (!seedsTable.isDisposed()) {
+						b_ok=true;
+						TableColumn[] seed_columns = seedsTable.getColumns();
+						List<Integer> seed_column_list = new ArrayList<Integer>();
+						for (TableColumn column:seed_columns){
+							int colWidth = column.getWidth();
+							//if it is 0, somthing is wrong.. break out and don't save
+							if(colWidth == 0){
+								b_ok = false;
+								break;
+							}else
+								seed_column_list.add(colWidth);
 
-				if(!RCMain.getRCMain().getProperties().getPropertyAsBoolean("tray.exit")){
-					if(RCMain.getRCMain().getProperties().getPropertyAsBoolean("confirm.exit")){
+						}
+						if(b_ok)
+							properties.setProperty("seedsTable.columns.widths", EncodingUtil.IntListToString(seed_column_list));
+					}
+
+					//Save Everything!
+					RCMain.getRCMain().saveConfig();
+
+
+			 //-----Now check if the user wants a confirmation---\\
+
+					if(confirmExit){
 						MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
 						messageBox.setText("Confirm Exit");
 						messageBox.setMessage("Are you sure you wish to exit AzSMRC entirely?");
@@ -1773,19 +1762,18 @@ public class DownloadManagerShell {
 							RCMain.getRCMain().close();
 							break;
 						case SWT.CANCEL:
-							DOWNLOAD_MANAGER_SHELL = null;
-							RCMain.getRCMain().openMainWindow();
+							//user wants to cancel everything.. so just break out
 							break;
 						}
 					}else{
 						RCMain.getRCMain().close();
 					}
+					//-----END of real exit -- everything below here keeps the program open---\\
+				}else{   //We just need to minimize everything here as we are not really exiting
+					RCMain.getRCMain().updateTimer(false);
+					DOWNLOAD_MANAGER_SHELL.setMinimized(true);
+					DOWNLOAD_MANAGER_SHELL.setVisible(false);
 				}
-				//DOWNLOAD_MANAGER_SHELL = null;
-
-				DOWNLOAD_MANAGER_SHELL.setMinimized(true);
-				DOWNLOAD_MANAGER_SHELL.setVisible(false);
-
 			}
 
 			public void shellDeactivated(ShellEvent arg0) {
