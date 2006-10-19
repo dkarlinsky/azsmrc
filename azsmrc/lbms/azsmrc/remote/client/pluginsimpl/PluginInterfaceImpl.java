@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
@@ -11,12 +13,14 @@ import lbms.azsmrc.remote.client.plugins.AzSMRCInterface;
 import lbms.azsmrc.remote.client.plugins.Plugin;
 import lbms.azsmrc.remote.client.plugins.PluginClient;
 import lbms.azsmrc.remote.client.plugins.PluginConfig;
+import lbms.azsmrc.remote.client.plugins.PluginI18N;
 import lbms.azsmrc.remote.client.plugins.PluginInterface;
 import lbms.azsmrc.remote.client.plugins.PluginManager;
 import lbms.azsmrc.remote.client.plugins.download.DownloadManager;
 import lbms.azsmrc.remote.client.plugins.ipc.IPCInterface;
 import lbms.azsmrc.remote.client.plugins.ui.swt.UISWTManager;
 import lbms.azsmrc.remote.client.pluginsimpl.ipc.IPCInterfaceImpl;
+import lbms.tools.flexyconf.FlexyConfiguration;
 
 /**
  * @author Damokles
@@ -30,16 +34,20 @@ public class PluginInterfaceImpl implements PluginInterface {
 	private String version;
 	private String pluginDir;
 	private String name;
+	private Properties pluginProps;
 	private IPCInterface ipcInterface;
 	private PluginConfigImpl config;
 	private File configFile;
+	private PluginI18NAdapter i18n;
+	private FlexyConfiguration fc;
 
-	public PluginInterfaceImpl(PluginManagerImpl manager, Plugin plugin, String id, String name, String version, String pluginDir) {
+	public PluginInterfaceImpl(PluginManagerImpl manager, Plugin plugin, Properties props, String pluginDir) {
 		this.manager = manager;
 		this.plugin = plugin;
-		this.id = id;
-		this.name = name;
-		this.version = version;
+		this.pluginProps = props;
+		this.id = props.getProperty("plugin.id");
+		this.name = props.getProperty("plugin.name");
+		this.version = props.getProperty("plugin.version");
 		this.pluginDir = pluginDir;
 	}
 
@@ -65,7 +73,30 @@ public class PluginInterfaceImpl implements PluginInterface {
 	 */
 	public PluginConfig getPluginConfig() {
 		if (config == null) {
-			config = new PluginConfigImpl();
+			Properties defaults = null;
+			String defConf = pluginProps.getProperty("azsmrc.default.config");
+			if (defConf != null) {
+				InputStream ris = PluginInterfaceImpl.class.getClassLoader().getResourceAsStream(defConf);
+				if (ris != null) {
+					defaults = new Properties();
+					try {
+						defaults.load(ris);
+					} catch (IOException e) {
+						e.printStackTrace();
+					} finally {
+						try {
+							ris.close();
+						} catch (IOException e) {}
+					}
+				}
+
+			}
+
+			if (defaults != null)
+				config = new PluginConfigImpl();
+			else
+				config = new PluginConfigImpl(defaults);
+
 			configFile = new File (pluginDir,"plugin.cfg");
 			if (configFile.exists()) {
 				FileInputStream is = null;
@@ -181,9 +212,76 @@ public class PluginInterfaceImpl implements PluginInterface {
 		return manager.getRcMain().getClient().getDownloadManager();
 	}
 
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.plugins.PluginInterface#getI18N()
+	 */
+	public PluginI18N getI18N() {
+		if (i18n == null) {
+			i18n = new PluginI18NAdapter();
+			String langfilePath = pluginProps.getProperty("azsmrc.plugin.langfile");
+			if (langfilePath != null) {
+				langfilePath.replace('.', '/');
+				if (langfilePath.charAt(langfilePath.length()-1) != '/') langfilePath += '/';
+				InputStream is = PluginInterfaceImpl.class.getResourceAsStream(langfilePath+"default.lang");
+				if (is != null) {
+					try {
+						i18n.initialize(is);
+					} catch (IOException e) {
+						e.printStackTrace();
+					} finally {
+						try {
+							is.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						is = null;
+					}
+				}
+				is = PluginInterfaceImpl.class.getResourceAsStream(langfilePath+manager.getRcMain().getProperties().getProperty("language")+".lang");
+				if (is != null) {
+					try {
+						i18n.load(is);
+					} catch (IOException e) {
+						e.printStackTrace();
+					} finally {
+						try {
+							is.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						is = null;
+					}
+				}
+			}
+		}
+		return i18n;
+	}
+
 	//--------------------------------------------------//
 
 	public void initializePlugin() {
 		plugin.initialize(this);
+	}
+
+	public FlexyConfiguration getPluginFlexyConf() {
+		if (fc == null) {
+			if (pluginProps.getProperty("azsmrc.plugin.config") == null) return null;
+			InputStream is = PluginInterfaceImpl.class.getResourceAsStream(pluginProps.getProperty("azsmrc.plugin.config"));
+			if (is!=null) {
+				try {
+					fc = FlexyConfiguration.readFromStream(is,getPluginID());
+				} catch (IOException e) {
+					fc = null;
+					e.printStackTrace();
+				} finally {
+					try {
+						is.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		return fc;
 	}
 }

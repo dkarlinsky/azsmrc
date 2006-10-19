@@ -23,6 +23,7 @@ public class PluginManagerImpl implements PluginManager {
 
 	private Map<String, PluginInterfaceImpl> pluginMap = new TreeMap<String, PluginInterfaceImpl>();
 	private PluginInterface[] emptyArray = new PluginInterface[0];
+	private PluginInterfaceImpl[] emptyImplArray = new PluginInterfaceImpl[0];
 	private AzSMRCInterface azsmrcInterface;
 	private PluginClientImpl plClient;
 	private UISWTManagerImpl uiManager;
@@ -31,8 +32,7 @@ public class PluginManagerImpl implements PluginManager {
 	private List<PluginListener> listeners = new ArrayList<PluginListener>();
 
 	public PluginInterfaceImpl addPlugin (Plugin plug, Properties props, String dir) {
-		PluginInterfaceImpl pI = new PluginInterfaceImpl (this ,
-				plug, props.getProperty("plugin.id"), props.getProperty("plugin.name"), props.getProperty("plugin.version"), dir);
+		PluginInterfaceImpl pI = new PluginInterfaceImpl (this, plug, props, dir);
 		pluginMap.put(pI.getPluginID(), pI);
 		return pI;
 	}
@@ -49,6 +49,10 @@ public class PluginManagerImpl implements PluginManager {
 	 */
 	public PluginInterface[] getPluginInterfaces() {
 		return pluginMap.values().toArray(emptyArray);
+	}
+
+	public PluginInterfaceImpl[] getPluginInterfacesImpl() {
+		return pluginMap.values().toArray(emptyImplArray);
 	}
 
 	/* (non-Javadoc)

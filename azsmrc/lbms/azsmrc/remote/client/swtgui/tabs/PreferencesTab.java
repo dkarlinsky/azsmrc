@@ -8,14 +8,16 @@ package lbms.azsmrc.remote.client.swtgui.tabs;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Properties;
 
 import lbms.azsmrc.remote.client.Client;
 import lbms.azsmrc.remote.client.RemotePlugin;
 import lbms.azsmrc.remote.client.User;
-
 import lbms.azsmrc.remote.client.events.ParameterListener;
 import lbms.azsmrc.remote.client.internat.I18N;
+import lbms.azsmrc.remote.client.pluginsimpl.PluginInterfaceImpl;
 import lbms.azsmrc.remote.client.swtgui.ColorUtilities;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
@@ -255,6 +257,8 @@ public class PreferencesTab {
 
 		tiSound = new TreeItem(menuTree,SWT.NULL);
 		tiSound.setText(I18N.translate(PFX + "sound.treeItem.text"));
+
+		addLocalPluginConfig();
 
 		User activeUser = RCMain.getRCMain().getClient().getUserManager().getActiveUser();
 
@@ -1121,6 +1125,48 @@ public class PreferencesTab {
 				rpTable.setItemCount(count);
 			else
 				rpTable.setItemCount(0);
+		}
+	}
+
+	public void addLocalPluginConfig () {
+		TreeItem localPlugsItem = new TreeItem(menuTree, SWT.NONE);
+		localPlugsItem.setText(PFX + "localplugins");
+
+		PluginInterfaceImpl[] plugins = RCMain.getRCMain().getPluginManagerImpl().getPluginInterfacesImpl();
+		Arrays.sort(plugins, new Comparator<PluginInterfaceImpl>() {
+			public int compare(PluginInterfaceImpl o1, PluginInterfaceImpl o2) {
+				return o1.getPluginName().compareToIgnoreCase(o2.getPluginName());
+			}
+		});
+		for (PluginInterfaceImpl p : plugins) {
+			FlexyConfiguration fc = p.getPluginFlexyConf();
+			if (fc!=null) {
+				final PluginInterfaceImpl pi = p;
+				final FCInterface fci = fc.getFCInterface();
+
+				fci.setI18NProvider(new I18NProvider() {
+					public String translate(String key) {
+						return pi.getI18N().translate(key);
+					}
+				});
+
+				fci.setContentProvider(new ContentProvider() {
+
+					public String getDefaultValue(String key, int type) {
+						return pi.getPluginConfig().getProperty(key);
+					}
+
+					public String getValue(String key, int type) {
+						return pi.getPluginConfig().getProperty(key);
+					}
+
+					public void setValue(String key, String value, int type) {
+						pi.getPluginConfig().setProperty(key, value);
+					}
+				});
+				SWTMenu sm = new SWTMenu(fc,menuTree,cOptions);
+				sm.addAsRoot(localPlugsItem);
+			}
 		}
 	}
 

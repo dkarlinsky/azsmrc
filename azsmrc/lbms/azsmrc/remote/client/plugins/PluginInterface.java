@@ -38,5 +38,7 @@ public interface PluginInterface {
 
 	public DownloadManager getDownloadManager();
 
+	public PluginI18N getI18N();
+
 	public Logger getLogger();
 }

@@ -227,9 +227,7 @@ public class RCMain implements Launchable {
 		if (connect) {
 			try {
 				LoginData login = new LoginData(properties.getProperty("lastConnection",""));
-				if (login.getPassword().equals("")
-						|| login.getUsername().equals("")
-						|| login.getHost().equals("")) {
+				if (!login.isComplete()) {
 					connect = false;
 				} else {
 					connect(false);
