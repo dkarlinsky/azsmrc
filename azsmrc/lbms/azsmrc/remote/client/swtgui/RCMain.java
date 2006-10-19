@@ -900,6 +900,7 @@ public class RCMain implements Launchable {
 		DownloadContainer.saveColumns();
 		SeedContainer.saveColumns();
 		getRunTime();
+		pluginManager.shutdown();
 		saveConfig();
 		ImageRepository.unLoadImages();
 		System.out.println("Shutdown completed");

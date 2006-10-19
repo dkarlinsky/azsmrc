@@ -116,6 +116,12 @@ public class PluginManagerImpl implements PluginManager {
 		}
 	}
 
+	public void shutdown() {
+		for (PluginInterfaceImpl pi:pluginMap.values()) {
+			pi.savePluginConfig();
+		}
+	}
+
 	public UISWTManagerImpl getUIManager() {
 		return uiManager;
 	}

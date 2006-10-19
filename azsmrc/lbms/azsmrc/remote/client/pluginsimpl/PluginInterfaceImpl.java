@@ -2,6 +2,7 @@ package lbms.azsmrc.remote.client.pluginsimpl;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
@@ -67,15 +68,39 @@ public class PluginInterfaceImpl implements PluginInterface {
 			config = new PluginConfigImpl();
 			configFile = new File (pluginDir,"plugin.cfg");
 			if (configFile.exists()) {
+				FileInputStream is = null;
 				try {
-					FileInputStream is = new FileInputStream(configFile);
+					is = new FileInputStream(configFile);
 					config.load(is);
 				} catch (IOException e) {
 					e.printStackTrace();
+				} finally {
+					if (is!=null)
+						try {
+							is.close();
+						} catch (IOException e) {}
 				}
 			}
 		}
 		return config;
+	}
+
+	public void savePluginConfig() {
+		if (config != null) {
+			configFile = new File (pluginDir,"plugin.cfg");
+			FileOutputStream os = null;
+			try {
+				os = new FileOutputStream(configFile);
+				config.store(os, getPluginVersion());
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				if (os!=null)
+					try {
+						os.close();
+					} catch (IOException e) {}
+			}
+		}
 	}
 
 	/* (non-Javadoc)
