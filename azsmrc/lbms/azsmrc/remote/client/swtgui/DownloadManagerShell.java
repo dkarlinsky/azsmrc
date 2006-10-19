@@ -311,22 +311,7 @@ public class DownloadManagerShell {
 		exitItem.setAccelerator (SWT.CTRL + 'Q');
 		exitItem.addListener (SWT.Selection, new Listener () {
 			public void handleEvent (Event e) {
-/*				if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("confirm.exit","true"))){
-					MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
-					messageBox.setText("Confirm Exit");
-					messageBox.setMessage("Are you sure?");
-					int response = messageBox.open();
-					switch (response){
-					case SWT.OK:
-						RCMain.getRCMain().close();
-						break;
-					case SWT.CANCEL:
-						break;
-					}
-				}else{*/
-					RCMain.getRCMain().close();
-				//}
-
+				DOWNLOAD_MANAGER_SHELL.close();
 			}
 		});
 
@@ -1676,7 +1661,7 @@ public class DownloadManagerShell {
 			public void shellActivated(ShellEvent arg0) {}
 
 			public void shellClosed(ShellEvent event) {
-				event.doit = false;
+
 
 				//Check to see the configs that we are coming in with
 				boolean sendMainWindowToTray = RCMain.getRCMain().getProperties().getPropertyAsBoolean("tray.exit");
@@ -1759,10 +1744,12 @@ public class DownloadManagerShell {
 						int response = messageBox.open();
 						switch (response){
 						case SWT.OK:
+							event.doit = true;
 							RCMain.getRCMain().close();
 							break;
 						case SWT.CANCEL:
 							//user wants to cancel everything.. so just break out
+							event.doit = false;
 							break;
 						}
 					}else{
