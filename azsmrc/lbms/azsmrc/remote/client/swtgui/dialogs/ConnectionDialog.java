@@ -270,9 +270,21 @@ public class ConnectionDialog {
 		button_comp.setLayoutData(gridData);
 
 		gridLayout = new GridLayout();
-		gridLayout.numColumns = 3;
+		gridLayout.numColumns = 4;
 		gridLayout.marginWidth = 0;
 		button_comp.setLayout(gridLayout);
+
+		Button saveProfile = new Button(button_comp,SWT.PUSH);
+		saveProfile.setText(I18N.translate(PFX + "saveprofile.text"));
+		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		saveProfile.setLayoutData(gridData);
+		saveProfile.setFocus();
+		saveProfile.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				addConnection();
+				saveToConfig();
+			}
+		});
 
 		Button delete = new Button(button_comp, SWT.PUSH);
 		delete.setText(I18N.translate(PFX + "removeprofile.text"));
@@ -300,6 +312,7 @@ public class ConnectionDialog {
 					port_text.setText("49009");
 			}
 		});
+
 
 
 		Button connect = new Button(button_comp,SWT.PUSH);

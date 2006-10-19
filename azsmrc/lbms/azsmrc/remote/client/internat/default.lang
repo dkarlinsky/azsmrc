@@ -12,6 +12,7 @@ dialog.connectiondialog.removeprofile.text=Remove Profile
 dialog.connectiondialog.removeprofile.tooltip=Remove currently selected saved profile
 dialog.connectiondialog.save_password.label=Save password (Note: password will be saved in plain text)
 dialog.connectiondialog.save_settings.label=Save settings for use on next connection
+dialog.connectiondialog.saveprofile.text=Save Profile
 dialog.connectiondialog.shell.text=Connect to Remote Server
 dialog.connectiondialog.url.label=Servername or IP:
 dialog.connectiondialog.use_https.label=Use secure https protocol to connect to this server?
