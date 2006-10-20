@@ -53,6 +53,7 @@ import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ErrorDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.InputShell;
 import lbms.azsmrc.remote.client.swtgui.dialogs.MessageDialog;
+import lbms.azsmrc.remote.client.swtgui.dialogs.MessageSlideShell;
 import lbms.azsmrc.remote.client.swtgui.dialogs.MotdDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByFileDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByURLDialog;
@@ -642,8 +643,9 @@ public class RCMain implements Launchable {
 								+ I18N.translate(PFX + "mainwindow.statusbar.badUsername_badPassword"), SWT.COLOR_RED);
 					}
 					logger.warn("Connection failed: " + statusCode + " Bad Username or Password");
-					MessageDialog.error(display,I18N.translate(PFX + "mainwindow.statusbar.failed")
-							,statusCode + " " + I18N.translate(PFX + "mainwindow.statusbar.badUsername_badPassword"));
+					new MessageSlideShell(display,SWT.ICON_ERROR,I18N.translate(PFX + "mainwindow.statusbar.failed"),statusCode + " " + I18N.translate(PFX + "mainwindow.statusbar.badUsername_badPassword"),(String)null);
+					/*MessageDialog.error(display,I18N.translate(PFX + "mainwindow.statusbar.failed")
+							,statusCode + " " + I18N.translate(PFX + "mainwindow.statusbar.badUsername_badPassword"));*/
 					disconnect();
 				} else {
 					if (mainWindow != null) {
@@ -677,11 +679,18 @@ public class RCMain implements Launchable {
 					}
 					failedConnection = true;
 					 if(client.getFailedConnections() > 0 && client.getFailedConnections()%3 == 0){
-						 MessageDialog.error(RCMain.getRCMain().getDisplay(),
+						 new MessageSlideShell(RCMain.getRCMain().getDisplay(),SWT.ICON_ERROR,
+								 I18N.translate(PFX + "mainwindow.statusbar.connectionError")
+								 ,I18N.translate(PFX + "mainwindow.statusbar.connectionError.failed")
+									+ " " + RCMain.getRCMain().getClient().getFailedConnections() + " "
+									+ I18N.translate(PFX + "mainwindow.statusbar.connectionError.failed_part2"),
+									(String)null);
+
+						 /*MessageDialog.error(RCMain.getRCMain().getDisplay(),
 									I18N.translate(PFX + "mainwindow.statusbar.connectionError")
 									, I18N.translate(PFX + "mainwindow.statusbar.connectionError.failed")
 									+ " " + RCMain.getRCMain().getClient().getFailedConnections() + " "
-									+ I18N.translate(PFX + "mainwindow.statusbar.connectionError.failed_part2"));
+									+ I18N.translate(PFX + "mainwindow.statusbar.connectionError.failed_part2"));*/
 							return;
 						}
 				} else if (failedConnection && (state == ST_CONNECTED)) {
@@ -720,8 +729,14 @@ public class RCMain implements Launchable {
 						String avgDl = (event.getAttributeValue("avgDownload") != null)?event.getAttributeValue("avgDownload") : "";
 						logger.info(I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+" "+event.getAttributeValue("name")
 											+" "+I18N.translate(PFX  + "mainwindow.statusbar.downloadFinishedIn")+DisplayFormatters.formatTime(duration*1000)+" "+avgDl);
-						MessageDialog.message(display,I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished"),
-								event.getAttributeValue("name")+"\n"+I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+DisplayFormatters.formatTime(duration*1000)+" "+avgDl);
+						new MessageSlideShell(
+								display,
+								SWT.ICON_INFORMATION,
+								I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished"),
+								event.getAttributeValue("name")+"\n"+I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+DisplayFormatters.formatTime(duration*1000)+" "+avgDl,
+								(String)null);
+						/*MessageDialog.message(display,I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished"),
+								event.getAttributeValue("name")+"\n"+I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+DisplayFormatters.formatTime(duration*1000)+" "+avgDl);*/
 					}
 					else {
 						logger.info(I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+" "+event.getAttributeValue("name"));
@@ -753,7 +768,13 @@ public class RCMain implements Launchable {
 					if (mainWindow != null) {
 						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.serverMessage") + ": " + msg);
 					}
-					MessageDialog.message(getDisplay(), I18N.translate(PFX + "mainwindow.statusbar.serverMessage"), msg);
+					new MessageSlideShell(
+							display,
+							SWT.ICON_INFORMATION,
+							I18N.translate(PFX + "mainwindow.statusbar.serverMessage"),
+							msg,
+							(String)null);
+					/*MessageDialog.message(getDisplay(), I18N.translate(PFX + "mainwindow.statusbar.serverMessage"), msg);*/
 					logger.debug("Server Message: "+msg);
 					break;
 				case RemoteConstants.EV_ERROR_MESSAGE:
@@ -761,7 +782,13 @@ public class RCMain implements Launchable {
 						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.serverErrorMessage") + ": " + msg, SWT.COLOR_RED);
 					}
 					logger.error("Server ErrorMessage: "+msg);
-					MessageDialog.error(getDisplay(), I18N.translate(PFX + "mainwindow.statusbar.serverErrorMessage"), msg);
+					new MessageSlideShell(
+							display,
+							SWT.ICON_ERROR,
+							I18N.translate(PFX + "mainwindow.statusbar.serverErrorMessage"),
+							msg,
+							(String)null);
+					//MessageDialog.error(getDisplay(), I18N.translate(PFX + "mainwindow.statusbar.serverErrorMessage"), msg);
 					break;
 				}
 			}
@@ -769,7 +796,13 @@ public class RCMain implements Launchable {
 		client.addExceptionListener(new ExceptionListener() {
 			public void exceptionOccured(Exception e, boolean serious) {
 				if (e instanceof SSLHandshakeException) {
-					MessageDialog.message(display,true,5000,"Connection Error","Server doesn't support SSL.");
+					new MessageSlideShell(
+							display,
+							SWT.ICON_ERROR,
+							"Connection Error",
+							"Server doesn't support SSL.",
+							(String)null);
+					//MessageDialog.message(display,true,5000,"Connection Error","Server doesn't support SSL.");
 					disconnect();
 					logger.error("Connection Error: Server doesn't support SSL.");
 				}

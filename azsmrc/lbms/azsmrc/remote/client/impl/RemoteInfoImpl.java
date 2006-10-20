@@ -8,8 +8,11 @@ import lbms.azsmrc.remote.client.RemotePlugin;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.dialogs.MessageDialog;
+import lbms.azsmrc.remote.client.swtgui.dialogs.MessageSlideShell;
+import lbms.azsmrc.shared.SWTSafeRunnable;
 import lbms.tools.updater.Version;
 
+import org.eclipse.swt.SWT;
 import org.jdom.Element;
 
 public class RemoteInfoImpl implements RemoteInfo {
@@ -47,9 +50,11 @@ public class RemoteInfoImpl implements RemoteInfo {
 	 * @param pluginVersion The pluginVersion to set.
 	 */
 	public void setPluginVersion(String pluginVersion) {
-		Version min = new Version(RCMain.getRCMain().getAzsmrcProperties().getProperty("minPluginVersion"));
+		final Version min = new Version(RCMain.getRCMain().getAzsmrcProperties().getProperty("minPluginVersion"));
 		Version plugin = new Version (pluginVersion);
-		if (min.compareTo(plugin)>0) MessageDialog.warning(RCMain.getRCMain().getDisplay(), I18N.translate("popup.minversion.title"), I18N.translate("popup.minversion.text")+min);
+		if (min.compareTo(plugin)>0){ //MessageDialog.warning(RCMain.getRCMain().getDisplay(), I18N.translate("popup.minversion.title"), I18N.translate("popup.minversion.text")+min);
+			new MessageSlideShell(RCMain.getRCMain().getDisplay(),SWT.ICON_WARNING,I18N.translate("popup.minversion.title"), I18N.translate("popup.minversion.text")+min,(String) null);
+		}
 		this.pluginVersion = pluginVersion;
 	}
 

@@ -2,9 +2,12 @@ package lbms.azsmrc.remote.client.pluginsimpl;
 
 import java.io.File;
 
+import org.eclipse.swt.SWT;
+
 import lbms.azsmrc.remote.client.plugins.AzSMRCInterface;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.dialogs.MessageDialog;
+import lbms.azsmrc.remote.client.swtgui.dialogs.MessageSlideShell;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ScrapeDialog;
 
 /**
@@ -24,7 +27,8 @@ public class AzSMRCInterfaceImpl implements AzSMRCInterface {
 	 */
 	public void popupError(String title, String message) {
 		if (rcMain.getDisplay() != null) {
-			MessageDialog.error(rcMain.getDisplay(), title, message);
+			//MessageDialog.error(rcMain.getDisplay(), title, message);
+			new MessageSlideShell(rcMain.getDisplay(),SWT.ICON_ERROR,title,message,(String)null);
 		}
 	}
 
@@ -33,7 +37,8 @@ public class AzSMRCInterfaceImpl implements AzSMRCInterface {
 	 */
 	public void popupMessage(String title, String message) {
 		if (rcMain.getDisplay() != null) {
-			MessageDialog.message(rcMain.getDisplay(), title, message);
+			//MessageDialog.message(rcMain.getDisplay(), title, message);
+			new MessageSlideShell(rcMain.getDisplay(),SWT.ICON_INFORMATION,title,message,(String)null);
 		}
 	}
 
@@ -42,7 +47,8 @@ public class AzSMRCInterfaceImpl implements AzSMRCInterface {
 	 */
 	public void popupWarning(String title, String message) {
 		if (rcMain.getDisplay() != null) {
-			MessageDialog.warning(rcMain.getDisplay(), title, message);
+			//MessageDialog.warning(rcMain.getDisplay(), title, message);
+			new MessageSlideShell(rcMain.getDisplay(),SWT.ICON_WARNING,title,message,(String)null);
 		}
 	}
 
