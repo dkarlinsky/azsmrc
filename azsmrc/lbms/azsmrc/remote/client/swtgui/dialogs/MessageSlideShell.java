@@ -24,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
+import lbms.azsmrc.shared.SWTSafeRunnable;
 import lbms.tools.launcher.Constants;
 
 import org.eclipse.swt.SWT;
@@ -175,28 +176,40 @@ public class MessageSlideShell {
 	 * @param details Text displayed when the Details button is pressed.  Null
 	 *                 for disabled Details button.
 	 */
-	public MessageSlideShell(Display display, int iconID, String title,
-			String text, String details) {
-		try {
-			//monitor.enter();
+	public MessageSlideShell(final Display display, final int iconID, final String title,
+			final String text, final String details) {
 
-			PopupParams popupParams = new PopupParams(iconID, title, text, details);
-			historyList.add(popupParams);
-			if (currentPopupIndex < 0) {
-				create(display, popupParams, true);
-			}
-		} catch (Exception e) {
-			//Logger.log(new LogEvent(LogIDs.GUI, "Mr. Slidey Init", e));
-			disposeShell(shell);
-			//Utils.disposeSWTObjects(disposeList);
-		} finally {
-			//monitor.exit();
-		}
+			display.asyncExec(new SWTSafeRunnable(){
+				@Override
+				public void runSafe() {
+					try {
+						PopupParams popupParams = new PopupParams(iconID, title, text, details);
+						historyList.add(popupParams);
+						if (currentPopupIndex < 0) {
+							create(display, popupParams, true);
+						}
+					} catch (Exception e) {
+						//Logger.log(new LogEvent(LogIDs.GUI, "Mr. Slidey Init", e));
+						disposeShell(shell);
+						//Utils.disposeSWTObjects(disposeList);
+					}
+				}
+
+			});
+
+
 	}
 
-	private MessageSlideShell(Display display, PopupParams popupParams,
-			boolean bSlide) {
-		create(display, popupParams, bSlide);
+	private MessageSlideShell(final Display display, final PopupParams popupParams,
+			final boolean bSlide) {
+
+		display.asyncExec(new SWTSafeRunnable(){
+			@Override
+			public void runSafe() {
+				create(display, popupParams, bSlide);
+			}
+		});
+
 	}
 
 	private void create(final Display display, final PopupParams popupParams,
