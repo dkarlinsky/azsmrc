@@ -87,7 +87,7 @@ import org.eclipse.swt.widgets.Shell;
 public class MessageSlideShell {
 	private static boolean USE_SWT32_BG_SET = true;
 
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 
 	private final static String REGEX_URLHTML = "<A HREF=\"(.+?)\">(.+?)</A>";
 
