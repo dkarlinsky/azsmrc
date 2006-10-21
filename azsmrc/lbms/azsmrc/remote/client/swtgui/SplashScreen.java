@@ -66,7 +66,7 @@ public class SplashScreen {
 		//define a region
 		final Region region = new Region();
 		Rectangle pixel = new Rectangle(0, 0, 1, 1);
-		for (int y = 0; y < 254; y++) {
+		for (int y = 0; y < 263; y++) {
 				for (int x = 0; x < 350; x++) {
 					pixel.x = x;
 					pixel.y = y;
