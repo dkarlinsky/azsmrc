@@ -218,10 +218,11 @@ public class PluginInterfaceImpl implements PluginInterface {
 	public PluginI18N getI18N() {
 		if (i18n == null) {
 			i18n = new PluginI18NAdapter();
-			String langfilePath = pluginProps.getProperty("azsmrc.plugin.langfile");
+			String langfilePath = pluginProps.getProperty("azsmrc.plugin.langpath");
 			if (langfilePath != null) {
-				langfilePath.replace('.', '/');
+				langfilePath = langfilePath.replace('.', '/');
 				if (langfilePath.charAt(langfilePath.length()-1) != '/') langfilePath += '/';
+				if (langfilePath.charAt(0) != '/') langfilePath = '/'+langfilePath;
 				InputStream is = PluginInterfaceImpl.class.getResourceAsStream(langfilePath+"default.lang");
 				if (is != null) {
 					try {

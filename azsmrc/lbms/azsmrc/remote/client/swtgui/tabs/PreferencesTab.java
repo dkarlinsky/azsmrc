@@ -1153,11 +1153,33 @@ public class PreferencesTab {
 				fci.setContentProvider(new ContentProvider() {
 
 					public String getDefaultValue(String key, int type) {
-						return pi.getPluginConfig().getProperty(key);
+						String v = pi.getPluginConfig().getProperty(key);
+						if (v==null) {
+							switch (type) {
+							case Entry.TYPE_STRING:
+								return "";
+							case Entry.TYPE_BOOLEAN:
+								return "false";
+							default:
+								return "0";
+							}
+						}
+						else return v;
 					}
 
 					public String getValue(String key, int type) {
-						return pi.getPluginConfig().getProperty(key);
+						String v = pi.getPluginConfig().getProperty(key);
+						if (v==null) {
+							switch (type) {
+							case Entry.TYPE_STRING:
+								return "";
+							case Entry.TYPE_BOOLEAN:
+								return "false";
+							default:
+								return "0";
+							}
+						}
+						else return v;
 					}
 
 					public void setValue(String key, String value, int type) {
@@ -1165,7 +1187,7 @@ public class PreferencesTab {
 					}
 				});
 				SWTMenu sm = new SWTMenu(fc,menuTree,cOptions);
-				sm.addAsRoot(localPlugsItem);
+				sm.addAsSubItem(localPlugsItem);
 			}
 		}
 	}
