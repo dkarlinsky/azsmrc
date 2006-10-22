@@ -282,7 +282,7 @@ public class ConnectionDialog {
 		saveProfile.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
 				addConnection();
-				saveToConfig();
+				loadConnections();
 			}
 		});
 
@@ -400,6 +400,7 @@ public class ConnectionDialog {
 
 	private void fillCombo(){
 		urlCombo.removeAll();
+		loadConnections();
 
 		for(int i = 0; i < loginDataList.size(); i++) {
 			urlCombo.add(loginDataList.get(i).getHost());
@@ -546,6 +547,7 @@ public class ConnectionDialog {
 	 */
 	public void deleteConnection (int id) {
 		loginDataList.remove(id);
+		saveToConfig ();
 	}
 
 	/**
@@ -564,13 +566,7 @@ public class ConnectionDialog {
 		} else {
 			loginDataList.add(logData);
 			Collections.sort(loginDataList);
-		}
-	}
-
-	public void editConnection (int id) {
-		if (loginDataList.size()>id) {
-			LoginData logData = new LoginData(urlCombo.getText(),Integer.parseInt(port_text.getText()),username_text.getText(),password_text.getText(),use_https.getSelection());
-			loginDataList.set(id, logData);
+			saveToConfig ();
 		}
 	}
 
