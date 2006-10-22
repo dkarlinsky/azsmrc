@@ -206,7 +206,7 @@ public class TorrentDownload extends Download {
 			conn.disconnect();
 			//finally call again
 			callProgress(sis.getBytesRead(), contentLength);
-			if (contentLength>0 && target != null && !(gzip || deflate) && target.length() != contentLength) {
+			if (contentLength>0 && !(gzip || deflate) && buffer.size() != contentLength) {
 				failed = true;
 				failureReason = "Content length doesn't Match.";
 				callStateChanged(STATE_FAILURE);
