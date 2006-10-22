@@ -23,8 +23,10 @@ import lbms.azsmrc.remote.client.torrent.scraper.Scraper;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.shared.EncodingUtil;
 import lbms.azsmrc.shared.SWTSafeRunnable;
+import lbms.tools.DownloadListener;
 import lbms.tools.TorrentDownload;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.CTabFolder;
@@ -53,7 +55,7 @@ public class ScrapeDialog {
 
 	private String lastDir;
 	private SortedMap<String,AddTorrentContainer> addTorrentMap = new TreeMap<String,AddTorrentContainer>();
-
+	private static Logger logger = Logger.getLogger(ScrapeDialog.class);
 
 	//SWT components
 	private Table torrentTable;
@@ -824,9 +826,20 @@ public class ScrapeDialog {
 						TorrentDownload tdl = new TorrentDownload (url,torTemp);
 						if (RCMain.getRCMain().getProxy() != null)
 							tdl.setProxy(RCMain.getRCMain().getProxy());
+						tdl.addDownloadListener(new DownloadListener() {
+
+							public void debugMsg(String msg) {
+								logger.debug(msg);
+							}
+
+							public void progress(long bytesRead, long bytesTotal) {}
+							public void stateChanged(int oldState, int newState) {}
+						});
 						tdl.call();
 						if (!tdl.hasFailed() && tdl.hasFinished()) {
 							openFileAndScrape(torTemp);
+						} else {
+							logger.debug("Download torrent for scrape failed: "+tdl.getFailureReason());
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
