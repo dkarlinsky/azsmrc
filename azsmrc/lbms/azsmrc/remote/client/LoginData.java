@@ -84,7 +84,7 @@ public class LoginData implements Comparable<LoginData> {
 	}
 
 	public boolean isComplete () {
-		return !(username.equals("") && !password.equals("") && !host.equals(""));
+		return !(username.equals("") || password.equals("") || host.equals(""));
 	}
 
 	/* (non-Javadoc)
