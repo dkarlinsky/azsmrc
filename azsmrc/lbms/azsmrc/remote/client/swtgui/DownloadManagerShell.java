@@ -1683,8 +1683,8 @@ public class DownloadManagerShell {
 
 					if (!sash.isDisposed()) {
 						int[] weights = sash.getWeights();
-						properties.setProperty("dms.sash.1", weights[0]);
-						properties.setProperty("dms.sash.0", weights[1]);
+						properties.setProperty("dms.sash.0", weights[0]);
+						properties.setProperty("dms.sash.1", weights[1]);
 					}
 					properties.setProperty("dms.size.x", size_x);
 					properties.setProperty("dms.size.y", size_y);
@@ -1811,6 +1811,7 @@ public class DownloadManagerShell {
 
 		if (RCMain.getRCMain().getRunTime()-properties.getPropertyAsLong("lastDonationQuestion")>DONATION_INTERVAL) {
 			properties.setProperty("lastDonationQuestion",RCMain.getRCMain().getRunTime());
+			//TODO MARC Popup donation tab
 		}
 
 		if (RCMain.getRCMain().connected())
