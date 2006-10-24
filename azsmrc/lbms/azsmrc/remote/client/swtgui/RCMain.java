@@ -218,22 +218,22 @@ public class RCMain implements Launchable {
 		SeedContainer.loadColumns();
 		terminated = false;
 
-
-		connect = properties.getPropertyAsBoolean("auto_connect");
 		display.asyncExec(new SWTSafeRunnable() {
 			public void runSafe() {
 				createContents();
 			}
 		});
+
+		connect = properties.getPropertyAsBoolean("auto_connect");
 		if (connect) {
 			try {
 				LoginData login = new LoginData(properties.getProperty("lastConnection",""));
-				if (!login.isComplete()) {
-					connect = false;
-				} else {
+				if (login.isComplete()) {
 					connect(false);
 					updateTimer(properties.getPropertyAsBoolean("auto_open"));
 					client.getDownloadManager().update(true);
+				} else {
+					connect = false;
 				}
 			} catch (MalformedURLException e) {
 				connect = false;
