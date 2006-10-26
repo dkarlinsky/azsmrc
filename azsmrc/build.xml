@@ -53,18 +53,25 @@
 		<antcall target="cleanDist" />
 		<antcall target="jar" />
 	</target>
+	
+	<target name="beta" depends="init, cleanDist">
+		<tstamp />
+		<property name="beta" value=".${DSTAMP}"/>
+		<antcall target="jar" />
+	</target>
 
 	<target name="jar" depends="init, azLangFiles">
 		<antcall target="modPluginProps" />
-		<echo message="Creating azsmrcPlugin_${version}.jar..." />
-		<jar destfile="${root.dir}/${dist.dir}/azsmrcPlugin_${version}.jar" basedir="${root.dir}/${build.dir}" excludes="${dist.jar.excludes}">
+		<property name="beta" value=""/>
+		<echo message="Creating azsmrcPlugin_${version}${beta}.jar..." />
+		<jar destfile="${root.dir}/${dist.dir}/azsmrcPlugin_${version}${beta}.jar" basedir="${root.dir}/${build.dir}" excludes="${dist.jar.excludes}">
 			<include name="lbms/azsmrc/plugin/**/*" />
 			<include name="lbms/azsmrc/shared/**/*" />
 			<include name="lbms/tools/flexyconf/**/*" />
 			<fileset file="${root.dir}/plugin.properties" />
 		</jar>
-		<echo message="Creating AzSMRC_${version}.jar..." />
-		<jar destfile="${root.dir}/${dist.dir}/AzSMRC_${version}.jar" basedir="${root.dir}/${build.dir}" excludes="${dist.jar.excludes}">
+		<echo message="Creating AzSMRC_${version}${beta}.jar..." />
+		<jar destfile="${root.dir}/${dist.dir}/AzSMRC_${version}${beta}.jar" basedir="${root.dir}/${build.dir}" excludes="${dist.jar.excludes}">
 			<include name="lbms/azsmrc/remote/**/*" />
 			<include name="lbms/azsmrc/shared/**/*" />
 			<include name="lbms/tools/launcher/Launchable.class" />
@@ -86,13 +93,13 @@
 			</manifest>
 		</jar>
 		<echo message="Creating Sources..." />
-		<zip destfile="${root.dir}/${dist.dir}/azsmrcPlugin_${version}_src.zip" basedir="${root.dir}" excludes="${generic.excludes}">
+		<zip destfile="${root.dir}/${dist.dir}/azsmrcPlugin_${version}${beta}_src.zip" basedir="${root.dir}" excludes="${generic.excludes}">
 			<include name="lbms/azsmrc/plugin/**/*" />
 			<include name="lbms/azsmrc/shared/**/*" />
 			<include name="lbms/tools/flexyconf/**/*" />
 			<fileset file="${root.dir}/plugin.properties" />
 		</zip>
-		<zip destfile="${root.dir}/${dist.dir}/AzSMRC_${version}_src.zip" basedir="${root.dir}" excludes="${generic.excludes}">
+		<zip destfile="${root.dir}/${dist.dir}/AzSMRC_${version}${beta}_src.zip" basedir="${root.dir}" excludes="${generic.excludes}">
 			<include name="lbms/azsmrc/remote/**/*" />
 			<include name="lbms/azsmrc/shared/**/*" />
 			<include name="lbms/tools/launcher/Launchable.class" />
