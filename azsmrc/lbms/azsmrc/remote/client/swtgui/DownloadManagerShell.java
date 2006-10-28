@@ -280,15 +280,31 @@ public class DownloadManagerShell {
 		menuQuickconnect.setText("&Quickconnect");
 		menuQuickconnect.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
-				ExtendedProperties properties = RCMain.getRCMain().getProperties();
-				if (
-						properties.getProperty("connection_lastURL_0") != null &&
-						properties.getProperty("connection_username_0") != null &&
-						properties.getProperty("connection_password_0") != null) {
-					RCMain.getRCMain().connect(true);
-					initializeConnection();
-				} else
-					ConnectionDialog.open(RCMain.getRCMain().getDisplay());
+				Properties properties = RCMain.getRCMain().getProperties();
+				if (properties.containsKey("lastConnection")) {
+					try {
+						LoginData login = new LoginData(properties.getProperty("lastConnection", ""));
+						if (login.isComplete()) {
+							RCMain.getRCMain().connect(true);
+							initializeConnection();
+						} else if (login.hasUsername() && login.hasHost()){
+							InputShell is = new InputShell("Enter Password", "Please enter password for\nUser: "+
+									login.getUsername() +
+									"\nServer: " +login.getHost());
+							is.setIsPassword(true);
+							String pw = is.open();
+							if(pw != null){
+								RCMain.getRCMain().getClient().setPassword(pw);
+								RCMain.getRCMain().connect(true);
+								initializeConnection();
+							}
+						}else
+							ConnectionDialog.open(RCMain.getRCMain().getDisplay());
+					} catch (MalformedURLException e1) {
+						ConnectionDialog.open(RCMain.getRCMain().getDisplay());
+					}
+
+				}
 			}
 		});
 
