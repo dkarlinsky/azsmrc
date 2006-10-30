@@ -67,7 +67,7 @@ public class WebRequestHandler	/*extends WebPlugin*/ implements TrackerWebPageGe
 
 	private String				home_page;
 	private String				file_root;
-	private String				resource_root;
+	private String				resource_root = "lbms/azsmrc/plugin/web";
 
 	private boolean				ip_range_all = true;
 	private IPRange				ip_range;
@@ -263,7 +263,7 @@ public class WebRequestHandler	/*extends WebPlugin*/ implements TrackerWebPageGe
 			//is.reset();
 		}
 		boolean useCompression = false;
-		if (headers.containsKey("accept-encoding") && headers.get("accept-encoding").toLowerCase().indexOf("gzip") != -1) {
+		if (headers.containsKey("accept-encoding") && headers.get("accept-encoding").toLowerCase().contains("gzip")) {
 			useCompression = true;
 			Plugin.addToLog("Usind Gzip Compression for output.");
 		}
@@ -287,6 +287,26 @@ public class WebRequestHandler	/*extends WebPlugin*/ implements TrackerWebPageGe
 		} catch (JDOMException e) {
 			Plugin.addToLog("Invalid XML request");
 			return false;
+		}
+		return true;
+	}
+
+	public boolean processFileUpload (
+			TrackerWebPageRequest		request,
+			TrackerWebPageResponse		response )
+	throws IOException {
+		try {
+			User user = Plugin.getXMLConfig().getUser(request.getUser());
+		/*	InputStream is = request.getInputStream();
+			System.out.println();
+			System.out.println("InputStream:");
+			for (int i = is.read();i>0;i=is.read())
+				System.out.print((char)i);
+			System.out.println();
+			System.out.println();*/
+
+		} catch (UserNotFoundException e1) {
+			e1.printStackTrace();
 		}
 		return true;
 	}
@@ -458,12 +478,21 @@ public class WebRequestHandler	/*extends WebPlugin*/ implements TrackerWebPageGe
 			}
 		}
 
+		if ( request.getURL().toString().equalsIgnoreCase("/fileupload.cgi")) {
+			try {
+				return processFileUpload(request, response);
+			} catch (IOException e) {
+				Plugin.addToLog("Fileupload error", e);
+				throw e;
+			}
+		}
+
 		if ( generateSupport( request, response )){
 
 			return(true);
 		}
 
-		OutputStream os = response.getOutputStream();
+		//OutputStream os = response.getOutputStream();
 
 		String	url = request.getURL();
 
@@ -540,7 +569,7 @@ public class WebRequestHandler	/*extends WebPlugin*/ implements TrackerWebPageGe
 				return( true );
 			}
 		}
-
+		response.setReplyStatus(404); //HTTP Status 404: NOT FOUND
 		return( false );
 	}
 
