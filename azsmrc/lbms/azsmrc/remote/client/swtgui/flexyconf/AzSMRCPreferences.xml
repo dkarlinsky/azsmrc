@@ -45,9 +45,12 @@
 			<Entry key="auto_clipboard" label="miscellaneous.autoClipboard" type="boolean" index="2"/>
 		</Section>
 		<Section label="update" index="3">
-			<Entry key="update.beta" label="update.updateBeta" type="boolean" index="0"/>
-			<Entry key="update.autocheck" label="update.updateAutoCheck" type="boolean" index="1"/>
+			<Entry key="update.autocheck" label="update.updateAutoCheck" type="boolean" index="0"/>
+			<Entry key="update.beta" label="update.updateBeta" type="boolean" index="1"/>
 			<Entry key="update.autoupdate" label="update.updateAutoUpdate" type="boolean" index="2"/>
+			<Entry key="motd.disable" label="update.motd.disable" type="boolean" index="3"/>
+			<Entry key="statistics.allow.label" label="update.statistics.label" type="label" index="4"/>
+			<Entry key="statistics.allow" label="update.statistics.allow" type="boolean" index="5"/>
 		</Section>
 	</Section>
 </FlexyConfiguration>

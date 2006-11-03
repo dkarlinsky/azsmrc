@@ -53,11 +53,19 @@
 		<antcall target="cleanDist" />
 		<antcall target="jar" />
 	</target>
-	
+
 	<target name="beta" depends="init, cleanDist">
 		<tstamp />
 		<property name="beta" value=".${DSTAMP}"/>
 		<antcall target="jar" />
+		<antcall target="copyBeta" />
+	</target>
+
+	<target name="copyBeta" if="moveBetaBuildsTo">
+		<copy todir="${moveBetaBuildsTo}" overwrite="true">
+			<fileset file="${root.dir}/${dist.dir}/AzSMRC_${version}${beta}.jar" />
+			<fileset file="${root.dir}/${dist.dir}/azsmrcPlugin_${version}${beta}.jar" />
+		</copy>
 	</target>
 
 	<target name="jar" depends="init, azLangFiles">

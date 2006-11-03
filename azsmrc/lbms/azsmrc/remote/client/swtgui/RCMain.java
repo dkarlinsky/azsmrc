@@ -9,12 +9,14 @@ import java.awt.datatransfer.FlavorListener;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
@@ -23,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
 import java.net.Proxy;
 import java.net.URL;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.List;
@@ -70,6 +73,7 @@ import lbms.azsmrc.remote.client.util.TimerEventPerformer;
 import lbms.azsmrc.remote.client.util.TimerEventPeriodic;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.azsmrc.shared.SWTSafeRunnable;
+import lbms.tools.CryptoTools;
 import lbms.tools.ExtendedProperties;
 import lbms.tools.launcher.Launchable;
 import lbms.tools.updater.Update;
@@ -500,7 +504,7 @@ public class RCMain implements Launchable {
 		//Add in the clipboard monitor
 		addAWTClipboardMonitor();
 		SplashScreen.setProgressAndText("All Done", 100);
-		checkMotd();
+		checkUpadteAndMotd();
 	}
 
 	private void initConfig() {
@@ -547,6 +551,7 @@ public class RCMain implements Launchable {
 				if (is!=null) try { is.close(); } catch (IOException e) {}
 			}
 		}
+		generateUID();
 	}
 
 	private void init () {
@@ -883,35 +888,7 @@ public class RCMain implements Launchable {
 				UpdateProgressDialog.initialize(dls);
 			}
 		});
-		if (properties.getPropertyAsBoolean("update.autocheck")) {
-			long lastcheck = properties.getPropertyAsLong("update.lastcheck");
-			if (System.currentTimeMillis()-lastcheck > 1000*60*60*24) {
-				if (mainWindow != null) {
-					mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.checking"));
-				}
-				logger.info("Checking for Updates");
-				boolean newUpdate = false;
-				try {
-					URL url = new URL (RemoteConstants.UPDATE_URL);
-					HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-					conn.setRequestMethod("HEAD");
-					conn.connect();
-					if (!conn.getHeaderField("Last-Modified").equalsIgnoreCase(properties.getProperty("update.Last-Modified", ""))) {
-						properties.setProperty("update.Last-Modified", conn.getHeaderField("Last-Modified"));
-						newUpdate = true;
-					}
-					conn.disconnect();
 
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-
-				if (newUpdate) {
-					updater.checkForUpdates(properties.getPropertyAsBoolean("update.beta"));
-				}
-				properties.setProperty("update.lastcheck",System.currentTimeMillis());
-			}
-		}
 		SplashScreen.setProgressAndText("Loading Sounds.",50);
 		loadSounds();
 		SplashScreen.setProgressAndText("Creating Timer.",55);
@@ -937,31 +914,49 @@ public class RCMain implements Launchable {
 		System.out.println("Shutdown completed");
 	}
 
-	public void checkMotd () {
-		if (properties.getPropertyAsBoolean("motd.disable")) return;
-
-		long lastcheck = properties.getPropertyAsLong("motd.lastcheck");
-		if (System.currentTimeMillis()-lastcheck > 1000*60*60*24) {
-			properties.setProperty("motd.lastcheck", System.currentTimeMillis());
-			logger.debug("Checking for MOTD");
-			try {
-				URL url = new URL (RemoteConstants.MOTD_URL);
-				HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-				conn.setRequestMethod("HEAD");
-				conn.connect();
-				if (!conn.getHeaderField("Last-Modified").equalsIgnoreCase(properties.getProperty("motd.Last-Modified", ""))) {
-					properties.setProperty("motd.Last-Modified", conn.getHeaderField("Last-Modified"));
-					logger.debug("New MOTD found.");
-					MotdDialog.open();
-				}
-				conn.disconnect();
-
-			} catch (Exception e) {
-				e.printStackTrace();
+	public void checkUpadteAndMotd () {
+		Thread t = new Thread () {
+			public void run() {
+				long lastcheck = properties.getPropertyAsLong("update.lastcheck");
+				if (System.currentTimeMillis()-lastcheck > 1000*60*60*24)
+					if (properties.getPropertyAsBoolean("update.autocheck") || !properties.getPropertyAsBoolean("motd.disable")) {
+						if (mainWindow != null) {
+							mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.checking"));
+						}
+						URL url = null;
+						try {
+							if (properties.getPropertyAsBoolean("statistics.allow")) {
+								url = new URL (RemoteConstants.INFO_URL+"?app=AzSMRC_client&version="+azsmrcProperties.getProperty("version","0")+"&uid="+properties.getProperty("azsmrc.uid"));
+							} else	{
+								url = new URL (RemoteConstants.INFO_URL);
+							}
+							HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+							conn.connect();
+							if (conn.getResponseCode() == 200) { //won't work unless something is requested
+								BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+								String info = br.readLine();
+								if (properties.getPropertyAsBoolean("update.autocheck") && !info.equalsIgnoreCase(properties.getProperty("update.Last-Modified", ""))) {
+									properties.setProperty("update.Last-Modified", info);
+									updater.checkForUpdates(properties.getPropertyAsBoolean("update.beta"));
+								}
+								info = br.readLine();
+								if (!properties.getPropertyAsBoolean("motd.disable") && !info.equalsIgnoreCase(properties.getProperty("motd.Last-Modified", ""))) {
+									properties.setProperty("motd.Last-Modified", info);
+									MotdDialog.open();
+								}
+								br.close();
+							}
+							conn.disconnect();
+							properties.setProperty("update.lastcheck", System.currentTimeMillis());
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
 			}
-		} else {
-			logger.debug("Skipping MOTD check");
-		}
+		};
+		t.setDaemon(true);
+		t.setPriority(Thread.MIN_PRIORITY);
+		t.start();
 	}
 
 	public long getRunTime() {
@@ -1232,6 +1227,42 @@ public class RCMain implements Launchable {
 			}
 		} else {
 			logger.warn("Couldn't Load "+key+" from "+snd);
+		}
+	}
+
+	/**
+	 * Generates a Random UID
+	 *
+	 * @return true if UID was generated, false if UID already present
+	 */
+	private boolean generateUID() {
+		if (properties.containsKey("azsmrc.uid")) return false;
+
+		long n = System.currentTimeMillis();
+		byte[] b = new byte[8];
+		b[7] = (byte) (n);
+		n >>>= 8;
+		b[6] = (byte) (n);
+		n >>>= 8;
+		b[5] = (byte) (n);
+		n >>>= 8;
+		b[4] = (byte) (n);
+		n >>>= 8;
+		b[3] = (byte) (n);
+		n >>>= 8;
+		b[2] = (byte) (n);
+		n >>>= 8;
+		b[1] = (byte) (n);
+		n >>>= 8;
+		b[0] = (byte) (n);
+		try {
+			String uid = CryptoTools.formatByte(CryptoTools.messageDigest(b, "SHA-1"));
+			properties.setProperty("azsmrc.uid", uid);
+			saveConfig();
+			return true;
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			return false;
 		}
 	}
 
