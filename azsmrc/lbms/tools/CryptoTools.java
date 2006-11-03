@@ -34,8 +34,12 @@ public class CryptoTools {
 
 	public static String formatByte (byte[] digest) {
 		String hash = "";
-		for ( byte d : digest )
-			hash += Integer.toHexString( d & 0xFF);
+		String hex;
+		for ( byte d : digest ) {
+			hex = Integer.toHexString( d & 0xFF);
+			if (hex.length() < 2) hash += "0"+hex;
+			else hash +=hex;
+		}
 		return hash;
 	}
 }

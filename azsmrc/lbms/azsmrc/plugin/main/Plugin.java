@@ -6,8 +6,10 @@ package lbms.azsmrc.plugin.main;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +20,7 @@ import lbms.azsmrc.plugin.web.RequestManager;
 import lbms.azsmrc.plugin.web.WebRequestHandler;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.azsmrc.shared.UserNotFoundException;
+import lbms.tools.CryptoTools;
 import lbms.tools.flexyconf.FlexyConfiguration;
 import lbms.tools.flexyconf.Section;
 
@@ -86,6 +89,8 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		locale_utils.integrateLocalisedMessageBundle("lbms.azsmrc.plugin.internat.Messages");
 		pi=pluginInterface;
 
+		generateUID();
+
 		UIManager   ui_manager = pluginInterface.getUIManager();
 		BasicPluginConfigModel config_model = ui_manager.createBasicPluginConfigModel( "plugins", "plugin.azsmrc");
 
@@ -98,6 +103,8 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		config_model.addBooleanParameter2("use_ssl","azsmrc.use.ssl",false);
 		config_model.addIntParameter2("remote_port", "azsmrc.remote.port", 49009);
 		config_model.addLabelParameter2("azsmrc.portchange.alert");
+		config_model.addLabelParameter2("azsmrc.statistics.label");
+		config_model.addBooleanParameter2("statistics.allow", "azsmrc.statistics.allow", true);
 
 		//Load the config file
 		config = XMLConfig.loadConfigFile(pluginInterface.getPluginDirectoryName() + System.getProperty("file.separator") + "MultiUserConfig.xml");
@@ -380,6 +387,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 			 * @see org.gudy.azureus2.plugins.PluginListener#initializationComplete()
 			 */
 			public void initializationComplete() {
+
 				for (PluginSupport ps:pluginSupport.values()) {
 					try {
 						ps.initialize(pluginInterface);
@@ -389,10 +397,64 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 						e.printStackTrace();
 					}
 				}
+				if (pi.getPluginconfig().getPluginBooleanParameter("statistics.allow")) {
+					Thread t = new Thread() {
+						public void run() {
+							try {
+								URL url = new URL (RemoteConstants.INFO_URL+"?app=AzSMRC_server&version="+pi.getPluginVersion()+"&uid="+pi.getPluginconfig().getPluginStringParameter("azsmrc.uid"));
 
+								System.out.println(url.toExternalForm());
+								HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+								conn.connect();
+								conn.getResponseCode();
+								conn.disconnect();
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					};
+					t.setDaemon(true);
+					t.setPriority(Thread.MIN_PRIORITY);
+					t.start();
+				}
 			}
 		});
 
+	}
+
+	/**
+	 * Generates a Random UID
+	 *
+	 * @return true if UID was generated, false if UID already present
+	 */
+	private boolean generateUID() {
+		if (!pi.getPluginconfig().getPluginStringParameter("azsmrc.uid").equals("")) return false;
+
+		long n = System.currentTimeMillis();
+		byte[] b = new byte[8];
+		b[7] = (byte) (n);
+		n >>>= 8;
+		b[6] = (byte) (n);
+		n >>>= 8;
+		b[5] = (byte) (n);
+		n >>>= 8;
+		b[4] = (byte) (n);
+		n >>>= 8;
+		b[3] = (byte) (n);
+		n >>>= 8;
+		b[2] = (byte) (n);
+		n >>>= 8;
+		b[1] = (byte) (n);
+		n >>>= 8;
+		b[0] = (byte) (n);
+		try {
+			String uid = CryptoTools.formatByte(CryptoTools.messageDigest(b, "SHA-1"));
+			pi.getPluginconfig().setPluginParameter("azsmrc.uid", uid);
+			return true;
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 
