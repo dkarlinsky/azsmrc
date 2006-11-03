@@ -398,24 +398,28 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 					}
 				}
 				if (pi.getPluginconfig().getPluginBooleanParameter("statistics.allow")) {
-					Thread t = new Thread() {
-						public void run() {
-							try {
-								URL url = new URL (RemoteConstants.INFO_URL+"?app=AzSMRC_server&version="+pi.getPluginVersion()+"&uid="+pi.getPluginconfig().getPluginStringParameter("azsmrc.uid"));
+					long lastcheck = Long.parseLong(pi.getPluginconfig().getPluginStringParameter("stats.lastcheck","0"));
+					if (System.currentTimeMillis()-lastcheck > 1000*60*60*24) {
+						Thread t = new Thread() {
+							public void run() {
+								try {
+									URL url = new URL (RemoteConstants.INFO_URL+"?app=AzSMRC_server&version="+pi.getPluginVersion()+"&uid="+pi.getPluginconfig().getPluginStringParameter("azsmrc.uid"));
 
-								System.out.println(url.toExternalForm());
-								HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-								conn.connect();
-								conn.getResponseCode();
-								conn.disconnect();
-							} catch (Exception e) {
-								e.printStackTrace();
+									System.out.println(url.toExternalForm());
+									HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+									conn.connect();
+									conn.getResponseCode();
+									conn.disconnect();
+									pi.getPluginconfig().setPluginParameter("stats.lastcheck",Long.toString(System.currentTimeMillis()));
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
 							}
-						}
-					};
-					t.setDaemon(true);
-					t.setPriority(Thread.MIN_PRIORITY);
-					t.start();
+						};
+						t.setDaemon(true);
+						t.setPriority(Thread.MIN_PRIORITY);
+						t.start();
+					}
 				}
 			}
 		});
