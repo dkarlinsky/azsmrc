@@ -168,7 +168,7 @@
 			<entry key="plugin.class" value="lbms.azsmrc.plugin.main.Plugin" />
 			<entry key="plugin.name" value="AzSMRC" />
 			<entry key="plugin.langfile" value="lbms.azsmrc.plugin.internat.Messages" />
-			<entry key="plugin.version" value="${version}" />
+			<entry key="plugin.version" value="${version}${beta}" />
 			<entry key="plugin.id" value="azsmrc" />
 		</propertyfile>
 	</target>
