@@ -452,7 +452,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		n >>>= 8;
 		b[0] = (byte) (n);
 		try {
-			String uid = CryptoTools.formatByte(CryptoTools.messageDigest(b, "SHA-1"));
+			String uid = CryptoTools.formatByte(CryptoTools.messageDigest(b, "SHA-1"),true);
 			pi.getPluginconfig().setPluginParameter("azsmrc.uid", uid);
 			return true;
 		} catch (NoSuchAlgorithmException e) {

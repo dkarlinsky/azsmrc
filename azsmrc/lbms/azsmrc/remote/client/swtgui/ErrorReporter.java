@@ -72,7 +72,7 @@ public class ErrorReporter {
 					sb.append((char)i);
 				}
 				errorLog = sb.toString();
-				hash = CryptoTools.formatByte(CryptoTools.messageDigest(errorLog.getBytes(), "SHA-1"));
+				hash = CryptoTools.formatByte(CryptoTools.messageDigest(errorLog.getBytes(), "SHA-1"),true);
 				System.out.println("Errorlog: "+errorLog);
 			} else {
 				System.out.println(error+" did not exist");

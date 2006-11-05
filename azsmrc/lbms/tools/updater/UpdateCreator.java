@@ -2,7 +2,6 @@ package lbms.tools.updater;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,7 +9,6 @@ import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.SortedSet;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
@@ -128,7 +126,7 @@ public class UpdateCreator {
 		}
 		f.setType(type);
 
-		f.setHash(CryptoTools.formatByte(CryptoTools.messageDigestFile(file.getAbsolutePath(), UpdateFile.HASH_ALGORITHM)));
+		f.setHash(CryptoTools.formatByte(CryptoTools.messageDigestFile(file.getAbsolutePath(), UpdateFile.HASH_ALGORITHM),false));
 		currentUpdate.addFile(f);
 		return f;
 	}
@@ -162,7 +160,7 @@ public class UpdateCreator {
 				f.setVersion(new Version(fn.substring(pos+1, end)));
 			}
 			InputStream in = zip.getInputStream(ze);
-			f.setHash(CryptoTools.formatByte(CryptoTools.messageDigestStream(in, UpdateFile.HASH_ALGORITHM)));
+			f.setHash(CryptoTools.formatByte(CryptoTools.messageDigestStream(in, UpdateFile.HASH_ALGORITHM),false));
 			in.close();
 			uf.addArchivFile(f);
 		}

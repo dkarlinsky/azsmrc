@@ -1256,7 +1256,7 @@ public class RCMain implements Launchable {
 		n >>>= 8;
 		b[0] = (byte) (n);
 		try {
-			String uid = CryptoTools.formatByte(CryptoTools.messageDigest(b, "SHA-1"));
+			String uid = CryptoTools.formatByte(CryptoTools.messageDigest(b, "SHA-1"),true);
 			properties.setProperty("azsmrc.uid", uid);
 			saveConfig();
 			return true;

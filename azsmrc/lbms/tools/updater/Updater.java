@@ -193,7 +193,7 @@ public class Updater {
 						File localTmp = new File(tmpDir,u.getPath()+u.getName());
 						if (localLoc.exists()) {
 							try {
-								String localHash = CryptoTools.formatByte(CryptoTools.messageDigestFile(localLoc.getAbsolutePath(), "SHA-1"));
+								String localHash = CryptoTools.formatByte(CryptoTools.messageDigestFile(localLoc.getAbsolutePath(), "SHA-1"),false);
 								if (localHash.equalsIgnoreCase(u.getHash())) {
 									System.out.println("Updater: file exists: "+localLoc);
 									continue;
@@ -210,7 +210,7 @@ public class Updater {
 								File aLoc = new File(dir,a.getPath()+a.getName());
 								if (aLoc.exists()) {
 									try {
-										String localHash = CryptoTools.formatByte(CryptoTools.messageDigestFile(aLoc.getAbsolutePath(), "SHA-1"));
+										String localHash = CryptoTools.formatByte(CryptoTools.messageDigestFile(aLoc.getAbsolutePath(), "SHA-1"),false);
 										if (localHash.equalsIgnoreCase(a.getHash())) {
 											System.out.println("Updater: file exists: "+aLoc);
 											continue;
@@ -284,7 +284,7 @@ public class Updater {
 							File localLoc = new File(dir,u.getPath()+u.getName());
 							if (localTmp.exists()) {
 								try {
-									String localHash = CryptoTools.formatByte(CryptoTools.messageDigestFile(localTmp.getAbsolutePath(), "SHA-1"));
+									String localHash = CryptoTools.formatByte(CryptoTools.messageDigestFile(localTmp.getAbsolutePath(), "SHA-1"),false);
 									if (!localHash.equalsIgnoreCase(u.getHash())) {
 										failed = true;
 										lastError = "File "+u.getName()+" failed Hash check";

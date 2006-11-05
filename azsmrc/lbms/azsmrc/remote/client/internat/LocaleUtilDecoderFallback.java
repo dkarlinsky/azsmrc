@@ -173,7 +173,7 @@ LocaleUtilDecoderFallback
 					e.printStackTrace();
 				}
 
-				String	hash_str = CryptoTools.formatByte(hash);
+				String	hash_str = CryptoTools.formatByte(hash,false);
 
 				res = res.substring(
 							0,
