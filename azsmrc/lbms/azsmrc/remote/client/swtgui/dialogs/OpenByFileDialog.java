@@ -38,6 +38,8 @@ import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -54,6 +56,8 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -453,6 +457,88 @@ public class OpenByFileDialog {
 
 			}
 		});
+
+		//menu for details Table
+		final Menu menu = new Menu(detailsTable);
+
+		final MenuItem selectAll = new MenuItem(menu,SWT.PUSH);
+		selectAll.setText(I18N.translate(PFX + "detailsTable.menu.selectAll"));
+		selectAll.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				if(activeATC == null) return;
+				TOTorrentFile[] files = activeATC.getFiles();
+				TableItem[] detailItem = detailsTable.getItems();
+				for (int i = 0; i < files.length; i++) {
+					activeATC.setFileProperty(i,1);
+					detailItem[i].setChecked(true);
+				}
+
+				setTotalSize();
+			}
+		});
+
+		final MenuItem unselectAll = new MenuItem(menu, SWT.PUSH);
+		unselectAll.setText(I18N.translate(PFX + "detailsTable.menu.unselectAll"));
+		unselectAll.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				if(activeATC == null) return;
+				TOTorrentFile[] files = activeATC.getFiles();
+				TableItem[] detailItem = detailsTable.getItems();
+				for (int i = 0; i < files.length; i++) {
+					activeATC.setFileProperty(i,0);
+					detailItem[i].setChecked(false);
+				}
+
+				setTotalSize();
+			}
+		});
+
+		final MenuItem selectInverse = new MenuItem(menu, SWT.PUSH);
+		selectInverse.setText(I18N.translate(PFX + "detailsTable.menu.selectInverse"));
+		selectInverse.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				if(activeATC == null) return;
+				TOTorrentFile[] files = activeATC.getFiles();
+				TableItem[] detailItem = detailsTable.getItems();
+				int[] properties = activeATC.getFileProperties();
+				for (int i = 0; i < files.length; i++) {
+					if(properties[i] == 1){
+						activeATC.setFileProperty(i,0);
+						detailItem[i].setChecked(false);
+					}else{
+						activeATC.setFileProperty(i,1);
+						detailItem[i].setChecked(true);
+					}
+				}
+
+				setTotalSize();
+			}
+		});
+
+		menu.addMenuListener(new MenuListener(){
+
+			public void menuHidden(MenuEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			public void menuShown(MenuEvent arg0) {
+				boolean selection;
+				if(detailsTable.getItemCount() == 0)
+					selection = false;
+				else
+					selection = true;
+
+				selectAll.setEnabled(selection);
+				unselectAll.setEnabled(selection);
+				selectInverse.setEnabled(selection);
+
+
+			}
+
+		});
+
+		detailsTable.setMenu(menu);
 
 		// Buttons
 		Composite button_comp = new Composite(shell, SWT.NULL);
