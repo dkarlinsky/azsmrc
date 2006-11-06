@@ -314,7 +314,7 @@ public class DownloadManagerShell {
 		menuLogout.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				RCMain.getRCMain().disconnect();
-				setGUItoLoggedOut();;
+				setGUItoLoggedOut();
 			}
 		});
 
@@ -2603,6 +2603,20 @@ public class DownloadManagerShell {
 					setLogInOutButtons(false);
 					DOWNLOAD_MANAGER_SHELL.setText(TITLE);
 					clearMapsAndChildred();
+
+					//close all open stray tabs and dialogs
+					CTabItem[] items = tabFolder.getItems();
+					for(CTabItem item:items){
+						if(item != myTorrents)
+							item.dispose();
+					}
+
+					Shell[] shells = display.getShells();
+					for(Shell shell:shells){
+						if(shell != DOWNLOAD_MANAGER_SHELL)
+							shell.dispose();
+					}
+
 				}
 				RCMain.getRCMain().setTrayIcon(0);
 			}
