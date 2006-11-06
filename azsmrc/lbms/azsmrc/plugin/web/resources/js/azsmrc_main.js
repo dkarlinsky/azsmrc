@@ -6,6 +6,10 @@ var Server = window.location.href;
 </Request>
 */
 var HealthStates = ["", "gray",  "blue",  "yellow", "green", "red", "red"];
+var selectedTransfers = [];
+var selectableDetails = ["Name", "Position", "Download Average", "Upload Average", "Downloaded", "Uploaded", "Health", "Completition", "Availability", "ETA", "State", "Status", "Share Ratio", "Tracker Status", "Download Limit", "Upload Limit", "Connected Seeds", "Connected Leecher", "Total Seeds", "Total Leecher", "Discarded", "Size", "Elapsed Time", "Total Average", "Scrape Times", "All Seeds", "All Leecher"];
+// standard selection
+var selectedDetails = [1,1,0,0,1,1,1,1,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0];
 function doNothing() {
 	// empty function doing nothing
 	// used for links
@@ -35,7 +39,7 @@ function fetchData(xmlhttp) {
 						img.src = "img/connect_established.png";
 						img.setAttribute("alt","Connection established");
 						img.setAttribute("title","Connected to Server");
-					}
+					}					
 				break;
 				case "listTransfers":
 					handlelistTransfers(doc);
@@ -51,9 +55,12 @@ function getRequestOptions(request) {
 	switch (request) {
 		case "listTransfers":
 		// static for testings
-			// standard options
-			// 2^0+2^1+2^2+2^3+2^4+2^5+2^6+2^7+2^9+2^11+2^12+2^13+2^16+2^17+2^21
-			options = ' options="2308863"';
+			options = 0;
+			for (var i in selectedDetails)
+				if (selectedDetails[i] == 1) {
+					options += Math.pow(2, i);
+				}
+			options = ' options="'+options+'"';
 			return options;			
 		break;
 		default:
@@ -95,6 +102,37 @@ function round(val,dig) {
 	var fac = Math.pow(10,dig);
 	return Math.round(val*fac)/fac;
 }
+function selectDetails(id) {
+	id = id.substring(11,id.length);
+	selectedDetails[id] = (document.getElementById("selDetails_"+id).checked == true) ? 1 : 0;
+}
+function selectTC(obj) {
+	var input = obj.firstChild.firstChild;
+	var hash = obj.getAttribute("hash");
+	// visual
+	input.checked = (input.checked == true) ? false : true;
+	// set array content
+	var inserted = false;
+	if (input.checked == true) {
+		for (var i in selectedTransfers) {
+			if (selectedTransfers[i] == null) {
+				selectedTransfers[i] = hash;
+				inserted = true;
+				break;
+			}				
+		}
+		if (!inserted) {
+			selectedTransfers[selectedTransfers.length] = hash;
+		}
+	} else
+		for (var i in selectedTransfers) {
+			if (selectedTransfers[i] == hash) {
+				selectedTransfers[i] = null;
+				break;
+			}
+		}
+	// addDebugEntry("selected Transfers: "+selectedTransfers);
+}
 function SendRequestToServer(request) {
 	request = registeredRequests[request];
 	var xmlhttp;
@@ -115,8 +153,8 @@ function SendRequestToServer(request) {
 	    return false;
 	}
 	xmlhttp.open("POST", requestURL, true);
-    xmlhttp.setRequestHeader("Content-type","application/xml"); 
-    xmlhttp.setRequestHeader("Connection","close"); 
+	xmlhttp.setRequestHeader("Content-type","application/xml"); 
+	xmlhttp.setRequestHeader("Connection","close"); 
 	xmlhttp.onreadystatechange = function () {
 		switch (xmlhttp.readyState) {
 			case 0:

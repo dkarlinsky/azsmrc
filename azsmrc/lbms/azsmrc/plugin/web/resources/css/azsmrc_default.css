@@ -2,7 +2,15 @@
  * Standard CSS file for AzSMRC Webinterface
  * all objects are sorted ascending
  */
-/* Elements */
+/* Elements and Pseudo-Classes */
+a {
+	font-size: 0.8em;
+}
+a:hover {
+	color: #00F;
+	cursor: pointer;
+	text-decoration: underline;
+}
 abbr {
 	border: none;
 	cursor: help;
@@ -30,6 +38,10 @@ caption {
 	text-align: left;
 	padding: 1px 5% 1px 2%;
 }
+form {
+	margin: 0px 0px 0px 0px;
+	width: 220px;
+}
 h1 {
 	font-size: 1.5em;
 	margin: 0px 5px 10px 0px;
@@ -46,9 +58,34 @@ h4 {
 	font-size: 1.2em;
 	margin: 0px 5px 10px 0px;
 }
+td > img {
+	margin: 0px 0px 0px 5px;
+}
+input {
+	background-color: #D0D0D9;
+	border: #888 1px solid;
+	margin: 0px 0px 0px 0px;
+}
+input:hover {
+	border-style: dotted;
+}
+input[type="button"], input[type="submit"] {
+	width: 120px;
+}
+label {	
+	font-size: 0.8em;
+	float: left;
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+	width: 200px;
+}
+label:after {
+	content: ":";
+}
 p {
 	font-size: 0.9em;
 	margin: 0px 5px 10px 0px;
+	text-align: justify;
 }
 table {
 	border-collapse: collapse;
@@ -78,6 +115,10 @@ tbody > tr:hover {
 	background-color: #DDD;
 }
 /* Classes */
+.closeButton {
+	float: right;
+	margin: 5px 0px 0px 0px;
+}
 .debuglist {
 	list-style: none outside none;
 	margin: -10px 0px 10px 0px;
@@ -90,8 +131,24 @@ tbody > tr:hover {
 .debuglist li:first-Line {
 	text-indent: 0px;
 }
+p.hint {
+	font-size: 0.8em;
+	font-style: italic;
+}
 .invisible {
 	display: none;
+}
+#labelselectionform {
+	background-color: #D0D0D9;
+	border: #888 1px solid;
+	display: none;
+	padding: 2px 2px 2px 2px;
+	position: absolute;
+	top: 5%;
+	left: 40%;
+}
+#labelselectionform > label {
+	margin: 3px 0px 0px 0px;
 }
 ul.menu {
 	display: block;
@@ -126,12 +183,17 @@ ul.submenu li a {
 div.tab {
 	display: none;
 }
+input.transferCtrl {
+	margin: 3px 0px 0px 0px;
+}
 /* IDs */
 #eventlist {
 	display: none;
 }
 #interaction_container {
+	border: #888 1px solid;
 	display: none;
+	padding: 1px 5% 2px 1%;
 }
 #picmenu {
 	display: block;
@@ -198,7 +260,7 @@ div.tab {
 	border-bottom: #D0D0D9 1px solid;
 }
 #tabbar li span {
-	color: #00f;
+	color: #00F;
 }
 #tabbar img {
 	height: 17px;

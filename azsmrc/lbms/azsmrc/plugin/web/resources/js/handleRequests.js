@@ -4,7 +4,51 @@ var attributes = ["health", "position", "name", "state", "status", "downloaded",
 // empty string defines no output
 var formalAttributes = ["Health", "#", "Name", "", "Status", "Downloaded", "Uploaded", "", "Down Speed", "Up Speed", "Total Speed", "Elapsed time", "ETA", "Availability", "Done", "Share Ratio", "Tracker Status", "max. #DL", "max #UL", "Seeds", "Peers", "Size", "Scrape", "next Scrape", ""];
 // event types
-var eventTypes = ["unknown", "unknown", "Torrent Remove"];
+var eventTypes = ["unknown", "Download Completed", "Download Torrent Removed", "Download Exception", "System Exception", "Update Available", "Message", "Error Message", "Plugin Message"];
+function addlistTransfersInteraction() {
+	var div, form, label, selector;
+	// details selection for interaction
+	div = document.getElementById("interaction_container");
+	if (!div) { 
+		div = document.createElement("div");
+		div.setAttribute("id", "interaction_container");
+	} else
+		while (div.firstChild) div.removeChild(div.firstChild);
+	form = document.createElement("form");
+	form.setAttribute("id", "labelselectionform");
+	var p = document.createElement("p");
+	p.appendChild(document.createTextNode("Select information to show in DL/UL tables."));
+	p.className = "hint";
+	form.appendChild(p);
+	for (var i in selectableDetails) {
+		label = document.createElement("label");
+		label.appendChild(document.createTextNode(selectableDetails[i]));
+		label.setAttribute("for", "selDetails_"+i);				
+		selector = document.createElement("input");
+		selector.setAttribute("type", "checkbox");
+		selector.setAttribute("id", "selDetails_"+i);
+		selector.checked = (selectedDetails[i] == 1) ? true : false;
+		selector.setAttribute("value", "show "+selectableDetails[i]);
+		selector.onchange = function () { selectDetails(this.getAttribute("id")); };
+		form.appendChild(label);
+		form.appendChild(selector);
+	}
+	var button = document.createElement("input");
+	button.setAttribute("type", "button");
+	button.setAttribute("value", "Close");
+	button.setAttribute("title", "Close Form");
+	button.className = "closeButton";
+	button.onclick = function () { document.getElementById("labelselectionform").style.display = "none"; };
+	form.appendChild(button);
+	var link = document.createElement("a");
+	link.setAttribute("title", "Open Labelselection");
+	link.onclick = function () { document.getElementById("labelselectionform").style.display = "block"; };
+	link.appendChild(document.createTextNode("Open Labelselection"));
+	div.appendChild(link);
+	div.appendChild(form);
+	div.style.display = "block";
+	return div;
+}
 // function for output format definitions
 function getAttributeFormat(attributeID, value) {
 	var attribute = attributes[attributeID];
@@ -48,45 +92,64 @@ function getEventType(evType) {
 }
 function handleEvents(Events) {
 	addDebugEntry("Handling Events..");
-		// childnodes: <Event ...>
-		var evType = null;
-		var Event, time;
-		
-		var evList = document.getElementById("eventlist");
-		while (evList.firstChild) evList.removeChild(evList.firstChild);
-		var evTable = document.createElement("table");
-		evTable.setAttribute("summary", "Events since last request");
-		evTable.setAttribute("rules", "groups");
-		
-		// static, will be changed to dynamic later
-		var tbody, tr, td;
-		tbody = document.createElement("caption");
-		tbody.appendChild(document.createTextNode("new Events"));
-		evTable.appendChild(tbody);
-		
-		tbody = document.createElement("thead");
-		tr = document.createElement("tr");
-		td = document.createElement("th");
-		td.appendChild(document.createTextNode("Time"));
-		tr.appendChild(td);
-		td = document.createElement("th");
-		td.appendChild(document.createTextNode("Event"));
-		tr.appendChild(td);
-		td = document.createElement("th");
-		td.appendChild(document.createTextNode("Torrent"));
-		tr.appendChild(td);
-		td = document.createElement("th");
-		td.appendChild(document.createTextNode("Hash"));
-		tr.appendChild(td);
-		tbody.appendChild(tr);
-		evTable.appendChild(tbody);
-		
-		tbody = document.createElement("tbody");	
-		addDebugEntry("Events: "+Events.nodeType+" - "+Events.nodeName);
-		Event = Events.firstChild;
+	// childnodes: <Event ...>
+	var evType = null;
+	var Event, time;
+	
+	var evList = document.getElementById("eventlist");
+	while (evList.firstChild) evList.removeChild(evList.firstChild);
+	var evTable = document.createElement("table");
+	evTable.setAttribute("summary", "Events since last request");
+	evTable.setAttribute("rules", "groups");
+	
+	// static, will be changed to dynamic later
+	var tbody, tr, td;
+	tbody = document.createElement("caption");
+	tbody.appendChild(document.createTextNode("new Events"));
+	evTable.appendChild(tbody);
+	
+	tbody = document.createElement("thead");
+	tr = document.createElement("tr");
+	td = document.createElement("th");
+	td.appendChild(document.createTextNode("Time"));
+	tr.appendChild(td);
+	td = document.createElement("th");
+	td.appendChild(document.createTextNode("Event"));
+	tr.appendChild(td);
+	td = document.createElement("th");
+	td.appendChild(document.createTextNode("Torrent"));
+	tr.appendChild(td);
+	td = document.createElement("th");
+	td.appendChild(document.createTextNode("Hash"));
+	tr.appendChild(td);
+	tbody.appendChild(tr);
+	evTable.appendChild(tbody);
+	
+	tbody = document.createElement("tbody");	
+	addDebugEntry("Events: "+Events.nodeType+" - "+Events.nodeName);
+	Event = Events.firstChild;
+	time = Math.floor(Event.getAttribute("time"));
+	time = new Date(time);
+	addDebugEntry("Event: "+Event.nodeType+" - "+Event.nodeName);
+	tr = document.createElement("tr");
+	td = document.createElement("td");
+	td.appendChild(document.createTextNode(time.toLocaleString()));
+	tr.appendChild(td);
+	td = document.createElement("td");
+	td.appendChild(document.createTextNode(getEventType(Event.getAttribute("type"))));
+	tr.appendChild(td);
+	td = document.createElement("td");
+	td.appendChild(document.createTextNode(Event.getAttribute("name")));
+	tr.appendChild(td);
+	td = document.createElement("td");
+	td.appendChild(document.createTextNode(Event.getAttribute("hash")));
+	tr.appendChild(td);
+	tbody.appendChild(tr);
+	
+	while (Event.nextSibling) {
+		Event = Event.nextSibling;
 		time = Math.floor(Event.getAttribute("time"));
 		time = new Date(time);
-		addDebugEntry("Event: "+Event.nodeType+" - "+Event.nodeName);
 		tr = document.createElement("tr");
 		td = document.createElement("td");
 		td.appendChild(document.createTextNode(time.toLocaleString()));
@@ -101,31 +164,12 @@ function handleEvents(Events) {
 		td.appendChild(document.createTextNode(Event.getAttribute("hash")));
 		tr.appendChild(td);
 		tbody.appendChild(tr);
-		
-		while (Event.nextSibling) {
-			Event = Event.nextSibling;
-			time = Math.floor(Event.getAttribute("time"));
-			time = new Date(time);
-			tr = document.createElement("tr");
-			td = document.createElement("td");
-			td.appendChild(document.createTextNode(time.toLocaleString()));
-			tr.appendChild(td);
-			td = document.createElement("td");
-			td.appendChild(document.createTextNode(getEventType(Event.getAttribute("type"))));
-			tr.appendChild(td);
-			td = document.createElement("td");
-			td.appendChild(document.createTextNode(Event.getAttribute("name")));
-			tr.appendChild(td);
-			td = document.createElement("td");
-			td.appendChild(document.createTextNode(Event.getAttribute("hash")));
-			tr.appendChild(td);
-			tbody.appendChild(tr);
-		}
-		evTable.appendChild(tbody);
-		evList.appendChild(evTable);
-		
-		evList.style.display = "block";
-		document.getElementById("eventstatus").firstChild.data = "new events";
+	}
+	evTable.appendChild(tbody);
+	evList.appendChild(evTable);
+	
+	evList.style.display = "block";
+	document.getElementById("eventstatus").firstChild.data = "new events";
 }
 function handlelistTransfers(xmldoc) {
 	var transfers = xmldoc.getElementsByTagName("Transfers");
@@ -179,10 +223,8 @@ function handlelistTransfers(xmldoc) {
 		if (list == null) {
 			addTab("listTransfers");
 			list = document.getElementById("tab_"+tabCount);
-		} else	while (list.firstChild) list.removeChild(list.firstChild);
-		var p = document.createElement("p");
-		p.appendChild(document.createTextNode("Detailsselection coming soon!"));				
-		list.appendChild(p);
+		} else while (list.firstChild) list.removeChild(list.firstChild);
+		list.appendChild(addlistTransfersInteraction());
 		var downloads = document.createElement("table");
 		var uploads = document.createElement("table");
 		var caption, dlbody, ulbody, tr, td;
@@ -203,7 +245,11 @@ function handlelistTransfers(xmldoc) {
 		for (j = 0; j < 2; j++) {
 			dlbody = document.createElement("thead");
 			tr = document.createElement("tr");
-			for (i in transferDataField[0])
+			td = document.createElement("th");
+			td.appendChild(document.createTextNode("TC"));
+			td.setAttribute("title", "TransferController");
+			tr.appendChild(td);
+			for (i in transferDataField[0]) {
 				if (formalAttributes[transferDataField[0][i]] != "") {
 					td = document.createElement("th");
 					td.appendChild(document.createTextNode(formalAttributes[transferDataField[0][i]]));
@@ -211,6 +257,7 @@ function handlelistTransfers(xmldoc) {
 					if (attributes[transferDataField[0][i]] == "completition") isDoneCol = i;
 					tr.appendChild(td);
 				}	
+			}
 			dlbody.appendChild(tr);
 			if (j == 0) downloads.appendChild(dlbody);
 			else uploads.appendChild(dlbody);
@@ -218,7 +265,8 @@ function handlelistTransfers(xmldoc) {
 		dlbody = document.createElement("tbody");
 		ulbody = document.createElement("tbody");
 		// filling tbody
-		for (j in transferDataField)
+		var transferCtrl = null;
+		for (j in transferDataField)		
 			if (j > 0) {
 				// check dl or ul
 				activeTable = 0;
@@ -226,6 +274,16 @@ function handlelistTransfers(xmldoc) {
 				// fetch
 				tr = document.createElement("tr");
 				tr.setAttribute("hash", transferDataField[j][hash]);
+				tr.onclick = function () { selectTC(this); };
+				td = document.createElement("td");
+				transferCtrl = document.createElement("input");
+				transferCtrl.setAttribute("type", "checkbox");
+				transferCtrl.checked = false;
+				transferCtrl.setAttribute("value", "check for interaction selection");
+				transferCtrl.setAttribute("name", "transferCtrl");
+				transferCtrl.className = "transferCtrl";
+				td.appendChild(transferCtrl);
+				tr.appendChild(td);
 				for (i in transferDataField[j]) {
 					if (formalAttributes[transferDataField[0][i]] != "") {
 						td = document.createElement("td");

@@ -6,7 +6,7 @@ var tabCount = 2;
 var registeredTabs = ["listTransfers", "about", "debug"];
 // open tabs at position (default is set below)
 var tabs = ["listTransfers", "about", "debug"];
-// a example tab (tabbar is list of tabs)
+// an example tab (tabbar is list of tabs)
 // <li><span onclick="SendRequestToServer(1);">ALL Torrents</span><img src="img/delete.png" alt="Close Tab" title="Close Tab" onclick="closeTab(this);" /></li>
 function addTab(contentElement) {
 	// only create new tab, if no tab with contentElement exists
@@ -68,9 +68,7 @@ function addTab(contentElement) {
 				tabContent.appendChild(ul);
 			break;
 			case "listTransfers":
-				var p = document.createElement("p");
-				p.appendChild(document.createTextNode("Detailsselection coming soon!"));				
-				tabContent.appendChild(p);
+				tabContent.appendChild(addlistTransfersInteraction());
 			break;
 			default:
 				tabContent.appendChild(document.createTextNode("This tab is empty!"));

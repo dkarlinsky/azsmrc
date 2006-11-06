@@ -5,7 +5,7 @@
 	<!-- Meta Tags -->
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 	<meta http-equiv="content-language" content="de" />
-	<meta name="author" content="Toni Uebernickel - Whitestarprogramming.de" />
+	<meta name="author" content="Toni Uebernickel"/>
 	<meta name="description" content="Webinterface f&#252;r Azureus AzSMRC Plugin" />
 	<meta name="keywords" content="Azureus Webinterface AzSMRC Plugin remote control" />
 	<meta name="creation_date" content="04/09/2006" />
@@ -26,9 +26,7 @@
 	<div id="topbar">
 		<h2 class="invisible">Menu</h2>
 		<ul id="picmenu" class="menu">
-			<li><img src="img/connect_new.png" alt="Connect to Server" title="Connect to Server" onclick="SendRequestToServer(1);" /></li>
-			<li><img src="img/connect_quick_new.png" alt="Quickconnect" title="Quickconnect" /></li>
-			<li><img src="img/logout_new.png" alt="Disconnect from Server" title="Disconnect from Server" /></li>
+			<li><img src="img/connect.png" alt="Open ALL Torrents" title="Open ALL Torrents" onclick="addTab('listTransfers');" /></li>
 			<li class="subbreak"><img src="img/refresh.png" alt="Refresh" title="Refresh" onclick="refreshView();" /></li>
 			<li><img src="img/open_by_file_new.png" alt="Send Torrent File to Server" title="Send Torrent File to Server" onclick="addTab('SendTorrentFile');" /></li>
 			<li class="subbreak"><img src="img/open_by_url_new.png" alt="Send Torrent URL to Server" title="Send Torrent URL to Server" /></li>
@@ -53,7 +51,7 @@
 	<div id="eventlist"><p>No events since last request.</p></div>
 	<img src="img/AzSMRC_Splash.png" id="splashscreen" class="invisible" alt="Splashscreen" title="AzSMRC Splashscreen" />
 	<div id="tabcontents">
-		<div id="tab_0" class="tab"><p>Detailsselection coming soon!</p><p>No data given, please refresh.</p></div>
+		<div id="tab_0" class="tab"><p>No data given, please refresh.</p></div>
 		<div id="tab_2" class="tab"><h2>Debug Log</h2><p>Debug Log is empty.</p></div>
 	</div>
 	<div id="interaction_container"><p>No interaction menu given.</p></div>
