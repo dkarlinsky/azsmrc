@@ -21,7 +21,7 @@
 <body onload="initAzSMRCwebUI();">
 	<div id="tab_1" class="tab">
 		<h1>AzSMRC Webinterface</h1>
-		<p>AzSMRC is a remotecontrol for Azureus Bittorrent Client.</p>
+		<p>AzSMRC is a remotecontrol for Azureus Bittorrent Client. This webinterface needs activated Javascript.</p>
 	</div>
 	<div id="topbar">
 		<h2 class="invisible">Menu</h2>
@@ -30,19 +30,14 @@
 			<li class="subbreak"><img src="img/refresh.png" alt="Refresh" title="Refresh" onclick="refreshView();" /></li>
 			<li><img src="img/open_by_file_new.png" alt="Send Torrent File to Server" title="Send Torrent File to Server" onclick="addTab('SendTorrentFile');" /></li>
 			<li class="subbreak"><img src="img/open_by_url_new.png" alt="Send Torrent URL to Server" title="Send Torrent URL to Server" /></li>
-			<li><img src="img/top.png" alt="Set on Top" title="Set on Top" /></li>
-			<li><img src="img/up.png" alt="Set Up" title="Set Up" /></li>
-			<li><img src="img/down.png" alt="Set Down" title="Set Down" /></li>
-			<li class="subbreak"><img src="img/bottom.png" alt="Set on Bottom" title="Set on Bottom" /></li>
-			<!-- Resume, Pause, Delete (img missing)
-			<li><img src="img/connect_new.png" /></li>
-			<li><img src="img/connect_new.png" /></li>
-			<li class="subbreak"><img src="img/connect_new.png" /></li>
-			-->
-			<li><img src="img/tool_pause.png" alt="Pause" title="Pause" /></li>
-			<li class="subbreak"><img src="img/tool_resume.png" alt="Resume" title="Resume" /></li>
+			<li><img src="img/top.png" alt="Move to Top" title="Move to Top" /></li>
+			<li><img src="img/up.png" alt="Move Up" title="Move Up" onclick="SendRequestToServer(15);" /></li>
+			<li><img src="img/down.png" alt="Move Down" title="Move Down" onclick="SendRequestToServer(16);" /></li>
+			<li class="subbreak"><img src="img/bottom.png" alt="Move to Bottom" title="Move to Bottom" /></li>
+			<li><img src="img/tool_pause.png" alt="Pause" title="Pause" onclick="SendRequestToServer(5);" /></li>
+			<li class="subbreak"><img src="img/tool_resume.png" alt="Resume" title="Resume" onclick="SendRequestToServer(11);" /></li>
 			<li><img src="img/preferences.png" alt="Open Preferences" title="Open Preferences" /></li>
-			<li><img src="img/manage_users.png" alt="Manage Users" title="Manage Users" /></li>
+			<li><img src="img/manage_users.png" alt="Manage Users" title="Manage Users" onclick="addTab('userManagement'); SendRequestToServer(29);" /></li>
 			<li><img src="img/console.png" alt="Open Console" title="Open Console" onclick="addTab('debug');" /></li>
 			<li><img src="img/information.png" alt="Information" title="Information" onclick="addTab('about');" /></li>
 		</ul>	
@@ -56,7 +51,7 @@
 	</div>
 	<div id="interaction_container"><p>No interaction menu given.</p></div>
 	<div id="statusbar">
-		<span id="eventstatus">no new events</span><span onclick="PingToServer();" id="ping">Ping: undefined</span><span id="requeststatus">no request sent</span><img id="connectionstatus" src="img/connect_no.png" alt="Connection not established" title="Not connected to Server" />
+		<a title="Open Debug Log" onclick="addTab('debug');">Open Debug Log</a><span id="eventstatus">no new events</span><span onclick="PingToServer();" id="ping">Ping: undefined</span><span id="requeststatus">no request sent</span><img id="connectionstatus" src="img/connect_no.png" alt="Connection not established" title="Not connected to Server" />
 	</div>	
 </body>
 </html>

@@ -6,10 +6,13 @@ var Server = window.location.href;
 </Request>
 */
 var HealthStates = ["", "gray",  "blue",  "yellow", "green", "red", "red"];
+var formalHealthStates = ["", "gray",  "blue",  "yellow", "green", "red", "red"];
 var selectedTransfers = [];
 var selectableDetails = ["Name", "Position", "Download Average", "Upload Average", "Downloaded", "Uploaded", "Health", "Completition", "Availability", "ETA", "State", "Status", "Share Ratio", "Tracker Status", "Download Limit", "Upload Limit", "Connected Seeds", "Connected Leecher", "Total Seeds", "Total Leecher", "Discarded", "Size", "Elapsed Time", "Total Average", "Scrape Times", "All Seeds", "All Leecher"];
 // standard selection
 var selectedDetails = [1,1,0,0,1,1,1,1,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0];
+// SI Unit byte prefix
+var SI_byte = ["bytes", "kB", "MB", "GB", "TB"];
 function doNothing() {
 	// empty function doing nothing
 	// used for links
@@ -68,6 +71,32 @@ function getRequestOptions(request) {
 		break;
 	}
 }
+function getRequestQuery(req) {
+//	var request = '<Query switch="'+request+'"'+options+' />';
+	var request = '';
+	switch (req) {
+		case "listTransfers":
+			request += '<Query switch="'+req+'"'+getRequestOptions(req)+' />';
+		break;
+		case "recheckDataDownload":
+		case "restartDownload":
+		case "startDownload":
+		case "stopDownload":
+		case "stopAndQueueDownload":
+		case "moveUp":		
+		case "moveDown":
+		case "requestDownloadScrape":
+		case "requestDownloadAnnounce":
+			for (var i in selectedTransfers)
+				if (selectedTransfers[i] != null)
+					request += '<Query switch="'+req+'" hash="'+selectedTransfers[i]+'" />';
+		break;		
+		default:
+			request += '<Query switch="'+req+'" />';
+		break;	
+	}
+	return request;
+}
 function initAzSMRCwebUI() {	
 	initDebugLog()
 	//showSplashScreen();
@@ -85,6 +114,7 @@ function PingToServer() {
 function refreshView() {
 	switch (tabs[activeTab]) {
 		case "listTransfers":
+			selectedTransfers = [];
 			SendRequestToServer(1);
 		break;
 		case "debug":
@@ -141,44 +171,47 @@ function SendRequestToServer(request) {
 	// edit line below if changes
 	var requestURL = Server+"process.cgi";
 	var options = getRequestOptions(request);
-	var xmlrequest = '<?xml version="1.0" encoding="UTF-8"?><Request version="1.0"><Query switch="'+request+'"'+options+' /></Request>';
-	addDebugEntry("XML Request: "+xmlrequest);
-	try {
-		if (window.XMLHttpRequest) {
-			xmlhttp = new XMLHttpRequest();
-		} else if(window.ActiveXObject) {
-		    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+	var xmlrequest = '<?xml version="1.0" encoding="UTF-8"?><Request version="1.0">'+getRequestQuery(request)+'</Request>';
+	// no empty requests
+	if (xmlrequest != '<?xml version="1.0" encoding="UTF-8"?><Request version="1.0"></Request>') {
+		addDebugEntry("XML Request: "+xmlrequest);
+		try {
+			if (window.XMLHttpRequest) {
+				xmlhttp = new XMLHttpRequest();
+			} else if(window.ActiveXObject) {
+			    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+		} catch(e) {
+		    return false;
 		}
-	} catch(e) {
-	    return false;
-	}
-	xmlhttp.open("POST", requestURL, true);
-	xmlhttp.setRequestHeader("Content-type","application/xml"); 
-	xmlhttp.setRequestHeader("Connection","close"); 
-	xmlhttp.onreadystatechange = function () {
-		switch (xmlhttp.readyState) {
-			case 0:
-				statusbarentry.data = "uninitialized";
-			break;
-			case 1:
-				statusbarentry.data = "open request";
-			break;
-			case 2:
-				statusbarentry.data = "request sent";
-			break;
-			case 3:
-				statusbarentry.data = "receiving response";
-			break;
-			case 4:
-				statusbarentry.data = "response loaded";	
-				fetchData(xmlhttp);		
-			break;
-			default:
-				statusbarentry.data = "unknown state";
-			break;
+		xmlhttp.open("POST", requestURL, true);
+		xmlhttp.setRequestHeader("Content-type","application/xml"); 
+		xmlhttp.setRequestHeader("Connection","close"); 
+		xmlhttp.onreadystatechange = function () {
+			switch (xmlhttp.readyState) {
+				case 0:
+					statusbarentry.data = "uninitialized";
+				break;
+				case 1:
+					statusbarentry.data = "open request";
+				break;
+				case 2:
+					statusbarentry.data = "request sent";
+				break;
+				case 3:
+					statusbarentry.data = "receiving response";
+				break;
+				case 4:
+					statusbarentry.data = "response loaded";	
+					fetchData(xmlhttp);		
+				break;
+				default:
+					statusbarentry.data = "unknown state";
+				break;
+			}
 		}
-	}
 	xmlhttp.send(xmlrequest);
+	}
 }
 function showSplashScreen() {
 	// just a funny splashscreen function

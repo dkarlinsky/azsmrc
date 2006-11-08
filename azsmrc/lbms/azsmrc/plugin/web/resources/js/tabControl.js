@@ -3,7 +3,7 @@ var activeTab = 0;
 // for easy usage it is a simple counter, do NOT decrease this counter anytime
 var tabCount = 2;
 // available tabs
-var registeredTabs = ["listTransfers", "about", "debug"];
+var registeredTabs = ["listTransfers", "about", "debug", "userManagement"];
 // open tabs at position (default is set below)
 var tabs = ["listTransfers", "about", "debug"];
 // an example tab (tabbar is list of tabs)
@@ -34,6 +34,9 @@ function addTab(contentElement) {
 			case "listTransfers":
 				label = document.createTextNode("ALL Torrents");			
 			break;
+			case "userManagement":
+				label = document.createTextNode("Users");
+			break;
 			default:
 				label = document.createTextNode("empty Tab");
 			break;
@@ -51,11 +54,13 @@ function addTab(contentElement) {
 		tabContent.className = "tab";
 		tabContent.setAttribute("id", "tab_"+tabCount);
 		switch (contentElement) {
+			// simple tabs can be created here
+			// advanced tabs should use own function
 			case "about":
 				var head = document.createElement("h1");
 				head.appendChild(document.createTextNode("AzSMRC Webinterface"));
 				var p = document.createElement("p");
-				p.appendChild(document.createTextNode("AzSMRC is a remotecontrol for Azureus Bittorrent Client."));
+				p.appendChild(document.createTextNode("AzSMRC is a remotecontrol for Azureus Bittorrent Client. This webinterface needs activated Javascript."));
 				tabContent.appendChild(head);
 				tabContent.appendChild(p);
 			break;
@@ -69,6 +74,9 @@ function addTab(contentElement) {
 			break;
 			case "listTransfers":
 				tabContent.appendChild(addlistTransfersInteraction());
+			break;
+			case "userManagement":
+				tabContent.appendChild(adduserManagement());
 			break;
 			default:
 				tabContent.appendChild(document.createTextNode("This tab is empty!"));
