@@ -50,6 +50,8 @@ import org.gudy.azureus2.plugins.update.UpdateCheckInstanceListener;
 import org.gudy.azureus2.plugins.update.UpdateManager;
 import org.gudy.azureus2.plugins.update.UpdateManagerListener;
 import org.gudy.azureus2.plugins.utils.LocaleUtilities;
+import org.gudy.azureus2.plugins.utils.UTTimerEvent;
+import org.gudy.azureus2.plugins.utils.UTTimerEventPerformer;
 import org.gudy.azureus2.ui.swt.plugins.UISWTInstance;
 import org.gudy.azureus2.ui.swt.plugins.UISWTViewEventListener;
 
@@ -189,6 +191,12 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		if (pluginInterface.getPluginconfig().getPluginBooleanParameter("disableAutoImport",false)) {
 			Timers.stopCheckDirsTimer();
 		}
+		logStat();
+		Timers.addPeriodicEvent(1000*60*60, new UTTimerEventPerformer() {
+			public void perform(UTTimerEvent event) {
+				logStat();
+			}
+		});
 
 		pluginInterface.getPluginconfig().addListener(new PluginConfigListener() {
 			public void configSaved() {
@@ -397,30 +405,6 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 						e.printStackTrace();
 					}
 				}
-				if (pi.getPluginconfig().getPluginBooleanParameter("statistics.allow")) {
-					long lastcheck = Long.parseLong(pi.getPluginconfig().getPluginStringParameter("stats.lastcheck","0"));
-					if (System.currentTimeMillis()-lastcheck > 1000*60*60*24) {
-						Thread t = new Thread() {
-							public void run() {
-								try {
-									URL url = new URL (RemoteConstants.INFO_URL+"?app=AzSMRC_server&version="+pi.getPluginVersion()+"&uid="+pi.getPluginconfig().getPluginStringParameter("azsmrc.uid"));
-
-									System.out.println(url.toExternalForm());
-									HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-									conn.connect();
-									conn.getResponseCode();
-									conn.disconnect();
-									pi.getPluginconfig().setPluginParameter("stats.lastcheck",Long.toString(System.currentTimeMillis()));
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
-							}
-						};
-						t.setDaemon(true);
-						t.setPriority(Thread.MIN_PRIORITY);
-						t.start();
-					}
-				}
 			}
 		});
 
@@ -458,6 +442,33 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 			return false;
+		}
+	}
+
+	private void logStat() {
+		if (pi.getPluginconfig().getPluginBooleanParameter("statistics.allow")) {
+			long lastcheck = Long.parseLong(pi.getPluginconfig().getPluginStringParameter("stats.lastcheck","0"));
+			if (System.currentTimeMillis()-lastcheck > 1000*60*60*24) {
+				Thread t = new Thread() {
+					public void run() {
+						try {
+							URL url = new URL (RemoteConstants.INFO_URL+"?app=AzSMRC_server&version="+pi.getPluginVersion()+"&uid="+pi.getPluginconfig().getPluginStringParameter("azsmrc.uid"));
+
+							System.out.println(url.toExternalForm());
+							HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+							conn.connect();
+							conn.getResponseCode();
+							conn.disconnect();
+							pi.getPluginconfig().setPluginParameter("stats.lastcheck",Long.toString(System.currentTimeMillis()));
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				};
+				t.setDaemon(true);
+				t.setPriority(Thread.MIN_PRIORITY);
+				t.start();
+			}
 		}
 	}
 

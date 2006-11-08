@@ -106,6 +106,10 @@ public class Timers {
 		checkDirTimer.cancel();
 	}
 
+	public static UTTimerEvent addPeriodicEvent (long period_millis, UTTimerEventPerformer ep) {
+		return timer.addPeriodicEvent(period_millis, ep);
+	}
+
 	public static void restartCheckDirsTimer () {
 		stopCheckDirsTimer();
 		startCheckDirsTimer();
