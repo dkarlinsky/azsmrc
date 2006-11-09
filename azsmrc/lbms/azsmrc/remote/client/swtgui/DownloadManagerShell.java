@@ -1677,6 +1677,7 @@ public class DownloadManagerShell {
 			public void shellActivated(ShellEvent arg0) {}
 
 			public void shellClosed(ShellEvent event) {
+				logger.warn("Closing Shell!!!");
 
 
 				//Check to see the configs that we are coming in with
@@ -1685,73 +1686,74 @@ public class DownloadManagerShell {
 
 
 
+
+
+				//-----First we need to save everything for the user---\\
+
+				//Saving user preferences for the shell and sash
+				int size_x = DOWNLOAD_MANAGER_SHELL.getSize().x;
+				int size_y = DOWNLOAD_MANAGER_SHELL.getSize().y;
+
+				int position_x = DOWNLOAD_MANAGER_SHELL.getLocation().x;
+				int position_y = DOWNLOAD_MANAGER_SHELL.getLocation().y;
+				ExtendedProperties properties = RCMain.getRCMain().getProperties();
+
+				if (!sash.isDisposed()) {
+					int[] weights = sash.getWeights();
+					properties.setProperty("dms.sash.0", weights[0]);
+					properties.setProperty("dms.sash.1", weights[1]);
+				}
+				properties.setProperty("dms.size.x", size_x);
+				properties.setProperty("dms.size.y", size_y);
+				properties.setProperty("dms.position.x", position_x);
+				properties.setProperty("dms.position.y", position_y);
+
+
+				boolean b_ok = true;
+
+				//save the downloadsTable column widths
+				if (!downloadsTable.isDisposed()) {
+					b_ok = true;
+					TableColumn[] columns = downloadsTable.getColumns();
+					List<Integer> dl_column_list = new ArrayList<Integer>();
+					for (TableColumn column:columns){
+						int colWidth = column.getWidth();
+						//if it is 0, somthing is wrong.. break out and don't save
+						if(colWidth == 0){
+							b_ok = false;
+							break;
+						}else
+							dl_column_list.add(colWidth);
+					}
+					if(b_ok)
+						properties.setProperty("downloadsTable.columns.widths", EncodingUtil.IntListToString(dl_column_list));
+				}
+
+				//save the seedsTable column widths
+				if (!seedsTable.isDisposed()) {
+					b_ok=true;
+					TableColumn[] seed_columns = seedsTable.getColumns();
+					List<Integer> seed_column_list = new ArrayList<Integer>();
+					for (TableColumn column:seed_columns){
+						int colWidth = column.getWidth();
+						//if it is 0, somthing is wrong.. break out and don't save
+						if(colWidth == 0){
+							b_ok = false;
+							break;
+						}else
+							seed_column_list.add(colWidth);
+
+					}
+					if(b_ok)
+						properties.setProperty("seedsTable.columns.widths", EncodingUtil.IntListToString(seed_column_list));
+				}
+
+				//Save Everything!
+				RCMain.getRCMain().saveConfig();
+
 				if(!sendMainWindowToTray ){ //This means a true exit from the program
 
-					//-----First we need to save everything for the user---\\
-
-					//Saving user preferences for the shell and sash
-					int size_x = DOWNLOAD_MANAGER_SHELL.getSize().x;
-					int size_y = DOWNLOAD_MANAGER_SHELL.getSize().y;
-
-					int position_x = DOWNLOAD_MANAGER_SHELL.getLocation().x;
-					int position_y = DOWNLOAD_MANAGER_SHELL.getLocation().y;
-					ExtendedProperties properties = RCMain.getRCMain().getProperties();
-
-					if (!sash.isDisposed()) {
-						int[] weights = sash.getWeights();
-						properties.setProperty("dms.sash.0", weights[0]);
-						properties.setProperty("dms.sash.1", weights[1]);
-					}
-					properties.setProperty("dms.size.x", size_x);
-					properties.setProperty("dms.size.y", size_y);
-					properties.setProperty("dms.position.x", position_x);
-					properties.setProperty("dms.position.y", position_y);
-
-
-					boolean b_ok = true;
-
-					//save the downloadsTable column widths
-					if (!downloadsTable.isDisposed()) {
-						b_ok = true;
-						TableColumn[] columns = downloadsTable.getColumns();
-						List<Integer> dl_column_list = new ArrayList<Integer>();
-						for (TableColumn column:columns){
-							int colWidth = column.getWidth();
-							//if it is 0, somthing is wrong.. break out and don't save
-							if(colWidth == 0){
-								b_ok = false;
-								break;
-							}else
-								dl_column_list.add(colWidth);
-						}
-						if(b_ok)
-							properties.setProperty("downloadsTable.columns.widths", EncodingUtil.IntListToString(dl_column_list));
-					}
-
-					//save the seedsTable column widths
-					if (!seedsTable.isDisposed()) {
-						b_ok=true;
-						TableColumn[] seed_columns = seedsTable.getColumns();
-						List<Integer> seed_column_list = new ArrayList<Integer>();
-						for (TableColumn column:seed_columns){
-							int colWidth = column.getWidth();
-							//if it is 0, somthing is wrong.. break out and don't save
-							if(colWidth == 0){
-								b_ok = false;
-								break;
-							}else
-								seed_column_list.add(colWidth);
-
-						}
-						if(b_ok)
-							properties.setProperty("seedsTable.columns.widths", EncodingUtil.IntListToString(seed_column_list));
-					}
-
-					//Save Everything!
-					RCMain.getRCMain().saveConfig();
-
-
-			 //-----Now check if the user wants a confirmation---\\
+					//-----Now check if the user wants a confirmation---\\
 
 					if(confirmExit){
 						MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
@@ -1810,7 +1812,7 @@ public class DownloadManagerShell {
 
 		//open shell
 		properties = RCMain.getRCMain().getProperties();
-		int size_x =properties.getPropertyAsInt("dms.size.x");
+		int size_x = properties.getPropertyAsInt("dms.size.x");
 		int size_y = properties.getPropertyAsInt("dms.size.y");
 		int position_x = properties.getPropertyAsInt("dms.position.x");
 		int position_y = properties.getPropertyAsInt("dms.position.y");
