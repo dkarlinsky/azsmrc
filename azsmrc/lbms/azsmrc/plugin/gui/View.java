@@ -6,6 +6,8 @@ package lbms.azsmrc.plugin.gui;
 
 
 
+import lbms.azsmrc.plugin.main.Plugin;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -20,8 +22,8 @@ import org.gudy.azureus2.ui.swt.plugins.UISWTViewEventListener;
 
 public class View implements UISWTViewEventListener {
 
-    boolean isCreated = false;
-    public static final String VIEWID = "AzSMRC_View";
+	boolean isCreated = false;
+	public static final String VIEWID = "AzSMRC_View";
 
 	//The current Display
 	private static Display display;
@@ -30,14 +32,14 @@ public class View implements UISWTViewEventListener {
 	public static Composite composite;
 
 
-    //The Plugin interface
-    PluginInterface pluginInterface;
+	//The Plugin interface
+	PluginInterface pluginInterface;
 
 
 
 
   public View(PluginInterface pluginInterface) {
-    this.pluginInterface = pluginInterface;
+	this.pluginInterface = pluginInterface;
 
   }
 
@@ -52,41 +54,42 @@ public class View implements UISWTViewEventListener {
 		// We store the Display variable as we'll need it for async GUI Changes
 		display = parent.getDisplay();
 
+		if (Plugin.isFirstRun())StartupWizard.open(display);
 
-        //Before starting the GUI we will initiate all of the pics
-        ImageRepository.loadImages(display);
+		//Before starting the GUI we will initiate all of the pics
+		ImageRepository.loadImages(display);
 
 
-        //Main composite layout
+		//Main composite layout
 		composite = new Composite(parent,SWT.NULL);
 
-        //Make the composite have a grid layout
-        GridLayout layout = new GridLayout();
+		//Make the composite have a grid layout
+		GridLayout layout = new GridLayout();
 
-        //set num of columns and margins
-        layout.numColumns = 1;
-
-
-        //set the composite to the layout
-        composite.setLayout(layout);
-
-        //GridData for the composite
-        GridData gridData = new GridData(GridData.FILL_BOTH);
-        gridData.grabExcessVerticalSpace = true;
-        gridData.grabExcessHorizontalSpace = true;
-        gridData.verticalSpan = 5;
-        composite.setLayoutData(gridData);
+		//set num of columns and margins
+		layout.numColumns = 1;
 
 
-        //Login Composite here and if successful, then show the main GUI
-        GUILogin.openLogin(composite);
+		//set the composite to the layout
+		composite.setLayout(layout);
+
+		//GridData for the composite
+		GridData gridData = new GridData(GridData.FILL_BOTH);
+		gridData.grabExcessVerticalSpace = true;
+		gridData.grabExcessHorizontalSpace = true;
+		gridData.verticalSpan = 5;
+		composite.setLayoutData(gridData);
+
+
+		//Login Composite here and if successful, then show the main GUI
+		GUILogin.openLogin(composite);
 
 
 
-        //GUIMain.open(composite);
+		//GUIMain.open(composite);
 
 
-        composite.layout();
+		composite.layout();
 
 	}
 
@@ -98,39 +101,39 @@ public class View implements UISWTViewEventListener {
  */
 
 public void delete() {
-    //Unload any custom colors
-    ColorUtilities.unloadColors();
+	//Unload any custom colors
+	ColorUtilities.unloadColors();
 
-    isCreated = false;
+	isCreated = false;
 
 
 }
 
 public boolean eventOccurred(UISWTViewEvent event) {
-    switch (event.getType()) {
+	switch (event.getType()) {
 
 
-    case UISWTViewEvent.TYPE_CREATE:
-        if (isCreated)
-          return false;
+	case UISWTViewEvent.TYPE_CREATE:
+		if (isCreated)
+		  return false;
 
-        isCreated = true;
-        break;
-
-
-    case UISWTViewEvent.TYPE_INITIALIZE:
-        initialize((Composite)event.getData());
-        break;
+		isCreated = true;
+		break;
 
 
+	case UISWTViewEvent.TYPE_INITIALIZE:
+		initialize((Composite)event.getData());
+		break;
 
-    case UISWTViewEvent.TYPE_DESTROY:
-        delete();
-        break;
 
-    }
 
-    return true;
+	case UISWTViewEvent.TYPE_DESTROY:
+		delete();
+		break;
+
+	}
+
+	return true;
 }
 
 
