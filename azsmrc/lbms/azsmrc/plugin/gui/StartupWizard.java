@@ -7,6 +7,9 @@
 
 package lbms.azsmrc.plugin.gui;
 
+import lbms.azsmrc.plugin.main.Plugin;
+import lbms.azsmrc.remote.client.plugins.PluginConfig;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.DisposeEvent;
@@ -31,6 +34,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.gudy.azureus2.core3.config.COConfigurationManager;
 
 
 public class StartupWizard {
@@ -109,7 +113,7 @@ public class StartupWizard {
 
 		//Left hand list side
 		lComp = new Composite(sash, SWT.BORDER);
-		lComp.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+		lComp.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = 1;
 		gridLayout.marginHeight = 0;
@@ -122,23 +126,23 @@ public class StartupWizard {
 		//Labels for lComp
 		step1 = new Label(lComp, SWT.LEFT);
 		step1.setText("Step 1");
-		step1.setBackground(display.getSystemColor(SWT.COLOR_LIST_SELECTION));
+		step1.setBackground(display.getSystemColor(SWT.COLOR_GRAY));
 
 		step2 = new Label(lComp, SWT.LEFT);
 		step2.setText("Step 2");
-		step2.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+		step2.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 
 		step3 = new Label(lComp, SWT.LEFT);
 		step3.setText("Step 3");
-		step3.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+		step3.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 
 		step4 = new Label(lComp, SWT.LEFT);
 		step4.setText("Step 4");
-		step4.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+		step4.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 
 		step5 = new Label(lComp, SWT.LEFT);
 		step5.setText("Step 5");
-		step5.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+		step5.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 
 		//Right hand composite
 		rComp = new Composite(sash, SWT.NULL);
@@ -198,6 +202,25 @@ public class StartupWizard {
 				else{
 					//This is where we need to commit everything
 					//TODO
+					try{
+						org.gudy.azureus2.plugins.PluginConfig pc = Plugin.getPluginInterface().getPluginconfig();
+						pc.setPluginParameter("remote_port", comPort);
+						pc.setPluginParameter("use_ssl", useSSL);
+						pc.setPluginParameter("statistics.allow", useStats);
+						//Save all
+						pc.save();
+						//right now we only have a core call to store the string settings
+						//COConfigurationManager.setParameter(xmlRequest.getAttributeValue("key"), xmlRequest.getAttributeValue("value"));
+						if(dirString != null && !dirString.equals("")){
+							COConfigurationManager.setParameter("Default save path", dirString);
+							COConfigurationManager.save();
+						}
+
+
+
+					}catch(Exception e){
+
+					}
 
 					shell.dispose();
 				}
@@ -349,7 +372,7 @@ public class StartupWizard {
 		comp.setLayoutData(gd);
 
 		final Button btnUseSSL = new Button(comp, SWT.CHECK);
-		btnUseSSL.setText("Use SSL (Secured Socet Layer) Communication");
+		btnUseSSL.setText("Use SSL (Secured Socket Layer) Communication");
 		btnUseSSL.setSelection(useSSL);
 		btnUseSSL.setFont(font12);
 		btnUseSSL.addListener(SWT.Selection, new Listener(){
@@ -448,9 +471,11 @@ public class StartupWizard {
 		dir.setLayoutData(gd);
 		if(dirString != null)
 			dir.setText(dirString);
-
+		else{
+			dir.setText(Plugin.getPluginInterface().getPluginconfig().getStringParameter("Default save path"));
+		}
 		Label dirImg = new Label(comp, SWT.NULL);
-		dirImg.setImage(display.getSystemImage(SWT.ICON_INFORMATION));
+		dirImg.setImage(ImageRepository.getImage("folder"));
 		dirImg.addMouseListener(new MouseListener(){
 
 			public void mouseDoubleClick(MouseEvent arg0) {}
@@ -488,43 +513,43 @@ public class StartupWizard {
 	private void loadStep(int stepToLoad){
 		switch (stepToLoad){
 		case 1:
-			step1.setBackground(display.getSystemColor(SWT.COLOR_LIST_SELECTION));
-			step2.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-			step3.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-			step4.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-			step5.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+			step1.setBackground(display.getSystemColor(SWT.COLOR_GRAY));
+			step2.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+			step3.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+			step4.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+			step5.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 			step1();
 			break;
 		case 2:
-			step1.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-			step2.setBackground(display.getSystemColor(SWT.COLOR_LIST_SELECTION));
-			step3.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-			step4.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-			step5.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+			step1.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+			step2.setBackground(display.getSystemColor(SWT.COLOR_GRAY));
+			step3.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+			step4.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+			step5.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 			step2();
 			break;
 		case 3:
-			step1.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-			step2.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-			step3.setBackground(display.getSystemColor(SWT.COLOR_LIST_SELECTION));
-			step4.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-			step5.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+			step1.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+			step2.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+			step3.setBackground(display.getSystemColor(SWT.COLOR_GRAY));
+			step4.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+			step5.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 			step3();
 			break;
 		case 4:
-			step1.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-			step2.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-			step3.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-			step4.setBackground(display.getSystemColor(SWT.COLOR_LIST_SELECTION));
-			step5.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+			step1.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+			step2.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+			step3.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+			step4.setBackground(display.getSystemColor(SWT.COLOR_GRAY));
+			step5.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 			step4();
 			break;
 		case 5:
-			step1.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-			step2.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-			step3.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-			step4.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-			step4.setBackground(display.getSystemColor(SWT.COLOR_LIST_SELECTION));
+			step1.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+			step2.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+			step3.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+			step4.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+			step4.setBackground(display.getSystemColor(SWT.COLOR_GRAY));
 			step5();
 			break;
 		}
