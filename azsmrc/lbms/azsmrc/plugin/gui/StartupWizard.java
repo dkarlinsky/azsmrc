@@ -8,8 +8,8 @@
 package lbms.azsmrc.plugin.gui;
 
 import lbms.azsmrc.plugin.main.Plugin;
-import lbms.azsmrc.remote.client.plugins.PluginConfig;
-import lbms.azsmrc.remote.client.swtgui.dialogs.ConnectionDialog;
+import lbms.azsmrc.plugin.main.Utilities;
+
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -21,7 +21,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -32,7 +31,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.gudy.azureus2.core3.config.COConfigurationManager;
@@ -236,7 +234,7 @@ public class StartupWizard {
 		loadStep(1);
 
 		//open shell
-		centerShellandOpen(shell, display);
+		Utilities.centerShellandOpen(shell);
 
 	}
 
@@ -570,25 +568,6 @@ public class StartupWizard {
 
 
 
-	/** Centers a Shell and opens it relative to the users Monitor
-	 *
-	 * @param shell
-	 */
 
-	public static void centerShellandOpen(Shell shell, Display display){
-		//open shell
-		shell.pack();
-
-		//Center Shell
-		Monitor primary = display.getPrimaryMonitor ();
-		Rectangle bounds = primary.getBounds ();
-		Rectangle rect = shell.getBounds ();
-		int x = bounds.x + (bounds.width - rect.width) / 2;
-		int y = bounds.y +(bounds.height - rect.height) / 2;
-		shell.setLocation (x, y);
-
-		//open shell
-		shell.open();
-	}
 
 }
