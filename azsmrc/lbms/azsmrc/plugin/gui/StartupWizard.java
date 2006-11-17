@@ -9,6 +9,7 @@ package lbms.azsmrc.plugin.gui;
 
 import lbms.azsmrc.plugin.main.Plugin;
 import lbms.azsmrc.remote.client.plugins.PluginConfig;
+import lbms.azsmrc.remote.client.swtgui.dialogs.ConnectionDialog;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -73,7 +74,7 @@ public class StartupWizard {
 	private String dirString;
 
 	//instance to make sure no more than one of these is open
-	StartupWizard instance;
+	private static StartupWizard instance;
 
 
 
@@ -82,7 +83,7 @@ public class StartupWizard {
 	 * Main open
 	 * @param _display
 	 */
-	private void open(Display _display){
+	private StartupWizard(Display _display){
 		display = _display;
 		instance = this;
 		shell = new Shell(display /*SWT.APPLICATION_MODAL*/);
@@ -555,22 +556,19 @@ public class StartupWizard {
 		}
 	}
 
+
 	/**
-	 * Test
-	 * 
-	 * @param args
+	 * Static open method
 	 */
-	public static void main(String[] args) {
-		Display display = Display.getDefault();
-
-		StartupWizard sw = new StartupWizard();
-
-		sw.open(display);
-		while (!sw.shell.isDisposed ()) {
-			if (!display.readAndDispatch ()) display.sleep ();
-		}
-		display.dispose ();
+	public static void open(Display display){
+		if(display == null) return;
+		if (instance == null || instance.shell == null || instance.shell.isDisposed()){
+			new StartupWizard(display);
+		}else
+			instance.shell.setActive();
 	}
+
+
 
 	/** Centers a Shell and opens it relative to the users Monitor
 	 *
