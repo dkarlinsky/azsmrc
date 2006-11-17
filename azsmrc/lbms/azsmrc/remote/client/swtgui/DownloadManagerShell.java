@@ -1775,10 +1775,19 @@ public class DownloadManagerShell {
 					}
 					//-----END of real exit -- everything below here keeps the program open---\\
 				}else{   //We just need to minimize everything here as we are not really exiting
-					event.doit = false;
+					//event.doit = false;
 					RCMain.getRCMain().updateTimer(false);
-					DOWNLOAD_MANAGER_SHELL.setMinimized(true);
-					DOWNLOAD_MANAGER_SHELL.setVisible(false);
+					RCMain.getRCMain().getClient().removeGlobalStatsListener(sul);
+					RCMain.getRCMain().getClient().removeConnectionListener(cl);
+					RCMain.getRCMain().getClient().getDownloadManager().removeListener(dml);
+					RCMain.getRCMain().getClient().removeClientUpdateListener(cul);
+					RCMain.getRCMain().getClient().removeParameterListener(pl);
+					DOWNLOAD_MANAGER_SHELL.dispose();
+					DOWNLOAD_MANAGER_SHELL = null;
+					RCMain.getRCMain().nullMainWindow();
+
+					//DOWNLOAD_MANAGER_SHELL.setMinimized(true);
+					//DOWNLOAD_MANAGER_SHELL.setVisible(false);
 				}
 			}
 
