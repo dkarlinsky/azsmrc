@@ -303,6 +303,7 @@ public class RCMain implements Launchable {
 						if (mainWindow == null) {
 							mainWindow = new DownloadManagerShell();
 						}
+						
 						mainWindow.open();
 						return;
 					}

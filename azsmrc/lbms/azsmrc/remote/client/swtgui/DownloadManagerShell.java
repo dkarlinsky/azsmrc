@@ -1775,6 +1775,7 @@ public class DownloadManagerShell {
 					}
 					//-----END of real exit -- everything below here keeps the program open---\\
 				}else{   //We just need to minimize everything here as we are not really exiting
+					event.doit = false;
 					RCMain.getRCMain().updateTimer(false);
 					DOWNLOAD_MANAGER_SHELL.setMinimized(true);
 					DOWNLOAD_MANAGER_SHELL.setVisible(false);
