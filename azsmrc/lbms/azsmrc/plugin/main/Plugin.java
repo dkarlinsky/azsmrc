@@ -80,6 +80,8 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 	private static FlexyConfiguration psFlexyConfig;
 	private static Map<String,Section> psSections = new HashMap<String, Section>();
 
+	private static boolean firstRun;
+
 	//new API startup code
 	UISWTInstance swtInstance = null;
 	UISWTViewEventListener myView = null;
@@ -91,7 +93,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		locale_utils.integrateLocalisedMessageBundle("lbms.azsmrc.plugin.internat.Messages");
 		pi=pluginInterface;
 
-		generateUID();
+		firstRun = generateUID();
 
 		UIManager   ui_manager = pluginInterface.getUIManager();
 		BasicPluginConfigModel config_model = ui_manager.createBasicPluginConfigModel( "plugins", "plugin.azsmrc");
@@ -573,6 +575,17 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 	public static FlexyConfiguration getPSFlexyConf() {
 		if (psFlexyConfig == null) psFlexyConfig = new FlexyConfiguration();
 		return psFlexyConfig;
+	}
+
+	/**
+	 * @return the firstRun
+	 */
+	public static boolean isFirstRun() {
+		if (firstRun) {
+			firstRun = false;
+			return true;
+		}
+		return firstRun;
 	}
 
 //EOF
