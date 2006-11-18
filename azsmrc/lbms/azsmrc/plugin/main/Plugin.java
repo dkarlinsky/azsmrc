@@ -216,8 +216,11 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		dm.addListener( new DownloadManagerListener()
 				{
 					public void downloadAdded(Download dl) {
-						if (!dl.isComplete())	//add only if the download isn't already complete
+						if (!dl.isComplete()) {	//add only if the download isn't already complete
 							dl.addListener(MultiUserDownloadListener.getInstance()); //attach DownloadListener
+							if (dl.getAttribute(MultiUser.TA_USER) == null)
+								dl.setAttribute(MultiUser.TA_USER, MultiUser.PUBLIC_DOWNLOAD_NAME);
+						}
 					}
 
 					public void downloadRemoved(Download dl) {

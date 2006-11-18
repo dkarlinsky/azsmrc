@@ -14,7 +14,6 @@ import java.util.Vector;
 import java.util.zip.GZIPOutputStream;
 
 import lbms.azsmrc.plugin.main.MultiUser;
-import lbms.azsmrc.plugin.main.MultiUserDownloadListener;
 import lbms.azsmrc.plugin.main.Plugin;
 import lbms.azsmrc.plugin.main.Timers;
 import lbms.azsmrc.plugin.main.User;
@@ -483,16 +482,17 @@ public class RequestManager {
 											}
 										}
 										user.eventDownloadFinished(dl);
-									} else if (dl.getAttribute(taUser) == null) {
-										dl.setAttribute(taUser, user.getUsername());
-										dl.addListener(MultiUserDownloadListener.getInstance());
-										if (Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("useUsernamesAsCategory", false)) {
-											dl.setAttribute(taCateory, user.getUsername());
-										}
 									} else {
-										dl.setAttribute(taUser, MultiUser.SHARED_USER_NAME);
-										if (Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("useUsernamesAsCategory", false)) {
-											dl.setAttribute(taCateory, MultiUser.SHARED_CAT_NAME);
+										if (MultiUser.isPublicDownload(dl)) {
+											dl.setAttribute(taUser, user.getUsername());
+											if (Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("useUsernamesAsCategory", false)) {
+												dl.setAttribute(taCateory, user.getUsername());
+											}
+										} else {
+											dl.setAttribute(taUser, MultiUser.SHARED_USER_NAME);
+											if (Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("useUsernamesAsCategory", false)) {
+												dl.setAttribute(taCateory, MultiUser.SHARED_CAT_NAME);
+											}
 										}
 									}
 								}
@@ -509,8 +509,6 @@ public class RequestManager {
 					}).start();
 				} else if (location.equalsIgnoreCase("XML")) {
 					try {
-						TorrentManager torrentManager = Plugin.getPluginInterface().getTorrentManager();
-						TorrentAttribute ta = torrentManager.getAttribute(TorrentAttribute.TA_CATEGORY);
 						Torrent newTorrent = getTorrentFromXML(xmlRequest.getChild("Torrent"));
 
 						String fileOptions = xmlRequest.getAttributeValue("fileOptions");
@@ -545,11 +543,18 @@ public class RequestManager {
 								}
 							}
 							user.eventDownloadFinished(dl);
-						} else if (dl.getAttribute(ta) == null) {
-							dl.setAttribute(ta, user.getUsername());
-							dl.addListener(MultiUserDownloadListener.getInstance());
 						} else {
-							dl.setAttribute(ta, MultiUser.SHARED_CAT_NAME);
+							if (MultiUser.isPublicDownload(dl)) {
+								dl.setAttribute(taUser, user.getUsername());
+								if (Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("useUsernamesAsCategory", false)) {
+									dl.setAttribute(taCateory, user.getUsername());
+								}
+							} else {
+								dl.setAttribute(taUser, MultiUser.SHARED_USER_NAME);
+								if (Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("useUsernamesAsCategory", false)) {
+									dl.setAttribute(taCateory, MultiUser.SHARED_CAT_NAME);
+								}
+							}
 						}
 					} catch (TorrentException e) {
 						user.eventException(e);

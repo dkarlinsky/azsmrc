@@ -9,13 +9,12 @@ import org.gudy.azureus2.core3.config.COConfigurationManager;
 import org.gudy.azureus2.plugins.disk.DiskManagerFileInfo;
 import org.gudy.azureus2.plugins.download.Download;
 import org.gudy.azureus2.plugins.download.DownloadException;
-import org.gudy.azureus2.plugins.torrent.TorrentAttribute;
 
 public class MultiUserDownloadListener implements org.gudy.azureus2.plugins.download.DownloadListener {
 
 	static private MultiUserDownloadListener instance = new MultiUserDownloadListener();
 	//static private TorrentAttribute taCategory = Plugin.getPluginInterface().getTorrentManager().getAttribute(TorrentAttribute.TA_CATEGORY);
-	static private TorrentAttribute taUser = Plugin.getPluginInterface().getTorrentManager().getPluginAttribute("User");
+
 
 	private MultiUserDownloadListener() {}
 
@@ -28,9 +27,10 @@ public class MultiUserDownloadListener implements org.gudy.azureus2.plugins.down
 
 	public void stateChanged(final Download download, int old_state, int new_state) {
 		if (old_state == Download.ST_DOWNLOADING && download.isComplete()) {
-			String user_attrib = download.getAttribute(taUser);
+			String user_attrib = download.getAttribute(MultiUser.TA_USER);
 			download.removeListener(this); //remove after trigger
-			final boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);if (user_attrib != null) {
+			final boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
+			if (user_attrib != null && !user_attrib.equals(MultiUser.PUBLIC_DOWNLOAD_NAME)) {
 				try {
 					if (!download.getSavePath().contains(COConfigurationManager.getStringParameter("Default save path"))) return;//not in standart save path
 					if (user_attrib.equalsIgnoreCase(MultiUser.SHARED_USER_NAME) ) { //Multiple owner
@@ -44,6 +44,7 @@ public class MultiUserDownloadListener implements org.gudy.azureus2.plugins.down
 							if (users.length == 1) {
 								download.moveDataFiles(new File(users[0].getOutputDir()));
 								download.moveTorrentFile(new File(users[0].getOutputDir()));
+								if (!singleUser)users[0].eventDownloadFinished(download);
 							} else {
 								new Thread(new Runnable (){
 									public void run () {

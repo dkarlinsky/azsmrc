@@ -4,15 +4,14 @@ import java.io.IOException;
 
 import lbms.azsmrc.plugin.main.User;
 
-import org.gudy.azureus2.plugins.tracker.web.TrackerWebPageResponse;
-import org.jdom.*;
+import org.jdom.Element;
 
 /**
  * @author Leonard
  *
  */
 public interface RequestHandler {
-	
+
 	/**
 	 * This function will handle xmlRequest and generate a response if
 	 * necessary.

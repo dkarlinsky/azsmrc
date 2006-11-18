@@ -401,8 +401,9 @@ public class TorrentDownload extends Download {
 
 	public boolean isTorrent (byte[] x) {
 		//we only need the 10 fist chars
-		byte[] y = new byte[10];
-		System.arraycopy(x, 0, y, 0, 10);
+		int length = x.length < 10 ? x.length : 10;
+		byte[] y = new byte[length];
+		System.arraycopy(x, 0, y, 0, length);
 
 		try {
 			if (torrentDataPattern.matcher(new String (y,"UTF-8")).find()) {
