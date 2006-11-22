@@ -13,6 +13,23 @@ var selectableDetails = ["Name", "Position", "Download Average", "Upload Average
 var selectedDetails = [1,1,0,0,1,1,1,1,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0];
 // SI Unit byte prefix
 var SI_byte = ["bytes", "kB", "MB", "GB", "TB"];
+function createXMLHTTP() {
+	var xmlhttp = null;
+	try {
+		if (window.XMLHttpRequest) {
+			xmlhttp = new XMLHttpRequest();
+		} else if(window.ActiveXObject) {
+		    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+	} catch(e) {
+	    return false;
+	}
+	return xmlhttp;
+}
+function doAutoRefresh(regTabID) {
+	if (refreshRequests[regTabID] > -1) 
+		SendRequestToServer(refreshRequests[regTabID]);
+}
 function doNothing() {
 	// empty function doing nothing
 	// used for links
@@ -47,6 +64,40 @@ function fetchData(xmlhttp) {
 				case "listTransfers":
 					handlelistTransfers(doc);
 				break;
+				case "getRemoteInfo":
+					document.getElementById("azversion").firstChild.data = "Azureus "+results[i].getAttribute("azureusVersion");
+					document.getElementById("azsmrcversion").firstChild.data = "AzSMRC "+results[i].getAttribute("pluginVersion");
+				break;
+				case "getUsers":
+					if (!document.getElementById("userTable"))
+						addTab("userManagement");
+					else {
+						var userTable = document.getElementById("userTableBody");
+						var users = doc.getElementsByTagName("User");
+						while (userTable.firstChild) userTable.removeChild(userTable.firstChild);
+						var tr, td;
+						for (var j in users) 
+							if (j < users.length) {
+								tr = document.createElement("tr");
+								td = document.createElement("td");
+								td.appendChild(document.createTextNode(users[j].getAttribute("username")));
+								tr.appendChild(td);
+								td = document.createElement("td");
+								td.appendChild(document.createTextNode(users[j].getAttribute("outputDir")));
+								tr.appendChild(td);
+								td = document.createElement("td");
+								td.appendChild(document.createTextNode(users[j].getAttribute("autoImportDir")));
+								tr.appendChild(td);
+								td = document.createElement("td");
+								td.appendChild(document.createTextNode(users[j].getAttribute("downloadSlots")));
+								tr.appendChild(td);
+								td = document.createElement("td");
+								td.appendChild(document.createTextNode((users[j].getAttribute("userRights") == 1) ? "true" : "false"));
+								tr.appendChild(td);
+								userTable.appendChild(tr);
+							}
+					}
+				break;
 				default:
 					addDebugEntry("unhandled request: "+result+" (aborting)");
 				break;
@@ -66,18 +117,30 @@ function getRequestOptions(request) {
 			options = ' options="'+options+'"';
 			return options;			
 		break;
+		case "addDownload":
+			var torrentURL = window.prompt("Please enter the URL for download\n\tmagnet and http works", "http://");
+			if (torrentURL != null) {
+				options = ' url="'+torrentURL+'"';
+			}
+			return options;
+		break;
 		default:
 			return options;
 		break;
 	}
 }
 function getRequestQuery(req) {
-//	var request = '<Query switch="'+request+'"'+options+' />';
 	var request = '';
 	switch (req) {
 		case "listTransfers":
 			request += '<Query switch="'+req+'"'+getRequestOptions(req)+' />';
 		break;
+		case "addDownload":
+			request += '<Query switch="'+req+'" location="url"'+getRequestOptions(req)+' />';
+			if (request == '<Query switch="'+req+'" location="url" />')
+				request = '';
+		break;	
+		case "removeDownload":
 		case "recheckDataDownload":
 		case "restartDownload":
 		case "startDownload":
@@ -97,11 +160,20 @@ function getRequestQuery(req) {
 	}
 	return request;
 }
+function getTCState(hash) {
+	for (var i in selectedTransfers)
+		if (selectedTransfers[i] == hash)
+			return true;
+	return false;
+}
 function initAzSMRCwebUI() {	
-	initDebugLog()
+	initDebugLog();
 	//showSplashScreen();
+	configAutoRefresh();
 	initTabControl();
 	PingToServer();
+	SendRequestToServer(40);
+	refreshView();
 }
 function PingToServer() {
 	var img = document.getElementById("connectionstatus");
@@ -115,10 +187,15 @@ function refreshView() {
 	switch (tabs[activeTab]) {
 		case "listTransfers":
 			selectedTransfers = [];
+			// listTransfers
 			SendRequestToServer(1);
 		break;
 		case "debug":
 			clearDebugLog();
+		break;
+		case "about":
+			// getRemoteInfo
+			SendRequestToServer(40);
 		break;
 		default: 
 			PingToServer();
@@ -165,56 +242,61 @@ function selectTC(obj) {
 }
 function SendRequestToServer(request) {
 	request = registeredRequests[request];
-	var xmlhttp;
-	var statusbarentry = document.getElementById("requeststatus").firstChild;
 	// respondig file fo server: process.cgi
 	// edit line below if changes
 	var requestURL = Server+"process.cgi";
-	var options = getRequestOptions(request);
-	var xmlrequest = '<?xml version="1.0" encoding="UTF-8"?><Request version="1.0">'+getRequestQuery(request)+'</Request>';
-	// no empty requests
-	if (xmlrequest != '<?xml version="1.0" encoding="UTF-8"?><Request version="1.0"></Request>') {
-		addDebugEntry("XML Request: "+xmlrequest);
-		try {
-			if (window.XMLHttpRequest) {
-				xmlhttp = new XMLHttpRequest();
-			} else if(window.ActiveXObject) {
-			    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+	var xmlhttp = createXMLHTTP();
+	if (xmlhttp) {
+		var statusbarentry = document.getElementById("requeststatus").firstChild;
+		var xmlrequest = '<?xml version="1.0" encoding="UTF-8"?><Request version="1.0">'+getRequestQuery(request)+'</Request>';
+		// no empty requests
+		if (xmlrequest != '<?xml version="1.0" encoding="UTF-8"?><Request version="1.0"></Request>') {
+			addDebugEntry("XML Request: "+xmlrequest);
+			xmlhttp.open("POST", requestURL, true);
+			xmlhttp.setRequestHeader("Content-type","application/xml"); 
+			xmlhttp.setRequestHeader("Connection","close"); 
+			xmlhttp.onreadystatechange = function () {
+				switch (xmlhttp.readyState) {
+					case 0:
+						statusbarentry.data = "uninitialized";
+					break;
+					case 1:
+						statusbarentry.data = "open request";
+					break;
+					case 2:
+						statusbarentry.data = "request sent";
+					break;
+					case 3:
+						statusbarentry.data = "receiving response";
+					break;
+					case 4:
+						statusbarentry.data = "response loaded";	
+						fetchData(xmlhttp);		
+					break;
+					default:
+						statusbarentry.data = "unknown state";
+					break;
+				}
 			}
-		} catch(e) {
-		    return false;
+			xmlhttp.send(xmlrequest);
 		}
-		xmlhttp.open("POST", requestURL, true);
-		xmlhttp.setRequestHeader("Content-type","application/xml"); 
-		xmlhttp.setRequestHeader("Connection","close"); 
-		xmlhttp.onreadystatechange = function () {
-			switch (xmlhttp.readyState) {
-				case 0:
-					statusbarentry.data = "uninitialized";
-				break;
-				case 1:
-					statusbarentry.data = "open request";
-				break;
-				case 2:
-					statusbarentry.data = "request sent";
-				break;
-				case 3:
-					statusbarentry.data = "receiving response";
-				break;
-				case 4:
-					statusbarentry.data = "response loaded";	
-					fetchData(xmlhttp);		
-				break;
-				default:
-					statusbarentry.data = "unknown state";
-				break;
-			}
-		}
-	xmlhttp.send(xmlrequest);
 	}
 }
 function showSplashScreen() {
 	// just a funny splashscreen function
 	document.getElementById("splashscreen").style.display = "block";
 	setTimeout("removeSplashScreen()", 5000);
+}
+function configAutoRefresh() {
+	var regTabID, i;
+	for (i in autoRefreshObjs)
+		if (autoRefreshObjs[i] != null)
+			window.clearInterval(autoRefreshObjs[i]);
+	for (i in tabs) 
+		if (tabs[i]) {
+			regTabID = getRegTabById(i);
+			if (autoRefresh[regTabID] > 0) {
+				autoRefreshObjs[regTabID] = window.setInterval("doAutoRefresh("+regTabID+")", autoRefresh[regTabID]);
+			}
+		}
 }

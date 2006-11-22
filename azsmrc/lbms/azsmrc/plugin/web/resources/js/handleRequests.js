@@ -1,11 +1,11 @@
 // attributes that are allowed to be shown
 var attributes = ["health", "position", "name", "state", "status", "downloaded", "uploaded", "forceStart", "downloadAVG", "uploadAVG", "totalAVG", "elapsedTime", "eta", "availability", "completition", "shareRatio", "tracker", "downloadLimit", "uploadLimit", "total_seeds", "total_leechers", "size", "last_scrape", "next_scrape", "hash"];
 // enable attributefiltering for tables
-var onlyDLAtt = [0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0]; 
-var onlyULAtt = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+var onlyDLAtt = [0,0,0,0,0,0,0,1,1,0,0,0,1,0,1,0,0,1,0,0,0,0,0,0,0]; 
+var onlyULAtt = [0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 // output strings for attributes
 // empty string defines no output
-var formalAttributes = ["Health", "#", "Name", "", "Status", "Downloaded", "Uploaded", "", "Down Speed", "Up Speed", "Total Speed", "Elapsed time", "ETA", "Availability", "Done", "Share Ratio", "Tracker Status", "max. #DL", "max #UL", "Seeds", "Peers", "Size", "Scrape", "next Scrape", ""];
+var formalAttributes = ["Health", "#", "Name", "", "Status", "Downloaded", "Uploaded", "", "Down Speed", "Up Speed", "Total Speed", "Elapsed time", "ETA", "Availability", "Done", "Share Ratio", "Tracker Status", "max. DL speed", "max UL speed", "Seeds", "Peers", "Size", "Scrape", "next Scrape", ""];
 // event types
 var eventTypes = ["unknown", "Download Completed", "Download Torrent Removed", "Download Exception", "System Exception", "Update Available", "Message", "Error Message", "Plugin Message"];
 // additional interactions listed in interaction menu
@@ -51,7 +51,11 @@ function addlistTransfersInteraction() {
 	button.setAttribute("value", "Close");
 	button.setAttribute("title", "Close Form");
 	button.className = "closeButton";
-	button.onclick = function () { document.getElementById("labelselectionform").style.display = "none"; };
+	button.onclick = function () {
+		document.getElementById("labelselectionform").style.display = "none";
+		if (window.confirm("Do you want to apply the new settings?\n\tClick OK for refresh!"))
+			refreshView();
+	};
 	form.appendChild(button);
 	link = document.createElement("a");
 	link.setAttribute("title", "Open Labelselection");
@@ -90,30 +94,43 @@ function addlistTransfersInteraction() {
 	div.style.display = "block";
 	return div;
 }
-function adduserManagement() {
+function addUserManagement() {
 	var div = document.createElement("div");
 	var heading = document.createElement("h2");
 	heading.appendChild(document.createTextNode("User Management"));
 	div.appendChild(heading);
-	var p = document.createElement("p");
-	p.appendChild(document.createTextNode("in progress"));
-	div.appendChild(p);
-	/*
+	
 	var userTable, tr, td, tbody;
 	userTable = document.createElement("table");
+	userTable.setAttribute("id", "userTable");
 	userTable.setAttribute("summary", "List of users for AzSMRC");
 	userTable.setAttribute("rules", "groups");		
 	tr = document.createElement("caption");
 	tr.appendChild(document.createTextNode("List of users"));
 	userTable.appendChild(tr);
 	tbody = document.createElement("thead");
+	tr = document.createElement("tr");
+	td = document.createElement("th");
+	td.appendChild(document.createTextNode("Username"));
+	tr.appendChild(td);
+	td = document.createElement("th");
+	td.appendChild(document.createTextNode("Output Directory"));
+	tr.appendChild(td);
+	td = document.createElement("th");
+	td.appendChild(document.createTextNode("Import Directory"));
+	tr.appendChild(td);
+	td = document.createElement("th");
+	td.appendChild(document.createTextNode("Downloadslots"));
+	tr.appendChild(td);
+	td = document.createElement("th");
+	td.appendChild(document.createTextNode("has Adminrights"));
+	tr.appendChild(td);
+	tbody.appendChild(tr);	
 	userTable.appendChild(tbody);
-	
 	tbody = document.createElement("tbody");
 	tbody.setAttribute("id", "userTableBody");
 	userTable.appendChild(tbody);	
-	div.appendChild(userTable);
-	*/
+	div.appendChild(userTable);	
 	return div;
 }
 // creates torrent interaction buttons and menues
@@ -164,6 +181,7 @@ function getAttributeFormat(attributeID, value) {
 		case "completition":
 			return document.createTextNode((value/10)+" %");
 		break;
+		case "totolAVG":
 		case "downloadAVG":
 		case "uploadAVG":
 			var i = 0;
@@ -345,12 +363,21 @@ function handlelistTransfers(xmldoc) {
 		if (list == null) {
 			addTab("listTransfers");
 			list = document.getElementById("tab_"+tabCount);
-		} else while (list.firstChild) list.removeChild(list.firstChild);
-		list.appendChild(addlistTransfersInteraction());
+			list.appendChild(addlistTransfersInteraction());
+		} else 
+			if (list.lastChild != list.firstChild)
+				list.removeChild(list.lastChild);
+			else {
+				list.removeChild(list.firstChild);
+				list.appendChild(addlistTransfersInteraction());				
+			}
+		var container = document.createElement("div");
 		var downloads = document.createElement("table");
 		var uploads = document.createElement("table");
 		var caption, dlbody, ulbody, tr, td;
 		var isDoneCol = -1;
+		var isStatusCol = -1;
+		var isForceCol = -1;
 		downloads.setAttribute("summary", "List of current Downloads on Server");
 		downloads.setAttribute("rules", "groups");
 		caption = document.createElement("caption");
@@ -372,14 +399,21 @@ function handlelistTransfers(xmldoc) {
 			td.setAttribute("title", "TransferController");
 			tr.appendChild(td);
 			for (i in transferDataField[0]) {
-				if (formalAttributes[transferDataField[0][i]] != "")
-					if (((j == 0) && (onlyULAtt[transferDataField[0][i]] == 0)) || ((j == 1) && (onlyDLAtt[transferDataField[0][i]] == 0))) {
-						td = document.createElement("th");
-						td.appendChild(document.createTextNode(formalAttributes[transferDataField[0][i]]));
-						// special Cols
+				if ((formalAttributes[transferDataField[0][i]] != "")
+					// or required for speciel cols
+					|| (attributes[transferDataField[0][i]] == "forceStart")
+					) {
+					// special cols
+						if (attributes[transferDataField[0][i]] == "forceStart") isForceCol = i;
 						if (attributes[transferDataField[0][i]] == "completition") isDoneCol = i;
-						tr.appendChild(td);
-					}	
+						if (attributes[transferDataField[0][i]] == "status") isStatusCol = i;
+					// normal viewport
+						if (((j == 0) && (onlyULAtt[transferDataField[0][i]] == 0)) || ((j == 1) && (onlyDLAtt[transferDataField[0][i]] == 0))) {
+							td = document.createElement("th");
+							td.appendChild(document.createTextNode(formalAttributes[transferDataField[0][i]]));
+							tr.appendChild(td);
+						}
+					}
 			}
 			dlbody.appendChild(tr);
 			if (j == 0) downloads.appendChild(dlbody);
@@ -401,16 +435,19 @@ function handlelistTransfers(xmldoc) {
 				td = document.createElement("td");
 				transferCtrl = document.createElement("input");
 				transferCtrl.setAttribute("type", "checkbox");
-				transferCtrl.checked = false;
+				transferCtrl.checked = getTCState(transferDataField[j][hash]);
 				transferCtrl.setAttribute("value", "check for interaction selection");
 				transferCtrl.setAttribute("name", "transferCtrl");
 				transferCtrl.className = "transferCtrl";
+				transferCtrl.onclick = function () { selectTC(this.parentNode.parentNode); };
 				td.appendChild(transferCtrl);
 				tr.appendChild(td);
 				for (i in transferDataField[j]) {
 					if (formalAttributes[transferDataField[0][i]] != "")
 						if (((activeTable == 0) && (onlyULAtt[transferDataField[0][i]] == 0)) || ((activeTable == 1) && (onlyDLAtt[transferDataField[0][i]] == 0))) {
 							td = document.createElement("td");
+							if ((i == isStatusCol) && (transferDataField[j][isForceCol] == "true")) 
+									td.appendChild(document.createTextNode("Forced "));
 							td.appendChild(getAttributeFormat(transferDataField[0][i], transferDataField[j][i]));						
 							tr.appendChild(td);
 						}
@@ -420,11 +457,12 @@ function handlelistTransfers(xmldoc) {
 			}
 		if (dlbody.hasChildNodes()) {
 			downloads.appendChild(dlbody);
-			list.appendChild(downloads);
+			container.appendChild(downloads);
 		}
 		if (ulbody.hasChildNodes()) {
 			uploads.appendChild(ulbody);
-			list.appendChild(uploads);		
+			container.appendChild(uploads);		
 		}
+		list.appendChild(container);
 	}
 }

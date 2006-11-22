@@ -31,7 +31,7 @@ var registeredRequests = [
 "getUsers",
 "updateUser",
 "addUser",
-"remoeUser",
+"removeUser",
 "setAzParameter",
 "getAzParameter",
 "setPluginParameter",

@@ -11,6 +11,7 @@
 	<meta name="creation_date" content="04/09/2006" />
 	<!-- Scripts -->
 	<script type="text/javascript" src="js/debugLog.js" />
+	<script type="text/javascript" src="js/fileUpload.js" />
 	<script type="text/javascript" src="js/registeredRequests.js" />
 	<script type="text/javascript" src="js/handleRequests.js" />
 	<script type="text/javascript" src="js/tabControl.js" />
@@ -28,17 +29,18 @@
 		<ul id="picmenu" class="menu">
 			<li><img src="img/connect.png" alt="Open ALL Torrents" title="Open ALL Torrents" onclick="addTab('listTransfers');" /></li>
 			<li class="subbreak"><img src="img/refresh.png" alt="Refresh" title="Refresh" onclick="refreshView();" /></li>
-			<li><img src="img/open_by_file_new.png" alt="Send Torrent File to Server" title="Send Torrent File to Server" onclick="addTab('SendTorrentFile');" /></li>
-			<li class="subbreak"><img src="img/open_by_url_new.png" alt="Send Torrent URL to Server" title="Send Torrent URL to Server" /></li>
-			<li><img src="img/top.png" alt="Move to Top" title="Move to Top" /></li>
+			<li><img src="img/open_by_file_new.png" alt="Send Torrent File to Server" title="Send Torrent File to Server" onclick="addTab('fileUpload');" /></li>
+			<li class="subbreak"><img src="img/open_by_url_new.png" alt="Send Torrent URL to Server" title="Send Torrent URL to Server" onclick="SendRequestToServer(3);" /></li>
+			<!--<li><img src="img/top.png" alt="Move to Top" title="Move to Top" /></li>-->
 			<li><img src="img/up.png" alt="Move Up" title="Move Up" onclick="SendRequestToServer(15);" /></li>
-			<li><img src="img/down.png" alt="Move Down" title="Move Down" onclick="SendRequestToServer(16);" /></li>
-			<li class="subbreak"><img src="img/bottom.png" alt="Move to Bottom" title="Move to Bottom" /></li>
+			<li class="subbreak"><img src="img/down.png" alt="Move Down" title="Move Down" onclick="SendRequestToServer(16);" /></li>
+			<!--<li class="subbreak"><img src="img/bottom.png" alt="Move to Bottom" title="Move to Bottom" /></li>-->
+			<li><img src="img/tool_delete.png" alt="Delete" title="Delete" onclick="SendRequestToServer(4);" /></li>
 			<li><img src="img/tool_pause.png" alt="Pause" title="Pause" onclick="SendRequestToServer(5);" /></li>
-			<li class="subbreak"><img src="img/tool_resume.png" alt="Resume" title="Resume" onclick="SendRequestToServer(11);" /></li>
-			<li><img src="img/preferences.png" alt="Open Preferences" title="Open Preferences" /></li>
+			<li class="subbreak"><img src="img/tool_resume.png" alt="Resume" title="Resume" onclick="SendRequestToServer(7);" /></li>
+			<!--<li><img src="img/preferences.png" alt="Open Preferences" title="Open Preferences" onclick="SendRequestToServer(41);" /></li>-->
 			<li><img src="img/manage_users.png" alt="Manage Users" title="Manage Users" onclick="addTab('userManagement'); SendRequestToServer(29);" /></li>
-			<li><img src="img/console.png" alt="Open Console" title="Open Console" onclick="addTab('debug');" /></li>
+			<!--<li><img src="img/console.png" alt="Open Console" title="Open Console" /></li>-->
 			<li><img src="img/information.png" alt="Information" title="Information" onclick="addTab('about');" /></li>
 		</ul>	
 		<ul id="tabbar" class="menu"><li><span onclick="ShowTab(this.getAttribute('tab'));">ALL Torrents</span><img src="img/delete.png" alt="Close Tab" title="Close Tab" onclick="closeTab(this);" /></li><li><span onclick="ShowTab(this.getAttribute('tab'));">About</span><img src="img/delete.png" alt="Close Tab" title="Close Tab" onclick="closeTab(this);" /></li><li><span onclick="ShowTab(this.getAttribute('tab'));">Debug Log</span><img src="img/delete.png" alt="Close Tab" title="Close Tab" onclick="closeTab(this);" /></li></ul>
@@ -51,7 +53,7 @@
 	</div>
 	<div id="interaction_container"><p>No interaction menu given.</p></div>
 	<div id="statusbar">
-		<a title="Open Debug Log" onclick="addTab('debug');">Open Debug Log</a><span id="eventstatus">no new events</span><span onclick="PingToServer();" id="ping">Ping: undefined</span><span id="requeststatus">no request sent</span><img id="connectionstatus" src="img/connect_no.png" alt="Connection not established" title="Not connected to Server" />
+		<a title="Open Debug Log" onclick="addTab('debug');">Open Debug Log</a><span id="azversion">unknown version</span><span id="azsmrcversion">unknown version</span><span id="eventstatus">no new events</span><span onclick="PingToServer();" id="ping">Ping: undefined</span><span id="requeststatus">no request sent</span><img id="connectionstatus" src="img/connect_no.png" alt="Connection not established" title="Not connected to Server" />
 	</div>	
 </body>
 </html>

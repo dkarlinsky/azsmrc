@@ -3,7 +3,13 @@ var activeTab = 0;
 // for easy usage it is a simple counter, do NOT decrease this counter anytime
 var tabCount = 2;
 // available tabs
-var registeredTabs = ["listTransfers", "about", "debug", "userManagement"];
+var registeredTabs = ["listTransfers", "about", "debug", "userManagement", "fileUpload"];
+// auto refresh for registered tabs (standard refresh time in ms)
+var autoRefresh = [5000, 0, 0, 0, 0];
+// requests used by registeredTabs (-1 = none)
+var refreshRequests = [1, -1, -1, 29, -1];
+// objects for deactivating autorefresh
+var autoRefreshObjs = [null, null, null, null];
 // open tabs at position (default is set below)
 var tabs = ["listTransfers", "about", "debug"];
 // an example tab (tabbar is list of tabs)
@@ -36,6 +42,9 @@ function addTab(contentElement) {
 			break;
 			case "userManagement":
 				label = document.createTextNode("Users");
+			break;
+			case "fileUpload":
+				label = document.createTextNode("TorrentUpload");
 			break;
 			default:
 				label = document.createTextNode("empty Tab");
@@ -76,7 +85,10 @@ function addTab(contentElement) {
 				tabContent.appendChild(addlistTransfersInteraction());
 			break;
 			case "userManagement":
-				tabContent.appendChild(adduserManagement());
+				tabContent.appendChild(addUserManagement());
+			break;
+			case "fileUpload":
+				tabContent.appendChild(addUploadContent());
 			break;
 			default:
 				tabContent.appendChild(document.createTextNode("This tab is empty!"));
@@ -85,6 +97,8 @@ function addTab(contentElement) {
 		contentList.appendChild(tabContent);
 		tabs[tabCount] = contentElement;
 		ShowTab(tabCount);
+		refreshView();
+		configAutoRefresh();
 	}
 }
 function closeTab(tabObj) {
@@ -104,6 +118,16 @@ function closeTab(tabObj) {
 		} else activeTab = -1;
 	}
 	tabs[tabID] = "";
+	configAutoRefresh();
+}
+function getRegTabById(tabID) {
+	var tab = null;
+	for (var i in registeredTabs)
+		if (registeredTabs[i] == tabs[tabID]) {
+			tab = i;
+			break;
+		}
+	return i;
 }
 function getTabByContent(contentElement) {
 	var list = null;
