@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -68,8 +69,8 @@ public class StartupWizard {
 
 
 	//Stored Info
-	private int comPort = Plugin.getPluginInterface().getPluginconfig().getPluginIntParameter("azsmrc.remote.port");
-	private boolean useSSL = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("azsmrc.use.ssl");
+	private int comPort = Plugin.getPluginInterface().getPluginconfig().getPluginIntParameter("remote_port");
+	private boolean useSSL = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("use_ssl");
 	private boolean useStats = true;
 	private String dirString;
 
@@ -108,8 +109,8 @@ public class StartupWizard {
 		sash.setLayout(new GridLayout());
 
 		GridData gridData = new GridData(GridData.FILL_BOTH);
-		gridData.heightHint =300;
-		gridData.widthHint = 600;
+		gridData.heightHint = 300;
+		gridData.widthHint  = 750;
 		sash.setLayoutData(gridData);
 
 		//Left hand list side
@@ -189,7 +190,7 @@ public class StartupWizard {
 		btnPrevious.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
 				if(step!=0)
-					loadStep(step-1);
+					loadStep(--step);
 			}
 		});
 
@@ -211,18 +212,13 @@ public class StartupWizard {
 						//Save all
 						pc.save();
 						//right now we only have a core call to store the string settings
-						//COConfigurationManager.setParameter(xmlRequest.getAttributeValue("key"), xmlRequest.getAttributeValue("value"));
+						//HACK: COConfigurationManager.setParameter(xmlRequest.getAttributeValue("key"), xmlRequest.getAttributeValue("value"));
 						if(dirString != null && !dirString.equals("")){
 							COConfigurationManager.setParameter("Default save path", dirString);
 							COConfigurationManager.save();
 						}
-
-
-
 					}catch(Exception e){
-
 					}
-
 					shell.dispose();
 				}
 
@@ -307,6 +303,8 @@ public class StartupWizard {
 		final Text port = new Text(comp, SWT.SINGLE | SWT.BORDER);
 		port.setText(String.valueOf(comPort));
 		port.setFont(font12);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		port.setLayoutData(gd);
 		port.addListener (SWT.Verify, new Listener () {
 			public void handleEvent (Event e) {
 				String string = e.text;
@@ -385,14 +383,20 @@ public class StartupWizard {
 		//Label explaining everything
 		Label label = new Label(comp, SWT.NULL);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 2;
 		label.setLayoutData(gd);
 
 		label.setText("\n\nEnabling this option allow for secure communication\nbetween Azureus running AzSMRC and the remote interface" +
 				"\n\nNotes:\n - Default is off" +
-				"\n - You need to create a certificate in Azurues to use this feature (Tools->Options->Security)");
+				"\n - You need to create a certificate in Azurues to use this feature (Tools->Options->Security)"+
+				"\n - If you have created a certificate you need to resart Azureus for changes to take effect.");
 
-		Button create_cert = new Button (comp, SWT.PUSH);
+		//HACK: Non PluginInterface action
+		Group certGroup = new Group(comp, SWT.NONE);
+		certGroup.setText("Create certificate");
+		certGroup.setLayout(new GridLayout(1, false));
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		certGroup.setLayoutData(gd);
+		Button create_cert = new Button (certGroup, SWT.PUSH);
 		Messages.setLanguageText(create_cert, "ConfigView.section.tracker.createbutton");
 
 		create_cert.addListener(SWT.Selection,
@@ -405,13 +409,10 @@ public class StartupWizard {
 					}
 				});
 
-		Label	info_label = new Label( comp, SWT.NULL );
+		Label	info_label = new Label( certGroup, SWT.NULL );
 		Messages.setLanguageText( info_label, "ConfigView.section.security.toolsinfo" );
-		gd = new GridData();
-		gd.horizontalSpan = 2;
-		info_label.setLayoutData( gd );
 
-
+		//certGroup.pack();
 		parent.layout();
 	}
 
@@ -432,7 +433,7 @@ public class StartupWizard {
 		comp.setLayoutData(gd);
 
 		final Button btnUseStats = new Button(comp, SWT.CHECK);
-		btnUseStats.setText("Allow Anonymous Statistics Reporting");
+		btnUseStats.setText("Allow Anonymous Statistics");
 		btnUseStats.setSelection(useStats);
 		btnUseStats.setFont(font12);
 		btnUseStats.addListener(SWT.Selection, new Listener(){
@@ -449,7 +450,7 @@ public class StartupWizard {
 		gd.horizontalSpan = 2;
 		label.setLayoutData(gd);
 
-		label.setText("\n\nAllow AzSMRC to send version and random ID for anonymous usage statistics" +
+		label.setText("\n\nAllow AzSMRC to send version and random ID, when checking for updates, for anonymous usage statistics." +
 				"\n\nNotes:\n - Default is off" +
 				"\n - The data is stored for 24 hours and will be deleted afterwards");
 
