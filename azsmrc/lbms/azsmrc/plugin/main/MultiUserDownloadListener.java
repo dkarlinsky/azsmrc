@@ -30,9 +30,33 @@ public class MultiUserDownloadListener implements org.gudy.azureus2.plugins.down
 			String user_attrib = download.getAttribute(MultiUser.TA_USER);
 			download.removeListener(this); //remove after trigger
 			final boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
+
+
 			if (user_attrib != null && !user_attrib.equals(MultiUser.PUBLIC_DOWNLOAD_NAME)) {
 				try {
-					if (!download.getSavePath().contains(COConfigurationManager.getStringParameter("Default save path"))) return;//not in standart save path
+					if (!download.getSavePath().contains(COConfigurationManager.getStringParameter("Default save path"))) {
+
+
+						if (!singleUser){
+							if (user_attrib.equalsIgnoreCase(MultiUser.SHARED_USER_NAME) ) {
+								User[] users = Plugin.getXMLConfig().getUsersOfDownload(download);
+								for (int i=0;i<users.length-1;i++) {
+									users[i].eventDownloadFinished(download);
+								}
+							} else {
+								User user = Plugin.getXMLConfig().getUser(user_attrib);
+								user.eventDownloadFinished(download);
+							}
+						} else {
+							User[] users = Plugin.getXMLConfig().getUsers();
+							for (User u:users) {
+								u.eventDownloadFinished(download);
+							}
+						}
+						return;//not in standart save path
+					}
+
+
 					if (user_attrib.equalsIgnoreCase(MultiUser.SHARED_USER_NAME) ) { //Multiple owner
 						DiskManagerFileInfo[] fileInfo = download.getDiskManagerFileInfo();
 						final File[] files = new File[fileInfo.length];
@@ -83,9 +107,13 @@ public class MultiUserDownloadListener implements org.gudy.azureus2.plugins.down
 				} catch (DownloadException e) {
 					Plugin.addToLog(e.getMessage());
 				}
+
+
 			} else if (!singleUser){
 
 			}
+
+
 			if (singleUser) {
 				User[] users = Plugin.getXMLConfig().getUsers();
 				for (User u:users) {
