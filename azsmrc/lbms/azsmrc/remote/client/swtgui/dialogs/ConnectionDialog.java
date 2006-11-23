@@ -366,7 +366,9 @@ public class ConnectionDialog {
 			try {
 				x = new LoginData(properties.getProperty("lastConnection"));
 			} catch (MalformedURLException e) {
-				x = loginDataList.get(0);
+				if (loginDataList.size() > 0)
+					x = loginDataList.get(0);
+				else x = new LoginData("",49009,"","",false); //default values
 			}
 		else
 			x = loginDataList.get(index);
@@ -401,23 +403,30 @@ public class ConnectionDialog {
 	private void fillCombo(){
 		urlCombo.removeAll();
 		loadConnections();
-
-		for(int i = 0; i < loginDataList.size(); i++) {
-			urlCombo.add(loginDataList.get(i).getHost());
-			urlCombo.select(0);
-		}
-
+		LoginData lastCon = null;
 		if (properties.containsKey("lastConnection")) {
 			if (properties.containsKey("lastConnection"))
 				try {
-					urlCombo.add(new LoginData(properties.getProperty("lastConnection")).getHost());
-					urlCombo.select(urlCombo.getItems().length-1);
+					lastCon = new LoginData(properties.getProperty("lastConnection"));
 				} catch (MalformedURLException e1) {
 					e1.printStackTrace();
+					lastCon = null;
 				}
 		}
-		else if(loginDataList.size()>1)
-			loadIndex(0);
+
+		for(int i = 0; i < loginDataList.size(); i++) {
+			urlCombo.add(loginDataList.get(i).getHost());
+			if (lastCon != null && lastCon.equals(loginDataList.get(i))) {
+				urlCombo.select(i);
+				loadIndex(i);
+			}
+		}
+
+		if (lastCon != null && !loginDataList.contains(lastCon)) {
+			urlCombo.add(lastCon.getHost());
+			urlCombo.select(urlCombo.getItems().length-1);
+			loadIndex(urlCombo.getItems().length-1);
+		}
 	}
 
 
@@ -548,6 +557,7 @@ public class ConnectionDialog {
 	public void deleteConnection (int id) {
 		loginDataList.remove(id);
 		saveToConfig ();
+		fillCombo();
 	}
 
 	/**
@@ -566,6 +576,7 @@ public class ConnectionDialog {
 		} else {
 			loginDataList.add(logData);
 			Collections.sort(loginDataList);
+			fillCombo();
 			saveToConfig ();
 		}
 	}
@@ -584,6 +595,7 @@ public class ConnectionDialog {
 	}
 
 	public void loadConnections () {
+		loginDataList.clear();
 		for (int i = 0;properties.containsKey("connection_"+i);i++) {
 			try {
 				loginDataList.add(new LoginData(properties.getProperty("connection_"+i)));

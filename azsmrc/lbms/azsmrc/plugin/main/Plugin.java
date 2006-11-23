@@ -108,7 +108,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		config_model.addIntParameter2("remote_port", "azsmrc.remote.port", 49009);
 		config_model.addLabelParameter2("azsmrc.portchange.alert");
 		config_model.addLabelParameter2("azsmrc.statistics.label");
-		config_model.addBooleanParameter2("statistics.allow", "azsmrc.statistics.allow", true);
+		config_model.addBooleanParameter2("statistics.allow", "azsmrc.statistics.allow", false);
 
 		//Load the config file
 		config = XMLConfig.loadConfigFile(pluginInterface.getPluginDirectoryName() + System.getProperty("file.separator") + "MultiUserConfig.xml");

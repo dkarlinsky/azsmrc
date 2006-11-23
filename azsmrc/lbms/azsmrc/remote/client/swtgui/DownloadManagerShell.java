@@ -327,7 +327,22 @@ public class DownloadManagerShell {
 		exitItem.setAccelerator (SWT.CTRL + 'Q');
 		exitItem.addListener (SWT.Selection, new Listener () {
 			public void handleEvent (Event e) {
-				DOWNLOAD_MANAGER_SHELL.close();
+				boolean confirmExit = RCMain.getRCMain().getProperties().getPropertyAsBoolean("confirm.exit");
+				if(confirmExit){
+					MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
+					messageBox.setText("Confirm Exit");
+					messageBox.setMessage("Are you sure you wish to exit AzSMRC entirely?");
+					int response = messageBox.open();
+					switch (response){
+					case SWT.OK:
+						RCMain.getRCMain().close();
+						break;
+					case SWT.CANCEL:
+						break;
+					}
+				}else{
+					RCMain.getRCMain().close();
+				}
 			}
 		});
 

@@ -34,6 +34,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.gudy.azureus2.core3.config.COConfigurationManager;
+import org.gudy.azureus2.ui.swt.Messages;
+import org.gudy.azureus2.ui.swt.auth.CertificateCreatorWindow;
 
 
 public class StartupWizard {
@@ -66,8 +68,8 @@ public class StartupWizard {
 
 
 	//Stored Info
-	private int comPort = 49009;
-	private boolean useSSL = false;
+	private int comPort = Plugin.getPluginInterface().getPluginconfig().getPluginIntParameter("azsmrc.remote.port");
+	private boolean useSSL = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("azsmrc.use.ssl");
 	private boolean useStats = true;
 	private String dirString;
 
@@ -197,7 +199,7 @@ public class StartupWizard {
 		btnContinue.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
 				if(step!=5)
-					loadStep(step+1);
+					loadStep(++step);
 				else{
 					//This is where we need to commit everything
 					//TODO
@@ -231,7 +233,8 @@ public class StartupWizard {
 
 		sash.setWeights(new int[] {10,90});
 		//open up the first step
-		loadStep(1);
+		step = 1;
+		loadStep(step);
 
 		//open shell
 		Utilities.centerShellandOpen(shell);
@@ -245,7 +248,6 @@ public class StartupWizard {
 		Control[] controls = parent.getChildren();
 		for(Control control:controls)
 			control.dispose();
-		step = 1;
 		btnPrevious.setEnabled(false);
 		btnContinue.setText("Continue");
 
@@ -287,7 +289,6 @@ public class StartupWizard {
 		Control[] controls = parent.getChildren();
 		for(Control control:controls)
 			control.dispose();
-		step = 2;
 		btnPrevious.setEnabled(true);
 		btnContinue.setText("Continue");
 
@@ -359,7 +360,6 @@ public class StartupWizard {
 		Control[] controls = parent.getChildren();
 		for(Control control:controls)
 			control.dispose();
-		step = 3;
 		btnPrevious.setEnabled(true);
 		btnContinue.setText("Continue");
 
@@ -392,6 +392,25 @@ public class StartupWizard {
 				"\n\nNotes:\n - Default is off" +
 				"\n - You need to create a certificate in Azurues to use this feature (Tools->Options->Security)");
 
+		Button create_cert = new Button (comp, SWT.PUSH);
+		Messages.setLanguageText(create_cert, "ConfigView.section.tracker.createbutton");
+
+		create_cert.addListener(SWT.Selection,
+				new Listener()
+				{
+					public void
+					handleEvent(Event event)
+					{
+						new CertificateCreatorWindow();
+					}
+				});
+
+		Label	info_label = new Label( comp, SWT.NULL );
+		Messages.setLanguageText( info_label, "ConfigView.section.security.toolsinfo" );
+		gd = new GridData();
+		gd.horizontalSpan = 2;
+		info_label.setLayoutData( gd );
+
 
 		parent.layout();
 	}
@@ -403,7 +422,6 @@ public class StartupWizard {
 		Control[] controls = parent.getChildren();
 		for(Control control:controls)
 			control.dispose();
-		step = 4;
 		btnPrevious.setEnabled(true);
 		btnContinue.setText("Continue");
 
@@ -447,7 +465,6 @@ public class StartupWizard {
 		Control[] controls = parent.getChildren();
 		for(Control control:controls)
 			control.dispose();
-		step = 5;
 		btnPrevious.setEnabled(true);
 		btnContinue.setText("Finish");
 
@@ -548,7 +565,7 @@ public class StartupWizard {
 			step2.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 			step3.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 			step4.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
-			step4.setBackground(display.getSystemColor(SWT.COLOR_GRAY));
+			step5.setBackground(display.getSystemColor(SWT.COLOR_GRAY));
 			step5();
 			break;
 		}
@@ -565,9 +582,4 @@ public class StartupWizard {
 		}else
 			instance.shell.setActive();
 	}
-
-
-
-
-
 }

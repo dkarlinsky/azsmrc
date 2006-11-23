@@ -83,6 +83,8 @@ public class MultiUserDownloadListener implements org.gudy.azureus2.plugins.down
 				} catch (DownloadException e) {
 					Plugin.addToLog(e.getMessage());
 				}
+			} else if (!singleUser){
+
 			}
 			if (singleUser) {
 				User[] users = Plugin.getXMLConfig().getUsers();
