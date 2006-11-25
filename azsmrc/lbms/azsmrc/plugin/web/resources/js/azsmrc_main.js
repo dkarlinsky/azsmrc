@@ -42,8 +42,8 @@ function fetchData(xmlhttp) {
 	var results = doc.getElementsByTagName("Result");
 	var result;
 	// setting defaults
-	document.getElementById("eventlist").style.display = "none";
-	document.getElementById("eventstatus").firstChild.data = "no new events";
+	//document.getElementById("eventlist").style.display = "none";
+	//document.getElementById("eventstatus").firstChild.data = "no new events";
 	for (var i in results)
 		if (results[i].nodeType == 1) {
 			result = results[i].getAttribute("switch")

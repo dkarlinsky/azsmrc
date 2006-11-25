@@ -308,6 +308,15 @@ function handleEvents(Events) {
 	evTable.appendChild(tbody);
 	evList.appendChild(evTable);
 	
+	var button = document.createElement("input");
+	button.setAttribute("type", "button");
+	button.setAttribute("value", "Clear Events");
+	button.onclick = function() {
+		document.getElementById("eventlist").style.display = "none";
+		document.getElementById("eventstatus").firstChild.data = "no new events";
+	}
+	evList.appendChild(button);
+	
 	evList.style.display = "block";
 	document.getElementById("eventstatus").firstChild.data = "new events";
 }

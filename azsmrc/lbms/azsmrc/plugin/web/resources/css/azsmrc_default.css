@@ -195,6 +195,9 @@ input.transferCtrl {
 #eventlist {
 	display: none;
 }
+#eventlist table {
+	margin: 0px 0px 2px 0px;
+}
 #labelselectionform {
 	background-color: #D0D0D9;
 	border: #888 1px solid;
