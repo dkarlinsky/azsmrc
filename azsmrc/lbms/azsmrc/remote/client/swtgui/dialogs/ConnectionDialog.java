@@ -555,6 +555,7 @@ public class ConnectionDialog {
 	 * @param id connection ID to delete
 	 */
 	public void deleteConnection (int id) {
+		if (loginDataList.size()<=id) return;
 		loginDataList.remove(id);
 		saveToConfig ();
 		fillCombo();
