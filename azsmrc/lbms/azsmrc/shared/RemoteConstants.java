@@ -76,6 +76,13 @@ public class RemoteConstants {
 	public static final int PARAMETER_LONG			= 5;
 	public static final int PARAMETER_DOUBLE		= 6;
 	public static final int PARAMETER_XML_ELEMENT	= 7;
+	public static final int PARAMETER_SERIALZED_OBJECT	= 8;
+	public static final int PARAMETER_ARRAY_STRING	= 11;
+	public static final int PARAMETER_ARRAY_INT		= 12;
+	public static final int PARAMETER_ARRAY_BOOLEAN	= 13;
+	public static final int PARAMETER_ARRAY_FLOAT	= 14;
+	public static final int PARAMETER_ARRAY_LONG	= 15;
+	public static final int PARAMETER_ARRAY_DOUBLE	= 16;
 
 	//User Rights
 	public static final int RIGHTS_ADMIN = 1;
