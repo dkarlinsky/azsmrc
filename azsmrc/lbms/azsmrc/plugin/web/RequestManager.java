@@ -1855,7 +1855,7 @@ public class RequestManager {
 					} else if (result instanceof Serializable) {
 						try {
 							resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_SERIALZED_OBJECT));
-							resultElement.addContent(Serializer.serializeObject((Serializable)result));
+							resultElement.addContent(Serializer.serializeObjectToElement((Serializable)result));
 						} catch (Exception e1) {
 							resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_NOT_FOUND));
 							e1.printStackTrace();

@@ -18,18 +18,25 @@ import org.jdom.Element;
  */
 public class Serializer {
 
-	public static Element serializeObject (Serializable o) throws NotSerializableException {
-		ObjectOutputStream oos = null;
+	public static Element serializeObjectToElement (Serializable o) throws NotSerializableException {
 		Element e = null;
+
+		e = new Element ("Object");
+		e.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_SERIALZED_OBJECT));
+		e.setAttribute("class", o.getClass().getCanonicalName());
+		e.setText(serializeObjectToString(o));
+
+		return e;
+	}
+
+	public static String serializeObjectToString (Serializable o) throws NotSerializableException {
+		ObjectOutputStream oos = null;
+		String s = null;
 		try {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			oos  =   new ObjectOutputStream( baos );
 			oos.writeObject( o );
-
-			e = new Element ("Object");
-			e.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_SERIALZED_OBJECT));
-			e.setAttribute("class", o.getClass().getCanonicalName());
-			e.setText(new String(new Base64().encode(baos.toByteArray())));
+			s = new String(new Base64().encode(baos.toByteArray()));
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		} finally {
@@ -39,30 +46,34 @@ public class Serializer {
 				} catch (IOException ex) {}
 		}
 
-		return e;
+		return s;
 	}
 
 	public static Object deserializeObject (Element e) throws InvalidObjectException, ClassNotFoundException {
 		if (e.getName().equalsIgnoreCase("Object")) {
-			ObjectInputStream ois = null;
-			Object o = null;
-			try {
-				ByteArrayInputStream bis = new ByteArrayInputStream(new Base64().decode(e.getTextTrim().getBytes()));
-				ois = new ObjectInputStream (bis);
-				o = ois.readObject();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			} finally {
-				if (ois != null) {
-					try {
-						ois.close();
-					} catch (IOException e1) {}
-				}
-			}
-			return o;
+			return deserializeObject(e.getTextTrim());
 		} else {
 			throw new InvalidObjectException("Element had not correct type: expected (Object) was ("+e.getName()+")");
 		}
+	}
+
+	public static Object deserializeObject (String s) throws InvalidObjectException, ClassNotFoundException {
+		ObjectInputStream ois = null;
+		Object o = null;
+		try {
+			ByteArrayInputStream bis = new ByteArrayInputStream(new Base64().decode(s.getBytes()));
+			ois = new ObjectInputStream (bis);
+			o = ois.readObject();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} finally {
+			if (ois != null) {
+				try {
+					ois.close();
+				} catch (IOException e1) {}
+			}
+		}
+		return o;
 	}
 
 	public static String getClassname (Element e) {
