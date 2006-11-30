@@ -2,6 +2,7 @@ package lbms.azsmrc.plugin.web;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import lbms.azsmrc.shared.DuplicatedUserException;
 import lbms.azsmrc.shared.EncodingUtil;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.azsmrc.shared.UserNotFoundException;
+import lbms.azsmrc.shared.Serializer;
 import lbms.tools.TorrentDownload;
 
 import org.apache.commons.io.FileSystemUtils;
@@ -1850,6 +1852,14 @@ public class RequestManager {
 					} else if (result instanceof Element) {
 						resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_XML_ELEMENT));
 						resultElement.addContent((Element)result);
+					} else if (result instanceof Serializable) {
+						try {
+							resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_SERIALZED_OBJECT));
+							resultElement.addContent(Serializer.serializeObject((Serializable)result));
+						} catch (Exception e1) {
+							resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_NOT_FOUND));
+							e1.printStackTrace();
+						}
 					} else
 						resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_NOT_FOUND));
 
