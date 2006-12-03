@@ -95,6 +95,13 @@ function addlistTransfersInteraction() {
 	div.style.display = "block";
 	return div;
 }
+function addPreferences() {
+	var div = document.createElement("div");
+	var head = document.createElement("h2");
+	head.appendChild(document.createTextNode("Preferences"));
+	div.appendChild(head);
+	return div;
+}
 function addUserManagement() {
 	var div = document.createElement("div");
 	var heading = document.createElement("h2");
@@ -326,7 +333,7 @@ function handleEvents(Events) {
 			document.getElementById("eventstatus").firstChild.data = "no new events";
 			while (evList.firstChild) evList.removeChild(evList.firstChild);
 			var p = document.createElement("p");
-			p.appendChild("No events since last request.");
+			p.appendChild(document.createTextNode("No events since last request."));
 			evList.appendChild(p);
 		}
 		evList.appendChild(button);
