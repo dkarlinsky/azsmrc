@@ -1,10 +1,14 @@
-function addUploadContent() {
+function addTorrentContent() {
 	var div = document.createElement("div");
 	var head = document.createElement("h2");
-	head.appendChild(document.createTextNode("Torrent File Upload"));
+	head.appendChild(document.createTextNode("Torrent Control"));
+	div.appendChild(head);
+	head = document.createElement("h3");
+	head.appendChild(document.createTextNode("Add Torrent by File Upload"));
 	div.appendChild(head);
 	var p = document.createElement("p");
 	p.appendChild(document.createTextNode("under construction"));
+	p.className = "hint";
 	div.appendChild(p);
 	var form = document.createElement("form");
 	form.setAttribute("enctype", "multipart/form-data");
@@ -24,6 +28,56 @@ function addUploadContent() {
 	input.onclick = function () { uploadFile(); };
 	form.appendChild(input);
 	div.appendChild(form);
+	
+	head = document.createElement("h3");
+	head.appendChild(document.createTextNode("Add Torrent by URL"));
+	div.appendChild(head);
+	form = document.createElement("form");
+	p = document.createElement("p");
+	p.appendChild(document.createTextNode("http, ftp and magnet works"));
+	p.className = "hint";
+	form.appendChild(p);
+	label = document.createElement("label");
+	label.setAttribute("for", "torrentURL");
+	label.appendChild(document.createTextNode("Torrent URL"));
+	input = document.createElement("input");
+	input.setAttribute("type", "text");
+	input.setAttribute("id", "torrentURL");
+	input.value = "http://";
+	form.appendChild(label);
+	form.appendChild(input);
+	p = document.createElement("p");
+	p.appendChild(document.createTextNode("Leave information below empty if torrent is public"));
+	p.className = "hint";
+	form.appendChild(p);
+	
+	label = document.createElement("label");
+	label.setAttribute("for", "torrentUser");
+	label.appendChild(document.createTextNode("Torrent user"));
+	input = document.createElement("input");
+	input.setAttribute("type", "text");
+	input.setAttribute("id", "torrentUser");
+	form.appendChild(label);
+	form.appendChild(input);
+	
+	label = document.createElement("label");
+	label.setAttribute("for", "torrentPasswd");
+	label.appendChild(document.createTextNode("Torrent password"));
+	input = document.createElement("input");
+	input.setAttribute("type", "password");
+	input.setAttribute("id", "torrentPasswd");
+	form.appendChild(label);
+	form.appendChild(input);
+	
+	input = document.createElement("input");
+	input.setAttribute("type", "button");
+	input.value = "Send to Server";
+	input.onclick = function () {
+		SendRequestToServer(3);
+		document.getElementById("torrentinfos").style.display = "none";
+	}
+	form.appendChild(input);
+	div.appendChild(form);	
 	return div;
 }
 function encode64(input) {
@@ -57,7 +111,7 @@ function uploadFile() {
 	try {
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	} catch (e) {
-		alert("Permission to read file was denied.");
+		alert("Permission to read file was denied.\nPlease check your security settings.");
 	}	
 	// open the local file
 	var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);

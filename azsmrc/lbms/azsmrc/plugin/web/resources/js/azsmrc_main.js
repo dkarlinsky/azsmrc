@@ -13,12 +13,27 @@ var selectableDetails = ["Name", "Position", "Download Average", "Upload Average
 var selectedDetails = [1,1,0,0,1,1,1,1,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0];
 // SI Unit byte prefix
 var SI_byte = ["bytes", "kB", "MB", "GB", "TB"];
+// max positions [dl, ul]
+var positions = [0, 0];
+function configAutoRefresh() {
+	var regTabID, i;
+	for (i in autoRefreshObjs)
+		if (autoRefreshObjs[i] != null)
+			window.clearInterval(autoRefreshObjs[i]);
+	for (i in tabs) 
+		if (tabs[i]) {
+			regTabID = getRegTabById(i);
+			if (autoRefresh[regTabID] > 0) {
+				autoRefreshObjs[regTabID] = window.setInterval("doAutoRefresh("+regTabID+")", autoRefresh[regTabID]);
+			}
+		}
+}
 function createXMLHTTP() {
 	var xmlhttp = null;
 	try {
 		if (window.XMLHttpRequest) {
 			xmlhttp = new XMLHttpRequest();
-		} else if(window.ActiveXObject) {
+		} else if (window.ActiveXObject) {
 		    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
 		}
 	} catch(e) {
@@ -104,6 +119,19 @@ function fetchData(xmlhttp) {
 			}
 		}	
 }
+function getLoadType(hash) {
+	var tab = document.getElementById("tab_"+getTabIdByContent("listTransfers"));
+	var dlTabs = tab.childNodes[1].firstChild;
+	// check weither real download table
+	if (dlTabs.firstChild.firstChild.data != "Downloads")
+		return 1;
+	dlTabs = dlTabs.childNodes[2];
+	for (var i in dlTabs.childNodes)
+		if (i < dlTabs.childNodes.length)
+			if (dlTabs.childNodes[i].getAttribute("hash") == hash)
+				return 0;
+	return 1;
+}
 function getRequestOptions(request) {
 	var options = "";
 	switch (request) {
@@ -118,9 +146,14 @@ function getRequestOptions(request) {
 			return options;			
 		break;
 		case "addDownload":
-			var torrentURL = window.prompt("Please enter the URL for download\n\tmagnet and http works", "http://");
-			if (torrentURL != null) {
+			var torrentURL = document.getElementById("torrentURL").value;
+			var torrentUser = document.getElementById("torrentUser").value;
+			var torrentPasswd = document.getElementById("torrentPasswd").value;
+			if ((torrentURL != null) && (torrentURL != "")) {
 				options = ' url="'+torrentURL+'"';
+			}
+			if (torrentUser && torrentPasswd) {
+				options += ' username="'+torrentUser+'" password="'+torrentPasswd+'"';
 			}
 			return options;
 		break;
@@ -129,7 +162,7 @@ function getRequestOptions(request) {
 		break;
 	}
 }
-function getRequestQuery(req) {
+function getRequestQuery(req, par) {
 	var request = '';
 	switch (req) {
 		case "listTransfers":
@@ -140,20 +173,40 @@ function getRequestQuery(req) {
 			if (request == '<Query switch="'+req+'" location="url" />')
 				request = '';
 		break;	
-		case "removeDownload":
+		case "removeDownload":			
+			if (!window.confirm("Are you sure to delete all selected downloads and uploads?"))
+				break;
+			for (var i in selectedTransfers)
+				if (selectedTransfers[i] != null) {
+					request += '<Query switch="'+req+'" hash="'+selectedTransfers[i]+'" />';
+					selectedTransfers[i] = null;
+				}
+		break;
 		case "recheckDataDownload":
 		case "restartDownload":
 		case "startDownload":
 		case "stopDownload":
 		case "stopAndQueueDownload":
-		case "moveUp":		
+		case "moveUp":
 		case "moveDown":
 		case "requestDownloadScrape":
 		case "requestDownloadAnnounce":
 			for (var i in selectedTransfers)
 				if (selectedTransfers[i] != null)
 					request += '<Query switch="'+req+'" hash="'+selectedTransfers[i]+'" />';
-		break;		
+		break;
+		case "moveToPosition":
+			for (var i in selectedTransfers)
+				if (selectedTransfers[i] != null) {
+					if (par == "top")
+						position = 1;
+					else if (par == "bottom")
+						position = positions[getLoadType(selectedTransfers[i])];
+					else 
+						position = par;
+					request += '<Query switch="'+req+'" position="'+position+'" hash="'+selectedTransfers[i]+'" />';
+				}
+		break;
 		default:
 			request += '<Query switch="'+req+'" />';
 		break;	
@@ -240,7 +293,7 @@ function selectTC(obj) {
 		}
 	// addDebugEntry("selected Transfers: "+selectedTransfers);
 }
-function SendRequestToServer(request) {
+function SendRequestToServer(request, par) {
 	request = registeredRequests[request];
 	// respondig file fo server: process.cgi
 	// edit line below if changes
@@ -248,7 +301,7 @@ function SendRequestToServer(request) {
 	var xmlhttp = createXMLHTTP();
 	if (xmlhttp) {
 		var statusbarentry = document.getElementById("requeststatus").firstChild;
-		var xmlrequest = '<?xml version="1.0" encoding="UTF-8"?><Request version="1.0">'+getRequestQuery(request)+'</Request>';
+		var xmlrequest = '<?xml version="1.0" encoding="UTF-8"?><Request version="1.0">'+getRequestQuery(request, par)+'</Request>';
 		// no empty requests
 		if (xmlrequest != '<?xml version="1.0" encoding="UTF-8"?><Request version="1.0"></Request>') {
 			addDebugEntry("XML Request: "+xmlrequest);
@@ -286,17 +339,4 @@ function showSplashScreen() {
 	// just a funny splashscreen function
 	document.getElementById("splashscreen").style.display = "block";
 	setTimeout("removeSplashScreen()", 5000);
-}
-function configAutoRefresh() {
-	var regTabID, i;
-	for (i in autoRefreshObjs)
-		if (autoRefreshObjs[i] != null)
-			window.clearInterval(autoRefreshObjs[i]);
-	for (i in tabs) 
-		if (tabs[i]) {
-			regTabID = getRegTabById(i);
-			if (autoRefresh[regTabID] > 0) {
-				autoRefreshObjs[regTabID] = window.setInterval("doAutoRefresh("+regTabID+")", autoRefresh[regTabID]);
-			}
-		}
 }

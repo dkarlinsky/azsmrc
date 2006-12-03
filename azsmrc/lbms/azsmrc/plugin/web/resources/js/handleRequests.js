@@ -53,8 +53,9 @@ function addlistTransfersInteraction() {
 	button.className = "closeButton";
 	button.onclick = function () {
 		document.getElementById("labelselectionform").style.display = "none";
-		if (window.confirm("Do you want to apply the new settings?\n\tClick OK for refresh!"))
-			refreshView();
+		if (!autoRefresh[getRegTabById(getTabIdByContent("listTransfers"))])
+			if (window.confirm("Do you want to apply the new settings?\n\tClick OK for refresh!"))
+				refreshView();
 	};
 	form.appendChild(button);
 	link = document.createElement("a");
@@ -225,33 +226,40 @@ function handleEvents(Events) {
 	//addDebugEntry("Handling Events..");
 	// childnodes: <Event ...>
 	var evType = null;
-	var Event, time;	
-	var evList = document.getElementById("eventlist");	
-	while (evList.firstChild) evList.removeChild(evList.firstChild);
-	var evTable = document.createElement("table");
-	evTable.setAttribute("summary", "Events since last request");
-	evTable.setAttribute("rules", "groups");		
+	var Event, time;
+	var evList = document.getElementById("eventlist");
 	var evDetails = null;
 	var tbody, tr, td, i, li;
-	tbody = document.createElement("caption");
-	tbody.appendChild(document.createTextNode("new Events"));
-	evTable.appendChild(tbody);
+	var wasClear = true;
+	if (evList.firstChild.nodeName == "TABLE") {
+		var evTable = evList.firstChild;
+		tbody = evTable.childNodes[2];
+		wasClear = false;
+	} else {
+		while (evList.firstChild) evList.removeChild(evList.firstChild);
+		var evTable = document.createElement("table");
+		evTable.setAttribute("summary", "Events since last request");
+		evTable.setAttribute("rules", "groups");		
+		tbody = document.createElement("caption");
+		tbody.appendChild(document.createTextNode("new Events"));
+		evTable.appendChild(tbody);
 	
-	tbody = document.createElement("thead");
-	tr = document.createElement("tr");
-	td = document.createElement("th");
-	td.appendChild(document.createTextNode("Time"));
-	tr.appendChild(td);
-	td = document.createElement("th");
-	td.appendChild(document.createTextNode("Event"));
-	tr.appendChild(td);
-	td = document.createElement("th");
-	td.appendChild(document.createTextNode("Details"));
-	tr.appendChild(td);
-	tbody.appendChild(tr);
-	evTable.appendChild(tbody);
+		tbody = document.createElement("thead");
+		tr = document.createElement("tr");
+		td = document.createElement("th");
+		td.appendChild(document.createTextNode("Time"));
+		tr.appendChild(td);
+		td = document.createElement("th");
+		td.appendChild(document.createTextNode("Event"));
+		tr.appendChild(td);
+		td = document.createElement("th");
+		td.appendChild(document.createTextNode("Details"));
+		tr.appendChild(td);
+		tbody.appendChild(tr);
+		evTable.appendChild(tbody);
 	
-	tbody = document.createElement("tbody");	
+		tbody = document.createElement("tbody");	
+	}
 	//addDebugEntry("Events: "+Events.nodeType+" - "+Events.nodeName);
 	Event = Events.firstChild;
 	time = Math.floor(Event.getAttribute("time"));
@@ -305,17 +313,24 @@ function handleEvents(Events) {
 		tr.appendChild(td);
 		tbody.appendChild(tr);
 	}
-	evTable.appendChild(tbody);
-	evList.appendChild(evTable);
 	
-	var button = document.createElement("input");
-	button.setAttribute("type", "button");
-	button.setAttribute("value", "Clear Events");
-	button.onclick = function() {
-		document.getElementById("eventlist").style.display = "none";
-		document.getElementById("eventstatus").firstChild.data = "no new events";
+	if (wasClear) {
+		evTable.appendChild(tbody);
+		evList.appendChild(evTable);
+		var button = document.createElement("input");
+		button.setAttribute("type", "button");
+		button.setAttribute("value", "Clear Events");
+		button.onclick = function() {
+			var evList = document.getElementById("eventlist");
+			document.getElementById("eventlist").style.display = "none";
+			document.getElementById("eventstatus").firstChild.data = "no new events";
+			while (evList.firstChild) evList.removeChild(evList.firstChild);
+			var p = document.createElement("p");
+			p.appendChild("No events since last request.");
+			evList.appendChild(p);
+		}
+		evList.appendChild(button);
 	}
-	evList.appendChild(button);
 	
 	evList.style.display = "block";
 	document.getElementById("eventstatus").firstChild.data = "new events";
@@ -326,6 +341,7 @@ function handlelistTransfers(xmldoc) {
 	var transferDataField = [];
 	var i = 0;
 	var hash = -1;
+	positions = [0, 0];
 	//addDebugEntry("Transfers: "+transfers);
 	for (var t in transfers) 
 		if (transfers[t].nodeType == 1) {
@@ -384,6 +400,7 @@ function handlelistTransfers(xmldoc) {
 		var downloads = document.createElement("table");
 		var uploads = document.createElement("table");
 		var caption, dlbody, ulbody, tr, td;
+		var content = null;
 		var isDoneCol = -1;
 		var isStatusCol = -1;
 		var isForceCol = -1;
@@ -457,12 +474,14 @@ function handlelistTransfers(xmldoc) {
 							td = document.createElement("td");
 							if ((i == isStatusCol) && (transferDataField[j][isForceCol] == "true")) 
 									td.appendChild(document.createTextNode("Forced "));
-							td.appendChild(getAttributeFormat(transferDataField[0][i], transferDataField[j][i]));						
+							content = getAttributeFormat(transferDataField[0][i], transferDataField[j][i]);
+							td.appendChild(content);
 							tr.appendChild(td);
 						}
 				}
 				if (activeTable == 0) dlbody.appendChild(tr);
 				else ulbody.appendChild(tr);
+				positions[activeTable]++;
 			}
 		if (dlbody.hasChildNodes()) {
 			downloads.appendChild(dlbody);
@@ -473,5 +492,6 @@ function handlelistTransfers(xmldoc) {
 			container.appendChild(uploads);		
 		}
 		list.appendChild(container);
+		//addDebugEntry("Positions: "+positions);
 	}
 }

@@ -40,7 +40,7 @@ caption {
 }
 form {
 	margin: 0px 0px 0px 0px;
-	width: 220px;
+	width: 400px;
 }
 h1 {
 	font-size: 1.5em;
@@ -51,11 +51,11 @@ h2 {
 	margin: 0px 5px 10px 0px;
 }
 h3 {
-	font-size: 1.3em;
+	font-size: 1.2em;
 	margin: 0px 5px 10px 0px;
 }
 h4 {
-	font-size: 1.2em;
+	font-size: 1.1em;
 	margin: 0px 5px 10px 0px;
 }
 td > img {
@@ -64,7 +64,7 @@ td > img {
 input {
 	background-color: #D0D0D9;
 	border: #888 1px solid;
-	margin: 0px 0px 0px 0px;
+	margin: 0px 0px 2px 0px;
 }
 input:hover {
 	background-color: #DDD;
@@ -73,7 +73,7 @@ input[type="button"], input[type="submit"] {
 	width: 120px;
 }
 input[type="file"] {
-	width: 20px;
+	width: 200px;
 }
 label {	
 	font-size: 0.8em;
@@ -91,7 +91,7 @@ label:hover {
 }
 p {
 	font-size: 0.9em;
-	margin: 0px 5px 10px 0px;
+	margin: 0px 5px 5px 0px;
 	text-align: justify;
 }
 table {
@@ -202,10 +202,11 @@ input.transferCtrl {
 	background-color: #D0D0D9;
 	border: #888 1px solid;
 	display: none;
+	left: 40%;
 	padding: 2px 2px 2px 2px;
 	position: absolute;
 	top: 5%;
-	left: 40%;
+	width: 220px;
 }
 #labelselectionform > label {
 	margin: 1px 0px 0px 0px;

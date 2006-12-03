@@ -3,7 +3,7 @@ var activeTab = 0;
 // for easy usage it is a simple counter, do NOT decrease this counter anytime
 var tabCount = 2;
 // available tabs
-var registeredTabs = ["listTransfers", "about", "debug", "userManagement", "fileUpload"];
+var registeredTabs = ["listTransfers", "about", "debug", "userManagement", "torrentControl"];
 // auto refresh for registered tabs (standard refresh time in ms)
 var autoRefresh = [5000, 0, 0, 0, 0];
 // requests used by registeredTabs (-1 = none)
@@ -11,7 +11,7 @@ var refreshRequests = [1, -1, -1, 29, -1];
 // objects for deactivating autorefresh
 var autoRefreshObjs = [null, null, null, null];
 // open tabs at position (default is set below)
-var tabs = ["listTransfers", "about", "debug"];
+var tabs = ["listTransfers", "about"];
 // an example tab (tabbar is list of tabs)
 // <li><span onclick="SendRequestToServer(1);">ALL Torrents</span><img src="img/delete.png" alt="Close Tab" title="Close Tab" onclick="closeTab(this);" /></li>
 function addTab(contentElement) {
@@ -43,8 +43,8 @@ function addTab(contentElement) {
 			case "userManagement":
 				label = document.createTextNode("Users");
 			break;
-			case "fileUpload":
-				label = document.createTextNode("TorrentUpload");
+			case "torrentControl":
+				label = document.createTextNode("Add Torrents");
 			break;
 			default:
 				label = document.createTextNode("empty Tab");
@@ -87,8 +87,8 @@ function addTab(contentElement) {
 			case "userManagement":
 				tabContent.appendChild(addUserManagement());
 			break;
-			case "fileUpload":
-				tabContent.appendChild(addUploadContent());
+			case "torrentControl":
+				tabContent.appendChild(addTorrentContent());
 			break;
 			default:
 				tabContent.appendChild(document.createTextNode("This tab is empty!"));
@@ -99,6 +99,8 @@ function addTab(contentElement) {
 		ShowTab(tabCount);
 		refreshView();
 		configAutoRefresh();
+	} else { 
+		ShowTab(getTabIdByContent(contentElement));
 	}
 }
 function closeTab(tabObj) {
@@ -137,6 +139,12 @@ function getTabByContent(contentElement) {
 			break; // exit for ()
 		}
 	return list;
+}
+function getTabIdByContent(contentElement) {
+	var tab = getTabByContent(contentElement);
+	var tabID = tab.getAttribute("id");
+	tabID = tabID.substring(4, tabID.length);
+	return tabID;
 }
 function initTabControl() {
 	// requirements

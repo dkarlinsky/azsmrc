@@ -18,8 +18,10 @@ function clearDebugLog() {
 }
 function initDebugLog() {
 	debugLog = getTabByContent("debug");
-	debugLog.removeChild(debugLog.lastChild);
-	debugLog.appendChild(document.createElement("ul"));
-	debugLog = debugLog.lastChild;
-	debugLog.className = "debuglist";
+	if (debugLog) {
+		debugLog.removeChild(debugLog.lastChild);
+		debugLog.appendChild(document.createElement("ul"));
+		debugLog = debugLog.lastChild;
+		debugLog.className = "debuglist";
+	}
 }
