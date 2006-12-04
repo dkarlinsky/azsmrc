@@ -66,26 +66,31 @@ public class MultiUserDownloadListener implements org.gudy.azureus2.plugins.down
 						final User[] users = Plugin.getXMLConfig().getUsersOfDownload(download);
 						if (users != null) {
 							if (users.length == 1) {
-								download.moveDataFiles(new File(users[0].getOutputDir()));
-								download.moveTorrentFile(new File(users[0].getOutputDir()));
+								if (users[0].getOutputDir() != null && !users[0].getOutputDir().equals("")) {
+									download.moveDataFiles(new File(users[0].getOutputDir()));
+									download.moveTorrentFile(new File(users[0].getOutputDir()));
+								}
 								if (!singleUser)users[0].eventDownloadFinished(download);
 							} else {
 								new Thread(new Runnable (){
 									public void run () {
 										for (int i=0;i<users.length-1;i++) {
-											for (File file:files) {
-												try {
-													Utilities.copy(file, new File(users[i].getOutputDir()), false);
-												} catch (IOException e) {
-													Plugin.addToLog(e.getMessage());
-													e.printStackTrace();
+											if (users[i].getOutputDir() != null && !users[i].getOutputDir().equals(""))
+												for (File file:files) {
+													try {
+														Utilities.copy(file, new File(users[i].getOutputDir()), false);
+													} catch (IOException e) {
+														Plugin.addToLog(e.getMessage());
+														e.printStackTrace();
+													}
 												}
-											}
 											if (!singleUser)users[i].eventDownloadFinished(download);
 										}
 										try {
-											download.moveDataFiles(new File(users[users.length-1].getOutputDir()));
-											download.moveTorrentFile(new File(users[users.length-1].getOutputDir()));
+											if (users[users.length-1].getOutputDir() != null && !users[users.length-1].getOutputDir().equals("")) {
+												download.moveDataFiles(new File(users[users.length-1].getOutputDir()));
+												download.moveTorrentFile(new File(users[users.length-1].getOutputDir()));
+											}
 											if (!singleUser)users[users.length-1].eventDownloadFinished(download);
 
 										} catch (DownloadException e) {
@@ -98,8 +103,10 @@ public class MultiUserDownloadListener implements org.gudy.azureus2.plugins.down
 						}
 					} else { //only a Single Download owner
 						User user = Plugin.getXMLConfig().getUser(user_attrib);
-						download.moveDataFiles(new File(user.getOutputDir()));
-						download.moveTorrentFile(new File(user.getOutputDir()));
+						if (user.getOutputDir() != null && !user.getOutputDir().equals("")) {
+							download.moveDataFiles(new File(user.getOutputDir()));
+							download.moveTorrentFile(new File(user.getOutputDir()));
+						}
 						if (!singleUser)user.eventDownloadFinished(download);
 					}
 				} catch (UserNotFoundException e) {
