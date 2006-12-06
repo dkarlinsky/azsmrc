@@ -1,17 +1,20 @@
 // default settings
 var activeTab = 0;
 // for easy usage it is a simple counter, do NOT decrease this counter anytime
-var tabCount = 2;
+var tabCount = 1;
 // available tabs
-var registeredTabs = ["listTransfers", "about", "debug", "userManagement", "torrentControl"];
+var registeredTabs = ["listTransfers", "about", "debug", "userManagement", "torrentControl", "preferences"];
+// shown labels for tabs
+var tabLabels = ["ALL Torrents", "About", "Debug Log", "Users", "Add Torrents", "Preferences"];
 // auto refresh for registered tabs (standard refresh time in ms)
-var autoRefresh = [5000, 0, 0, 0, 0];
+var autoRefresh = [5000, 0, 0, 0, 0, 0];
 // requests used by registeredTabs (-1 = none)
-var refreshRequests = [1, -1, -1, 29, -1];
+var refreshRequests = [1, -1, -1, 29, -1, -1];
 // objects for deactivating autorefresh
-var autoRefreshObjs = [null, null, null, null];
+var autoRefreshObjs = [null, null, null, null, null];
 // open tabs at position (default is set below)
-var tabs = ["listTransfers", "about"];
+var tabs = ["listTransfers"];
+var startupTabs = [false, true, false, false, false, false];
 // an example tab (tabbar is list of tabs)
 // <li><span onclick="SendRequestToServer(1);">ALL Torrents</span><img src="img/delete.png" alt="Close Tab" title="Close Tab" onclick="closeTab(this);" /></li>
 function addTab(contentElement) {
@@ -32,19 +35,22 @@ function addTab(contentElement) {
 		img.onclick = function() { closeTab(this); };
 		switch (contentElement) {
 			case "about":
-				label = document.createTextNode("About");
+				label = document.createTextNode(tabLabels[1]);
 			break;
 			case "debug":
-				label = document.createTextNode("Debug Log");
+				label = document.createTextNode(tabLabels[2]);
 			break;
 			case "listTransfers":
-				label = document.createTextNode("ALL Torrents");			
+				label = document.createTextNode(tabLabels[0]);			
 			break;
 			case "userManagement":
-				label = document.createTextNode("Users");
+				label = document.createTextNode(tabLabels[3]);
 			break;
 			case "torrentControl":
-				label = document.createTextNode("Add Torrents");
+				label = document.createTextNode(tabLabels[4]);
+			break;
+			case "preferences":
+				label = document.createTextNode(tabLabels[5]);
 			break;
 			default:
 				label = document.createTextNode("empty Tab");
@@ -89,6 +95,9 @@ function addTab(contentElement) {
 			break;
 			case "torrentControl":
 				tabContent.appendChild(addTorrentContent());
+			break;
+			case "preferences":
+				tabContent.appendChild(addPreferences());
 			break;
 			default:
 				tabContent.appendChild(document.createTextNode("This tab is empty!"));
@@ -167,8 +176,12 @@ function initTabControl() {
 			tab.lastChild.setAttribute("tab", i);
 			i++;
 		}
-	}	
-	ShowTab(activeTab);
+	}
+	// add startup tabs
+	for (var i in startupTabs)
+		if (startupTabs[i])
+			addTab(registeredTabs[i]);
+	ShowTab(0);
 }
 function refreshTabbar() {
 	var tabbar = document.getElementById("tabbar");

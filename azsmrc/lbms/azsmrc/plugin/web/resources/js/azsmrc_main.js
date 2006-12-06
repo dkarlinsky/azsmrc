@@ -219,9 +219,10 @@ function getTCState(hash) {
 			return true;
 	return false;
 }
-function initAzSMRCwebUI() {	
+function initAzSMRCwebUI() {
 	initDebugLog();
 	//showSplashScreen();
+	initCookies();
 	configAutoRefresh();
 	initTabControl();
 	PingToServer();
@@ -261,6 +262,37 @@ function removeSplashScreen() {
 function round(val,dig) {
 	var fac = Math.pow(10,dig);
 	return Math.round(val*fac)/fac;
+}
+function savePreferences() {
+	var value = null;
+	// read data
+	for (var i in registeredTabs) {
+		if (refreshRequests[i] > -1) {
+			value = Math.floor(document.getElementById("cookie_autorefresh_"+i).value);
+			if (!Math.floor(value))
+				document.getElementById("cookie_autorefresh_"+i).value = 0;
+			autoRefresh[i] = value > 0 ? value : 0;			
+		}
+		if (i > 0)
+			startupTabs[i] = document.getElementById("startup_"+i).checked;
+	}
+	configAutoRefresh();
+	// cookies
+	var now = new Date();
+	fixDate(now);
+	// expires after one year
+	now.setTime(now.getTime() + 365 * 24 * 60 * 60 * 1000);
+	// startup tabs
+	value = startupTabs.join(",");
+	setCookie("startupTabs", value, now);
+	// auto refresh	
+	var saveCookie = document.getElementById("cookie_autorefresh").checked;	
+	if (saveCookie) {
+		// set autorefresh cookie
+		value = autoRefresh.join(",");
+		setCookie("autoRefresh", value, now);
+	}
+	addDebugEntry("saved Cookies: "+document.cookie);
 }
 function selectDetails(id) {
 	id = id.substring(11,id.length);

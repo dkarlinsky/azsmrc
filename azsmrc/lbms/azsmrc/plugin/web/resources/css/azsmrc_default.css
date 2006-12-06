@@ -38,6 +38,12 @@ caption {
 	text-align: left;
 	padding: 1px 5% 1px 2%;
 }
+fieldset {
+	border: #888 1px solid;
+	margin: 0px 0px 2px 0px;
+	padding: 5px 5px 5px 5px;
+	width: 360px;
+}
 form {
 	margin: 0px 0px 0px 0px;
 	width: 400px;
@@ -89,6 +95,12 @@ label:hover {
 	cursor: pointer;
 	text-decoration: underline;
 }
+legend {
+	font-size: 0.9em;
+	font-weight: bold;
+	margin: 0px 0px 0px 0px;
+	padding: 0px 2px 0px 2px;
+}
 p {
 	font-size: 0.9em;
 	margin: 0px 5px 5px 0px;
@@ -138,10 +150,25 @@ tbody > tr:hover {
 .debuglist li:first-Line {
 	text-indent: 0px;
 }
+fieldset > p.description {
+	font-size: 0.8em;
+	font-style: italic;
+}
+form > p.description {
+	font-size: 0.9em;
+	font-style: italic;
+	margin: 0px 0px 2px 0px;
+	padding: 0px 5px 0px 5px;
+	text-align: justify;
+	width: 360px;
+}
 ul.eventDetails {
 	list-style: none outside none;
 	margin: 0px 0px 0px 0px;
 	padding:0px 0px 0px 0px;
+}
+.form_checks {
+	width: 220px;
 }
 p.hint {
 	font-size: 0.8em;

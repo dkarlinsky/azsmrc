@@ -15,15 +15,12 @@
 	<script type="text/javascript" src="js/registeredRequests.js" />
 	<script type="text/javascript" src="js/handleRequests.js" />
 	<script type="text/javascript" src="js/tabControl.js" />
+	<script type="text/javascript" src="js/cookieControl.js" />
 	<script type="text/javascript" src="js/azsmrc_main.js" />
 	<!-- Styles -->
 	<link rel="stylesheet" type="text/css" href="css/azsmrc_default.css" title="Standard AzSMRC Style" />
 </head>
 <body onload="initAzSMRCwebUI();">
-	<div id="tab_1" class="tab">
-		<h1>AzSMRC Webinterface</h1>
-		<p>AzSMRC is a remotecontrol for Azureus Bittorrent Client. This webinterface needs activated Javascript.</p>
-	</div>
 	<div id="topbar">
 		<h2 class="invisible">Menu</h2>
 		<ul id="picmenu" class="menu">
@@ -43,7 +40,7 @@
 			<!--<li><img src="img/console.png" alt="Open Console" title="Open Console" /></li>-->
 			<li><img src="img/information.png" alt="Information" title="Information" onclick="addTab('about');" /></li>
 		</ul>	
-		<ul id="tabbar" class="menu"><li><span onclick="ShowTab(this.getAttribute('tab'));">ALL Torrents</span></li><li><span onclick="ShowTab(this.getAttribute('tab'));">About</span><img src="img/delete.png" alt="Close Tab" title="Close Tab" onclick="closeTab(this);" /></li></ul>
+		<ul id="tabbar" class="menu"><li><span onclick="ShowTab(this.getAttribute('tab'));">ALL Torrents</span></li></ul>
 	</div>
 	<div id="eventlist"><p>No events since last request.</p></div>
 	<img src="img/AzSMRC_Splash.png" id="splashscreen" class="invisible" alt="Splashscreen" title="AzSMRC Splashscreen" />

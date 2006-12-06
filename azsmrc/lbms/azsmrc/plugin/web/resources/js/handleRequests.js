@@ -98,8 +98,92 @@ function addlistTransfersInteraction() {
 function addPreferences() {
 	var div = document.createElement("div");
 	var head = document.createElement("h2");
-	head.appendChild(document.createTextNode("Preferences"));
+	head.appendChild(document.createTextNode("System Preferences"));
 	div.appendChild(head);
+	var form = document.createElement("form");
+	var fieldset = document.createElement("fieldset");
+	var legend = document.createElement("legend");
+	var label, input, p = null;
+	p = document.createElement("p");
+	p.appendChild(document.createTextNode("All settings can be saved in a cookie. If no cookie is set the new settings will only be applied temporarly to the current session."));
+	p.className = "description";
+	form.appendChild(p);
+	legend.appendChild(document.createTextNode("Autorefresh"));
+	fieldset.appendChild(legend);
+	p = document.createElement("p");
+	p.appendChild(document.createTextNode("All values below are in milliseconds! You can assign several refresh times for each available tab."));
+	p.className = "description";
+	fieldset.appendChild(p);
+	for (var i in registeredTabs)
+		if (refreshRequests[i] > -1) {
+			label = document.createElement("label");
+			label.appendChild(document.createTextNode(tabLabels[i]));
+			label.setAttribute("for", "cookie_autorefresh_"+i);
+			input = document.createElement("input");
+			input.setAttribute("id", "cookie_autorefresh_"+i);
+			input.setAttribute("type", "text");
+			input.setAttribute("value", autoRefresh[i]);
+			fieldset.appendChild(label);
+			fieldset.appendChild(input);
+		}
+	label = document.createElement("label");
+	label.appendChild(document.createTextNode("Save data in cookie"));
+	label.setAttribute("for", "cookie_autorefresh");
+	fieldset.appendChild(label);
+	input = document.createElement("input");
+	input.setAttribute("id", "cookie_autorefresh");
+	input.setAttribute("type", "checkbox");
+	fieldset.appendChild(input);
+	form.appendChild(fieldset);
+
+	fieldset = document.createElement("fieldset");
+	legend = document.createElement("legend");
+	legend.appendChild(document.createTextNode("Tabs on startup"));
+	fieldset.appendChild(legend);
+	p = document.createElement("p");
+	p.appendChild(document.createTextNode("These settings will only be available with cookies activated. 'ALL Torrents' tab will always be displayed."));
+	p.className = "description";
+	fieldset.appendChild(p);
+	var container = document.createElement("div");
+	container.className = "form_checks";
+	for (i in registeredTabs)
+		if (i > 0) {
+			label = document.createElement("label");
+			label.appendChild(document.createTextNode(tabLabels[i]));
+			label.setAttribute("for", "startup_"+i);
+			input = document.createElement("input");
+			input.setAttribute("type", "checkbox");
+			input.setAttribute("id", "startup_"+i);
+			if (startupTabs[i])
+				input.setAttribute("checked", true);
+			container.appendChild(label);
+			container.appendChild(input);
+		}
+	fieldset.appendChild(container);
+	form.appendChild(fieldset);
+	
+	input = document.createElement("input");
+	input.setAttribute("type", "button");
+	input.setAttribute("value", "Save settings");
+	input.onclick = function() {
+		savePreferences();
+	}
+	form.appendChild(input);
+	p = document.createElement("p");
+	p.appendChild(document.createTextNode("This button deletes all cookies for this AzSMRC Server: "));
+	var strong = document.createElement("strong");
+	strong.appendChild(document.createTextNode(Server));
+	p.appendChild(strong);
+	p.className = "description";
+	input = document.createElement("input");
+	input.setAttribute("type", "button");
+	input.setAttribute("value", "Delete cookies");
+	input.onclick = function () {
+		clearCookies();
+	}
+	form.appendChild(p);
+	form.appendChild(input);
+	div.appendChild(form);
 	return div;
 }
 function addUserManagement() {

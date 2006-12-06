@@ -74,7 +74,6 @@ function addTorrentContent() {
 	input.value = "Send to Server";
 	input.onclick = function () {
 		SendRequestToServer(3);
-		document.getElementById("torrentinfos").style.display = "none";
 	}
 	form.appendChild(input);
 	div.appendChild(form);	
