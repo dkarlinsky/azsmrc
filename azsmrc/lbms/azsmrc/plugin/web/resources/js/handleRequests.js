@@ -15,6 +15,18 @@ var interactions = [["request download scrape",17], ["request download announce"
 var globalinteractions = [["start all downloads", 21], ["resume all downloads", 24], ["stop all downloads",22]];
 // system (admin) interactions
 var systeminteractions = [["restart Azureus", 39]];
+function addAdvInteraction() {
+	var div = document.createElement("div");
+	// torrent interaction
+	form = document.createElement("form");
+	p = document.createElement("p");
+	p.appendChild(document.createTextNode("interact with selected torrents"));
+	p.className = "hint";
+	form.appendChild(p);
+	form.appendChild(createTorrentInteractions());
+	div.appendChild(form);	
+	return div;	
+}
 function addlistTransfersInteraction() {
 	var div, form, label, selector, p, link, button, i, ul, li;
 	// details selection for interaction
@@ -48,6 +60,20 @@ function addlistTransfersInteraction() {
 	}
 	button = document.createElement("input");
 	button.setAttribute("type", "button");
+	button.setAttribute("value", "Save to cookie");
+	button.setAttribute("title", "Save selected labels into a cookie");
+	button.className = "closeButton";
+	button.onclick = function () {
+		var now = new Date();
+		fixDate(now);
+		// expires after one year
+		now.setTime(now.getTime() + 365 * 24 * 60 * 60 * 1000);
+		var value = selectedDetails.join(",");
+		setCookie("selectedDetails", value, now);
+	};
+	form.appendChild(button);
+	button = document.createElement("input");
+	button.setAttribute("type", "button");
 	button.setAttribute("value", "Close");
 	button.setAttribute("title", "Close Form");
 	button.className = "closeButton";
@@ -58,6 +84,8 @@ function addlistTransfersInteraction() {
 				refreshView();
 	};
 	form.appendChild(button);
+	div.appendChild(form);
+	
 	link = document.createElement("a");
 	link.setAttribute("title", "Open Labelselection");
 	link.onclick = function () { document.getElementById("labelselectionform").style.display = "block"; };
@@ -65,33 +93,14 @@ function addlistTransfersInteraction() {
 	li = document.createElement("li");
 	li.appendChild(link);
 	ul.appendChild(li);
-	div.appendChild(form);
-	// torrent interaction
-	form = document.createElement("form");
-	form.setAttribute("id", "interactionform");
-	p = document.createElement("p");
-	p.appendChild(document.createTextNode("interact with selected torrents"));
-	p.className = "hint";
-	form.appendChild(p);
-	
-	form.appendChild(createTorrentInteractions());
-	
-	button = document.createElement("input");
-	button.setAttribute("type", "button");
-	button.setAttribute("value", "Close");
-	button.setAttribute("title", "Close Form");
-	button.className = "closeButton";
-	button.onclick = function () { document.getElementById("interactionform").style.display = "none"; };
-	form.appendChild(button);	
 	link = document.createElement("a");
 	link.setAttribute("title", "Open Advanced Interactionmenu");
-	link.onclick = function () { document.getElementById("interactionform").style.display = "block"; };
+	link.onclick = function () { addTab("advanced_interaction"); };
 	link.appendChild(document.createTextNode("Open Advanced Interactionmenu"));
 	li = document.createElement("li");
 	li.appendChild(link);
 	ul.appendChild(li);	
 	div.appendChild(ul);
-	div.appendChild(form);	
 	div.style.display = "block";
 	return div;
 }

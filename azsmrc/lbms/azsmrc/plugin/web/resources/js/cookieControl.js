@@ -1,4 +1,4 @@
-var registeredCookies = ["autoRefresh", "startupTabs"];
+var registeredCookies = ["autoRefresh", "startupTabs", "selectedDetails"];
 function clearCookies() {
 	for (var i in registeredCookies)
 		deleteCookie(registeredCookies[i]);
@@ -36,10 +36,10 @@ function getCookie(name) {
 function initCookies() {
 	var value;
 	value = getCookie("autoRefresh");
-	if (value != null)
+	if (value)
 		autoRefresh = value.split(",");
 	value = getCookie("startupTabs");
-	if (value != null) {
+	if (value) {
 		value = value.split(",");
 		for (var i in value)
 			if (value[i] == "true")
@@ -47,6 +47,9 @@ function initCookies() {
 			else
 				startupTabs[i] = false;
 	}
+	value = getCookie("selectedDetails");
+	if (value)
+		selectedDetails = value.split(",");
 }
 function setCookie(name, value, expires, path, domain, secure) {
 	var curCookie = name + "=" + escape(value) +
