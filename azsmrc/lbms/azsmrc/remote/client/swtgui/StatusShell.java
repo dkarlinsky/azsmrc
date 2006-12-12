@@ -242,9 +242,11 @@ public class StatusShell {
 			lSpeedUp.addMouseListener(mListener);
 			lSpeedUp.addMouseMoveListener(mMoveListener);
 
+			//Restore position
 			ExtendedProperties props = RCMain.getRCMain().getProperties();
 			shell.setLocation(new Point (props.getPropertyAsInt("StatusShell.x"),props.getPropertyAsInt("StatusShell.y")));
 
+			//Add the listener for the Data
 			RCMain.getRCMain().getClient().addGlobalStatsListener(gsl);
 			shell.addShellListener(new ShellAdapter() {
 				/* (non-Javadoc)
@@ -264,6 +266,9 @@ public class StatusShell {
 			shell.layout();
 			shell.pack();
 			shell.open();
+
+			//Request an update
+			RCMain.getRCMain().getClient().sendGetGlobalStats();
 
 	}
 
