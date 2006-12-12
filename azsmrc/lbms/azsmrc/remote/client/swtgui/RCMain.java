@@ -331,6 +331,9 @@ public class RCMain implements Launchable {
 		final MenuItem openMainWindowMenuItem = new MenuItem(menu, SWT.PUSH);
 		openMainWindowMenuItem.setText(I18N.translate(PFX + "traymenu.openMainWindow"));
 
+		final MenuItem openStatusShellMenuItem = new MenuItem(menu, SWT.PUSH);
+		openStatusShellMenuItem.setText(I18N.translate(PFX + "traymenu.openStatusShell"));
+
 		final MenuItem addMenuItem = new MenuItem(menu, SWT.CASCADE);
 		addMenuItem.setText(I18N.translate(PFX + "traymenu.add"));
 
@@ -382,6 +385,14 @@ public class RCMain implements Launchable {
 					mainWindow = new DownloadManagerShell();
 					mainWindow.open();
 				}
+			}
+		});
+
+
+		openStatusShellMenuItem.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				StatusShell.open();
 			}
 		});
 
@@ -636,6 +647,17 @@ public class RCMain implements Launchable {
 									+ " "+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d)
 									+ I18N.translate(PFX + "tray.tooltip.part4")
 									+ " "+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u));
+
+							//Check to see if the StatusShell is open and if it is, then update it
+							if(StatusShell.isOpen()){
+								StatusShell.getInstance().setAll(DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u),
+										DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d),
+										"S: "
+										+ seeding + " ("+ seedqueue+") "
+										+ "D: "
+										+ downloading + " ("+ downloadqueue+") "
+										);
+							}
 						}
 					});
 			}

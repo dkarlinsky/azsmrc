@@ -115,6 +115,9 @@ public class ImageRepository {
 		//UpdateProgressDialog
 		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/progress_stop.png","progress_stop",255);
 
+		//Status Shell Icons
+		loadImage(display,"lbms/azsmrc/remote/client/swtgui/resources/statusShell/close.png","statusShell_close",255);
+
 	}
 
 
