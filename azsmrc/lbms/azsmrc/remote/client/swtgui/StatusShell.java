@@ -1,7 +1,10 @@
 package lbms.azsmrc.remote.client.swtgui;
 
 
+import lbms.azsmrc.remote.client.events.GlobalStatsListener;
+import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.shared.SWTSafeRunnable;
+import lbms.tools.ExtendedProperties;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -11,6 +14,8 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
@@ -46,6 +51,26 @@ public class StatusShell {
 	//Be sure to dispose of me!
 	private Font font;
 	private Font boldFont;
+
+	private GlobalStatsListener gsl = new GlobalStatsListener () {
+		/* (non-Javadoc)
+		 * @see lbms.azsmrc.remote.client.events.GlobalStatsListener#updateStats(int, int, int, int, int, int)
+		 */
+		public void updateStats(final int d, final int u, final int seeding, final int seedqueue, final int downloading, final int downloadqueue) {
+			if(display != null)
+				display.syncExec(new SWTSafeRunnable() {
+					public void runSafe() {
+						instance.setAll(DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u),
+								DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d),
+								"S: "
+								+ seeding + " ("+ seedqueue+") "
+								+ "D: "
+								+ downloading + " ("+ downloadqueue+") "
+								);
+					}
+				});
+		}
+	};
 
 
 
@@ -216,6 +241,24 @@ public class StatusShell {
 			lSpeedDown.addMouseMoveListener(mMoveListener);
 			lSpeedUp.addMouseListener(mListener);
 			lSpeedUp.addMouseMoveListener(mMoveListener);
+
+			ExtendedProperties props = RCMain.getRCMain().getProperties();
+			shell.setLocation(new Point (props.getPropertyAsInt("StatusShell.x"),props.getPropertyAsInt("StatusShell.y")));
+
+			RCMain.getRCMain().getClient().addGlobalStatsListener(gsl);
+			shell.addShellListener(new ShellAdapter() {
+				/* (non-Javadoc)
+				 * @see org.eclipse.swt.events.ShellAdapter#shellClosed(org.eclipse.swt.events.ShellEvent)
+				 */
+				@Override
+				public void shellClosed(ShellEvent e) {
+					RCMain.getRCMain().getClient().removeGlobalStatsListener(gsl);
+					ExtendedProperties props = RCMain.getRCMain().getProperties();
+					Point currentLoc = shell.getLocation();
+					props.setProperty("StatusShell.x", currentLoc.x);
+					props.setProperty("StatusShell.y", currentLoc.y);
+				}
+			});
 
 			//Open the shell
 			shell.layout();

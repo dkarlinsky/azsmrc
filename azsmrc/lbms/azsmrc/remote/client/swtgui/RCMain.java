@@ -647,17 +647,6 @@ public class RCMain implements Launchable {
 									+ " "+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d)
 									+ I18N.translate(PFX + "tray.tooltip.part4")
 									+ " "+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u));
-
-							//Check to see if the StatusShell is open and if it is, then update it
-							if(StatusShell.isOpen()){
-								StatusShell.getInstance().setAll(DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u),
-										DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d),
-										"S: "
-										+ seeding + " ("+ seedqueue+") "
-										+ "D: "
-										+ downloading + " ("+ downloadqueue+") "
-										);
-							}
 						}
 					});
 			}
