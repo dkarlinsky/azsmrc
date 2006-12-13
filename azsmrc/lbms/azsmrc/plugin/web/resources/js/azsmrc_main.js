@@ -54,70 +54,72 @@ function fetchData(xmlhttp) {
 // fetch data from responseText
 	var doc = xmlhttp.responseXML; // allows to use DOM methods on XML document
 	addDebugEntry("XML Response: "+xmlhttp.responseText);
-	var results = doc.getElementsByTagName("Result");
-	var result;
-	// setting defaults
-	//document.getElementById("eventlist").style.display = "none";
-	//document.getElementById("eventstatus").firstChild.data = "no new events";
-	for (var i in results)
-		if (results[i].nodeType == 1) {
-			result = results[i].getAttribute("switch")
-			switch (result) {
-				case "Events":
-					// send events to handlers
-					handleEvents(results[i]);
-				break;
-				case "Ping":
-					var img = document.getElementById("connectionstatus");
-					document.getElementById("ping").firstChild.data = "Ping: "+results[i].firstChild.data;
-					if (results[i].firstChild.data == "Pong") {
-						img.src = "img/connect_established.png";
-						img.setAttribute("alt","Connection established");
-						img.setAttribute("title","Connected to Server");
-					}					
-				break;
-				case "listTransfers":
-					handlelistTransfers(doc);
-				break;
-				case "getRemoteInfo":
-					document.getElementById("azversion").firstChild.data = "Azureus "+results[i].getAttribute("azureusVersion");
-					document.getElementById("azsmrcversion").firstChild.data = "AzSMRC "+results[i].getAttribute("pluginVersion");
-				break;
-				case "getUsers":
-					if (!document.getElementById("userTable"))
-						addTab("userManagement");
-					else {
-						var userTable = document.getElementById("userTableBody");
-						var users = doc.getElementsByTagName("User");
-						while (userTable.firstChild) userTable.removeChild(userTable.firstChild);
-						var tr, td;
-						for (var j in users) 
-							if (j < users.length) {
-								tr = document.createElement("tr");
-								td = document.createElement("td");
-								td.appendChild(document.createTextNode(users[j].getAttribute("username")));
-								tr.appendChild(td);
-								td = document.createElement("td");
-								td.appendChild(document.createTextNode(users[j].getAttribute("outputDir")));
-								tr.appendChild(td);
-								td = document.createElement("td");
-								td.appendChild(document.createTextNode(users[j].getAttribute("autoImportDir")));
-								tr.appendChild(td);
-								td = document.createElement("td");
-								td.appendChild(document.createTextNode(users[j].getAttribute("downloadSlots")));
-								tr.appendChild(td);
-								td = document.createElement("td");
-								td.appendChild(document.createTextNode((users[j].getAttribute("userRights") == 1) ? "true" : "false"));
-								tr.appendChild(td);
-								userTable.appendChild(tr);
-							}
-					}
-				break;
-				default:
-					addDebugEntry("unhandled request: "+result+" (aborting)");
-				break;
+	if (xmlhttp.responseText != "") {
+		var results = doc.getElementsByTagName("Result");
+		var result;
+		// setting defaults
+		//document.getElementById("eventlist").style.display = "none";
+		//document.getElementById("eventstatus").firstChild.data = "no new events";
+		for (var i in results)
+			if (results[i].nodeType == 1) {
+				result = results[i].getAttribute("switch")
+				switch (result) {
+					case "Events":
+						// send events to handlers
+						handleEvents(results[i]);
+					break;
+					case "Ping":
+						var img = document.getElementById("connectionstatus");
+						document.getElementById("ping").firstChild.data = "Ping: "+results[i].firstChild.data;
+						if (results[i].firstChild.data == "Pong") {
+							img.src = "img/connect_established.png";
+							img.setAttribute("alt","Connection established");
+							img.setAttribute("title","Connected to Server");
+						}					
+					break;
+					case "listTransfers":
+						handlelistTransfers(doc);
+					break;
+					case "getRemoteInfo":
+						document.getElementById("azversion").firstChild.data = "Azureus "+results[i].getAttribute("azureusVersion");
+						document.getElementById("azsmrcversion").firstChild.data = "AzSMRC "+results[i].getAttribute("pluginVersion");
+					break;
+					case "getUsers":
+						if (!document.getElementById("userTable"))
+							addTab("userManagement");
+						else {
+							var userTable = document.getElementById("userTableBody");
+							var users = doc.getElementsByTagName("User");
+							while (userTable.firstChild) userTable.removeChild(userTable.firstChild);
+							var tr, td;
+							for (var j in users) 
+								if (j < users.length) {
+									tr = document.createElement("tr");
+									td = document.createElement("td");
+									td.appendChild(document.createTextNode(users[j].getAttribute("username")));
+									tr.appendChild(td);
+									td = document.createElement("td");
+									td.appendChild(document.createTextNode(users[j].getAttribute("outputDir")));
+									tr.appendChild(td);
+									td = document.createElement("td");
+									td.appendChild(document.createTextNode(users[j].getAttribute("autoImportDir")));
+									tr.appendChild(td);
+									td = document.createElement("td");
+									td.appendChild(document.createTextNode(users[j].getAttribute("downloadSlots")));
+									tr.appendChild(td);
+									td = document.createElement("td");
+									td.appendChild(document.createTextNode((users[j].getAttribute("userRights") == 1) ? "true" : "false"));
+									tr.appendChild(td);
+									userTable.appendChild(tr);
+								}
+						}
+					break;
+					default:
+						addDebugEntry("unhandled request: "+result+" (aborting)");
+					break;
+				}
 			}
-		}	
+	} else PingToServer();
 }
 function getLoadType(hash) {
 	var tab = document.getElementById("tab_"+getTabIdByContent("listTransfers"));
