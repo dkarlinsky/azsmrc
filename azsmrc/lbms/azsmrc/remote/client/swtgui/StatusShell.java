@@ -304,6 +304,10 @@ public class StatusShell {
 				if(lSeeds != null || !lSeeds.isDisposed())
 					lSeeds.setText(sSeeds);
 
+				try{
+					Composite comp = lSpeedDown.getParent();
+					comp.layout();
+				}catch(Exception e){}
 				//Re-layout the shell
 				if(shell != null || !shell.isDisposed())
 					shell.layout();
