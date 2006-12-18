@@ -43,7 +43,7 @@ public class StatusShell {
 	private Composite parentBottom, downComp, upComp;
 	private String sSpeedDown = "xxxKB/s";
 	private String sSpeedUp =  "xxxKB/s";
-	private String sSeeds = "0(0)S - 0(0)L";
+	private String sSeeds = "xx(xx)S - xx(xx)L";
 	private Display display;
 
 
@@ -136,7 +136,7 @@ public class StatusShell {
 		parentTop.setBackground(display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.widthHint = 150;
+		gd.widthHint = 160;
 		//gd.heightHint = (16)+5; //height of the icons -- 2*16pixels
 		parentTop.setLayoutData(gd);
 
