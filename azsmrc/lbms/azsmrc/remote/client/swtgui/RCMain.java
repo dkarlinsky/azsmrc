@@ -508,7 +508,9 @@ public class RCMain implements Launchable {
 		if (systrayItem != null) {
 			systrayItem.addListener (SWT.MenuDetect, new Listener () {
 				public void handleEvent (Event event) {
-					menu.setVisible (true);
+					try{
+						menu.setVisible (true);
+					}catch (Exception e){}
 				}
 			});
 		}
