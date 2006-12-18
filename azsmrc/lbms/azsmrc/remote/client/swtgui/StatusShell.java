@@ -7,7 +7,6 @@ import lbms.azsmrc.shared.SWTSafeRunnable;
 import lbms.tools.ExtendedProperties;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
@@ -40,9 +39,10 @@ public class StatusShell {
 	private int xPressed, yPressed;
 
 	//Labels for torrent
-	private CLabel lSpeedDown, lSpeedUp, lSeeds;
-	private String sSpeedDown = "xxx kb/s";
-	private String sSpeedUp =  "xxx kb/s";
+	private Label lSpeedDown, lSpeedUp, lSeeds;
+	private Composite parentBottom, downComp, upComp;
+	private String sSpeedDown = "xxxKB/s";
+	private String sSpeedUp =  "xxxKB/s";
 	private String sSeeds = "0(0)S - 0(0)L";
 	private Display display;
 
@@ -90,6 +90,7 @@ public class StatusShell {
 		gl.numColumns = 1;
 		gl.marginHeight = 0;
 		gl.marginWidth = 0;
+		gl.verticalSpacing = 0;
 		shell.setLayout(gl);
 		shell.setBackground(display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
@@ -142,7 +143,7 @@ public class StatusShell {
 
 
 		//Seeds and Leechers
-		lSeeds = new CLabel(parentTop, SWT.NULL);
+		lSeeds = new Label(parentTop, SWT.NULL);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		lSeeds.setLayoutData(gd);
 		lSeeds.setText(sSeeds);
@@ -164,7 +165,7 @@ public class StatusShell {
 		xLabel.setLayoutData(gd);
 
 
-		Composite parentBottom = new Composite(shell, SWT.NULL);
+		parentBottom = new Composite(shell, SWT.NULL);
 		gl = new GridLayout();
 		gl.numColumns = 2;
 		gl.marginHeight = 0;
@@ -178,9 +179,26 @@ public class StatusShell {
 
 
 		//Speed Down
-		lSpeedDown = new CLabel(parentBottom, SWT.NULL);
+
+		downComp = new Composite(parentBottom, SWT.NULL);
+		gl = new GridLayout();
+		gl.numColumns = 2;
+		gl.marginHeight = 0;
+		gl.marginWidth = 0;
+		gl.makeColumnsEqualWidth = false;
+		downComp.setLayout(gl);
+		downComp.setBackground(display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+
+
+		//Icon
+		Label lSpeedDownIcon = new Label(downComp, SWT.NULL);
+		lSpeedDownIcon.setImage(ImageRepository.getImage("statusbar_down"));
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		lSpeedDownIcon.setLayoutData(gd);
+
+		//label
+		lSpeedDown = new Label(downComp, SWT.NULL);
 		lSpeedDown.setText(sSpeedDown);
-		lSpeedDown.setImage(ImageRepository.getImage("statusbar_down"));
 		lSpeedDown.setFont(font);
 		lSpeedDown.setBackground(display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
@@ -188,9 +206,26 @@ public class StatusShell {
 		lSpeedDown.setLayoutData(gd);
 
 		//Speed Up
-		lSpeedUp = new CLabel(parentBottom, SWT.NULL);
+
+		upComp = new Composite(parentBottom, SWT.NULL);
+		gl = new GridLayout();
+		gl.numColumns = 2;
+		gl.marginHeight = 0;
+		gl.marginWidth = 0;
+		gl.makeColumnsEqualWidth = false;
+		upComp.setLayout(gl);
+		upComp.setBackground(display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+
+
+		//Icon
+		Label lSpeedUpIcon = new Label(upComp, SWT.NULL);
+		lSpeedUpIcon.setImage(ImageRepository.getImage("statusbar_up"));
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		lSpeedUpIcon.setLayoutData(gd);
+
+
+		lSpeedUp = new Label(upComp, SWT.NULL);
 		lSpeedUp.setText(sSpeedUp);
-		lSpeedUp.setImage(ImageRepository.getImage("statusbar_up"));
 		lSpeedUp.setFont(font);
 		lSpeedUp.setBackground(display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 		gd = new GridData();
@@ -235,12 +270,20 @@ public class StatusShell {
 			parentTop.addMouseMoveListener(mMoveListener);
 			parentBottom.addMouseListener(mListener);
 			parentBottom.addMouseMoveListener(mMoveListener);
+			upComp.addMouseListener(mListener);
+			upComp.addMouseMoveListener(mMoveListener);
+			downComp.addMouseListener(mListener);
+			downComp.addMouseMoveListener(mMoveListener);
 			lSeeds.addMouseListener(mListener);
 			lSeeds.addMouseMoveListener(mMoveListener);
 			lSpeedDown.addMouseListener(mListener);
 			lSpeedDown.addMouseMoveListener(mMoveListener);
 			lSpeedUp.addMouseListener(mListener);
 			lSpeedUp.addMouseMoveListener(mMoveListener);
+			lSpeedDownIcon.addMouseListener(mListener);
+			lSpeedDownIcon.addMouseMoveListener(mMoveListener);
+			lSpeedUpIcon.addMouseListener(mListener);
+			lSpeedUpIcon.addMouseMoveListener(mMoveListener);
 
 			//Restore position
 			ExtendedProperties props = RCMain.getRCMain().getProperties();
@@ -305,8 +348,9 @@ public class StatusShell {
 					lSeeds.setText(sSeeds);
 
 				try{
-					Composite comp = lSpeedDown.getParent();
-					comp.layout();
+					upComp.layout();
+					downComp.layout();
+					parentBottom.layout();
 				}catch(Exception e){}
 				//Re-layout the shell
 				if(shell != null || !shell.isDisposed())
@@ -328,7 +372,7 @@ public class StatusShell {
 
 	/**
 	 * Checks to see if the status shell is open or not
-	 * 
+	 *
 	 */
 	public static boolean isOpen(){
 		if (instance == null || instance.shell == null || instance.shell.isDisposed())
@@ -338,7 +382,7 @@ public class StatusShell {
 	}
 
 	/**
-	 * Returns that instance.. warning, this can be null, be sure to check if it is 
+	 * Returns that instance.. warning, this can be null, be sure to check if it is
 	 * open before using
 	 * @return instance
 	 */
