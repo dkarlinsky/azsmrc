@@ -24,8 +24,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -54,9 +52,6 @@ public class StartupWizard {
 
 	//Sash for shell
 	private SashForm sash;
-
-	//Font for shell
-	Font font16, font12;
 
 	//Main composite for Right and Left hand sides
 	private Composite lComp;
@@ -160,10 +155,7 @@ public class StartupWizard {
 		shell.addDisposeListener(new DisposeListener(){
 
 			public void widgetDisposed(DisposeEvent arg0) {
-				if(font16 != null || !font16.isDisposed())
-					font16.dispose();
-				if(font12 != null || !font12.isDisposed())
-					font12.dispose();
+
 			}
 
 		});
@@ -328,18 +320,6 @@ public class StartupWizard {
 		welcome1.setLayoutData(gridData);
 
 		welcome1.setText("Welcome to AzSMRC");
-		Font initialFont = welcome1.getFont();
-		FontData[] fontData = initialFont.getFontData();
-		for (int i = 0; i < fontData.length; i++) {
-			fontData[i].setHeight(16);
-		}
-		font16 = new Font(display, fontData);
-
-		for(int i = 0; i < fontData.length; i++){
-			fontData[i].setHeight(12);
-		}
-		font12 = new Font(display, fontData);
-		welcome1.setFont(font16);
 
 
 		Label welcome2 = new Label(parent, SWT.CENTER);
@@ -380,13 +360,13 @@ public class StartupWizard {
 
 		Label cLabel = new Label(comp, SWT.NULL);
 		cLabel.setText("Language: ");
-		cLabel.setFont(font12);
+
 
 
 		final Combo language_combo = new Combo(comp, SWT.READ_ONLY | SWT.DROP_DOWN);
 		language_combo.add("English");
 		language_combo.add("Deutsch");
-		language_combo.setFont(font12);
+
 
 		if(lang.equals("en_EN"))
 			language_combo.select(0);
@@ -449,17 +429,17 @@ public class StartupWizard {
 		final Button btnUpdate_autocheck = new Button(updateGroup, SWT.CHECK);
 		btnUpdate_autocheck.setText("Allow AzSMRC to periodically check for updates");
 		btnUpdate_autocheck.setSelection(update_autocheck);
-		btnUpdate_autocheck.setFont(font12);
+
 
 		final Button btnUpdate_beta = new Button(updateGroup, SWT.CHECK);
 		btnUpdate_beta.setText("Allow updates to include potentially non-stable, beta builds of AzSMRC");
 		btnUpdate_beta.setSelection(update_beta);
-		btnUpdate_beta.setFont(font12);
+
 
 		final Button btnUpdate_autoupdate = new Button(updateGroup, SWT.CHECK);
 		btnUpdate_autoupdate.setText("If an update is found, automatically merge the files without any user interaction");
 		btnUpdate_autoupdate.setSelection(update_autoupdate);
-		btnUpdate_autoupdate.setFont(font12);
+
 
 
 
@@ -522,7 +502,6 @@ public class StartupWizard {
 		final Button btnAllow_stats = new Button(comp, SWT.CHECK);
 		btnAllow_stats.setText("Allow Statistics");
 		btnAllow_stats.setSelection(useStats);
-		btnAllow_stats.setFont(font12);
 		btnAllow_stats.addListener(SWT.Selection, new Listener(){
 
 			public void handleEvent(Event arg0) {
@@ -570,7 +549,6 @@ public class StartupWizard {
 		//Open Text box
 		final Text openText = new Text(comp, SWT.SINGLE | SWT.BORDER);
 		openText.setText(String.valueOf(connectionInterval_open));
-		openText.setFont(font12);
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		gd.widthHint = 75;
 		openText.setLayoutData(gd);
@@ -617,7 +595,6 @@ public class StartupWizard {
 		//Open Text box
 		final Text trayText = new Text(comp, SWT.SINGLE | SWT.BORDER);
 		trayText.setText(String.valueOf(connectionInterval_closed));
-		trayText.setFont(font12);
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		gd.widthHint = 75;
 		trayText.setLayoutData(gd);
