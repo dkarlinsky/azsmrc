@@ -126,6 +126,8 @@ public class RCMain implements Launchable {
 	private boolean manifestInUse;
 	private StartServer startServer;
 
+	private boolean firstRun;
+
 
 	//  I18N prefix
 	public static final String PFX = "rcmain.";
@@ -519,6 +521,9 @@ public class RCMain implements Launchable {
 		addAWTClipboardMonitor();
 		SplashScreen.setProgressAndText("All Done", 100);
 		checkUpadteAndMotd();
+		if (firstRun) {
+			StartupWizard.open();
+		}
 	}
 
 	private void initConfig() {
@@ -565,7 +570,7 @@ public class RCMain implements Launchable {
 				if (is!=null) try { is.close(); } catch (IOException e) {}
 			}
 		}
-		generateUID();
+		firstRun = generateUID();
 	}
 
 	private void init () {
