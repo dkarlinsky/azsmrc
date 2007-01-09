@@ -65,9 +65,8 @@ public class WebRequestHandler	/*extends WebPlugin*/ implements TrackerWebPageGe
 	protected PluginInterface	pluginInterface;	// unfortunately this is accessed by webui - fix sometime
 	private LoggerChannel		log;
 
-	private String				home_page;
 	private String				file_root;
-	private String				resource_root = "lbms/azsmrc/plugin/web";
+	private String				resource_root = "lbms/azsmrc/plugin/web/resources";
 
 	private boolean				ip_range_all = true;
 	private IPRange				ip_range;
@@ -92,7 +91,12 @@ public class WebRequestHandler	/*extends WebPlugin*/ implements TrackerWebPageGe
 
 		torrent_categories = pluginInterface.getTorrentManager().getAttribute(TorrentAttribute.TA_CATEGORY);
 		///////////////////////////////
-		file_root = pluginInterface.getPluginDirectoryName() + File.separator + "web";
+		try {
+			file_root = new File(pluginInterface.getPluginDirectoryName() + File.separator + "web").getCanonicalPath();
+		} catch (IOException e) {
+			e.printStackTrace();
+			file_root =pluginInterface.getPluginDirectoryName() + File.separator + "web";
+		}
 
 		Plugin.addToLog(file_root);
 		welcome_files = new File[welcome_pages.length];
@@ -323,8 +327,6 @@ public class WebRequestHandler	/*extends WebPlugin*/ implements TrackerWebPageGe
 
 		String url = request.getURL();
 
-		Hashtable	params = null;
-
 		if ( url.equals("/")){
 			url = "/index.htm";
 		}
@@ -333,14 +335,16 @@ public class WebRequestHandler	/*extends WebPlugin*/ implements TrackerWebPageGe
 
 		Plugin.addToLog("Handling: "+url);
 
-		int	p_pos = url.indexOf( '?' );
 
+		/*
+		int	p_pos = url.indexOf( '?' );
+		Hashtable	params = null;
 		if ( p_pos != -1 ){
 
 			params = decodeParams( url.substring( p_pos+1 ));
 
 			url = url.substring(0,p_pos);
-		}
+		}*/
 		/////////////////////////////////////////////////////////////
 		String	target = file_root + url.replace('/',File.separatorChar);
 		File canonical_file = new File(target).getCanonicalFile();
@@ -348,8 +352,7 @@ public class WebRequestHandler	/*extends WebPlugin*/ implements TrackerWebPageGe
 		System.out.println("Trying to open File: "+canonical_file.getAbsolutePath());
 			// make sure some fool isn't trying to use ../../ to escape from web dir
 		if ( !canonical_file.toString().toLowerCase().startsWith( file_root.toLowerCase() )){
-			System.out.println("Fileroot is not matched.");
-			return false ;
+			System.out.println("Fileroot is not matched: "+file_root);
 		} else if ( !canonical_file.isDirectory() && canonical_file.canRead()){
 			System.out.println("Trying to send File.");
 			String str = canonical_file.toString().toLowerCase();
@@ -381,12 +384,11 @@ public class WebRequestHandler	/*extends WebPlugin*/ implements TrackerWebPageGe
 			}
 		}
 		////////////////////////////////////////////////////////////////
-		InputStream is = WebRequestHandler.class.getClassLoader().getResourceAsStream("lbms/azsmrc/plugin/web/resources" + url );//
+		InputStream is = WebRequestHandler.class.getClassLoader().getResourceAsStream(resource_root + url );//
 
 		System.out.println("Trying to load per classloader: "+ url);
 		if ( is == null ) {
 			System.out.println("Couldn't open Stream.");
-
 			return( false );
 		}
 
@@ -488,87 +490,9 @@ public class WebRequestHandler	/*extends WebPlugin*/ implements TrackerWebPageGe
 		}
 
 		if ( generateSupport( request, response )){
-
 			return(true);
 		}
 
-		//OutputStream os = response.getOutputStream();
-
-		String	url = request.getURL();
-
-		if (url.equals("/")){
-
-			if (home_page != null ){
-
-				url = home_page;
-
-			}else{
-
-				for (int i=0;i<welcome_files.length;i++){
-
-					if ( welcome_files[i].exists()){
-
-						url = "/" + welcome_pages[i];
-
-						break;
-					}
-				}
-			}
-		}
-
-			// first try file system for data
-
-		if ( response.useFile( file_root, url )){
-
-			return( true );
-		}
-
-				// now try jars
-
-		String	resource_name = url;
-
-		if (resource_name.startsWith("/")){
-
-			resource_name = resource_name.substring(1);
-		}
-
-		int	pos = resource_name.lastIndexOf(".");
-
-		if ( pos != -1 ){
-
-			String	type = resource_name.substring( pos+1 );
-
-			ClassLoader	cl = pluginInterface.getPluginClassLoader();
-
-			InputStream is = cl.getResourceAsStream( resource_name );
-
-			if ( is == null ){
-
-				// failed absolute load, try relative
-
-				if ( resource_root != null ){
-
-					resource_name = resource_root + "/" + resource_name;
-
-					is = cl.getResourceAsStream( resource_name );
-				}
-			}
-
-			// System.out.println( resource_name + "->" + is + ", url = " + url );
-
-			if (is != null ){
-
-				try{
-					response.useStream( type, is );
-
-				}finally{
-
-					is.close();
-				}
-
-				return( true );
-			}
-		}
 		response.setReplyStatus(404); //HTTP Status 404: NOT FOUND
 		return( false );
 	}
