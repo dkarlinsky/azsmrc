@@ -85,8 +85,23 @@ public class RemoteConstants {
 	public static final int PARAMETER_ARRAY_DOUBLE	= 16;
 
 	//User Rights
+	/**
+	 * Is Admin, Admins can do everything, so all
+	 * rights apply to non admin users only
+	 */
 	public static final int RIGHTS_ADMIN = 1;
-	public static final int RIGHTS_FORCESTART = 1<<1;
+	/**
+	 * Can force start Downloads
+	 */
+	public static final int RIGHTS_FORCESTART 	= 1<<1;
+	/**
+	 * Can see public Downloads
+	 */
+	public static final int RIGHTS_SEE_PUBLICDL = 1<<2;
+	/**
+	 * Can choose Download dir
+	 */
+	public static final int RIGHTS_SET_DL_DIR	= 1<<3;
 
 	//IPC Status Codes
 	public static final int IPC_EXCEPTION				= -2;

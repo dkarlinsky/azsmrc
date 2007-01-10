@@ -401,7 +401,7 @@ public class RequestManager {
 				Element transferList = new Element("Transfers");
 				Download[] dlList = Plugin.getPluginInterface().getDownloadManager().getDownloads(true);
 				for (Download dl:dlList) {
-					if(singleUser || user.hasDownload(dl)) {
+					if(singleUser || user.hasDownload(dl) || (user.checkAccess(RemoteConstants.RIGHTS_SEE_PUBLICDL) && MultiUser.isPublicDownload(dl))) {
 						if (dl.getTorrent() == null) continue;
 						Element dle = new Element ("Transfer");
 						setDlStats(dle, dl, switches);

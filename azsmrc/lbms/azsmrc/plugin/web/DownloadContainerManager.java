@@ -6,7 +6,9 @@ package lbms.azsmrc.plugin.web;
 import java.util.List;
 import java.util.Vector;
 
+import lbms.azsmrc.plugin.main.MultiUser;
 import lbms.azsmrc.plugin.main.User;
+import lbms.azsmrc.shared.RemoteConstants;
 
 import org.gudy.azureus2.plugins.download.Download;
 import org.gudy.azureus2.plugins.download.DownloadManager;
@@ -51,7 +53,7 @@ public class DownloadContainerManager {
 	public Element updateDownloadsFromUser (User user, boolean full) {
 		Element transferList = new Element("Transfers");
 		for (DownloadContainer dc:dcList) {
-			if(user.hasDownload(dc.getDownload())) {
+			if(user.hasDownload(dc.getDownload()) || (user.checkAccess(RemoteConstants.RIGHTS_SEE_PUBLICDL) && MultiUser.isPublicDownload(dc.getDownload()))) {
 				if (full)
 					transferList.addContent(dc.fullUpdate());
 				else
