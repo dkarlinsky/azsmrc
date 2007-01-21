@@ -52,6 +52,7 @@ public class FlexyConfiguration {
 		Document doc = new Document();
 		Element root = new Element ("FlexyConfiguration");
 		root.addContent(rootSection.toElement());
+		doc.addContent(root);
 		return doc;
 	}
 
