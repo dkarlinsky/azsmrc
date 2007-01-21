@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lbms.azsmrc.plugin.gui.View;
+import lbms.azsmrc.plugin.pluginsupport.PSupportAzJabber;
 import lbms.azsmrc.plugin.pluginsupport.PSupportStatusMailer;
 import lbms.azsmrc.plugin.pluginsupport.PluginSupport;
 import lbms.azsmrc.plugin.web.RequestManager;
@@ -376,6 +377,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 		//Add Plugin Support
 		pluginSupport.put(PSupportStatusMailer.IDENTIFIER, new PSupportStatusMailer());
+		pluginSupport.put(PSupportAzJabber.IDENTIFIER, new PSupportAzJabber());
 
 		pluginInterface.addListener(new PluginListener() {
 			/* (non-Javadoc)
@@ -400,16 +402,18 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 			 * @see org.gudy.azureus2.plugins.PluginListener#initializationComplete()
 			 */
 			public void initializationComplete() {
-
+				addToLog("Initializing Plugin Support...");
 				for (PluginSupport ps:pluginSupport.values()) {
 					try {
+						addToLog("Loading Plugin Support for: ["+ps.getName()+"]...");
 						ps.initialize(pluginInterface);
-						logger.log("Plugin Support for: ["+ps.getName()+"] is active: "+ps.isActive());
+						addToLog("Plugin Support for: ["+ps.getName()+"] is active: "+ps.isActive());
 					} catch (Throwable e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
+				addToLog("Finished loading Plugin Support.");
 			}
 		});
 
@@ -521,7 +525,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		//don't spam console if debug is deaktivated
 		if(!getPluginInterface().getPluginconfig().getPluginBooleanParameter("debug",true)) return;
 		logger.log(textToAdd);
-		System.out.println(textToAdd);
+		System.out.println("AzSMRC: "+textToAdd);
 	}
 
 	/**
@@ -535,7 +539,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		//don't spam console if debug is deaktivated
 		if(!getPluginInterface().getPluginconfig().getPluginBooleanParameter("debug",true)) return;
 		logger.log(textToAdd,e);
-		System.out.println(textToAdd);
+		System.out.println("AzSMRC: "+textToAdd);
 		System.out.println(e.getMessage());
 	}
 

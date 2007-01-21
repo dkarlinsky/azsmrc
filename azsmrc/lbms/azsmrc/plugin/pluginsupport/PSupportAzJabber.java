@@ -1,5 +1,9 @@
 package lbms.azsmrc.plugin.pluginsupport;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import lbms.azsmrc.plugin.main.Plugin;
 import lbms.azsmrc.plugin.main.User;
 import lbms.tools.flexyconf.Entry;
@@ -15,13 +19,13 @@ import org.gudy.azureus2.plugins.ipc.IPCInterface;
  * @author Damokles
  *
  */
-public class PSupportStatusMailer implements PluginSupport {
+public class PSupportAzJabber implements PluginSupport {
 
-	public final static String IDENTIFIER = "StatusMailerSupport";
+	public final static String IDENTIFIER = "AzJabberSupport";
 	private boolean active;
-	private final static String SUPPORTED_PLUGIN_ID = "azstatusmailer";
-	private final static String NAME = "Status Mailer Support";
-	private final static String MIN_VERSION = "0.7.1";
+	private final static String SUPPORTED_PLUGIN_ID = "azjabber";
+	private final static String NAME = "AzJabber Support";
+	private final static String MIN_VERSION = "1.1";
 	private IPCInterface ipc;
 
 	/* (non-Javadoc)
@@ -50,19 +54,23 @@ public class PSupportStatusMailer implements PluginSupport {
 	 */
 	public void initialize(PluginInterface pi) {
 		PluginInterface target = pi.getPluginManager().getPluginInterfaceByID(SUPPORTED_PLUGIN_ID);
-		Section confSection = Plugin.addPSConfigSection("StatusMailerSupport");
-		new Entry("","azsmrc.pluginsupport.StatusMailerSupport.info",Entry.TYPE_LABEL,confSection);
-		new Entry("eMailNotification","azsmrc.pluginsupport.config.emailnotify",Entry.TYPE_BOOLEAN,confSection);
-		Entry mailE = new Entry("eMail","azsmrc.pluginsupport.config.email",Entry.TYPE_STRING,confSection);
-		mailE.setDependsOn("eMailNotification");
+
+		Section confSection = Plugin.addPSConfigSection("AzJabberSupport");
+		new Entry("","azsmrc.pluginsupport.AzJabberSupport.info",Entry.TYPE_LABEL,confSection);
+		new Entry("JabberNotification","azsmrc.pluginsupport.config.jabbernotify",Entry.TYPE_BOOLEAN,confSection);
+		Entry jabberE = new Entry("JabberAddress","azsmrc.pluginsupport.config.jabberAddress",Entry.TYPE_STRING,confSection);
+		jabberE.setDependsOn("JabberNotification");
+
 		try {
 			//only accept valid email addresses
-			mailE.setRule("^[\\w-\\.]+@(?:[\\w-]+\\.)+[\\w-]{2,4}$");
+			jabberE.setRule("^[\\w-\\.]+@(?:[\\w-]+\\.)+[\\w-]{2,4}$");
 		} catch (InvalidRuleException e) {
 			e.printStackTrace();
 		} catch (InvalidTypeException e) {
 			e.printStackTrace();
 		}
+
+
 		if (target == null) {
 			active = false;
 			return;
@@ -73,8 +81,31 @@ public class PSupportStatusMailer implements PluginSupport {
 			} else {
 				ipc = target.getIPC();
 				active = true;
+				try {
+					String[] usersInRoster = (String[])ipc.invoke("ipcListRecipients", new Object[] {Boolean.FALSE});
+					User[] azsmrcUsers =Plugin.getXMLConfig().getUsers();
+					List<String> jabberUsers = new ArrayList<String>();
+					for (User user:azsmrcUsers) {
+						if (Boolean.parseBoolean(user.getProperty("JabberNotification"))) {
+							String jabberAddress = user.getProperty("JabberAddress");
+							if (jabberAddress != null)
+								jabberUsers.add(jabberAddress);
+						}
+					}
+					jabberUsers.removeAll(Arrays.asList(usersInRoster));
+					for (String user:jabberUsers) {
+						try {
+							ipc.invoke("ipcAddUserToRoster", new Object[] {user});
+						} catch (IPCException e) {
+							e.printStackTrace();
+						}
+					}
+				} catch (IPCException e) {
+					e.printStackTrace();
+				}
 			}
 		}
+
 	}
 
 	/* (non-Javadoc)
@@ -84,13 +115,13 @@ public class PSupportStatusMailer implements PluginSupport {
 		return active;
 	}
 
-	public void sendMessage(User user,String subject, String msg) {
+	public void sendMessage(User user, String msg) {
 		if(!active) return;
-		if (Boolean.parseBoolean(user.getProperty("eMailNotification"))) {
-			String targetMail = user.getProperty("eMail");
-			if (targetMail != null)
+		if (Boolean.parseBoolean(user.getProperty("JabberNotification"))) {
+			String jabberAddress = user.getProperty("JabberAddress");
+			if (jabberAddress != null)
 				try {
-					ipc.invoke("sendMessage", new Object[] {subject, targetMail, msg});
+					ipc.invoke("ipcSendMessage", new Object[] {jabberAddress, msg});
 				} catch (IPCException e) {
 					e.printStackTrace();
 				}

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
+import lbms.azsmrc.plugin.pluginsupport.PSupportAzJabber;
 import lbms.azsmrc.plugin.pluginsupport.PSupportStatusMailer;
 import lbms.azsmrc.shared.EncodingUtil;
 import lbms.azsmrc.shared.RemoteConstants;
@@ -190,10 +191,14 @@ public class User extends lbms.azsmrc.shared.User {
 
 	public void eventDownloadFinished(Download dl) {
 		Formatters formatters = Plugin.getPluginInterface().getUtilities().getFormatters();
+		String notificationMessage = "Download Finished: "
+			+dl.getName()+"\nTime: "+formatters.formatTimeFromSeconds(dl.getStats().getSecondsDownloading())
+			+"\nAverage Download Speed: "+formatters.formatByteCountToKiBEtcPerSec(dl.getTorrent().getSize()/dl.getStats().getSecondsDownloading());
 		PSupportStatusMailer mailer = (PSupportStatusMailer)Plugin.getPluginSupport(PSupportStatusMailer.IDENTIFIER);
-		mailer.sendMessage(this, "Download Finished: "+dl.getName(), "Download Finished: "
-				+dl.getName()+"\nTime: "+formatters.formatTimeFromSeconds(dl.getStats().getSecondsDownloading())
-				+"\nAverage Download Speed: "+formatters.formatByteCountToKiBEtcPerSec(dl.getTorrent().getSize()/dl.getStats().getSecondsDownloading()));
+		mailer.sendMessage(this, "Download Finished: "+dl.getName(), notificationMessage);
+		PSupportAzJabber jabber = (PSupportAzJabber)Plugin.getPluginSupport(PSupportAzJabber.IDENTIFIER);
+		jabber.sendMessage(this, notificationMessage);
+
 		Element event = getEventElement();
 		event.setAttribute("type", Integer.toString(RemoteConstants.EV_DL_FINISHED));
 		event.setAttribute("name", dl.getName());
