@@ -15,6 +15,7 @@ public class Group extends AbstractEntryContainer implements ConfigEntity {
 		this.section = parent;
 		this.label = label;
 		this.fci = parent.getFCInterface();
+		this.index = parent.getEntries().length;
 		parent.addGroup(this);
 	}
 

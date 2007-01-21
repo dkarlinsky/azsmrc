@@ -23,6 +23,7 @@ public class Section extends AbstractEntryContainer implements Comparable<Sectio
 	public Section (String label, Section parent) {
 		this.label = label;
 		this.fci = parent.getFCInterface();
+		this.index = parent.getEntries().length;
 		parent.addSubSection(this);
 	}
 
