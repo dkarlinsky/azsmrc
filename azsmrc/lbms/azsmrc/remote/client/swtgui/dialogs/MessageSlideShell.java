@@ -131,6 +131,9 @@ public class MessageSlideShell {
 	 */
 	private Button btnHideAll;
 
+
+	private Button btnClearAll;
+
 	/** Button to move to next message.  Text changes from "Hide" to "Next"
 	 * appropriately.
 	 */
@@ -476,7 +479,7 @@ public class MessageSlideShell {
 		gridLayout.verticalSpacing = 0;
 		if (Constants.isOSX)
 			gridLayout.horizontalSpacing = 0;
-		gridLayout.numColumns = (idxHistory > 0) ? 3 : 2;
+		gridLayout.numColumns = (idxHistory > 0) ? 4 : 3;
 		cButtons.setLayout(gridLayout);
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_END
 				| GridData.VERTICAL_ALIGN_CENTER);
@@ -497,7 +500,20 @@ public class MessageSlideShell {
 			}
 		});
 
-		if (idxHistory > 0) {
+		if (idxHistory != 0) {
+			btnClearAll = new Button(cButtons, SWT.PUSH);
+			btnClearAll.setText("Clear");
+			btnClearAll.setToolTipText("Clears the History");
+			btnClearAll.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+			btnClearAll.addListener(SWT.MouseUp, new Listener() {
+				public void handleEvent(Event arg0) {
+					if (DEBUG)
+						System.out.println("Clear Pressed");
+					historyList.clear();
+					disposeShell(shell);
+				}
+			});
+
 			final Button btnPrev = new Button(cButtons, SWT.PUSH);
 			btnPrev.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
 			btnPrev.setText("< " +  idxHistory );
@@ -1172,7 +1188,7 @@ public class MessageSlideShell {
 	public static void main(String[] args) {
 		Display display = Display.getDefault();
 
-		ImageRepository.loadImages(display);
+		//ImageRepository.loadImages(display);
 
 		String title = "This is the title that never ends, never ends!";
 		String text = "This is a very long message with lots of information and "
