@@ -302,12 +302,68 @@ public class GUIEditUser {
 
 
 
-		if(user.checkAccess(RemoteConstants.RIGHTS_ADMIN))
+		final Button rights1 = new Button(composite, SWT.CHECK);
+		rights1.setText("User has right to Force Start torrents");
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
+		rights1.setLayoutData(gd);
+		rights1.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				if(!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)){
+					if(rights1.getSelection())
+						user.setRight(RemoteConstants.RIGHTS_FORCESTART);
+					else
+						user.unsetRight(RemoteConstants.RIGHTS_FORCESTART);
+				}
+			}
+		});
+
+
+		final Button rights2 = new Button(composite, SWT.CHECK);
+		rights2.setText("User can see public downloads");
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
+		rights2.setLayoutData(gd);
+		rights2.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				if(!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)){
+					if(rights1.getSelection())
+						user.setRight(RemoteConstants.RIGHTS_SEE_PUBLICDL);
+					else
+						user.unsetRight(RemoteConstants.RIGHTS_SEE_PUBLICDL);
+				}
+			}
+		});
+
+
+		final Button rights3 = new Button(composite, SWT.CHECK);
+		rights3.setText("User has right to set download directory");
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
+		rights3.setLayoutData(gd);
+		rights3.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				if(!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)){
+					if(rights1.getSelection())
+						user.setRight(RemoteConstants.RIGHTS_SET_DL_DIR);
+					else
+						user.unsetRight(RemoteConstants.RIGHTS_SET_DL_DIR);
+				}
+			}
+		});
+
+
+		if(user.checkAccess(RemoteConstants.RIGHTS_ADMIN)){
 			combo.select(1);
-		else
+			rights1.setEnabled(false);
+			rights2.setEnabled(false);
+			rights3.setEnabled(false);
+		}else{
 			combo.select(0);
-
-
+			rights1.setEnabled(true);
+			rights2.setEnabled(true);
+			rights3.setEnabled(true);
+		}
 
 		try {
 			if(!Plugin.getXMLConfig().getUser(Plugin.LOGGED_IN_USER).checkRight(RemoteConstants.RIGHTS_ADMIN)){
@@ -322,10 +378,20 @@ public class GUIEditUser {
 		//Combo Listener to save changes to user
 		combo.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
-				if(combo.getSelectionIndex() == 1)
+				if(combo.getSelectionIndex() == 1){
 					user.setRight(RemoteConstants.RIGHTS_ADMIN);
-				else
+					rights1.setEnabled(false);
+					rights2.setEnabled(false);
+					rights3.setEnabled(false);
+					rights1.setSelection(false);
+					rights2.setSelection(false);
+					rights3.setSelection(false);
+				}else{
 					user.unsetRight(RemoteConstants.RIGHTS_ADMIN);
+					rights1.setEnabled(true);
+					rights2.setEnabled(true);
+					rights3.setEnabled(true);
+				}
 			}
 		});
 
