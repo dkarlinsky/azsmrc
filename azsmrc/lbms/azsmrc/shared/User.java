@@ -183,6 +183,7 @@ public class User {
 				Element e = new Element("Property");
 				e.setAttribute("key", key);
 				e.setText(properties.get(key));
+				user.addContent(e);
 			}
 		} catch (RuntimeException e) {
 			e.printStackTrace();
