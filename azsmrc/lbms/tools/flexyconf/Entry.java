@@ -297,6 +297,10 @@ public class Entry implements ConfigEntity {
 		triggerDependencyCheck();
 	}
 
+	public void reset() {
+		value = null;
+	}
+
 	/**
 	 * @return the option
 	 */

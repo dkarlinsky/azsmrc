@@ -22,7 +22,7 @@ public class FlexyConfiguration {
 
 	public FlexyConfiguration () {
 		fci = new FCInterface (this);
-		rootSection = new Section ("RootSection");
+		rootSection = new Section ("FlexyConfiguration");
 		rootSection.setFCInterface(getFCInterface());
 	}
 
@@ -69,6 +69,14 @@ public class FlexyConfiguration {
 	 */
 	public Section getRootSection() {
 		return rootSection;
+	}
+
+	/**
+	 * This will reset all Entries, this is neccessary if the FlexyConf
+	 * is reused with another ContentProvider.
+	 */
+	public void reset() {
+		rootSection.resetAll();
 	}
 
 	/**

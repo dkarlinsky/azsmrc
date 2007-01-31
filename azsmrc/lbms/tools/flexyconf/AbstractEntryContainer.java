@@ -46,6 +46,13 @@ public abstract class AbstractEntryContainer {
 		}
 	}
 
+	public void reset() {
+		Set<String> keys = entries.keySet();
+		for (String k:keys) {
+			entries.get(k).reset();
+		}
+	}
+
 	public Entry getEntry (String key) {
 		if (entries.containsKey(key))
 			return entries.get(key);

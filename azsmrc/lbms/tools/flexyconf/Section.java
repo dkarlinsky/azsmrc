@@ -166,10 +166,28 @@ public class Section extends AbstractEntryContainer implements Comparable<Sectio
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see lbms.tools.flexyconf.AbstractEntryContainer#reset()
+	 */
+	@Override
+	public void reset() {
+		super.reset();
+		for (Group g:groups) {
+			g.reset();
+		}
+	}
+
 	public void initAll() {
 		init();
 		for (Section child:children) {
 			child.initAll();
+		}
+	}
+
+	public void resetAll() {
+		reset();
+		for (Section child:children) {
+			child.resetAll();
 		}
 	}
 
