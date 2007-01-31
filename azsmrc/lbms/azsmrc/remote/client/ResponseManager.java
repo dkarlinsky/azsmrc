@@ -220,9 +220,12 @@ public class ResponseManager {
 			public long handleRequest(Element xmlResponse) throws IOException {
 				Element root = xmlResponse.getChild("Transfers");
 				List<Element> transfers = root.getChildren("Transfer");
+				List<String> dls = new ArrayList<String>();
 				for (Element t:transfers) {
 					updateDownload(t);
+					dls.add(t.getAttributeValue("hash"));
 				}
+				dm.retainDownloads(dls);
 				return Constants.UPDATE_LIST_TRANSFERS;
 			}
 		});

@@ -8,7 +8,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import lbms.azsmrc.remote.client.Client;
 import lbms.azsmrc.remote.client.Download;
@@ -200,5 +202,13 @@ public class DownloadManagerImpl implements DownloadManager {
 	public void manAddDownload (DownloadImpl dl) {
 		downloads.put(dl.getHash(), dl);
 		eventDownloadAdded(dl);
+	}
+
+	public void retainDownloads (List<String> hashes) {
+		Set<String> keySet = new TreeSet<String>(downloads.keySet());
+		keySet.removeAll(hashes);
+		for (String hash:keySet) {
+			manRemoveDownload(hash);
+		}
 	}
 }
