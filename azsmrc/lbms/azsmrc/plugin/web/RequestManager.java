@@ -576,15 +576,20 @@ public class RequestManager {
 				if (singleUser || user.hasDownload(hash)) {
 					try {
 						Download dl = getDownloadByHash (hash);
-						if (dl.getState() != Download.ST_STOPPED)dl.stop();
-						if (xmlRequest.getAttributeValue("delTorrent")!=null) {
-							try {
-								dl.remove(Boolean.parseBoolean(xmlRequest.getAttributeValue("delTorrent")),Boolean.parseBoolean(xmlRequest.getAttributeValue("delData")));
-							} catch(NullPointerException e) {
+						User[] users = Plugin.getXMLConfig().getUsersOfDownload(dl);
+						if (users.length==1 || users.length == 0) {
+							if (dl.getState() != Download.ST_STOPPED)dl.stop();
+							if (xmlRequest.getAttributeValue("delTorrent")!=null) {
+								try {
+									dl.remove(Boolean.parseBoolean(xmlRequest.getAttributeValue("delTorrent")),Boolean.parseBoolean(xmlRequest.getAttributeValue("delData")));
+								} catch(NullPointerException e) {
+								}
 							}
+							else
+								dl.remove();
+						} else {
+							user.removeDownload(dl);
 						}
-						else
-							dl.remove();
 					} catch (DownloadException e) {
 						user.eventException(e);
 						e.printStackTrace();
