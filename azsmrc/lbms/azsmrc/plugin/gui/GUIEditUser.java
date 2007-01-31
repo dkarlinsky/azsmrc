@@ -224,6 +224,7 @@ public class GUIEditUser {
 			 * @see lbms.tools.flexyconf.ContentProvider#setValue(java.lang.String, java.lang.String, int)
 			 */
 			public void setValue(String key, String value, int type) {
+				System.out.println("Set Property for user ["+user+"]: "+key+" -> "+value);
 				user.setProperty(key, value);
 			}
 		});
@@ -235,6 +236,7 @@ public class GUIEditUser {
 				return Plugin.getLocaleUtilities().getLocalisedMessageText(key);
 			}
 		});
+		fc.reset(); //reset all values before creating menu
 		SWTMenu fcm = new SWTMenu (fc,tree,cOptions);
 		fcm.addAsRoot();
 	}
