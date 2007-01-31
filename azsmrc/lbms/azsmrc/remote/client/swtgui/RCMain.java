@@ -267,7 +267,7 @@ public class RCMain implements Launchable {
 	protected void createContents() {
 		shell = new Shell();
 		SplashScreen.setProgressAndText("Loading Images", 80);
-		ImageRepository.loadImages(display);
+		ImageRepository.preloadImages(display);
 		SplashScreen.setProgressAndText("Creating GUI", 90);
 
 /*		//Show Splash
