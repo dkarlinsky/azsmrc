@@ -21,7 +21,7 @@ public class PSupportStatusMailer implements PluginSupport {
 	private boolean active;
 	private final static String SUPPORTED_PLUGIN_ID = "azstatusmailer";
 	private final static String NAME = "Status Mailer Support";
-	private final static String MIN_VERSION = "0.7.1";
+	private final static String MIN_VERSION = "0.8";
 	private IPCInterface ipc;
 
 	/* (non-Javadoc)
