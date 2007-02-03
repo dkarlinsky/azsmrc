@@ -78,6 +78,7 @@
 			<include name="lbms/tools/flexyconf/**/*" />
 			<include name="lbms/tools/Crypto*" />
 			<include name="lbms/tools/*" />
+			<include name="lbms/tools/stats/*" />
 			<fileset file="${root.dir}/plugin.properties" />
 		</jar>
 		<echo message="Creating AzSMRC_${version}${beta}.jar..." />
@@ -109,6 +110,7 @@
 			<include name="lbms/tools/flexyconf/**/*" />
 			<include name="lbms/tools/Crypto*" />
 			<include name="lbms/tools/*" />
+			<include name="lbms/tools/stats/*" />
 			<fileset file="${root.dir}/plugin.properties" />
 		</zip>
 		<zip destfile="${root.dir}/${dist.dir}/AzSMRC_${version}${beta}_src.zip" basedir="${root.dir}" excludes="${generic.excludes}">
