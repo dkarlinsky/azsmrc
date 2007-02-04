@@ -28,21 +28,6 @@ public class PluginClientImpl implements PluginClient, ClientEventListener, IPCR
 	}
 
 	/* (non-Javadoc)
-	 * @see lbms.azsmrc.remote.client.plugins.PluginClient#getSendElement(java.lang.String)
-	 */
-	public Element getSendElement(String id) {
-		Element sendElement = client.getSendElement(id);
-		return sendElement;
-	}
-
-	/* (non-Javadoc)
-	 * @see lbms.azsmrc.remote.client.plugins.PluginClient#sendCustomRequest(org.jdom.Element)
-	 */
-	public void sendCustomRequest(Element e) {
-		client.enqueue(e);
-	}
-
-	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.plugins.PluginClient#sendIPCCall(java.lang.String, java.lang.String, java.lang.String, java.lang.Object[])
 	 */
 	public void sendIPCCall(String pluginID, String senderID, String method,

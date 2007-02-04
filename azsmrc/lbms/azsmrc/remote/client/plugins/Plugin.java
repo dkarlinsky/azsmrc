@@ -1,6 +1,3 @@
-/**
- * 
- */
 package lbms.azsmrc.remote.client.plugins;
 
 /**
@@ -9,5 +6,10 @@ package lbms.azsmrc.remote.client.plugins;
  */
 public interface Plugin {
 
+	/**
+	 * This method is called when the PluginManager fires it up
+	 * 
+	 * @param pluginInterface
+	 */
 	public void initialize (PluginInterface pluginInterface);
 }

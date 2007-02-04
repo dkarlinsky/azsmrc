@@ -2,30 +2,15 @@ package lbms.azsmrc.remote.client.plugins;
 
 import lbms.azsmrc.remote.client.plugins.event.PluginClientListener;
 
-import org.jdom.Element;
-
 /**
+ * PluginClient Interface
+ * 
+ * This is the Interface to interact with any remote plugin via IPC.
+ * 
  * @author Damokles
  *
  */
-public interface PluginClient {
-
-	/**
-	 * Returns a Element for Requests.
-	 * 
-	 * @param id the switch of the Element, it has to be prefixed with the pluginID.
-	 * @return Element for Requests
-	 */
-	public Element getSendElement(String id);
-
-	/**
-	 * Sends a fully customized Request to AzSMRC plugin.
-	 * 
-	 * The Element should be aquired by @see getSendElement 
-	 * 
-	 * @param e Element to send
-	 */
-	public void sendCustomRequest (Element e);
+public interface PluginClient {	
 
 	/**
 	 * Send an IPC call to Azureus

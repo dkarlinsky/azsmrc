@@ -4,6 +4,8 @@ import java.io.File;
 
 
 /**
+ * The Basic Interface for Plugins to interact with AzSMRC
+ * 
  * @author Damokles
  *
  */

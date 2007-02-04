@@ -1,6 +1,8 @@
 package lbms.azsmrc.remote.client.plugins;
 
 /**
+ * I18N for your plugin
+ * 
  * @author Damokles
  *
  */

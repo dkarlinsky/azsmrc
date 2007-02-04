@@ -1,6 +1,3 @@
-/**
- * 
- */
 package lbms.azsmrc.remote.client.plugins.ui.swt;
 
 /**

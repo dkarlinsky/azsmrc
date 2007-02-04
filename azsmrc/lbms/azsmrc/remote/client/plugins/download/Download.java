@@ -1,24 +1,3 @@
-/*
- * File    : Download.java
- * Created : 06-Jan-2004
- * By      : parg
- *
- * Azureus - a Java Bittorrent client
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details ( see the LICENSE file ).
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- */
-
 package lbms.azsmrc.remote.client.plugins.download;
 
 import lbms.azsmrc.remote.client.events.DownloadListener;
@@ -286,39 +265,107 @@ Download
 	public void moveDataFiles
 	(String target);
 
+	/**
+	 * Gets the Advanced Download Stats 
+	 * @return
+	 */
 	public DownloadAdvancedStats
 	getAdvancedStats();
 
+	/**
+	 * Returns the FileManager for the Download
+	 * @return
+	 */
 	public DownloadFileManager
 	getFileManager();
 
+  	/**
+  	 * Set the Download Speed Limit for the Download
+  	 * @param kb
+  	 */
   	public void
 	setMaximumDownloadKBPerSecond(
 		int		kb );
 
+  	/**
+  	 * Returns the current Speed Limit for the Download
+  	 * 
+  	 * @return
+  	 */
   	public int
 	getMaximumDownloadKBPerSecond();
 
+  	/**
+  	 * Returns the current Seeds for the Download
+  	 * 
+  	 * @return
+  	 */
   	public int getSeeds();
 
+  	/**
+  	 * Returns the current Leechers for the Download
+  	 * 
+  	 * @return
+  	 */
   	public int getLeecher();
 
+  	/**
+  	 * Returns Seeds in the Swarm for the Downloads
+  	 * 
+  	 * @return
+  	 */
   	public int getTotalSeeds();
 
+  	/**
+  	 * Returns the Leechers in the Swarm for the Downloads
+  	 * 
+  	 * @return
+  	 */
   	public int getTotalLeecher();
 
+  	/**
+  	 * Get Discarded bytes for the Download
+  	 * 
+  	 * @return
+  	 */
   	public long getDiscarded();
 
+  	/**
+  	 * Get the Size of the Download
+  	 * 
+  	 * @return
+  	 */
   	public long getSize();
 
+  	/**
+  	 * Request a Scrape for the Download
+  	 */
   	public void requestScrape();
 
+  	/**
+  	 * Request an Announce for the Download
+  	 */
   	public void requestAnnounce();
 
+  	/**
+  	 * Returns the Time of the last Scrape
+  	 * 
+  	 * @return
+  	 */
   	public long getLastScrapeTime();
 
+  	/**
+  	 * Returns the Time until the next Scrape
+  	 * 
+  	 * @return
+  	 */
   	public long getNextScrapeTime();
 
+  	/**
+  	 * Returns the Time to wait until next Announce Request
+  	 * 
+  	 * @return
+  	 */
   	public long getAnnounceTimeToWait();
 
 	/**
@@ -333,7 +380,17 @@ Download
 	 */
 	public void setUploadRateLimitBytesPerSecond( int max_rate_bps );
 
+	/**
+	 * Adds a Download Listener to the Download
+	 * 
+	 * @param dll
+	 */
 	public void addDownloadListener (DownloadListener dll);
 
+	/**
+	 * Removes a Download Listener from the Download
+	 * 
+	 * @param dll
+	 */
 	public void removeDownloadListener (DownloadListener dll);
 }

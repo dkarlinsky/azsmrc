@@ -47,6 +47,11 @@ DownloadStats
 	public String
 	getStatus();
 
+	/**
+	 * Returns the Tracker Status
+	 * 
+	 * @return
+	 */
 	public String
 	getTrackerStatus();
 
@@ -54,8 +59,8 @@ DownloadStats
 	 * returns a value between 0 and 1000 giving the completion status of the current download
 	 * task (e.g. checking, downloading)
 	 * @return
-   *
-   * @since 2.0.7.0
+	 *
+	 * @since 2.0.7.0
 	 */
 	public int
 	getCompleted();
@@ -67,8 +72,8 @@ DownloadStats
 	/**
 	 * Gives the number of bytes downloaded
 	 * @return
-   *
-   * @since 2.0.7.0
+	 *
+	 * @since 2.0.7.0
 	 */
 	public long
 	getDownloaded();
@@ -76,8 +81,8 @@ DownloadStats
 	/**
 	 * Gives the number of bytes uploaded
 	 * @return
-   *
-   * @since 2.0.7.0
+	 *
+	 * @since 2.0.7.0
 	 */
 	public long
 	getUploaded();
@@ -85,8 +90,8 @@ DownloadStats
 	/**
 	 * Gives average number of bytes downloaded in last second 
 	 * @return
-   *
-   * @since 2.0.7.0
+	 *
+	 * @since 2.0.7.0
 	 */
 	public long
 	getDownloadAverage();
@@ -94,8 +99,8 @@ DownloadStats
 	/**
 	 * Gives average number of bytes uploaded in last second 
 	 * @return
-   *
-   * @since 2.0.7.0
+	 *
+	 * @since 2.0.7.0
 	 */
 	public long
 	getUploadAverage();
@@ -106,8 +111,8 @@ DownloadStats
 	/**
 	 * Gives the estimated time to completion as a string
 	 * @return
-   *
-   * @since 2.0.7.0
+	 *
+	 * @since 2.0.7.0
 	 */
 	public String
 	getETA();
@@ -115,8 +120,8 @@ DownloadStats
 	/**
 	 * Gives the share ratio of the torrent in 1000ths (i.e. 1000 = share ratio of 1)
 	 * @return
-   *
-   * @since 2.0.7.0
+	 *
+	 * @since 2.0.7.0
 	 */
 	public int
 	getShareRatio();
@@ -124,8 +129,8 @@ DownloadStats
 	/**
 	 * Gives the currently seen availability of the torrent
 	 * @return
-   *
-   * @since 2.0.8.2
+	 *
+	 * @since 2.0.8.2
 	 */
 	public float
 	getAvailability();
