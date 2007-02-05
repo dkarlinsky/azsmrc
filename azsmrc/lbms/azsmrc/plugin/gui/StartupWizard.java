@@ -10,7 +10,6 @@ package lbms.azsmrc.plugin.gui;
 import lbms.azsmrc.plugin.main.Plugin;
 import lbms.azsmrc.plugin.main.Utilities;
 
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.DisposeEvent;
@@ -34,7 +33,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.gudy.azureus2.core3.config.COConfigurationManager;
 import org.gudy.azureus2.ui.swt.Messages;
 import org.gudy.azureus2.ui.swt.auth.CertificateCreatorWindow;
 
@@ -209,14 +207,12 @@ public class StartupWizard {
 						pc.setPluginParameter("remote_port", comPort);
 						pc.setPluginParameter("use_ssl", useSSL);
 						pc.setPluginParameter("statistics.allow", useStats);
+
+						if(dirString != null && !dirString.equals("")){
+							pc.setUnsafeStringParameter("Default save path", dirString);
+						}
 						//Save all
 						pc.save();
-						//right now we only have a core call to store the string settings
-						//HACK: COConfigurationManager.setParameter(xmlRequest.getAttributeValue("key"), xmlRequest.getAttributeValue("value"));
-						if(dirString != null && !dirString.equals("")){
-							COConfigurationManager.setParameter("Default save path", dirString);
-							COConfigurationManager.save();
-						}
 					}catch(Exception e){
 					}
 					shell.dispose();

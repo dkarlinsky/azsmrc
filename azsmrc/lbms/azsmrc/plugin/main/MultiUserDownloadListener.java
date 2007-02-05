@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import lbms.azsmrc.shared.UserNotFoundException;
 
-import org.gudy.azureus2.core3.config.COConfigurationManager;
 import org.gudy.azureus2.plugins.disk.DiskManagerFileInfo;
 import org.gudy.azureus2.plugins.download.Download;
 import org.gudy.azureus2.plugins.download.DownloadException;
@@ -34,7 +33,7 @@ public class MultiUserDownloadListener implements org.gudy.azureus2.plugins.down
 
 			if (user_attrib != null && !user_attrib.equals(MultiUser.PUBLIC_DOWNLOAD_NAME)) {
 				try {
-					if (!download.getSavePath().contains(COConfigurationManager.getStringParameter("Default save path"))) {
+					if (!download.getSavePath().contains(Plugin.getPluginInterface().getPluginconfig().getUnsafeStringParameter("Default save path",null))) {
 
 
 						if (!singleUser){
