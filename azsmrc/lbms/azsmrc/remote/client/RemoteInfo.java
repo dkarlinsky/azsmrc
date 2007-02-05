@@ -14,4 +14,5 @@ public interface RemoteInfo {
 
 	public RemotePlugin[] getRemotePlugins();
 	public Element getPluginsFlexyConf();
+	public Element getAzSMRCPluginSupportFlexyConf();
 }

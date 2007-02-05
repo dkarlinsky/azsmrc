@@ -7,9 +7,7 @@ import lbms.azsmrc.remote.client.RemoteInfo;
 import lbms.azsmrc.remote.client.RemotePlugin;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
-import lbms.azsmrc.remote.client.swtgui.dialogs.MessageDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.MessageSlideShell;
-import lbms.azsmrc.shared.SWTSafeRunnable;
 import lbms.tools.updater.Version;
 
 import org.eclipse.swt.SWT;
@@ -24,6 +22,7 @@ public class RemoteInfoImpl implements RemoteInfo {
 	private Map<String, String> driveInfo;
 	private RemotePluginImpl[] remotePlugins;
 	private Element pluginFlexyConf;
+	private Element azsmrcPluginSupportFlexyConf;
 
 	public RemoteInfoImpl (Client c) {
 		client = c;
@@ -122,6 +121,18 @@ public class RemoteInfoImpl implements RemoteInfo {
 	public void setPluginFlexyConf(Element fc) {
 		fc.detach();
 		this.pluginFlexyConf = fc;
+	}
+
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.RemoteInfo#getAzSMRCPluginSupportFlexyConf()
+	 */
+	public Element getAzSMRCPluginSupportFlexyConf() {
+		return azsmrcPluginSupportFlexyConf;
+	}
+
+	public void setAzSMRCPluginSupportFlexyConf(Element fc) {
+		fc.detach();
+		this.azsmrcPluginSupportFlexyConf = fc;
 	}
 
 	/**

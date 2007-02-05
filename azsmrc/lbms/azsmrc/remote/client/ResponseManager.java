@@ -382,6 +382,7 @@ public class ResponseManager {
 				RemoteInfoImpl ri = client.getRemoteInfoImpl();
 				ri.setAzureusVersion(xmlResponse.getAttributeValue("azureusVersion"));
 				ri.setPluginVersion(xmlResponse.getAttributeValue("pluginVersion"));
+				ri.setAzSMRCPluginSupportFlexyConf(xmlResponse.getChild("FlexyConfiguration"));
 				ri.setLoaded(true);
 				return Constants.UPDATE_REMOTE_INFO;
 			}

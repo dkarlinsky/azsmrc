@@ -1385,6 +1385,9 @@ public class RequestManager {
 				PluginInterface pi = Plugin.getPluginInterface();
 				response.setAttribute("azureusVersion", pi.getAzureusVersion());
 				response.setAttribute("pluginVersion", pi.getPluginVersion());
+				Element fc = Plugin.getPSFlexyConf().toDocument().getRootElement();
+				fc.detach();
+				response.addContent(fc);
 
 				return true;
 			}
