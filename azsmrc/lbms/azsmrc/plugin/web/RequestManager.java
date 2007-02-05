@@ -22,12 +22,11 @@ import lbms.azsmrc.plugin.main.Utilities;
 import lbms.azsmrc.shared.DuplicatedUserException;
 import lbms.azsmrc.shared.EncodingUtil;
 import lbms.azsmrc.shared.RemoteConstants;
-import lbms.azsmrc.shared.UserNotFoundException;
 import lbms.azsmrc.shared.Serializer;
+import lbms.azsmrc.shared.UserNotFoundException;
 import lbms.tools.TorrentDownload;
 
 import org.apache.commons.io.FileSystemUtils;
-import org.gudy.azureus2.core3.config.COConfigurationManager;
 import org.gudy.azureus2.core3.internat.MessageText;
 import org.gudy.azureus2.core3.security.SESecurityManager;
 import org.gudy.azureus2.core3.util.Constants;
@@ -1312,16 +1311,16 @@ public class RequestManager {
 						int type = xmlRequest.getAttribute("type").getIntValue();
 						switch (type) {
 						case RemoteConstants.PARAMETER_BOOLEAN:
-							COConfigurationManager.setParameter(xmlRequest.getAttributeValue("key"), xmlRequest.getAttribute("value").getBooleanValue());
+							Plugin.getPluginInterface().getPluginconfig().setUnsafeBooleanParameter(xmlRequest.getAttributeValue("key"), xmlRequest.getAttribute("value").getBooleanValue());
 							break;
 						case RemoteConstants.PARAMETER_STRING:
-							COConfigurationManager.setParameter(xmlRequest.getAttributeValue("key"), xmlRequest.getAttributeValue("value"));
+							Plugin.getPluginInterface().getPluginconfig().setUnsafeStringParameter(xmlRequest.getAttributeValue("key"), xmlRequest.getAttributeValue("value"));
 							break;
 						case RemoteConstants.PARAMETER_FLOAT:
-							COConfigurationManager.setParameter(xmlRequest.getAttributeValue("key"), xmlRequest.getAttribute("value").getFloatValue());
+							Plugin.getPluginInterface().getPluginconfig().setUnsafeFloatParameter(xmlRequest.getAttributeValue("key"), xmlRequest.getAttribute("value").getFloatValue());
 							break;
 						case RemoteConstants.PARAMETER_INT:
-							COConfigurationManager.setParameter(xmlRequest.getAttributeValue("key"), xmlRequest.getAttribute("value").getIntValue());
+							Plugin.getPluginInterface().getPluginconfig().setUnsafeIntParameter(xmlRequest.getAttributeValue("key"), xmlRequest.getAttribute("value").getIntValue());
 							break;
 						}
 					} catch (DataConversionException e) {
@@ -1341,22 +1340,23 @@ public class RequestManager {
 						int type = xmlRequest.getAttribute("type").getIntValue();
 						response.setAttribute("type",xmlRequest.getAttributeValue("type"));
 						response.setAttribute("key", xmlRequest.getAttributeValue("key"));
+						PluginConfig pc = Plugin.getPluginInterface().getPluginconfig();
 						switch (type) {
 						case RemoteConstants.PARAMETER_BOOLEAN:
 							response.setAttribute("value",Boolean.toString(
-							COConfigurationManager.getBooleanParameter(xmlRequest.getAttributeValue("key"))));
+							pc.getUnsafeBooleanParameter(xmlRequest.getAttributeValue("key"),false)));
 							break;
 						case RemoteConstants.PARAMETER_STRING:
 							response.setAttribute("value",
-							COConfigurationManager.getStringParameter(xmlRequest.getAttributeValue("key")));
+							pc.getUnsafeStringParameter(xmlRequest.getAttributeValue("key"),""));
 							break;
 						case RemoteConstants.PARAMETER_FLOAT:
 							response.setAttribute("value",Float.toString(
-							COConfigurationManager.getFloatParameter(xmlRequest.getAttributeValue("key"))));
+							pc.getUnsafeFloatParameter(xmlRequest.getAttributeValue("key"),0)));
 							break;
 						case RemoteConstants.PARAMETER_INT:
 							response.setAttribute("value",Integer.toString(
-							COConfigurationManager.getIntParameter(xmlRequest.getAttributeValue("key"))));
+							pc.getUnsafeIntParameter(xmlRequest.getAttributeValue("key"),0)));
 							break;
 						}
 					} catch (DataConversionException e) {
