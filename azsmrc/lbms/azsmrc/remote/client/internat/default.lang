@@ -405,6 +405,7 @@ tab.preferencestab.connection.proxy.username=Username
 tab.preferencestab.grayTitle.text=All changes are immediately committed
 tab.preferencestab.language.Deutsch=Deutsch
 tab.preferencestab.language.English=English
+tab.preferencestab.localplugins=Local Plugins
 tab.preferencestab.mainLabel=AzSMRC Settings
 tab.preferencestab.mainWindow=Main Window
 tab.preferencestab.mainWindow.autoConsole=Auto open console when opening main window

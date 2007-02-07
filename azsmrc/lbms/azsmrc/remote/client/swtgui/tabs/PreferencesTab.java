@@ -1130,7 +1130,7 @@ public class PreferencesTab {
 
 	public void addLocalPluginConfig () {
 		TreeItem localPlugsItem = new TreeItem(menuTree, SWT.NONE);
-		localPlugsItem.setText(PFX + "localplugins");
+		localPlugsItem.setText(I18N.translate(PFX + "localplugins"));
 
 		PluginInterfaceImpl[] plugins = RCMain.getRCMain().getPluginManagerImpl().getPluginInterfacesImpl();
 		Arrays.sort(plugins, new Comparator<PluginInterfaceImpl>() {
