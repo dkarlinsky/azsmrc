@@ -6,10 +6,12 @@ function addTorrentContent() {
 	head = document.createElement("h3");
 	head.appendChild(document.createTextNode("Add Torrent by File Upload"));
 	div.appendChild(head);
+	/*
 	var p = document.createElement("p");
 	p.appendChild(document.createTextNode("under construction"));
 	p.className = "hint";
 	div.appendChild(p);
+	*/
 	var form = document.createElement("form");
 	form.setAttribute("enctype", "multipart/form-data");
 	var label = document.createElement("label");

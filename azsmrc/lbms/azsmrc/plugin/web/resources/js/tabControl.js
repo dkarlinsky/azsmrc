@@ -1,7 +1,7 @@
 // default settings
-var activeTab = 0;
+var activeTab = -1;
 // for easy usage it is a simple counter, do NOT decrease this counter anytime
-var tabCount = 1;
+var tabCount = -1;
 // available tabs
 var registeredTabs = ["listTransfers", "about", "debug", "userManagement", "torrentControl", "preferences", "advanced_interaction"];
 // shown labels for tabs
@@ -13,26 +13,29 @@ var refreshRequests = [1, -1, -1, 29, -1, -1, -1];
 // objects for deactivating autorefresh
 var autoRefreshObjs = [null, null, null, null, null, null];
 // open tabs at position (default is set below)
-var tabs = ["listTransfers"];
+var tabs = [];
 var startupTabs = [false, true, false, false, false, false, false];
 // an example tab (tabbar is list of tabs)
 // <li><span onclick="SendRequestToServer(1);">ALL Torrents</span><img src="img/delete.png" alt="Close Tab" title="Close Tab" onclick="closeTab(this);" /></li>
 function addTab(contentElement) {
 	// only create new tab, if no tab with contentElement exists
 	var tabExists = getTabByContent(contentElement);
-	if (tabExists == null) {
+	if (tabExists == null) {		
 		// tabbar entry
+		
 		var tabbar = document.getElementById("tabbar");
 		var tab = document.createElement("li");
 		var tabLabel = document.createElement("span");
 		var img = document.createElement("img");
 		var label;
 		tabCount++;
-		img.src = "img/delete.png";
-		img.setAttribute("alt", "Close Tab");
-		img.setAttribute("title", "Close Tab");
-		img.setAttribute("tab", tabCount);
-		img.onclick = function() { closeTab(this); };
+		if (contentElement != "listTransfers") {
+			img.src = "img/delete.png";
+			img.setAttribute("alt", "Close Tab");
+			img.setAttribute("title", "Close Tab");
+			img.setAttribute("tab", tabCount);
+			img.onclick = function() { closeTab(this); };
+		}
 		switch (contentElement) {
 			case "about":
 				label = document.createTextNode(tabLabels[1]);
@@ -63,14 +66,17 @@ function addTab(contentElement) {
 		tabLabel.setAttribute("tab", tabCount);
 		tabLabel.onclick = function() { ShowTab(this.getAttribute("tab")); };
 		tab.appendChild(tabLabel);
-		tab.appendChild(img);
+		if (contentElement != "listTransfers")
+			tab.appendChild(img);
 		tab.setAttribute("tab_control", tabCount);
 		tabbar.appendChild(tab);
+		
 		// tabcontent
 		var contentList = document.getElementById("tabcontents");
 		var tabContent = document.createElement("div");
 		tabContent.className = "tab";
 		tabContent.setAttribute("id", "tab_"+tabCount);
+		tabContent.setAttribute("tab", tabCount);
 		switch (contentElement) {
 			// simple tabs can be created here
 			// advanced tabs should use own function
@@ -109,33 +115,52 @@ function addTab(contentElement) {
 				tabContent.appendChild(document.createTextNode("This tab is empty!"));
 			break;
 		}
+		tabContent.onclick = function () {
+			ShowTab(this.getAttribute("tab"));
+		}
 		contentList.appendChild(tabContent);
 		tabs[tabCount] = contentElement;
 		ShowTab(tabCount);
 		refreshView();
 		configAutoRefresh();
+		set_dragbar(tabContent);
+
+		if (contentElement != "listTransfers") {
+			var dragbar = tabContent.firstChild;
+			var close = document.createElement("img");
+			close.src = "img/icon-close.png";
+			close.setAttribute("title", "Close");
+			close.setAttribute("alt", "Close");
+			close.setAttribute("tab", tabCount);
+			close.onclick = function () {
+				closeTab(this);
+			}
+			dragbar.appendChild(close);
+		}		
 	} else { 
 		ShowTab(getTabIdByContent(contentElement));
 	}
 }
 function closeTab(tabObj) {
 	tabID = tabObj.getAttribute("tab");
-	//addDebugEntry("tabID: "+tabID);
-	var tabControl = tabObj.parentNode;
-	tabControl.parentNode.removeChild(tabControl);
-	removeTab = document.getElementById("tab_"+tabID);
-	if (removeTab)
-		removeTab.parentNode.removeChild(removeTab);
-	if (tabID == activeTab) {
-		//addDebugEntry("closing active tab");
-		var tabbar = document.getElementById("tabbar");
-		if (tabbar.hasChildNodes()) {
-			activeTab = tabbar.firstChild.getAttribute("tab_control");
-			ShowTab(activeTab);
-		} else activeTab = -1;
+	if (getTabIdByContent("listTransfers") != tabID) {
+		//addDebugEntry("tabID: "+tabID);
+		var tabControl = tabObj.parentNode;
+		tabControl.parentNode.removeChild(tabControl);
+		removeTab = document.getElementById("tab_"+tabID);
+		if (removeTab)
+			removeTab.parentNode.removeChild(removeTab);
+		if (tabID == activeTab) {
+			//addDebugEntry("closing active tab");
+			var tabbar = document.getElementById("tabbar");
+			if (tabbar.hasChildNodes()) {
+				activeTab = tabbar.firstChild.getAttribute("tab_control");
+				ShowTab(activeTab);
+			} else activeTab = -1;
+		}
+		tabs[tabID] = "";
+		configAutoRefresh();
 	}
-	tabs[tabID] = "";
-	configAutoRefresh();
 }
 function getRegTabById(tabID) {
 	var tab = null;
@@ -211,9 +236,13 @@ function refreshTabbar() {
 function ShowTab(tab) {
 	var toActivate = document.getElementById("tab_"+tab);
 	if (toActivate != null) {
+		/*
 		if (activeTab > -1)
 			document.getElementById("tab_"+activeTab).style.display = "none";
 		toActivate.style.display = "block";
+		*/
+		zIndex++;
+		toActivate.style.zIndex = zIndex;
 		activeTab = tab;
 		refreshTabbar();
 	}

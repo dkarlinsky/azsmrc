@@ -84,6 +84,8 @@ function addlistTransfersInteraction() {
 				refreshView();
 	};
 	form.appendChild(button);
+	form.className = "tab";
+	set_dragbar(form);
 	div.appendChild(form);
 	
 	link = document.createElement("a");
@@ -489,13 +491,9 @@ function handlelistTransfers(xmldoc) {
 			addTab("listTransfers");
 			list = document.getElementById("tab_"+tabCount);
 			list.appendChild(addlistTransfersInteraction());
-		} else 
-			if (list.lastChild != list.firstChild)
+		} else
+			if (list.lastChild.firstChild.nodeName == "TABLE")
 				list.removeChild(list.lastChild);
-			else {
-				list.removeChild(list.firstChild);
-				list.appendChild(addlistTransfersInteraction());				
-			}
 		var container = document.createElement("div");
 		var downloads = document.createElement("table");
 		var uploads = document.createElement("table");

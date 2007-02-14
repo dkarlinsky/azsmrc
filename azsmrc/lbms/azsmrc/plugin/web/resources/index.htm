@@ -17,14 +17,14 @@
 	<script type="text/javascript" src="js/tabControl.js" />
 	<script type="text/javascript" src="js/cookieControl.js" />
 	<script type="text/javascript" src="js/azsmrc_main.js" />
+	<script type="text/javascript" src="js/dragdrop.js" />
 	<!-- Styles -->
 	<link rel="stylesheet" type="text/css" href="css/azsmrc_default.css" title="Standard AzSMRC Style" />
 </head>
-<body onload="initAzSMRCwebUI();">
+<body onload="setJSHint(); initAzSMRCwebUI(); init_dragdrop('tab', true);"><div><h1>AzSMRC - webUserInterface</h1><p>This application uses Javascript and requires a modern browser. If you can read this after the page have loaded completly, you may have been disabled Javascript or your browser is not up to date.</p><p>Please contact your system administrator.</p></div>
 	<div id="topbar">
 		<h2 class="invisible">Menu</h2>
 		<ul id="picmenu" class="menu">
-			<!--<li><img src="img/connect.png" alt="Open ALL Torrents" title="Open ALL Torrents" onclick="addTab('listTransfers');" /></li>-->
 			<li class="subbreak"><img src="img/refresh.png" alt="Refresh" title="Refresh" onclick="refreshView();" /></li>
 			<li><img src="img/open_by_file_new.png" alt="Send Torrent File to Server" title="Send Torrent File to Server" onclick="addTab('torrentControl');" /></li>
 			<li class="subbreak"><img src="img/open_by_url_new.png" alt="Send Torrent URL to Server" title="Send Torrent URL to Server" onclick="addTab('torrentControl');" /></li>
@@ -40,16 +40,13 @@
 			<!--<li><img src="img/console.png" alt="Open Console" title="Open Console" /></li>-->
 			<li><img src="img/information.png" alt="Information" title="Information" onclick="addTab('about');" /></li>
 		</ul>	
-		<ul id="tabbar" class="menu"><li><span onclick="ShowTab(this.getAttribute('tab'));">ALL Torrents</span></li></ul>
+		<ul id="tabbar" class="menu"></ul>
 	</div>
-	<div id="eventlist"><p>No events since last request.</p></div>
 	<img src="img/AzSMRC_Splash.png" id="splashscreen" class="invisible" alt="Splashscreen" title="AzSMRC Splashscreen" />
-	<div id="tabcontents">
-		<div id="tab_0" class="tab"><p>No data given, please refresh.</p></div>
-	</div>
-	<div id="interaction_container"><p>No interaction menu given.</p></div>
+	<div id="eventlist" class="tab"><p>No events since last request.</p></div>
+	<div id="tabcontents"></div>
 	<div id="statusbar">
 		<a title="Open Debug Log" onclick="addTab('debug');">Open Debug Log</a><span id="azversion">unknown version</span><span id="azsmrcversion">unknown version</span><span id="eventstatus">no new events</span><span onclick="PingToServer();" id="ping">Ping: undefined</span><span id="requeststatus">no request sent</span><img id="connectionstatus" src="img/connect_no.png" alt="Connection not established" title="Not connected to Server" />
-	</div>	
+	</div>
 </body>
 </html>

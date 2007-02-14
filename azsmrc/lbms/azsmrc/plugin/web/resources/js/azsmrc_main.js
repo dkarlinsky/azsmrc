@@ -224,6 +224,7 @@ function getTCState(hash) {
 function initAzSMRCwebUI() {
 	initDebugLog();
 	//showSplashScreen();
+	addTab("listTransfers");
 	initCookies();
 	configAutoRefresh();
 	initTabControl();
@@ -368,6 +369,10 @@ function SendRequestToServer(request, par) {
 			xmlhttp.send(xmlrequest);
 		}
 	}
+}
+function setJSHint() {
+	var body = document.getElementsByTagName("body")[0];
+	body.firstChild.setAttribute("id", "JS-Hint");
 }
 function showSplashScreen() {
 	// just a funny splashscreen function

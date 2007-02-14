@@ -31,12 +31,15 @@ body > * {
 	margin: 0px 5px 10px 0px;
 	padding: 0px 0px 0px 10px;
 }
+body > #JS-Hint {
+	display: none;
+}
 caption {
 	border-bottom: #888 1px solid;
 	font-size: 0.9em;
 	font-weight: bold;
 	text-align: left;
-	padding: 1px 5% 1px 2%;
+	padding: 1px 5% 1px 20px;
 }
 fieldset {
 	border: #888 1px solid;
@@ -162,6 +165,16 @@ form > p.description {
 	text-align: justify;
 	width: 360px;
 }
+.dragbar {
+	background: #C0C0C0;
+	display: block;
+	height: 15px;
+	margin: -1px -2px 2px -2px;
+	text-align: right;
+}
+.dragbar img {
+	margin: -1px 1px 1px 0px;
+}
 ul.eventDetails {
 	list-style: none outside none;
 	margin: 0px 0px 0px 0px;
@@ -213,7 +226,14 @@ ul.submenu li a {
 	width: 200px;
 }
 div.tab {
-	display: none;
+	display: block;
+	background: #D0D0D9;
+	border: #888 1px solid;
+	max-width: 1000px;
+	min-width: 440px;
+	/* label + file input */
+	padding: 1px 2px 2px 2px;
+	width: auto;
 }
 input.transferCtrl {
 	margin: 3px 0px 0px 0px;
@@ -230,7 +250,7 @@ input.transferCtrl {
 	border: #888 1px solid;
 	display: none;
 	left: 40%;
-	padding: 2px 2px 2px 2px;
+	padding: 1px 2px 2px 2px;
 	position: absolute;
 	top: 5%;
 	width: 220px;
@@ -261,8 +281,9 @@ input.transferCtrl {
 	padding: 0px 0px 0px 0px;
 }
 #picmenu {
-	display: block;
 	background-color: #D0D0D9;
+	border-bottom: #888 1px solid;
+	display: block;
 	height: 22px;
 	margin: 0px 0px 10px 0px;
 	padding: 1px 5% 2px 2%;
@@ -307,6 +328,7 @@ input.transferCtrl {
 #tabbar {
 	background-color: #F7EBAB;
 	border-bottom: #C4B878 1px solid;
+	display: none;
 	font-size: 0.9em;
 	height: 18px;
 	margin: 0px 0px 10px 0px;
