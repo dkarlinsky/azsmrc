@@ -3,8 +3,10 @@ package lbms.azsmrc.shared;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jdom.DataConversionException;
 import org.jdom.Element;
@@ -21,6 +23,7 @@ public class User {
 	protected int downloadSlots;
 	protected int userRights;
 	protected Map<String, String> properties = new HashMap<String, String>();
+	protected Set<String> downloadList = new HashSet<String>();
 
 	/**
 	 * Creates a User object and reads the data
@@ -82,6 +85,11 @@ public class User {
 				this.downloadSlots 	= userElement.getAttribute("downloadSlots").getIntValue();
 			if (userElement.getAttribute("userRights") != null)
 				this.userRights 	= userElement.getAttribute("userRights").getIntValue();
+
+			List<Element> downloads = userElement.getChildren("Download");
+			for (Element download:downloads) {
+				addDownload(download.getTextTrim());
+			}
 		} catch (DataConversionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -178,6 +186,13 @@ public class User {
 		user.setAttribute("autoImportDir",autoImportDir);
 		user.setAttribute("downloadSlots",Integer.toString(downloadSlots));
 		user.setAttribute("userRights",Integer.toString(userRights));
+
+		for (String download:downloadList) {
+			Element downloadElement = new Element("Download");
+			downloadElement.setText(download);
+			user.addContent(downloadElement);
+		}
+
 		try {
 			for (String key:properties.keySet()) {
 				Element e = new Element("Property");
@@ -327,5 +342,42 @@ public class User {
 	 */
 	public void setProperty(String key, String value) {
 		properties.put(key, value);
+	}
+
+	/**
+	 * Adds a download to the User
+	 * 
+	 * @param download
+	 */
+	public void addDownload (String downloadHash) {
+		downloadList.add(downloadHash);
+	}
+
+	/**
+	 * The download will be removed from the user.
+	 * 
+	 * @param download
+	 */
+	public void removeDownload (String download) {
+		downloadList.remove(download);
+	}
+
+
+	/**
+	 * @return list of Torrentnames
+	 */
+	public String[] getDownloads () {
+		return downloadList.toArray(new String[downloadList.size()]);
+	}
+
+
+	/**
+	 * Checks if the user is an owner of the Download
+	 * 
+	 * @param dlHash
+	 * @return
+	 */
+	public boolean hasDownload(String dlHash) {
+		return downloadList.contains(dlHash);
 	}
 }

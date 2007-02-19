@@ -128,6 +128,9 @@ public class Client {
 		password = login.getPassword();
 	}
 
+	/**
+	 * Initialises Variables
+	 */
 	private void init() {
 		downloadManager = new DownloadManagerImpl(this);
 		responseManager = new ResponseManager(this);
@@ -138,6 +141,11 @@ public class Client {
 		logger = Logger.getLogger("lbms.azsmrc.client");
 	}
 
+	/**
+	 * Reset Variables that are Server specific.
+	 * 
+	 * Call this when you disconnect from a Server.
+	 */
 	private void reset() {
 		userManager 		= new UserManagerImpl(this);
 		remoteInfo			= new RemoteInfoImpl(this);
@@ -163,6 +171,9 @@ public class Client {
 		callConnectionListener(ConnectionListener.ST_DISCONNECTED);
 	}
 
+	/**
+	 * @return whether currently Connected to a Server
+	 */
 	public boolean isConnected() {
 		return connect;
 	}

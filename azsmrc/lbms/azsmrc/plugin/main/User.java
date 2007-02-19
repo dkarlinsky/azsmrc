@@ -1,11 +1,8 @@
 package lbms.azsmrc.plugin.main;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
-import java.util.Set;
 
 import lbms.azsmrc.plugin.pluginsupport.PSupportAzJabber;
 import lbms.azsmrc.plugin.pluginsupport.PSupportStatusMailer;
@@ -23,7 +20,6 @@ import org.jdom.Element;
  */
 public class User extends lbms.azsmrc.shared.User {
 
-	private Set<String> downloadList = new HashSet<String>();
 	private Queue<Element> eventQueue = new LinkedList<Element>();
 
 	/**
@@ -34,10 +30,6 @@ public class User extends lbms.azsmrc.shared.User {
 	 */
 	public User (Element userElement) {
 		super(userElement);
-		List<Element> downloads = userElement.getChildren("Download");
-		for (Element download:downloads) {
-			this.addDownload(download.getTextTrim());
-		}
 	}
 
 
@@ -61,6 +53,7 @@ public class User extends lbms.azsmrc.shared.User {
 	/**
 	 * @param download
 	 */
+	@Override
 	public void addDownload (String downloadHash) {
 		try {
 			Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(downloadHash));
@@ -80,14 +73,7 @@ public class User extends lbms.azsmrc.shared.User {
 		downloadList.retainAll(dls);
 	}
 
-	/**
-	 * The download will be removed from the user.
-	 * 
-	 * @param download
-	 */
-	public void removeDownload (String download) {
-		downloadList.remove(download);
-	}
+
 
 	/**
 	 * The download will be removed from the user.
@@ -96,24 +82,6 @@ public class User extends lbms.azsmrc.shared.User {
 	 */
 	public void removeDownload (Download download) {
 		downloadList.remove(getDlHash(download));
-	}
-
-	/**
-	 * @return list of Torrentnames
-	 */
-	public String[] getDownloads () {
-		return downloadList.toArray(new String[] {});
-	}
-
-
-	/**
-	 * Checks if the user is an owner of the Download
-	 * 
-	 * @param dlHash
-	 * @return
-	 */
-	public boolean hasDownload(String dlHash) {
-		return downloadList.contains(dlHash);
 	}
 
 	/**
@@ -149,11 +117,6 @@ public class User extends lbms.azsmrc.shared.User {
 	 */
 	public Element toElement () {
 		Element user = super.toElement();
-		for (String download:downloadList) {
-			Element downloadElement = new Element("Download");
-			downloadElement.setText(download);
-			user.addContent(downloadElement);
-		}
 		return user;
 	}
 
