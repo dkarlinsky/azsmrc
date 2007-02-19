@@ -31,7 +31,7 @@ public class MultiUserDownloadListener implements org.gudy.azureus2.plugins.down
 			final boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 
 
-			if (user_attrib != null && !user_attrib.equals(MultiUser.PUBLIC_DOWNLOAD_NAME)) {
+			if (user_attrib != null && !user_attrib.equals(MultiUser.PUBLIC_USER_NAME)) {
 				try {
 					if (!download.getSavePath().contains(Plugin.getPluginInterface().getPluginconfig().getUnsafeStringParameter("Default save path",null))) {
 

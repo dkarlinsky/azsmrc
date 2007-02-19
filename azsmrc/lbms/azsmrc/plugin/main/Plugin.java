@@ -220,7 +220,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 						if (!dl.isComplete()) {	//add only if the download isn't already complete
 							dl.addListener(MultiUserDownloadListener.getInstance()); //attach DownloadListener
 							if (dl.getAttribute(MultiUser.TA_USER) == null)
-								dl.setAttribute(MultiUser.TA_USER, MultiUser.PUBLIC_DOWNLOAD_NAME);
+								dl.setAttribute(MultiUser.TA_USER, MultiUser.PUBLIC_USER_NAME);
 						}
 					}
 

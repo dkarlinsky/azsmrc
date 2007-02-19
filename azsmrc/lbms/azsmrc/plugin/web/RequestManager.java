@@ -545,17 +545,7 @@ public class RequestManager {
 							}
 							user.eventDownloadFinished(dl);
 						} else {
-							if (MultiUser.isPublicDownload(dl)) {
-								dl.setAttribute(taUser, user.getUsername());
-								if (Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("useUsernamesAsCategory", false)) {
-									dl.setAttribute(taCateory, user.getUsername());
-								}
-							} else {
-								dl.setAttribute(taUser, MultiUser.SHARED_USER_NAME);
-								if (Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("useUsernamesAsCategory", false)) {
-									dl.setAttribute(taCateory, MultiUser.SHARED_CAT_NAME);
-								}
-							}
+							MultiUser.addUserToDownload(user, dl);
 						}
 					} catch (TorrentException e) {
 						user.eventException(e);
@@ -1617,6 +1607,41 @@ public class RequestManager {
 					e.printStackTrace();
 					return false;
 				}
+			}
+		});
+
+		addHandler("addDownloadToUser", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {
+				if (user.checkAccess(RemoteConstants.RIGHTS_ADMIN) || (user.getUsername().equalsIgnoreCase(xmlRequest.getAttributeValue("userName")))) {
+					try {
+						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(xmlRequest.getAttributeValue("hash")));
+						if (dl != null) {
+							user.addDownload(dl);
+							MultiUser.addUserToDownload(user, dl);
+						}
+					} catch (DownloadException e) {
+						e.printStackTrace();
+						return false;
+					}
+				}
+				return true;
+			}
+		});
+		addHandler("removeDownloadFromUser", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException{
+				if (user.checkAccess(RemoteConstants.RIGHTS_ADMIN) || (user.getUsername().equalsIgnoreCase(xmlRequest.getAttributeValue("userName")))) {
+					try {
+						Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(xmlRequest.getAttributeValue("hash")));
+						if (dl != null) {
+							user.removeDownload(dl);
+							MultiUser.removeUserFromDownload(user, dl);
+						}
+					} catch (DownloadException e) {
+						e.printStackTrace();
+						return false;
+					}
+				}
+				return true;
 			}
 		});
 
