@@ -1,6 +1,3 @@
-/**
- * 
- */
 package lbms.azsmrc.plugin.web;
 
 import java.util.List;

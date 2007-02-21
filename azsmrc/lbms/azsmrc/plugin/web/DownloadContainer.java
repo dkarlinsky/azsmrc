@@ -1,13 +1,15 @@
-/**
- * 
- */
 package lbms.azsmrc.plugin.web;
 
+import java.util.Map;
+import java.util.TreeMap;
+
+import lbms.azsmrc.plugin.main.Plugin;
 import lbms.azsmrc.shared.EncodingUtil;
 
 import org.gudy.azureus2.plugins.download.Download;
 import org.gudy.azureus2.plugins.download.DownloadStats;
 import org.gudy.azureus2.plugins.peers.PeerManagerStats;
+import org.gudy.azureus2.plugins.torrent.TorrentAttribute;
 import org.jdom.Element;
 
 /**
@@ -15,6 +17,8 @@ import org.jdom.Element;
  *
  */
 public class DownloadContainer {
+
+	private static TorrentAttribute[] TA_LIST;
 
 	private Download dl;
 
@@ -41,8 +45,10 @@ public class DownloadContainer {
 	private long discarded;
 	private long last_scrape, next_scrape;
 	private long announceTTW, size;
+	private Map<String, String> attributes = new TreeMap<String, String>();
 
 	public DownloadContainer (Download dl) throws Exception {
+		if (TA_LIST == null) TA_LIST = Plugin.getPluginInterface().getTorrentManager().getDefinedAttributes();
 		this.dl = dl;
 		if (dl.getTorrent() == null) throw new Exception("Torrent not here");
 		_new = true;
@@ -198,6 +204,19 @@ public class DownloadContainer {
 			dle.setAttribute("announceTimeToWait",Long.toString(announceTTW));
 		}
 
+		for (TorrentAttribute ta : TA_LIST) {
+			String dlA = dl.getAttribute(ta);
+			if (dlA != null) {
+				if (!attributes.get(ta.getName()).equals(dlA)) {
+					Element a = new Element("Attribute");
+					a.setAttribute("name",ta.getName());
+					a.setAttribute("value", dlA);
+					attributes.put(ta.getName(), dlA);
+					dle.addContent(a);
+				}
+			}
+		}
+
 		return dle;
 	}
 
@@ -239,6 +258,15 @@ public class DownloadContainer {
 		dle.setAttribute("next_scrape",Long.toString(next_scrape));
 		dle.setAttribute("announceTimeToWait",Long.toString(announceTTW));
 		dle.setAttribute("size",Long.toString(size));
+		for (TorrentAttribute ta : TA_LIST) {
+			String dlA = dl.getAttribute(ta);
+			if (dlA != null) {
+				Element a = new Element("Attribute");
+				a.setAttribute("name",ta.getName());
+				a.setAttribute("value", dlA);
+				dle.addContent(a);
+			}
+		}
 		return dle;
 	}
 
@@ -281,6 +309,10 @@ public class DownloadContainer {
 
 		announceTTW = dl.getLastAnnounceResult().getTimeToWait();
 		size = dl.getTorrent().getSize();
+
+		for (TorrentAttribute ta : TA_LIST) {
+			attributes.put(ta.getName(), dl.getAttribute(ta));
+		}
 	}
 
 	public Download getDownload() {

@@ -44,6 +44,7 @@ import org.gudy.azureus2.plugins.ipc.IPCInterface;
 import org.gudy.azureus2.plugins.peers.PeerManagerStats;
 import org.gudy.azureus2.plugins.torrent.Torrent;
 import org.gudy.azureus2.plugins.torrent.TorrentAttribute;
+import org.gudy.azureus2.plugins.torrent.TorrentEncodingException;
 import org.gudy.azureus2.plugins.torrent.TorrentException;
 import org.gudy.azureus2.plugins.torrent.TorrentManager;
 import org.gudy.azureus2.plugins.tracker.TrackerException;
@@ -459,6 +460,8 @@ public class RequestManager {
 										return;
 									}
 									newTorrent = torrentManager.createFromBEncodedData(tdl.getBuffer().toByteArray());
+									if (newTorrent.getAdditionalProperty("encoding") == null)
+										newTorrent.setEncoding("UTF8");
 								}
 
 								Download dl = Plugin.getPluginInterface().getDownloadManager().addDownload(newTorrent,null,file);
@@ -522,6 +525,16 @@ public class RequestManager {
 							}
 							downloadControlList.put(EncodingUtil.encode(newTorrent.getHash()), options);
 							System.out.println("AzSMRC addDL downloadControlList.size:" +downloadControlList.size());
+						}
+
+						if (xmlRequest.getAttributeValue("encoding") != null) {
+							try {
+								newTorrent.setEncoding(xmlRequest.getAttributeValue("encoding"));
+							} catch (TorrentEncodingException e1) {
+								e1.printStackTrace();
+							}
+						} else if (newTorrent.getAdditionalProperty("encoding") == null) {
+							newTorrent.setEncoding("UTF8");
 						}
 
 						Download dl = Plugin.getPluginInterface().getDownloadManager().addDownload(newTorrent, null, file_location);
