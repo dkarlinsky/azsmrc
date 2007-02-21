@@ -595,5 +595,36 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		return firstRun;
 	}
 
+	/**
+	 * Returns an Array of users.
+	 * 
+	 * This Method is intended to be used via IPC.
+	 * 
+	 * @return array of User
+	 */
+	public String[] ipcGetUsers () {
+		return config.getUserList();
+	}
+
+	/**
+	 * Adds a Download to a User if he exists.
+	 * 
+	 * This Method is intended to be used via IPC.
+	 * 
+	 * @param uName username to add Download to
+	 * @param dl Download to add
+	 * @return true on success, false on fail
+	 */
+	public boolean ipcAddDownloadToUser (String uName, Download dl) {
+		try {
+			User u = config.getUser(uName);
+			u.addDownload(dl);
+			MultiUser.addUserToDownload(u, dl);
+			return true;
+		} catch (UserNotFoundException e) {
+			return false;
+		}
+	}
+
 //EOF
 }
