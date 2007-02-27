@@ -5,8 +5,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
@@ -22,19 +26,24 @@ public class HTTPDownload extends Download  {
 
 	private ByteArrayOutputStream buffer;
 
+	private Map<String, List<String>> headerFields = null;
+
+	private int responeCode = 0;
+
+	private Method method = Method.GET;
+
+	private String postData = "";
+
 	public HTTPDownload(URL source, File target) {
 		super(source, target);
-		// TODO Auto-generated constructor stub
 	}
 
 	public HTTPDownload(URL source) {
 		super(source);
-		// TODO Auto-generated constructor stub
 	}
 
 	public HTTPDownload(Download d) {
 		super(d);
-		// TODO Auto-generated constructor stub
 	}
 
 	public void run() {
@@ -82,6 +91,10 @@ public class HTTPDownload extends Download  {
 			conn.setConnectTimeout(TIMEOUT);
 			conn.setReadTimeout(TIMEOUT);
 			conn.setDoInput(true);
+			if (method.equals(Method.POST)) {
+				conn.setRequestMethod(method.name());
+				conn.setDoOutput(true);
+			}
 
 			conn.addRequestProperty("Accept-Encoding","gzip, x-gzip, deflate, x-deflate");
 			conn.addRequestProperty("User-Agent", userAgent);
@@ -97,16 +110,17 @@ public class HTTPDownload extends Download  {
 			callStateChanged(STATE_CONNECTING);
 			conn.connect();
 
-			int response = conn.getResponseCode();
+			responeCode = conn.getResponseCode();
+
+			headerFields = conn.getHeaderFields();
 
 			//connection failed
-			if ((response != HttpURLConnection.HTTP_ACCEPTED) && (response != HttpURLConnection.HTTP_OK)) {
+			if ((responeCode != HttpURLConnection.HTTP_ACCEPTED) && (responeCode != HttpURLConnection.HTTP_OK)) {
 				callStateChanged(STATE_FAILURE);
 				failed = true;
 				failureReason = conn.getResponseMessage();
 				return this;
 			}
-
 
 			StatsInputStream sis = new StatsInputStream (conn.getInputStream());
 			is = sis;
@@ -203,5 +217,43 @@ public class HTTPDownload extends Download  {
 	 */
 	public ByteArrayOutputStream getBuffer() {
 		return buffer;
+	}
+
+	/**
+	 * @return the headerFields may be null
+	 */
+	public Map<String, List<String>> getHeaderFields() {
+		return headerFields;
+	}
+
+	/**
+	 * Returns HTTP response code
+	 * @return the responseCode (0 if not connected)
+	 */
+	public int getResponeCode() {
+		return responeCode;
+	}
+
+	public void setPostData (String data) {
+		postData = data;
+	}
+
+	public void setPostData (Map<String,String> data) {
+		postData = "";
+		for (String key:data.keySet()) {
+			try {
+				postData+=URLEncoder.encode(key, "UTF8")+"="+URLEncoder.encode(data.get(key), "UTF8")+"&";
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void setMethod (Method m) {
+		this.method = m;
+	}
+
+	public static enum Method {
+		GET, POST, HEAD;
 	}
 }

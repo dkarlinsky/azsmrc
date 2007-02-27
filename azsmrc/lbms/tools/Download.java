@@ -38,7 +38,7 @@ public abstract class Download implements Runnable, Callable<Download> {
 	protected boolean failed = false;
 
 	protected String referer;
-	protected String userAgent = "Mozilla/5.0 (Windows; U; Windows NT 5.1; de; rv:1.8.0.2) Gecko/20060308 Firefox/1.5.0.2";
+	protected String userAgent = "Mozilla/5.0 (Windows; U; Windows NT 5.1; de; rv:1.8.1.2) Gecko/20070219 Firefox/2.0.0.2";
 	protected String cookie;
 	protected String login;
 
