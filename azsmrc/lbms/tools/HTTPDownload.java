@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -56,6 +57,7 @@ public class HTTPDownload extends Download  {
 
 	public Download call() throws Exception {
 		InputStream is = null;
+		OutputStream os = null;
 		try {
 			HttpURLConnection conn = null;
 
@@ -108,7 +110,13 @@ public class HTTPDownload extends Download  {
 				conn.setRequestProperty("Authorization", "Basic: "+login);
 
 			callStateChanged(STATE_CONNECTING);
+
 			conn.connect();
+			if (method.equals(Method.POST)) {
+				os = conn.getOutputStream();
+				os.write(postData.getBytes("UTF8"));
+				os.close();
+			}
 
 			responeCode = conn.getResponseCode();
 
@@ -145,19 +153,19 @@ public class HTTPDownload extends Download  {
 			byte[] buf = new byte[BUFFER_SIZE];
 			if (target != null) {
 				target.createNewFile();
-				FileOutputStream os = null;
+				FileOutputStream fos = null;
 				try {
-					os = new FileOutputStream(target);
+					fos = new FileOutputStream(target);
 					for (int read=is.read(buf);read>0;read=is.read(buf)) {
 						if (abort) {
-							os.close();
+							fos.close();
 							is.close();
 							callStateChanged(STATE_ABORTED);
 							failed = true;
 							failureReason = "Aborted by User";
 							return this;
 						}
-						os.write(buf,0,read);
+						fos.write(buf,0,read);
 						now = System.currentTimeMillis();
 						if (now-last>=500) {
 							callProgress(sis.getBytesRead(), contentLength);
@@ -165,8 +173,8 @@ public class HTTPDownload extends Download  {
 						}
 					}
 				} finally {
-					if (os != null)
-						os.close();
+					if (fos != null)
+						fos.close();
 				}
 			} else {
 
@@ -204,10 +212,16 @@ public class HTTPDownload extends Download  {
 			e.printStackTrace();
 			throw e;
 		} finally {
-			if (is!= null)
+			if (is!= null) {
 				try {
 					is.close();
 				} catch (IOException e) {}
+			}
+			if (os!= null) {
+				try {
+					os.close();
+				} catch (IOException e) {}
+			}
 		}
 		return this;
 	}
