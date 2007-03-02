@@ -428,6 +428,10 @@ public class Client {
 	}
 
 	public void sendAddDownload(File torrentFile, int[] fileOptions, String fileLocation) {
+		sendAddDownload(torrentFile, fileOptions, fileLocation, null);
+	}
+
+	public void sendAddDownload(File torrentFile, int[] fileOptions, String fileLocation, String encoding) {
 		Element sendElement = getSendElement("addDownload");
 		sendElement.setAttribute("location", "XML");
 		if (fileOptions != null) {
@@ -435,6 +439,9 @@ public class Client {
 		}
 		if (fileLocation != null) {
 			sendElement.setAttribute("fileLocation", fileLocation);
+		}
+		if (encoding != null) {
+			sendElement.setAttribute("encoding", encoding);
 		}
 		try {
 			sendElement.addContent(loadTorrentToXML(torrentFile));
