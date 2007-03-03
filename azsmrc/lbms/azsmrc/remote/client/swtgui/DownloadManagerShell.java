@@ -477,18 +477,6 @@ public class DownloadManagerShell {
 			});
 		}
 
-
-
-		menuMyShares = new MenuItem(toolSubmenu, SWT.PUSH);
-		menuMyShares.setText("&My Tracker");
-		menuMyShares.addListener(SWT.Selection, new Listener(){
-			public void handleEvent(Event e){
-				MyTracker.open(tabFolder);
-			}
-		});
-
-
-
 		//-----Help Submenu
 
 		MenuItem menuAbout = new MenuItem(helpSubmenu,SWT.PUSH);
