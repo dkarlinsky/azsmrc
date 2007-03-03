@@ -299,6 +299,16 @@ TOTorrent
 
 		throws TOTorrentException;
 
+	/**
+	  * This method will serialise a torrent into a "b-encoded" byte array
+	  * @return
+	  * @throws TOTorrentException
+	  */
+	public byte[]
+	serialiseToByteArray()
+
+		throws TOTorrentException;
+
 	 /**
 	  * A diagnostic method for dumping the tracker contents to "stdout"
 	  *

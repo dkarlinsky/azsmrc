@@ -197,7 +197,7 @@ public class HTTPDownload extends Download  {
 			}
 			//finally call again
 			callProgress(sis.getBytesRead(), contentLength);
-			if (contentLength>0 &&  !(gzip || deflate) && buffer.size() != contentLength) {
+			if (contentLength>0 &&  !(gzip || deflate) && (buffer != null && buffer.size() != contentLength)) {
 				failed = true;
 				callStateChanged(STATE_FAILURE);
 			}

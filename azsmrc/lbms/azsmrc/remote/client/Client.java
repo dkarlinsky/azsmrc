@@ -35,6 +35,8 @@ import lbms.azsmrc.remote.client.impl.RemoteUpdateManagerImpl;
 import lbms.azsmrc.remote.client.impl.TrackerImpl;
 import lbms.azsmrc.remote.client.impl.TrackerTorrentImpl;
 import lbms.azsmrc.remote.client.impl.UserManagerImpl;
+import lbms.azsmrc.remote.client.torrent.TOTorrent;
+import lbms.azsmrc.remote.client.torrent.TOTorrentException;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.remote.client.util.Timer;
 import lbms.azsmrc.remote.client.util.TimerEvent;
@@ -447,6 +449,23 @@ public class Client {
 			sendElement.addContent(loadTorrentToXML(torrentFile));
 			enqueue(sendElement);
 		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void sendAddDownload(TOTorrent torrent, int[] fileOptions, String fileLocation) {
+		Element sendElement = getSendElement("addDownload");
+		sendElement.setAttribute("location", "XML");
+		if (fileOptions != null) {
+			sendElement.setAttribute("fileOptions", EncodingUtil.IntArrayToString(fileOptions));
+		}
+		if (fileLocation != null) {
+			sendElement.setAttribute("fileLocation", fileLocation);
+		}
+		try {
+			sendElement.addContent(loadTorrentToXML(torrent));
+			enqueue(sendElement);
+		} catch (TOTorrentException e) {
 			e.printStackTrace();
 		}
 	}
@@ -889,6 +908,21 @@ public class Client {
 			} catch (IOException e) {}
 		}
 		return torrent;
+	}
+
+	/**
+	 * Loads a Torrent file into an XML element.
+	 * 
+	 * The Torrent Data is Base64 encoded
+	 * 
+	 * @param torrentFile the Torrent to read
+	 * @return the Element containing the Torrent data
+	 * @throws TOTorrentException
+	 */
+	public Element loadTorrentToXML (TOTorrent torrent) throws TOTorrentException {
+		Element torrentElement = new Element ("Torrent");
+		torrentElement.setText(EncodingUtil.encode(torrent.serialiseToByteArray()));
+		return torrentElement;
 	}
 
 	//--------------------------------------------------------//

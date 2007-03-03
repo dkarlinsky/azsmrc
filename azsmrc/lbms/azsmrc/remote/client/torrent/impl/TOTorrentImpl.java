@@ -189,7 +189,7 @@ TOTorrentImpl
 		}
 	}
 
-	protected byte[]
+	public byte[]
 	serialiseToByteArray()
 
 		throws TOTorrentException
