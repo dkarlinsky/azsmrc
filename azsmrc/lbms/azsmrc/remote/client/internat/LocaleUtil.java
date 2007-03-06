@@ -440,7 +440,7 @@ LocaleUtil
 	 * @throws TOTorrentException
 	 * @throws UnsupportedEncodingException
 	 */
-	protected LocaleUtilDecoderCandidate[]
+	public LocaleUtilDecoderCandidate[]
 	getTorrentCandidates(
   		TOTorrent		torrent )
 
