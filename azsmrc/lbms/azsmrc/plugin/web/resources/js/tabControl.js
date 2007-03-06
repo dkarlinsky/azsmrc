@@ -21,8 +21,7 @@ function addTab(contentElement) {
 	// only create new tab, if no tab with contentElement exists
 	var tabExists = getTabByContent(contentElement);
 	if (tabExists == null) {		
-		// tabbar entry
-		
+		// tabbar entry		
 		var tabbar = document.getElementById("tabbar");
 		var tab = document.createElement("li");
 		var tabLabel = document.createElement("span");
@@ -123,9 +122,8 @@ function addTab(contentElement) {
 		ShowTab(tabCount);
 		refreshView();
 		configAutoRefresh();
-		set_dragbar(tabContent);
-
 		if (contentElement != "listTransfers") {
+			set_dragbar(tabContent);
 			var dragbar = tabContent.firstChild;
 			var close = document.createElement("img");
 			close.src = "img/icon-close.png";
