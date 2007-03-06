@@ -3104,11 +3104,84 @@ public class DownloadManagerShell {
 					downloadsTable.setItemCount(downloadsArray.length);
 				}
 
+								
 				if(seedsTable != null || !seedsTable.isDisposed()){
 					seedsTable.clearAll();
 					seedsTable.setItemCount(seedsArray.length);
 				}
 
+				
+				if(downloadsTable.getSelectionCount() == 0 && seedsTable.getSelectionCount() == 0){ //Nothing is selected anymore
+					setTorrentMoveButtons(false,false,false,false);
+					setToolBarTorrentIcons(false,false,false);
+				}else if(downloadsTable.getSelectionCount() > 0){ //Something is selected in downloadsTable, refresh Toolbars 
+					TableItem[] items = downloadsTable.getSelection();
+					if(items == null) return;
+					if(items.length == 1){
+						//Single line selection
+						setTorrentMoveButtons(false,false,false,false);
+						int index = downloadsTable.indexOf(items[0]);
+						if(index==0 && downloadsTable.getItemCount() == 1)
+							setTorrentMoveButtons(false,true,true,false);
+						else if(index == 0)
+							setTorrentMoveButtons(false,true,true,true);
+						else if(index == downloadsTable.getItemCount()-1)
+							setTorrentMoveButtons(true,true,true,false);
+						else
+							setTorrentMoveButtons(true,true,true,true);
+
+						//torrent control
+						Container container = (Container)items[0].getData();
+						Download download = container.getDownload();
+						if(download.getState() == Download.ST_QUEUED || download.getState() == Download.ST_DOWNLOADING){
+							setToolBarTorrentIcons(false,true,true);
+						}else if(download.getState() == Download.ST_STOPPED){
+							setToolBarTorrentIcons(true,false,true);
+						} else if(download.getState() == Download.ST_ERROR){
+							setToolBarTorrentIcons(false,true,true);
+						} else {
+							setToolBarTorrentIcons(false,false,false);
+						}
+
+
+					}else if(items.length > 1){
+						//Multiple selection here
+						setTorrentMoveButtons(false,false,false,false);
+						setToolBarTorrentIcons(true,true,true);
+
+					}
+				}else if(seedsTable.getSelectionCount() > 0){ //SeedsTable has selection, Refresh toolbars
+					TableItem[] items = seedsTable.getSelection();
+					if(items == null) return;
+					if(items.length == 1){
+						//Single line selection
+						setTorrentMoveButtons(false,false,false,false);
+						int index = seedsTable.indexOf(items[0]);
+						if(index==0 && seedsTable.getItemCount() == 1)
+							setTorrentMoveButtons(false,true,true,false);
+						else if(index == 0)
+							setTorrentMoveButtons(false,true,true,true);
+						else if(index == seedsTable.getItemCount()-1)
+							setTorrentMoveButtons(true,true,true,false);
+						else
+							setTorrentMoveButtons(true,true,true,true);
+
+
+						//Torrent Control
+						Container container = (Container)items[0].getData();
+						Download download = container.getDownload();
+						if(download.getState() == Download.ST_QUEUED || download.getState() == Download.ST_SEEDING){
+							setToolBarTorrentIcons(false,true,true);
+						}else if(download.getState() == Download.ST_STOPPED){
+							setToolBarTorrentIcons(true,false,true);
+						}
+					}else if(items.length > 1){
+						//Multiple selection here
+						setTorrentMoveButtons(false,false,false,false);
+						setToolBarTorrentIcons(true,true,true);
+
+					}
+				}
 			}
 		});
 	}
