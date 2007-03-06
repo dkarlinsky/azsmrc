@@ -17,6 +17,7 @@ import lbms.azsmrc.remote.client.RemotePlugin;
 import lbms.azsmrc.remote.client.User;
 import lbms.azsmrc.remote.client.events.ParameterListener;
 import lbms.azsmrc.remote.client.internat.I18N;
+import lbms.azsmrc.remote.client.plugins.PluginInterface;
 import lbms.azsmrc.remote.client.pluginsimpl.PluginInterfaceImpl;
 import lbms.azsmrc.remote.client.swtgui.ColorUtilities;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
@@ -1093,6 +1094,8 @@ public class PreferencesTab {
 				item.setText(4, plugin.getPluginDirectoryName());
 				item.setText(5, Boolean.toString(plugin.isUnloadable()));
 
+				
+				item.setData(plugin);
 				//color every other one
 				if(index%2!=0){
 					item.setBackground(ColorUtilities.getBackgroundColor());
@@ -1100,6 +1103,20 @@ public class PreferencesTab {
 
 
 			}
+		});
+
+		rpTable.addListener(SWT.Selection, new Listener(){
+
+			public void handleEvent(Event event) {
+				if(event.detail == SWT.CHECK){
+					TableItem item = (TableItem) event.item;
+					RemotePlugin plugin = (RemotePlugin) item.getData();
+					
+					plugin.setDisabled(!item.getChecked());
+					
+				}
+			}
+			
 		});
 
 
@@ -1176,16 +1193,19 @@ public class PreferencesTab {
 				TableItem item = (TableItem) event.item;
 				int index = lpTable.indexOf(item);
 
-				PluginInterfaceImpl[] plugins = RCMain.getRCMain().getPluginManagerImpl().getPluginInterfacesImpl();
-				Arrays.sort(plugins, new Comparator<PluginInterfaceImpl>() {
-					public int compare(PluginInterfaceImpl o1, PluginInterfaceImpl o2) {
+				PluginInterface[] plugins = RCMain.getRCMain().getPluginManagerImpl().getAllPluginInterfaces();
+				Arrays.sort(plugins, new Comparator<PluginInterface>() {
+					public int compare(PluginInterface o1, PluginInterface o2) {
 						return o1.getPluginName().compareToIgnoreCase(o2.getPluginName());
 					}
 				});
 				
+				//PluginInterfaceImpl[] deadPlugins = RCMain.getRCMain().getPluginManagerImpl().getDisabledPluginInterfaces();
+
+				
 				if(plugins == null || plugins.length == 0) return;
 
-				PluginInterfaceImpl plugin = plugins[index];
+				PluginInterface plugin = plugins[index];
 
 
 				if(plugin == null) return;
@@ -1193,19 +1213,17 @@ public class PreferencesTab {
 				//Column 0 = loadatstartup (checkbox)
 				//Column 1 = name
 				//Column 2 = version
-				//Column 3 = directory
-
-
+				//Column 3 = directory				
 				
-				//TODO.. leave box here, but don't set it until Leonard fixes up this function
-				//item.setChecked(!plugin.isDisabled());
-				item.setChecked(true);
+				item.setChecked(!plugin.isDisabled());
+				
 
 				
 				item.setText(1, plugin.getPluginName());
 				item.setText(2, plugin.getPluginVersion());
 				item.setText(3, plugin.getPluginDir());
 				
+				item.setData(plugin);
 
 				//color every other one
 				if(index%2!=0){
@@ -1214,6 +1232,21 @@ public class PreferencesTab {
 
 
 			}
+		});
+		
+		
+		lpTable.addListener(SWT.Selection, new Listener(){
+
+			public void handleEvent(Event event) {
+				if(event.detail == SWT.CHECK){
+					TableItem item = (TableItem) event.item;
+					PluginInterface plugin = (PluginInterface) item.getData();
+					
+					plugin.setDisabled(!item.getChecked());
+					
+				}
+			}
+			
 		});
 
 
@@ -1236,7 +1269,7 @@ public class PreferencesTab {
 			lpTable.removeAll();
 			int count;
 			try{
-				count = RCMain.getRCMain().getPluginManagerImpl().getPluginInterfacesImpl().length;
+				count = RCMain.getRCMain().getPluginManagerImpl().getAllPluginInterfaces().length;
 			}catch(Exception e){
 				count = 0;
 			}
