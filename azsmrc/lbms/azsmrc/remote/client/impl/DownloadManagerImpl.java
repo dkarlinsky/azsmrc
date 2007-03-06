@@ -16,6 +16,7 @@ import lbms.azsmrc.remote.client.Client;
 import lbms.azsmrc.remote.client.Download;
 import lbms.azsmrc.remote.client.DownloadManager;
 import lbms.azsmrc.remote.client.events.DownloadManagerListener;
+import lbms.azsmrc.remote.client.torrent.TOTorrent;
 
 public class DownloadManagerImpl implements DownloadManager {
 
@@ -56,7 +57,30 @@ public class DownloadManagerImpl implements DownloadManager {
 	public void addDownload(File torrent_file, String fileLocation) {
 		client.sendAddDownload(torrent_file, null, fileLocation);
 	}
-
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.DownloadManager#addDownload(lbms.azsmrc.remote.client.torrent.TOTorrent)
+	 */
+	public void addDownload(TOTorrent torrent) {
+		client.sendAddDownload(torrent, null, null);
+	}
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.DownloadManager#addDownload(lbms.azsmrc.remote.client.torrent.TOTorrent, int[])
+	 */
+	public void addDownload(TOTorrent torrent, int[] fileSelection) {
+		client.sendAddDownload(torrent, fileSelection, null);
+	}
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.DownloadManager#addDownload(lbms.azsmrc.remote.client.torrent.TOTorrent, int[], java.lang.String)
+	 */
+	public void addDownload(TOTorrent torrent, int[] fileSelection, String fileLocation) {
+		client.sendAddDownload(torrent, fileSelection, fileLocation);
+	}
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.DownloadManager#addDownload(lbms.azsmrc.remote.client.torrent.TOTorrent, java.lang.String)
+	 */
+	public void addDownload(TOTorrent torrent, String fileLocation) {
+		client.sendAddDownload(torrent, null, fileLocation);
+	}
 	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.DownloadManager#addDownload(java.net.URL)
 	 */

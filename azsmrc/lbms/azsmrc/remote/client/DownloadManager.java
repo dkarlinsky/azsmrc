@@ -25,6 +25,7 @@ import java.io.File;
 import java.net.URL;
 
 import lbms.azsmrc.remote.client.events.DownloadManagerListener;
+import lbms.azsmrc.remote.client.torrent.TOTorrent;
 
 public interface
 DownloadManager extends lbms.azsmrc.remote.client.plugins.download.DownloadManager
@@ -77,6 +78,57 @@ DownloadManager extends lbms.azsmrc.remote.client.plugins.download.DownloadManag
 	public void
 	addDownload(
 		File 	torrent_file,
+		final int[] fileSelection,
+		final String fileLocation );
+
+	/**
+	 * add a torrent from memory.
+	 *
+	 * @param torrent
+	 */
+	public void
+	addDownload(
+		TOTorrent 	torrent );
+
+	/**
+	 * add a torrent from memory and select which files should be downloaded.
+	 *
+	 * fileSelection is an array consisting of 1 and 0, for every file in the torrent
+	 * there has to be either 1 or 0. They have to be in the same order as the torrent
+	 * specifies.
+	 *
+	 * @param torrent in memory
+	 * @param fileSelection the array selects the downloads 1 is download 0 is DND
+	 */
+	public void
+	addDownload(
+		TOTorrent 	torrent,
+		final int[] fileSelection );
+
+	/**
+	 * add a torrent from memory and specify save dir
+	 * @param torrent in memory
+	 * @param fileLocation file save location; null -> default will be used
+	 */
+	public void
+	addDownload(
+		TOTorrent 	torrent,
+		final String fileLocation );
+
+	/**
+	 * add a torrent from a file and select which files should be downloaded and specify save dir.
+	 *
+	 * fileSelection is an array consisting of 1 and 0, for every file in the torrent
+	 * there has to be either 1 or 0. They have to be in the same order as the torrent
+	 * specifies.
+	 *
+	 * @param torrent_file local torrent file
+	 * @param fileSelection the array selects the downloads 1 is download 0 is DND
+	 * @param fileLocation file save location; null -> default will be used
+	 */
+	public void
+	addDownload(
+		TOTorrent 	torrent,
 		final int[] fileSelection,
 		final String fileLocation );
 
