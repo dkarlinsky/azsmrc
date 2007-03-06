@@ -598,16 +598,16 @@ public class OpenByFileDialog {
 						//else send it with the properties int[]
 						if(container.isWholeFileSent()){
 							if(container.getSaveToDirectory().equalsIgnoreCase(""))
-								RCMain.getRCMain().getClient().getDownloadManager().addDownload(container.getTorrentFile());
+								RCMain.getRCMain().getClient().getDownloadManager().addDownload(container.getTorrent());
 							else
-								RCMain.getRCMain().getClient().getDownloadManager().addDownload(container.getTorrentFile(), container.getSaveToDirectory());
+								RCMain.getRCMain().getClient().getDownloadManager().addDownload(container.getTorrent(), container.getSaveToDirectory());
 						}else{
 							int[] props = container.getFileProperties();
 							//Main add to Azureus
 							if(container.getSaveToDirectory().equalsIgnoreCase(""))
-								RCMain.getRCMain().getClient().getDownloadManager().addDownload(container.getTorrentFile(), props);
+								RCMain.getRCMain().getClient().getDownloadManager().addDownload(container.getTorrent(), props);
 							else
-								RCMain.getRCMain().getClient().getDownloadManager().addDownload(container.getTorrentFile(), props, container.getSaveToDirectory());
+								RCMain.getRCMain().getClient().getDownloadManager().addDownload(container.getTorrent(), props, container.getSaveToDirectory());
 						}
 
 						if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("delete.on.send", "false"))){
