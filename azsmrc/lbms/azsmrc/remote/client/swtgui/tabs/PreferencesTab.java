@@ -78,9 +78,9 @@ public class PreferencesTab {
 	private Button singleUser;
 	private Tree menuTree;
 
-	private Table rpTable;
+	private Table rpTable, lpTable;
 
-	private TreeItem tiPlugin, tiSound, tiNotes, tiRemotePlugins;
+	private TreeItem tiPlugin, tiSound, tiNotes, tiLocalPlugins, tiRemotePlugins;
 
 	private Composite cOptions;
 	private ScrolledComposite sc;
@@ -213,6 +213,8 @@ public class PreferencesTab {
 					makeNotesPreferences(cOptions);
 				}else if(event.item.equals(tiRemotePlugins )){
 					makeRemotePluginPreferences(cOptions);
+				}else if(event.item.equals(tiLocalPlugins)){
+					makeLocalPluginPreferences(cOptions);
 				}
 
 			}
@@ -258,6 +260,9 @@ public class PreferencesTab {
 		tiSound = new TreeItem(menuTree,SWT.NULL);
 		tiSound.setText(I18N.translate(PFX + "sound.treeItem.text"));
 
+		tiLocalPlugins = new TreeItem(menuTree, SWT.NULL);
+		tiLocalPlugins.setText(I18N.translate(PFX + "localplugins"));
+		
 		addLocalPluginConfig();
 
 		User activeUser = RCMain.getRCMain().getClient().getUserManager().getActiveUser();
@@ -1127,11 +1132,122 @@ public class PreferencesTab {
 				rpTable.setItemCount(0);
 		}
 	}
+	
+	private void makeLocalPluginPreferences(final Composite composite){
+		Control[] controls = composite.getChildren();
+		for(Control control:controls){
+			control.dispose();
+		}
+
+		Label pluginsIDed = new Label(composite, SWT.NULL);
+		pluginsIDed.setText(I18N.translate(PFX + "remoteplugins.pluginsided.text"));
+
+		//Remote Table Initialization
+		lpTable = new Table(composite, SWT.CHECK | SWT.VIRTUAL | SWT.SINGLE | SWT.FULL_SELECTION | SWT.BORDER);
+		lpTable.setHeaderVisible(true);
+
+		GridData gd = new GridData(GridData.FILL_BOTH);
+		gd.horizontalSpan = 2;
+		lpTable.setLayoutData(gd);
+
+		//columns
+		TableColumn loadatstartup = new TableColumn(lpTable, SWT.CENTER);
+		loadatstartup.setText(I18N.translate(PFX + "remoteplugins.columns.loadatstartup"));
+		loadatstartup.pack();
+
+		TableColumn name = new TableColumn(lpTable, SWT.LEFT);
+		name.setText(I18N.translate(PFX + "remoteplugins.columns.name"));
+		name.setWidth(175);
+
+		TableColumn version = new TableColumn(lpTable, SWT.LEFT);
+		version.setText(I18N.translate(PFX + "remoteplugins.columns.version"));
+		version.pack();
+
+		TableColumn directory = new TableColumn(lpTable, SWT.LEFT);
+		directory.setText(I18N.translate(PFX + "remoteplugins.columns.directory"));
+		directory.setWidth(450);
+
+
+
+		//Set Data listener
+		lpTable.addListener(SWT.SetData, new Listener(){
+			public void handleEvent(Event event) {
+				//Pull table item
+				TableItem item = (TableItem) event.item;
+				int index = lpTable.indexOf(item);
+
+				PluginInterfaceImpl[] plugins = RCMain.getRCMain().getPluginManagerImpl().getPluginInterfacesImpl();
+				Arrays.sort(plugins, new Comparator<PluginInterfaceImpl>() {
+					public int compare(PluginInterfaceImpl o1, PluginInterfaceImpl o2) {
+						return o1.getPluginName().compareToIgnoreCase(o2.getPluginName());
+					}
+				});
+				
+				if(plugins == null || plugins.length == 0) return;
+
+				PluginInterfaceImpl plugin = plugins[index];
+
+
+				if(plugin == null) return;
+
+				//Column 0 = loadatstartup (checkbox)
+				//Column 1 = name
+				//Column 2 = version
+				//Column 3 = directory
+
+
+				
+				//TODO.. leave box here, but don't set it until Leonard fixes up this function
+				//item.setChecked(!plugin.isDisabled());
+				item.setChecked(true);
+
+				
+				item.setText(1, plugin.getPluginName());
+				item.setText(2, plugin.getPluginVersion());
+				item.setText(3, plugin.getPluginDir());
+				
+
+				//color every other one
+				if(index%2!=0){
+					item.setBackground(ColorUtilities.getBackgroundColor());
+				}
+
+
+			}
+		});
+
+
+		Composite buttonComp = new Composite(composite, SWT.NULL);
+		buttonComp.setLayout(new GridLayout(2,false));
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		buttonComp.setLayoutData(gd);
+
+
+
+		//redraw the comp
+		composite.layout();
+
+		//Clear the rptable
+		clearLPTable();
+	}
+	
+	private void clearLPTable(){
+		if(lpTable != null || !lpTable.isDisposed()){
+			lpTable.removeAll();
+			int count;
+			try{
+				count = RCMain.getRCMain().getPluginManagerImpl().getPluginInterfacesImpl().length;
+			}catch(Exception e){
+				count = 0;
+			}
+			if(count > 0)
+				lpTable.setItemCount(count);
+			else
+				lpTable.setItemCount(0);
+		}
+	}
 
 	public void addLocalPluginConfig () {
-		TreeItem localPlugsItem = new TreeItem(menuTree, SWT.NONE);
-		localPlugsItem.setText(I18N.translate(PFX + "localplugins"));
-
 		PluginInterfaceImpl[] plugins = RCMain.getRCMain().getPluginManagerImpl().getPluginInterfacesImpl();
 		Arrays.sort(plugins, new Comparator<PluginInterfaceImpl>() {
 			public int compare(PluginInterfaceImpl o1, PluginInterfaceImpl o2) {
@@ -1187,7 +1303,7 @@ public class PreferencesTab {
 					}
 				});
 				SWTMenu sm = new SWTMenu(fc,menuTree,cOptions);
-				sm.addAsSubItem(localPlugsItem);
+				if(tiLocalPlugins != null) sm.addAsSubItem(tiLocalPlugins);
 			}
 		}
 	}
