@@ -5,8 +5,8 @@
 		<Section label="connection" index="0">
 			<Entry key="auto_connect" label="connection.autoconnect" type="boolean" index="0"/>
 			<Entry key="client.fastmode" label="connection.fastmode" type="boolean" index="1"/>
-			<Entry key="connection_interval_open" label="connection.connection_interval_open" type="integer" index="2" validate="3000..300000"/>
-			<Entry key="connection_interval_closed" label="connection.connection_interval_closed" type="integer" index="3" validate="3000..300000"/>
+			<Entry key="connection_interval_open" label="connection.connection_interval_open" type="integer" index="2" validate="500..300000"/>
+			<Entry key="connection_interval_closed" label="connection.connection_interval_closed" type="integer" index="3" validate="500..300000"/>
 			<Group index="4" label="connection.proxy">
 				<Entry index="0" key="connection.proxy.use" label="connection.proxy.use" type="boolean" />
 				<Entry index="1" key="" label="connection.proxy.help" type="label" />
