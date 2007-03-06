@@ -22,6 +22,7 @@ import lbms.azsmrc.remote.client.swtgui.SplashScreen;
 public class PluginManagerImpl implements PluginManager {
 
 	private Map<String, PluginInterfaceImpl> pluginMap = new TreeMap<String, PluginInterfaceImpl>();
+	private Map<String, DisabledPluginInterfaceImpl> disabledPluginMap = new TreeMap<String, DisabledPluginInterfaceImpl>();
 	private PluginInterface[] emptyArray = new PluginInterface[0];
 	private PluginInterfaceImpl[] emptyImplArray = new PluginInterfaceImpl[0];
 	private AzSMRCInterface azsmrcInterface;
@@ -34,6 +35,12 @@ public class PluginManagerImpl implements PluginManager {
 	public PluginInterfaceImpl addPlugin (Plugin plug, Properties props, String dir) {
 		PluginInterfaceImpl pI = new PluginInterfaceImpl (this, plug, props, dir);
 		pluginMap.put(pI.getPluginID(), pI);
+		return pI;
+	}
+
+	public DisabledPluginInterfaceImpl addDisabledPlugin (Properties props, String dir) {
+		DisabledPluginInterfaceImpl pI = new DisabledPluginInterfaceImpl (this, props, dir);
+		disabledPluginMap.put(pI.getPluginID(), pI);
 		return pI;
 	}
 
@@ -53,6 +60,10 @@ public class PluginManagerImpl implements PluginManager {
 
 	public PluginInterfaceImpl[] getPluginInterfacesImpl() {
 		return pluginMap.values().toArray(emptyImplArray);
+	}
+
+	public PluginInterface[] getDisabledPluginInterfaces() {
+		return disabledPluginMap.values().toArray(emptyArray);
 	}
 
 	/* (non-Javadoc)
@@ -128,6 +139,14 @@ public class PluginManagerImpl implements PluginManager {
 
 	public UISWTManagerImpl getUIManager() {
 		return uiManager;
+	}
+
+	public boolean isDisabled (String pluginID) {
+		return !rcMain.getProperties().getPropertyAsBoolean("plugins."+pluginID+".load");
+	}
+
+	public void setDisabled (String pluginID, boolean disabled) {
+		rcMain.getProperties().setProperty("plugins."+pluginID+".load", !disabled);
 	}
 
 }

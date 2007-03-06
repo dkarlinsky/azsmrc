@@ -130,6 +130,7 @@ public class PluginLoader {
 					//if we don't want to load this plugin continue
 					if (!azsmrcProps.getPropertyAsBoolean("plugins."+pluginID+".load")) {
 						System.out.println( "Skipping load of "+pluginID);
+						manager.addDisabledPlugin(props, pluginID);
 						continue;
 					}
 				} else {

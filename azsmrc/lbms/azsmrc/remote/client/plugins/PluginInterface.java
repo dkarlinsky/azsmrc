@@ -92,4 +92,8 @@ public interface PluginInterface {
 	 * @return logger
 	 */
 	public Logger getLogger();
+
+	public boolean isDisabled();
+
+	public void setDisabled(boolean disabled);
 }

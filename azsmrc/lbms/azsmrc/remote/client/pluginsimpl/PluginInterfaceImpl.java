@@ -258,6 +258,20 @@ public class PluginInterfaceImpl implements PluginInterface {
 		return i18n;
 	}
 
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.plugins.PluginInterface#isDisabled()
+	 */
+	public boolean isDisabled() {
+		return manager.isDisabled(getPluginID());
+	}
+
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.plugins.PluginInterface#setDisabled(boolean)
+	 */
+	public void setDisabled(boolean disabled) {
+		manager.setDisabled(getPluginID(), disabled);
+	}
+
 	//--------------------------------------------------//
 
 	public void initializePlugin() {
