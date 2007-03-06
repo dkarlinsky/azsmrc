@@ -1,6 +1,7 @@
 package lbms.azsmrc.remote.client.pluginsimpl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -64,6 +65,15 @@ public class PluginManagerImpl implements PluginManager {
 
 	public PluginInterface[] getDisabledPluginInterfaces() {
 		return disabledPluginMap.values().toArray(emptyArray);
+	}
+
+	public PluginInterface[] getAllPluginInterfaces() {
+		PluginInterface[] norm = getPluginInterfaces();
+		PluginInterface[] disabled = getDisabledPluginInterfaces();
+		PluginInterface[] merged = new PluginInterface[norm.length + disabled.length];
+		System.arraycopy(norm, 0, merged, 0, norm.length);
+		System.arraycopy(disabled, 0, merged, norm.length, disabled.length);
+		return merged;
 	}
 
 	/* (non-Javadoc)
