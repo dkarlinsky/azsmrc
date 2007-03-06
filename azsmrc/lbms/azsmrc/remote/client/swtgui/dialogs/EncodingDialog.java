@@ -133,8 +133,13 @@ EncodingDialog
 				if(-1 == selectedIndex) 
 					return;
 				String encodingChoice = candidates[selectedIndex].getValue();
+				try {
+					localeUtil.setTorrentEncoding(container.getTorrent(), encodingChoice);
+				} catch (LocaleUtilEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				
-				container.getTorrent().setAdditionalProperty("encoding", encodingChoice);
 				encodingShell.dispose();
 			}
 		});
