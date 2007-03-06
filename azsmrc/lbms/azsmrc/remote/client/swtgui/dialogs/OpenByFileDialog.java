@@ -151,6 +151,14 @@ public class OpenByFileDialog {
 						File test = new File(choosen_file);
 						if (test.isFile() && test.canRead()) {
 							AddTorrentContainer container = new AddTorrentContainer(test);
+							
+							//check the encoding of the file
+							if(container.getTorrent().getAdditionalProperty("encoding") == null){
+								EncodingDialog.open(RCMain.getRCMain().getDisplay(), container);
+								
+							}
+							
+							//Check to see if it is already there, and if so, alert the user and cancel
 							if(tMap.containsKey(container.getName())){
 								MessageBox messageBox = new MessageBox(shell,SWT.ICON_INFORMATION | SWT.OK);
 								messageBox.setText(I18N.translate(PFX + "openfile.filedialog.duplicate.title"));
