@@ -82,11 +82,7 @@ SectionEnd
 Section -SWT SEC0001
 	SetOutPath $INSTDIR
 	SetOverwrite on
-	File ..\swt-3.2\swt.jar
-	File ..\swt-3.2\swt-awt-win32-3232.dll
-	File ..\swt-3.2\swt-gdip-win32-3232.dll
-	File ..\swt-3.2\swt-wgl-win32-3232.dll
-	File ..\swt-3.2\swt-win32-3232.dll
+	File ..\swt-3.3\swt.jar
 SectionEnd
 !endif
 
@@ -172,10 +168,6 @@ Section -un.Main UNSEC0000
 	Delete /REBOOTOK $INSTDIR\.certs
 
 	#SWT
-	Delete /REBOOTOK $INSTDIR\swt-win32-3232.dll
-	Delete /REBOOTOK $INSTDIR\swt-wgl-win32-3232.dll
-	Delete /REBOOTOK $INSTDIR\swt-gdip-win32-3232.dll
-	Delete /REBOOTOK $INSTDIR\swt-awt-win32-3232.dll
 	Delete /REBOOTOK $INSTDIR\swt.jar
 
 	DeleteRegValue HKLM "${REGKEY}\Components" Main
@@ -235,4 +227,3 @@ Function un.onInit
 	ReadRegStr $StartMenuGroup HKLM "${REGKEY}" StartMenuGroup
 	!insertmacro SELECT_UNSECTION Main ${UNSEC0000}
 FunctionEnd
-
