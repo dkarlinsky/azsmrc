@@ -15,18 +15,27 @@ var autoRefreshObjs = [null, null, null, null, null, null];
 // open tabs at position (default is set below)
 var tabs = [];
 var startupTabs = [false, true, false, false, false, false, false];
+// current tab positions and layer (zIndex) in viewport
+var tabPositions = [];
+var tabzIndex = [];
 // an example tab (tabbar is list of tabs)
 // <li><span onclick="SendRequestToServer(1);">ALL Torrents</span><img src="img/delete.png" alt="Close Tab" title="Close Tab" onclick="closeTab(this);" /></li>
 function addTab(contentElement) {
 	// only create new tab, if no tab with contentElement exists
 	var tabExists = getTabByContent(contentElement);
 	if (tabExists == null) {		
-		// tabbar entry		
+		var label, labelID = null;
+		label = document.createTextNode("Empty Tab");
+		for (var i in registeredTabs)
+			if (registeredTabs[i] == contentElement) {
+				labelID = i;
+				break;
+			}
+		// tabbar entry
 		var tabbar = document.getElementById("tabbar");
 		var tab = document.createElement("li");
 		var tabLabel = document.createElement("span");
 		var img = document.createElement("img");
-		var label;
 		tabCount++;
 		if (contentElement != "listTransfers") {
 			img.src = "img/delete.png";
@@ -35,32 +44,8 @@ function addTab(contentElement) {
 			img.setAttribute("tab", tabCount);
 			img.onclick = function() { closeTab(this); };
 		}
-		switch (contentElement) {
-			case "about":
-				label = document.createTextNode(tabLabels[1]);
-			break;
-			case "debug":
-				label = document.createTextNode(tabLabels[2]);
-			break;
-			case "listTransfers":
-				label = document.createTextNode(tabLabels[0]);			
-			break;
-			case "userManagement":
-				label = document.createTextNode(tabLabels[3]);
-			break;
-			case "torrentControl":
-				label = document.createTextNode(tabLabels[4]);
-			break;
-			case "preferences":
-				label = document.createTextNode(tabLabels[5]);
-			break;
-			case "advanced_interaction":
-				label = document.createTextNode(tabLabels[6]);
-			break;
-			default:
-				label = document.createTextNode("empty Tab");
-			break;
-		}
+		if (labelID != null)
+			label = document.createTextNode(tabLabels[labelID]);
 		tabLabel.appendChild(label);
 		tabLabel.setAttribute("tab", tabCount);
 		tabLabel.onclick = function() { ShowTab(this.getAttribute("tab")); };
@@ -68,8 +53,7 @@ function addTab(contentElement) {
 		if (contentElement != "listTransfers")
 			tab.appendChild(img);
 		tab.setAttribute("tab_control", tabCount);
-		tabbar.appendChild(tab);
-		
+		tabbar.appendChild(tab);		
 		// tabcontent
 		var contentList = document.getElementById("tabcontents");
 		var tabContent = document.createElement("div");
@@ -80,7 +64,7 @@ function addTab(contentElement) {
 			// simple tabs can be created here
 			// advanced tabs should use own function
 			case "about":
-				var head = document.createElement("h1");
+				var head = document.createElement("h2");
 				head.appendChild(document.createTextNode("AzSMRC Webinterface"));
 				var p = document.createElement("p");
 				p.appendChild(document.createTextNode("AzSMRC is a remotecontrol for Azureus Bittorrent Client. This webinterface needs activated Javascript."));
@@ -119,24 +103,35 @@ function addTab(contentElement) {
 		}
 		contentList.appendChild(tabContent);
 		tabs[tabCount] = contentElement;
-		ShowTab(tabCount);
+		window.setTimeout("ShowTab(tabCount)", 200);
 		refreshView();
 		configAutoRefresh();
 		if (contentElement != "listTransfers") {
 			set_dragbar(tabContent);
 			var dragbar = tabContent.firstChild;
+			var frameLabel = document.createElement("h2");
+			frameLabel.appendChild(document.createTextNode(tabLabels[labelID]));
+			dragbar.appendChild(frameLabel);
 			var close = document.createElement("img");
 			close.src = "img/icon-close.png";
 			close.setAttribute("title", "Close");
 			close.setAttribute("alt", "Close");
 			close.setAttribute("tab", tabCount);
 			close.onclick = function () {
-				closeTab(this);
+				var tabID = this.getAttribute("tab");
+				var list = document.getElementById("tabbar");
+				var tab = 0;
+				for (var i = 0; i < list.childNodes.length; i++) {
+					tab = list.childNodes[i];
+					if (tab.getAttribute("tab_control") == tabID) {
+						tab.lastChild.onclick();
+					}
+				}
 			}
 			dragbar.appendChild(close);
 		}		
 	} else { 
-		ShowTab(getTabIdByContent(contentElement));
+		window.setTimeout("ShowTab(getTabIdByContent('"+contentElement+"'))", 200);
 	}
 }
 function closeTab(tabObj) {

@@ -6,7 +6,7 @@ var Server = window.location.href;
 </Request>
 */
 var HealthStates = ["", "gray",  "blue",  "yellow", "green", "red", "red"];
-var formalHealthStates = ["", "gray",  "blue",  "yellow", "green", "red", "red"];
+var formalHealthStates = ["", "torrent not running",  "not connected to any peer or tracker down",  "no remote connection, check NAT", "everything is fine", "not connected to any peer", "not connected to any peer"];
 var selectedTransfers = [];
 var selectableDetails = ["Name", "Position", "Download Average", "Upload Average", "Downloaded", "Uploaded", "Health", "Completition", "Availability", "ETA", "State", "Status", "Share Ratio", "Tracker Status", "Download Limit", "Upload Limit", "Connected Seeds", "Connected Leecher", "Total Seeds", "Total Leecher", "Discarded", "Size", "Elapsed Time", "Total Average", "Scrape Times", "All Seeds", "All Leecher"];
 // standard selection
@@ -15,6 +15,15 @@ var selectedDetails = [1,1,0,0,1,1,1,1,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0];
 var SI_byte = ["bytes", "kB", "MB", "GB", "TB"];
 // max positions [dl, ul]
 var positions = [0, 0];
+function adjustMaxTabWidth() {
+	var maxwidth = Math.floor(window.innerWidth*0.98);
+	for (var s = 0; s < document.styleSheets.length; s++)
+		for (var r = 0; r < document.styleSheets[s]["cssRules"].length; r++)
+			if (document.styleSheets[s]["cssRules"][r].selectorText == "div.tab") {
+				document.styleSheets[s]["cssRules"][r].style["maxWidth"] = maxwidth+"px";
+				document.styleSheets[s]["cssRules"][r].style["max-width"] = maxwidth+"px";
+			}
+}
 function configAutoRefresh() {
 	var regTabID, i;
 	for (i in autoRefreshObjs)
@@ -123,7 +132,7 @@ function fetchData(xmlhttp) {
 }
 function getLoadType(hash) {
 	var tab = document.getElementById("tab_"+getTabIdByContent("listTransfers"));
-	var dlTabs = tab.childNodes[1].firstChild;
+	var dlTabs = tab.childNodes[3].firstChild;
 	// check weither real download table
 	if (dlTabs.firstChild.firstChild.data != "Downloads")
 		return 1;
@@ -177,12 +186,18 @@ function getRequestQuery(req, par) {
 		break;	
 		case "removeDownload":			
 			if (!window.confirm("Are you sure to delete all selected downloads and uploads?"))
-				break;
-			for (var i in selectedTransfers)
-				if (selectedTransfers[i] != null) {
-					request += '<Query switch="'+req+'" hash="'+selectedTransfers[i]+'" />';
-					selectedTransfers[i] = null;
-				}
+				break;			
+			if (par) {
+				request += '<Query switch="'+req+'" hash="'+par+'" />';
+			} else
+				for (var i in selectedTransfers)
+					if (selectedTransfers[i] != null) {
+						request += '<Query switch="'+req+'" hash="'+selectedTransfers[i]+'" />';
+						selectedTransfers[i] = null;
+					}
+		break;
+		case "setForceStart":
+			request += '<Query switch="'+req+'" start="false" hash="'+par+'" />';
 		break;
 		case "recheckDataDownload":
 		case "restartDownload":
@@ -193,9 +208,13 @@ function getRequestQuery(req, par) {
 		case "moveDown":
 		case "requestDownloadScrape":
 		case "requestDownloadAnnounce":
-			for (var i in selectedTransfers)
-				if (selectedTransfers[i] != null)
-					request += '<Query switch="'+req+'" hash="'+selectedTransfers[i]+'" />';
+			if (par) {
+				request += '<Query switch="'+req+'" hash="'+par+'" />';
+			} else
+				for (var i in selectedTransfers)
+					if (selectedTransfers[i] != null)
+						request += '<Query switch="'+req+'" hash="'+selectedTransfers[i]+'" />';
+			
 		break;
 		case "moveToPosition":
 			for (var i in selectedTransfers)
@@ -223,14 +242,20 @@ function getTCState(hash) {
 }
 function initAzSMRCwebUI() {
 	initDebugLog();
+	adjustMaxTabWidth();
+	setJSHint(); 
 	//showSplashScreen();
-	addTab("listTransfers");
 	initCookies();
+	initContextMenu();
+	addTab("listTransfers");
 	configAutoRefresh();
 	initTabControl();
 	PingToServer();
 	SendRequestToServer(40);
 	refreshView();
+	init_dragdrop('tab', true);
+	//initTableSort();
+	//alert(window.innerWidth);
 }
 function PingToServer() {
 	var img = document.getElementById("connectionstatus");
@@ -319,13 +344,15 @@ function selectTC(obj) {
 		if (!inserted) {
 			selectedTransfers[selectedTransfers.length] = hash;
 		}
-	} else
+	} else {
 		for (var i in selectedTransfers) {
 			if (selectedTransfers[i] == hash) {
 				selectedTransfers[i] = null;
 				break;
 			}
 		}
+	}
+	obj.className = (input.checked == true)? "activeTC" : "";
 	// addDebugEntry("selected Transfers: "+selectedTransfers);
 }
 function SendRequestToServer(request, par) {

@@ -1,7 +1,7 @@
 // attributes that are allowed to be shown
 var attributes = ["health", "position", "name", "state", "status", "downloaded", "uploaded", "forceStart", "downloadAVG", "uploadAVG", "totalAVG", "elapsedTime", "eta", "availability", "completition", "shareRatio", "tracker", "downloadLimit", "uploadLimit", "total_seeds", "total_leechers", "size", "last_scrape", "next_scrape", "hash"];
 // enable attributefiltering for tables
-var onlyDLAtt = [0,0,0,0,0,0,0,1,1,0,0,0,1,0,1,0,0,1,0,0,0,0,0,0,0]; 
+var onlyDLAtt = [0,0,0,0,0,0,0,1,1,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0]; 
 var onlyULAtt = [0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 // output strings for attributes
 // empty string defines no output
@@ -24,7 +24,7 @@ function addAdvInteraction() {
 	p.className = "hint";
 	form.appendChild(p);
 	form.appendChild(createTorrentInteractions());
-	div.appendChild(form);	
+	div.appendChild(form);
 	return div;	
 }
 function addlistTransfersInteraction() {
@@ -275,6 +275,7 @@ function createTorrentInteractions() {
 		button.onclick = function () { SendRequestToServer(this.getAttribute("reqID")); };
 		div.appendChild(button);
 	}
+	div.setAttribute("id", "advinteractform");
 	return div;
 }
 // function for output format definitions
@@ -333,12 +334,17 @@ function handleEvents(Events) {
 	var evDetails = null;
 	var tbody, tr, td, i, li;
 	var wasClear = true;
-	if (evList.firstChild.nodeName == "TABLE") {
-		var evTable = evList.firstChild;
-		tbody = evTable.childNodes[2];
-		wasClear = false;
-	} else {
-		while (evList.firstChild) evList.removeChild(evList.firstChild);
+	if (evList.childNodes.length > 1) {
+		if (evList.childNodes[1].nodeName == "TABLE") {
+			var evTable = evList.childNodes[1];
+			tbody = evTable.childNodes[2];
+			wasClear = false;
+		} else
+			while (evList.lastChild.className != "dragbar") evList.removeChild(evList.lastChild);
+	}
+	if (wasClear) {
+		if (evList.lastChild)
+			while (evList.lastChild.className != "dragbar") evList.removeChild(evList.lastChild);
 		var evTable = document.createElement("table");
 		evTable.setAttribute("summary", "Events since last request");
 		evTable.setAttribute("rules", "groups");		
@@ -432,6 +438,8 @@ function handleEvents(Events) {
 			evList.appendChild(p);
 		}
 		evList.appendChild(button);
+		if (evList.firstChild.className != "dragbar")
+			set_dragbar(evList);
 	}
 	
 	evList.style.display = "block";
@@ -492,7 +500,7 @@ function handlelistTransfers(xmldoc) {
 			list = document.getElementById("tab_"+tabCount);
 			list.appendChild(addlistTransfersInteraction());
 		} else
-			if (list.lastChild.firstChild.nodeName == "TABLE")
+			while (list.lastChild.getAttribute("id") != "interaction_container")
 				list.removeChild(list.lastChild);
 		var container = document.createElement("div");
 		var downloads = document.createElement("table");
@@ -502,6 +510,7 @@ function handlelistTransfers(xmldoc) {
 		var isDoneCol = -1;
 		var isStatusCol = -1;
 		var isForceCol = -1;
+		var nodl, noul;
 		downloads.setAttribute("summary", "List of current Downloads on Server");
 		downloads.setAttribute("rules", "groups");
 		caption = document.createElement("caption");
@@ -521,6 +530,7 @@ function handlelistTransfers(xmldoc) {
 			td = document.createElement("th");
 			td.appendChild(document.createTextNode("TC"));
 			td.setAttribute("title", "TransferController");
+			td.className = "invisible";
 			tr.appendChild(td);
 			for (i in transferDataField[0]) {
 				if ((formalAttributes[transferDataField[0][i]] != "")
@@ -555,6 +565,7 @@ function handlelistTransfers(xmldoc) {
 				// fetch
 				tr = document.createElement("tr");
 				tr.setAttribute("hash", transferDataField[j][hash]);
+				tr.className = (getTCState(transferDataField[j][hash])) ? "activeTC" : "";
 				tr.onclick = function () { selectTC(this); };
 				td = document.createElement("td");
 				transferCtrl = document.createElement("input");
@@ -565,6 +576,7 @@ function handlelistTransfers(xmldoc) {
 				transferCtrl.className = "transferCtrl";
 				transferCtrl.onclick = function () { selectTC(this.parentNode.parentNode); };
 				td.appendChild(transferCtrl);
+				td.className = "invisible";
 				tr.appendChild(td);
 				for (i in transferDataField[j]) {
 					if (formalAttributes[transferDataField[0][i]] != "")
@@ -584,10 +596,26 @@ function handlelistTransfers(xmldoc) {
 		if (dlbody.hasChildNodes()) {
 			downloads.appendChild(dlbody);
 			container.appendChild(downloads);
-		}
+			nodl = 0;
+			//addTableToSort(downloads);
+		} else nodl = 1;
 		if (ulbody.hasChildNodes()) {
 			uploads.appendChild(ulbody);
-			container.appendChild(uploads);		
+			container.appendChild(uploads);
+			noul = 0;
+			//addTableToSort(uploads);	
+		} else noul = 1;
+		if (nodl) {
+			var p = document.createElement("p");
+			p.appendChild(document.createTextNode("No downloads present!"));
+			p.className = "hint";
+			list.appendChild(p); 
+		}
+		if (noul) {
+			var p = document.createElement("p");
+			p.appendChild(document.createTextNode("No uploads present!"));
+			p.className = "hint";
+			list.appendChild(p); 
 		}
 		list.appendChild(container);
 		//addDebugEntry("Positions: "+positions);
