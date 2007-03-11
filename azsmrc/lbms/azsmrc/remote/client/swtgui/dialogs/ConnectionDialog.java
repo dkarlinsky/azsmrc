@@ -360,6 +360,7 @@ public class ConnectionDialog {
 	}
 
 	private void loadIndex(int index){
+		if (index < 0) return;
 
 		LoginData x = null;
 		if (index == loginDataList.size())
