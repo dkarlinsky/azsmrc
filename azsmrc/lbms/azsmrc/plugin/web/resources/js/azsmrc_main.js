@@ -19,7 +19,8 @@ function adjustMaxTabWidth() {
 	var maxwidth = Math.floor(window.innerWidth*0.98);
 	for (var s = 0; s < document.styleSheets.length; s++)
 		for (var r = 0; r < document.styleSheets[s]["cssRules"].length; r++)
-			if (document.styleSheets[s]["cssRules"][r].selectorText == "div.tab") {
+			if ((document.styleSheets[s]["cssRules"][r].selectorText == "div.tab") ||
+				(document.styleSheets[s]["cssRules"][r].selectorText == "div.moveTab")) {
 				document.styleSheets[s]["cssRules"][r].style["maxWidth"] = maxwidth+"px";
 				document.styleSheets[s]["cssRules"][r].style["max-width"] = maxwidth+"px";
 			}
