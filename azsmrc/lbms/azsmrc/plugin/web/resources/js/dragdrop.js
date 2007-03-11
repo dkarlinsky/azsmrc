@@ -48,7 +48,7 @@ function drop() {
 	}
 }
 function set_dragbar(obj) {
-	if (obj.firstChild)
+	if (obj.firstChild) {
 		if (obj.firstChild.className != "dragbar") {
 			var dragbar = document.createElement("div");
 			dragbar.className = "dragbar";
@@ -56,7 +56,7 @@ function set_dragbar(obj) {
 			dragbar.ondblclick = function () { changeFixState(this); }
 			obj.insertBefore(dragbar, obj.firstChild);
 		}
-	else {
+	} else {
 		var dragbar = document.createElement("div");
 		dragbar.className = "dragbar";
 		dragbar.onmousedown = function () { drag(this.parentNode); }

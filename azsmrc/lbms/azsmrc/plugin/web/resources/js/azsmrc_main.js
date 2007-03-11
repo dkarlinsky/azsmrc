@@ -242,14 +242,14 @@ function getTCState(hash) {
 }
 function initAzSMRCwebUI() {
 	initDebugLog();
-	adjustMaxTabWidth();
-	setJSHint(); 
-	//showSplashScreen();
 	initCookies();
 	initContextMenu();
 	addTab("listTransfers");
-	configAutoRefresh();
 	initTabControl();
+	adjustMaxTabWidth();
+	setJSHint(); 
+	//showSplashScreen();
+	configAutoRefresh();
 	PingToServer();
 	SendRequestToServer(40);
 	refreshView();

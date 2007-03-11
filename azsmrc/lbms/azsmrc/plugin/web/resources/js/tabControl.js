@@ -187,18 +187,20 @@ function initTabControl() {
 	if (tabbar.hasChildNodes) {
 		var i = 0;
 		var tab = tabbar.firstChild;
-		if (tab.nodeName == "LI") {
-			tab.setAttribute("tab_control", i);
-			tab.firstChild.setAttribute("tab", i);
-			tab.lastChild.setAttribute("tab", i);
-			i++;
-		}
-		while (tab.nextSibling) {
-			tab = tab.nextSibling;
-			tab.setAttribute("tab_control", i);
-			tab.firstChild.setAttribute("tab", i);
-			tab.lastChild.setAttribute("tab", i);
-			i++;
+		if (tab) {
+			if (tab.nodeName == "LI") {
+				tab.setAttribute("tab_control", i);
+				tab.firstChild.setAttribute("tab", i);
+				tab.lastChild.setAttribute("tab", i);
+				i++;
+			}
+			while (tab.nextSibling) {
+				tab = tab.nextSibling;
+				tab.setAttribute("tab_control", i);
+				tab.firstChild.setAttribute("tab", i);
+				tab.lastChild.setAttribute("tab", i);
+				i++;
+			}
 		}
 	}
 	// add startup tabs
