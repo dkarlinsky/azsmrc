@@ -56,7 +56,7 @@
 
 	<target name="beta" depends="init, cleanDist">
 		<tstamp />
-		<property name="beta" value=".${DSTAMP}"/>
+		<property name="beta" value=".${DSTAMP}" />
 		<antcall target="jar" />
 		<antcall target="copyBeta" />
 	</target>
@@ -69,8 +69,14 @@
 	</target>
 
 	<target name="jar" depends="init, azLangFiles">
-		<antcall target="modPluginProps" />
-		<property name="beta" value=""/>
+		<property name="beta" value="" />
+		<propertyfile file="${root.dir}/plugin.properties">
+			<entry key="plugin.class" value="lbms.azsmrc.plugin.main.Plugin" />
+			<entry key="plugin.name" value="AzSMRC" />
+			<entry key="plugin.langfile" value="lbms.azsmrc.plugin.internat.Messages" />
+			<entry key="plugin.version" value="${version}${beta}" />
+			<entry key="plugin.id" value="azsmrc" />
+		</propertyfile>
 		<echo message="Creating azsmrcPlugin_${version}${beta}.jar..." />
 		<jar destfile="${root.dir}/${dist.dir}/azsmrcPlugin_${version}${beta}.jar" basedir="${root.dir}/${build.dir}" excludes="${dist.jar.excludes}">
 			<include name="lbms/azsmrc/plugin/**/*" />
@@ -138,12 +144,11 @@
 			<fileset file="${dist.dir}/AzSMRC.exe" />
 			<fileset file="${root.dir}/launch.properties" />
 			<fileset file="${dist.dir}/launcher.jar" />
+			<fileset file="${swt.jar}/swt.jar" />
 		</zip>
 		<zip destfile="${root.dir}/${dist.dir}/azsmrcPlugin_${version}.zip">
 			<fileset file="${dist.dir}/azsmrcPlugin_${version}.jar" />
-			<fileset file="${root.dir}/lbms/azsmrc/libs/commons-codec_1.3.jar" />
-			<fileset file="${root.dir}/lbms/azsmrc/libs/commons-io_1.2.jar" />
-			<fileset file="${root.dir}/lbms/azsmrc/libs/jdom_1.0.jar" />
+			<zipfileset dir="${root.dir}/lbms/azsmrc/libs" includes="commons-codec_1.3.jar commons-io_1.2.jar jdom_1.0.jar" prefix="shared/lib" />
 			<fileset file="${root.dir}/Readme.txt" />
 		</zip>
 	</target>
@@ -167,16 +172,6 @@
 			<define name="VERSION" value="${version}" />
 			<define name="SWT" value="true" />
 		</nsis>
-	</target>
-
-	<target name="modPluginProps">
-		<propertyfile file="${root.dir}/plugin.properties">
-			<entry key="plugin.class" value="lbms.azsmrc.plugin.main.Plugin" />
-			<entry key="plugin.name" value="AzSMRC" />
-			<entry key="plugin.langfile" value="lbms.azsmrc.plugin.internat.Messages" />
-			<entry key="plugin.version" value="${version}${beta}" />
-			<entry key="plugin.id" value="azsmrc" />
-		</propertyfile>
 	</target>
 
 	<target name="source" depends="init">
