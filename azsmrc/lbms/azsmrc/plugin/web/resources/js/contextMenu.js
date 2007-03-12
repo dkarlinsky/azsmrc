@@ -45,7 +45,7 @@ function renderContextMenuContent(event) {
 				link.onclick = function () { SendRequestToServer(13, hash); }
 				link.appendChild(document.createTextNode("force start torrent"));
 				menuitem.appendChild(link);
-				//menulist.appendChild(menuitem);
+				menulist.appendChild(menuitem);
 				menuitem = document.createElement("li");
 				link = document.createElement("a");
 				link.onclick = function() { SendRequestToServer(5, hash); }

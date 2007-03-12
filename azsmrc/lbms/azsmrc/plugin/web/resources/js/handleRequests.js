@@ -565,6 +565,7 @@ function handlelistTransfers(xmldoc) {
 				// fetch
 				tr = document.createElement("tr");
 				tr.setAttribute("hash", transferDataField[j][hash]);
+				forceStates[transferDataField[j][hash]] = transferDataField[j][isForceCol];
 				tr.className = (getTCState(transferDataField[j][hash])) ? "activeTC" : "";
 				tr.onclick = function () { selectTC(this); };
 				td = document.createElement("td");

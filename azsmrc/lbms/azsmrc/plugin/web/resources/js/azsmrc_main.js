@@ -15,6 +15,8 @@ var selectedDetails = [1,1,0,0,1,1,1,1,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0];
 var SI_byte = ["bytes", "kB", "MB", "GB", "TB"];
 // max positions [dl, ul]
 var positions = [0, 0];
+// save force states for torrents
+var forceStates = [];
 function adjustMaxTabWidth() {
 	var maxwidth = Math.floor(window.innerWidth*0.98);
 	for (var s = 0; s < document.styleSheets.length; s++)
@@ -198,7 +200,8 @@ function getRequestQuery(req, par) {
 					}
 		break;
 		case "setForceStart":
-			request += '<Query switch="'+req+'" start="false" hash="'+par+'" />';
+			forceStates[par] = (forceStates[par] == "true") ? "false" : "true";
+			request += '<Query switch="'+req+'" start="'+forceStates[par]+'" hash="'+par+'" />';
 		break;
 		case "recheckDataDownload":
 		case "restartDownload":
