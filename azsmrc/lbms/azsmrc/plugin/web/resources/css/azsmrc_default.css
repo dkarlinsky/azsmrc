@@ -173,6 +173,9 @@ form > p.description {
 	margin: -1px -2px 2px -2px;
 	text-align: right;
 }
+.dragbar:hover {
+	cursor: pointer;
+}
 .dragbar h2 {
 	font-size: 0.8em;
 	font-weight: bold;
@@ -251,6 +254,10 @@ div.moveTab {
 	/* label + file input */
 	padding: 1px 2px 2px 2px;
 	width: auto;
+}
+.moveTab:hover,
+.moveTab .dragbar:hover {
+	cursor: move;
 }
 li.subbreak a {
 	border-bottom: #C0C0C0 1px solid;	
