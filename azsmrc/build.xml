@@ -145,6 +145,7 @@
 			<fileset file="${root.dir}/launch.properties" />
 			<fileset file="${dist.dir}/launcher.jar" />
 			<fileset file="${swt.jar}/swt.jar" />
+			<zipfileset dir="${root.dir}/lbms/azsmrc/libs" includes="*" excludes="commons-io_1.2.jar" prefix="" />
 		</zip>
 		<zip destfile="${root.dir}/${dist.dir}/azsmrcPlugin_${version}.zip">
 			<fileset file="${dist.dir}/azsmrcPlugin_${version}.jar" />

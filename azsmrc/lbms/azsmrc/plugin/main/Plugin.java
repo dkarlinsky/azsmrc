@@ -118,6 +118,8 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		logger = pluginInterface.getLogger().getTimeStampedChannel("AzSMRC");
 		final BasicPluginViewModel	view_model =
 			ui_manager.createBasicPluginViewModel( "AzSMRC Log" );
+		view_model.getActivity().setVisible(false);
+		view_model.getProgress().setVisible(false);
 
 		logger.addListener(
 				new LoggerChannelListener()

@@ -1,21 +1,33 @@
-Changelog for Version: 0.9.8
+Changelog for Version: 0.9.9
 
 ***New Features***
 
-- Open-With support in Windows (it is suggested that you download and install the Setup.exe)
-- Ability to allow only one instance of AzSMRC to run at any time (Needed for Open-With support)
-- Enhanced the Splash Screen
-- Show average speed in Download Finished message
-- Option to pause torrents for a specific time.
-- New windows AzSMRC.exe -- File is much smaller and has it's own process name
-- Proxy Support
+- Encoding Selection for new Torrents
+- Plugins for AzSMRC (ScaneRSS)
+- Added Support StatusMailer
+- Added support for AzJabber plugin when it is ready in v1.1
+- Remote Azureus Plugin Configuration
+- Added FirstTime Configuration Wizard
+- AJAX based WebUI
+- Added a selectAll, unselectAll, and selectInverse menu to the details table for add torrent by file dialog
+- extended the ScrapeDialog with the ability to download torrents from an url and display them
+- SSL availability & status is shown in the Az plugin config
 
 ***Changes***
 
-- Allow for 'ForceStart' of more than one torrent at a time
-- Switched logger (console output) over to log4j for better organized and more detailed logging
+- New Logo and Splash Screen
+- Switched form COConfigurationManager  to PluginConfig Unsafe methods
+- Connection Dialog can now save unlimited profiles
+- Message Popup Shell was changed to behave like the Az one, especially not blocking AzSMRC when many messages are coming in
+- Shells now have custom icons
 
 ***BugFixes***
 
-- AzSMRC will not crash anymore if systray is not available
+- When deselecting a File in the Add By Torrent by File dialog AzSMRC crashes
+- It was impossible to set specific Up/Download Speeds per Torrent
+- Confirmationdialog on Exit appears 2 times
+- Fix for "Ghost" torrents in the remote
+- Bug in Plugin Loader was fixed
+- allow to stop the torrent on error
+- "Core Update Checker"
 
