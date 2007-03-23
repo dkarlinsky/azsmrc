@@ -991,6 +991,13 @@ public class RCMain implements Launchable {
 		terminated = true;
 	}
 
+	/**
+	 * @return the terminated
+	 */
+	public boolean isTerminated() {
+		return terminated;
+	}
+
 	public void setTrayToolTip (String toolTip) {
 		if (systrayItem != null) systrayItem.setToolTipText(toolTip);
 	}

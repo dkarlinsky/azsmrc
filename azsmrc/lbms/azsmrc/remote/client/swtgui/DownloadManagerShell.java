@@ -1758,7 +1758,7 @@ public class DownloadManagerShell {
 
 					//-----Now check if the user wants a confirmation---\\
 
-					if(confirmExit){
+					if(confirmExit && !RCMain.getRCMain().isTerminated()){
 						MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
 						messageBox.setText("Confirm Exit");
 						messageBox.setMessage("Are you sure you wish to exit AzSMRC entirely?");
@@ -3104,17 +3104,17 @@ public class DownloadManagerShell {
 					downloadsTable.setItemCount(downloadsArray.length);
 				}
 
-								
+
 				if(seedsTable != null || !seedsTable.isDisposed()){
 					seedsTable.clearAll();
 					seedsTable.setItemCount(seedsArray.length);
 				}
 
-				
+
 				if(downloadsTable.getSelectionCount() == 0 && seedsTable.getSelectionCount() == 0){ //Nothing is selected anymore
 					setTorrentMoveButtons(false,false,false,false);
 					setToolBarTorrentIcons(false,false,false);
-				}else if(downloadsTable.getSelectionCount() > 0){ //Something is selected in downloadsTable, refresh Toolbars 
+				}else if(downloadsTable.getSelectionCount() > 0){ //Something is selected in downloadsTable, refresh Toolbars
 					TableItem[] items = downloadsTable.getSelection();
 					if(items == null) return;
 					if(items.length == 1){
