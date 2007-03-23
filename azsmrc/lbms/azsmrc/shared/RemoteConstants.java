@@ -68,6 +68,7 @@ public class RemoteConstants {
 
 	//Parameter types
 	public static final int PARAMETER_NOT_FOUND 	= -1;
+	public static final int PARAMETER_NULL			= 0;
 	public static final int PARAMETER_STRING 		= 1;
 	public static final int PARAMETER_INT			= 2;
 	public static final int PARAMETER_BOOLEAN		= 3;

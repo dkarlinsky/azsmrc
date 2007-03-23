@@ -846,7 +846,9 @@ public class Client {
 		if (params != null) {
 			for (Object o : params) {
 				Element e = new Element ("Parameter");
-				if (o instanceof Boolean) {
+				if (o == null) {
+					e.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_NULL));
+				} else if (o instanceof Boolean) {
 					e.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_BOOLEAN));
 					e.setText(o.toString());
 				} else if (o instanceof Integer) {

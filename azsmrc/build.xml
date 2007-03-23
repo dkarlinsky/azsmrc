@@ -191,5 +191,22 @@
 	<target name="cleanDist">
 		<delete dir="${root.dir}/${dist.dir}" />
 	</target>
-
+	
+	<target name="etc" depends="cleanDist, init">
+		<taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask" classpath="${launch4j.dir}/launch4j.jar:${launch4j.dir}/lib/xstream.jar" />
+		<!--<launch4j configfile="${root.dir}/launch4j_ETC.xml" fileVersion="1.0" txtFileVersion="1.0" productVersion="1.0" txtProductVersion="1.0" outfile="${dist.dir}/ETC.exe" />-->
+		
+		<jar destfile="${root.dir}/${dist.dir}/ETC.jar" basedir="${root.dir}/${build.dir}" excludes="${dist.jar.excludes}">
+			<include name="lbms/tools/i18n/*"/>
+			<include name="lbms/tools/i18n/**/*"/>
+			<manifest>
+				<attribute name="Main-Class" value="lbms.tools.i18n.swt.ETC"/>
+			</manifest>
+		</jar>
+		
+		<zip destfile="${root.dir}/${dist.dir}/ETC.zip">
+			<fileset file="${root.dir}/${dist.dir}/ETC.exe"/>
+			<fileset file="${root.dir}/${dist.dir}/ETC.jar"/>
+		</zip>
+	</target>
 </project>

@@ -1841,6 +1841,9 @@ public class RequestManager {
 					List<Object> params = new Vector<Object>();
 					for (Element e:paramList) {
 						switch (Integer.parseInt(e.getAttributeValue("type"))) {
+						case RemoteConstants.PARAMETER_NULL:
+							params.add(null);
+							break;
 						case RemoteConstants.PARAMETER_BOOLEAN:
 							params.add(Boolean.parseBoolean(e.getText()));
 							break;
