@@ -8,6 +8,8 @@ package lbms.azsmrc.remote.client.swtgui.container;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 
+import lbms.azsmrc.remote.client.internat.LocaleUtil;
+import lbms.azsmrc.remote.client.internat.LocaleUtilDecoder;
 import lbms.azsmrc.remote.client.torrent.TOTorrent;
 import lbms.azsmrc.remote.client.torrent.TOTorrentException;
 import lbms.azsmrc.remote.client.torrent.TOTorrentFactory;
@@ -22,6 +24,7 @@ public class AddTorrentContainer {
 	private File fTorrentFile;
 	private ScrapeResult sr;
 	private String saveTo = "";
+	private LocaleUtilDecoder decoder;
 
 	public AddTorrentContainer(File torrentFile) throws TOTorrentException{
 		torrent = TOTorrentFactory.deserialiseFromBEncodedFile(torrentFile);
@@ -32,13 +35,26 @@ public class AddTorrentContainer {
 		}
 	}
 
+	public LocaleUtilDecoder getDecoder () {
+		if  (decoder == null) {
+			try {
+				decoder = LocaleUtil.getSingleton().getTorrentEncoding(torrent);
+			} catch (Exception e) {
+				e.printStackTrace();
+				decoder = LocaleUtil.getSingleton().getSystemDecoder();
+			}
+		}
+		return decoder;
+	}
+
 	/**
 	 * Obtain the name of the torrent by parsing the byte[]
 	 * @return
 	 * @throws UnsupportedEncodingException
 	 */
-	public String getName() throws UnsupportedEncodingException{
-		return torrent.getName() instanceof byte[]?new String((byte[])torrent.getName(), RemoteConstants.DEFAULT_ENCODING):torrent.getName().toString();
+	public String getName() throws UnsupportedEncodingException {
+
+		return (torrent.getName() instanceof byte[]) ? getDecoder().tryDecode((byte[])torrent.getName(), true) : torrent.getName().toString();
 	}
 
 	/**
