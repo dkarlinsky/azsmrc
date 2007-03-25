@@ -68,6 +68,7 @@ import org.gudy.azureus2.pluginsimpl.local.ui.config.IntParameterImpl;
 import org.gudy.azureus2.pluginsimpl.local.ui.config.ParameterImpl;
 import org.gudy.azureus2.pluginsimpl.local.ui.config.StringParameterImpl;
 import org.gudy.azureus2.ui.swt.views.ConfigView;
+import org.jdom.Attribute;
 import org.jdom.DataConversionException;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -387,6 +388,23 @@ public class RequestManager {
 			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException{
 				response.setAttribute("switch", "Ping");
 				response.setText("Pong");
+				return true;
+			}
+		});
+		addHandler("Echo", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {
+
+				response.setAttribute("switch", xmlRequest.getAttributeValue("_swtich"));
+				//remove not needed attribs
+				xmlRequest.removeAttribute("switch");
+				xmlRequest.removeAttribute("_switch");
+				//copy all remaining attributes
+				response.setAttributes(xmlRequest.getAttributes());
+				//copy all children
+				List<Element> children = response.getChildren();
+				for (Element e:children) {
+					response.addContent(e.detach());
+				}
 				return true;
 			}
 		});
