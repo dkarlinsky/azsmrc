@@ -49,6 +49,7 @@ import lbms.azsmrc.remote.client.swtgui.container.Container;
 import lbms.azsmrc.remote.client.swtgui.container.DownloadContainer;
 import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ConnectionDialog;
+import lbms.azsmrc.remote.client.swtgui.dialogs.DeskBar;
 import lbms.azsmrc.remote.client.swtgui.dialogs.InputShell;
 import lbms.azsmrc.remote.client.swtgui.dialogs.MoveDataDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.NormalUserDialog;
@@ -123,6 +124,8 @@ import org.eclipse.swt.widgets.ToolItem;
 
 
 public class DownloadManagerShell {
+	
+	private static final String PFX = "downloadmanagershell.";
 
 	private static final long DONATION_INTERVAL = 24*60*60*1000;
 
@@ -231,34 +234,34 @@ public class DownloadManagerShell {
 		DOWNLOAD_MANAGER_SHELL.setMenuBar (menuBar);
 
 		MenuItem fileItem = new MenuItem(menuBar,SWT.CASCADE);
-		fileItem.setText("&Main");
+		fileItem.setText(I18N.translate(PFX + "menu.main"));
 
 		Menu fileSubmenu = new Menu (DOWNLOAD_MANAGER_SHELL, SWT.DROP_DOWN);
 		fileItem.setMenu (fileSubmenu);
 
 		MenuItem remoteItem = new MenuItem(menuBar,SWT.CASCADE);
-		remoteItem.setText("&Remote");
+		remoteItem.setText(I18N.translate(PFX + "menu.remote"));
 
 		Menu remoteSubmenu = new Menu (DOWNLOAD_MANAGER_SHELL, SWT.DROP_DOWN);
 		remoteItem.setMenu (remoteSubmenu);
 
 
 		MenuItem toolItem = new MenuItem(menuBar,SWT.CASCADE);
-		toolItem.setText("&Tools");
+		toolItem.setText(I18N.translate(PFX + "menu.tools"));
 
 		Menu toolSubmenu = new Menu (DOWNLOAD_MANAGER_SHELL, SWT.DROP_DOWN);
 		toolItem.setMenu (toolSubmenu);
 
 
 		MenuItem pluginItem = new MenuItem(menuBar, SWT.CASCADE);
-		pluginItem.setText("&Plugins");
+		pluginItem.setText(I18N.translate(PFX + "menu.plugins"));
 
 		Menu pluginSubmenu = new Menu(DOWNLOAD_MANAGER_SHELL, SWT.DROP_DOWN);
 		pluginItem.setMenu(pluginSubmenu);
 
 
 		MenuItem helpItem = new MenuItem(menuBar,SWT.CASCADE);
-		helpItem.setText("&Help");
+		helpItem.setText(I18N.translate(PFX + "menu.help"));
 
 		Menu helpSubmenu = new Menu (DOWNLOAD_MANAGER_SHELL, SWT.DROP_DOWN);
 		helpItem.setMenu (helpSubmenu);
@@ -268,7 +271,7 @@ public class DownloadManagerShell {
 
 		//Login
 		menuLogin = new MenuItem(fileSubmenu,SWT.PUSH);
-		menuLogin.setText("&Connect to Server");
+		menuLogin.setText(I18N.translate(PFX + "menu.main.connect"));
 		menuLogin.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				ConnectionDialog.open(RCMain.getRCMain().getDisplay());
@@ -277,7 +280,7 @@ public class DownloadManagerShell {
 
 		//QuickConnect
 		menuQuickconnect = new MenuItem(fileSubmenu,SWT.PUSH);
-		menuQuickconnect.setText("&Quickconnect");
+		menuQuickconnect.setText(I18N.translate(PFX + "menu.main.quickconnect"));
 		menuQuickconnect.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				Properties properties = RCMain.getRCMain().getProperties();
@@ -288,9 +291,11 @@ public class DownloadManagerShell {
 							RCMain.getRCMain().connect(true);
 							initializeConnection();
 						} else if (login.hasUsername() && login.hasHost()){
-							InputShell is = new InputShell("Enter Password", "Please enter password for\nUser: "+
+							InputShell is = new InputShell(I18N.translate(PFX + "menu.main.quickconnect.inputshell.title"), 
+									I18N.translate(PFX + "menu.main.quickconnect.inputshell.text1") + " " +
 									login.getUsername() +
-									"\nServer: " +login.getHost());
+									I18N.translate(PFX + "menu.main.quickconnect.inputshell.text2") + " " +
+									login.getHost());
 							is.setIsPassword(true);
 							String pw = is.open();
 							if(pw != null){
@@ -310,7 +315,7 @@ public class DownloadManagerShell {
 
 		//Logout
 		menuLogout = new MenuItem(fileSubmenu,SWT.PUSH);
-		menuLogout.setText("&Disconnect from Server");
+		menuLogout.setText(I18N.translate(PFX + "menu.main.logout"));
 		menuLogout.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				RCMain.getRCMain().disconnect();
@@ -323,15 +328,15 @@ public class DownloadManagerShell {
 
 		//Exit
 		MenuItem exitItem = new MenuItem (fileSubmenu, SWT.PUSH);
-		exitItem.setText ("E&xit\tCtrl+Q");
+		exitItem.setText (I18N.translate(PFX + "menu.main.exit") + "\tCtrl+Q");
 		exitItem.setAccelerator (SWT.CTRL + 'Q');
 		exitItem.addListener (SWT.Selection, new Listener () {
 			public void handleEvent (Event e) {
 				boolean confirmExit = RCMain.getRCMain().getProperties().getPropertyAsBoolean("confirm.exit");
 				if(confirmExit){
 					MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
-					messageBox.setText("Confirm Exit");
-					messageBox.setMessage("Are you sure you wish to exit AzSMRC entirely?");
+					messageBox.setText(I18N.translate(PFX + "menu.main.exit.messagebox.title"));
+					messageBox.setMessage(I18N.translate(PFX + "menu.main.exit.messagebox.message"));
 					int response = messageBox.open();
 					switch (response){
 					case SWT.OK:
@@ -350,7 +355,7 @@ public class DownloadManagerShell {
 
 		//Add by file
 		menuAddByFile = new MenuItem(remoteSubmenu,SWT.PUSH);
-		menuAddByFile.setText("Send Torrent &File to Server");
+		menuAddByFile.setText(I18N.translate(PFX + "menu.remote.addbyfile"));
 		menuAddByFile.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e){
 				OpenByFileDialog.open();
@@ -360,7 +365,7 @@ public class DownloadManagerShell {
 
 		//Add by URL
 		menuAddbyURL = new MenuItem(remoteSubmenu,SWT.PUSH);
-		menuAddbyURL.setText("Send Torrent &URL to Server");
+		menuAddbyURL.setText(I18N.translate(PFX + "menu.remote.addbyurl"));
 		menuAddbyURL.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e){
 				OpenByURLDialog.open();
@@ -372,14 +377,14 @@ public class DownloadManagerShell {
 
 		//Server Details
 		menuServerDetails = new MenuItem(remoteSubmenu, SWT.PUSH);
-		menuServerDetails.setText("&Server Details");
+		menuServerDetails.setText(I18N.translate(PFX + "menu.remote.serverdetails"));
 		menuServerDetails.addListener(SWT.Selection,new Listener(){
 			public void handleEvent(Event e){
 				ServerDetailsTab.open(tabFolder);
 			}
 		});
 		menuServerUpdate = new MenuItem(remoteSubmenu, SWT.PUSH);
-		menuServerUpdate.setText("&Check for Updates for Server");
+		menuServerUpdate.setText(I18N.translate(PFX + "menu.remote.serverupdates"));
 		menuServerUpdate.addListener(SWT.Selection,new Listener(){
 			public void handleEvent(Event e){
 				ServerUpdateDialog.open();
@@ -393,12 +398,12 @@ public class DownloadManagerShell {
 
 		//Restart Server
 		menuRestartAzureus = new MenuItem(remoteSubmenu,SWT.PUSH);
-		menuRestartAzureus.setText("&Restart Server");
+		menuRestartAzureus.setText(I18N.translate(PFX + "menu.remote.restartserver"));
 		menuRestartAzureus.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e){
 				MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
-				messageBox.setText("Restart Azureus");
-				messageBox.setMessage("Are you sure?");
+				messageBox.setText(I18N.translate(PFX + "menu.remote.restartserver.messagebox.title"));
+				messageBox.setMessage(I18N.translate(PFX + "menu.remote.restartserver.messagebox.message"));
 				int response = messageBox.open();
 				switch (response){
 				case SWT.OK:
@@ -414,7 +419,7 @@ public class DownloadManagerShell {
 		//-----Tools Submenu
 
 		menuMyShares = new MenuItem(toolSubmenu, SWT.PUSH);
-		menuMyShares.setText("&My Tracker");
+		menuMyShares.setText(I18N.translate(PFX + "menu.tools.mytracker"));
 		menuMyShares.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e){
 				MyTracker.open(tabFolder);
@@ -424,7 +429,7 @@ public class DownloadManagerShell {
 
 
 		MenuItem menuScraper = new MenuItem(toolSubmenu,SWT.PUSH);
-		menuScraper.setText("&Scrape a torrent file");
+		menuScraper.setText(I18N.translate(PFX + "menu.tools.scrapetorrent"));
 		menuScraper.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e){
 				ScrapeDialog.open();
@@ -433,7 +438,7 @@ public class DownloadManagerShell {
 
 
 		MenuItem menuConsole = new MenuItem(toolSubmenu,SWT.PUSH);
-		menuConsole.setText("&Console\tCtrl+C");
+		menuConsole.setText(I18N.translate(PFX + "menu.tools.console") + "\tCtrl+C");
 		menuConsole.setAccelerator(SWT.CTRL + 'C');
 		menuConsole.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e){
@@ -443,7 +448,7 @@ public class DownloadManagerShell {
 
 
 		MenuItem menuPrefs = new MenuItem(toolSubmenu,SWT.PUSH);
-		menuPrefs.setText("&Preferences");
+		menuPrefs.setText(I18N.translate(PFX + "menu.tools.preferences"));
 		menuPrefs.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
 				PreferencesTab.open(tabFolder);
@@ -454,7 +459,7 @@ public class DownloadManagerShell {
 		new MenuItem(toolSubmenu,SWT.SEPARATOR);
 
 		MenuItem menuUpdate = new MenuItem(toolSubmenu,SWT.PUSH);
-		menuUpdate.setText("Check for &Updates");
+		menuUpdate.setText(I18N.translate(PFX + "menu.tools.update"));
 		menuUpdate.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
 				RCMain.getRCMain().getUpdater().checkForUpdates(RCMain.getRCMain().getProperties().getPropertyAsBoolean("update.beta"));
@@ -480,7 +485,7 @@ public class DownloadManagerShell {
 		//-----Help Submenu
 
 		MenuItem menuAbout = new MenuItem(helpSubmenu,SWT.PUSH);
-		menuAbout.setText("&About");
+		menuAbout.setText(I18N.translate(PFX + "menu.help.about"));
 
 		menuAbout.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
@@ -562,6 +567,8 @@ public class DownloadManagerShell {
 			public void handleEvent (Event e){
 				if(RCMain.getRCMain().connected())
 					RCMain.getRCMain().getClient().getDownloadManager().update(true);
+					StartupWizard.open();
+
 			}
 		});
 
@@ -2685,7 +2692,7 @@ public class DownloadManagerShell {
 
 	/**
 	 * Sets the Toolbar Icons for Queue Stop and Remove
-	 * 
+	 *
 	 * @param bQueue true if Queue enabled
 	 * @param bStop true if Stop enabled
 	 * @param bRemove true if Remove enabled
