@@ -977,19 +977,20 @@ public class DownloadManagerShell {
 								if(bSingleUserMode){
 
 									if(RCMain.getRCMain().getProperties().getPropertyAsBoolean("mainwindow.showHost")){
-										myTorrents.setText("ALL Torrents: " + RCMain.getRCMain().getClient().getServer().getHost());
+										myTorrents.setText(I18N.translate(PFX + "mytorrents.tabtitle.all.text1") +
+												" " + RCMain.getRCMain().getClient().getServer().getHost());
 									}else
-										myTorrents.setText("ALL Torrents");
+										myTorrents.setText(I18N.translate(PFX + "mytorrents.tabtitle.all.text2"));
 
 
 								}else if(userLoggedIn != null)
 									if(RCMain.getRCMain().getProperties().getPropertyAsBoolean("mainwindow.showHost")){
-										myTorrents.setText(userLoggedIn + "'s Torrents: " + RCMain.getRCMain().getClient().getServer().getHost());
+										myTorrents.setText(userLoggedIn + I18N.translate(PFX + "mytorrents.tabtitle.user") + ": " + RCMain.getRCMain().getClient().getServer().getHost());
 									}else
-										myTorrents.setText(userLoggedIn + "'s Torrents");
+										myTorrents.setText(userLoggedIn + I18N.translate(PFX + "mytorrents.tabtitle.user"));
 
 								else
-									myTorrents.setText("My Torrents");
+									myTorrents.setText(I18N.translate(PFX + "mytorrents.tabtitle.fallback"));
 							}
 
 						}
@@ -1433,11 +1434,11 @@ public class DownloadManagerShell {
 
 		String userLoggedIn = RCMain.getRCMain().getClient().getUsername();
 		if(bSingleUserMode)
-			myTorrents.setText("ALL Torrents");
+			myTorrents.setText(I18N.translate(PFX + "mytorrents.tabtitle.all.text2"));
 		else if(userLoggedIn != null)
-			myTorrents.setText(userLoggedIn + "'s Torrents");
+			myTorrents.setText(userLoggedIn + I18N.translate(PFX + "mytorrents.tabtitle.user"));
 		else
-			myTorrents.setText("My Torrents");
+			myTorrents.setText(I18N.translate(PFX + "mytorrents.tabtitle.fallback"));
 
 		//------------bottom status bar---------------\\
 		final int borderFlag = (Utilities.isOSX) ? SWT.NONE : SWT.SHADOW_IN;
@@ -1464,17 +1465,13 @@ public class DownloadManagerShell {
 		statusDown = new CLabelPadding(statusbarComp, borderFlag);
 		statusDown.setText("0B/s");
 		statusDown.setImage(ImageRepository.getImage("statusbar_down"));
-		statusDown.setToolTipText("Right-click to set max download speed of core\n" +
-				"Double-click to force a speed update\n" +
-		"[N/S] = Data not yet received from server");
+		statusDown.setToolTipText(I18N.translate(PFX + "statusbar.download.tooltiptext"));
 
 
 		statusUp = new CLabelPadding(statusbarComp, borderFlag);
 		statusUp.setText("0B/s");
 		statusUp.setImage(ImageRepository.getImage("statusbar_up"));
-		statusUp.setToolTipText("Right-click to set max upload speed of core\n" +
-				"Double-click to force a speed update\n" +
-		"[N/S] = Data not yet received from server");
+		statusUp.setToolTipText(I18N.translate(PFX + "statusbar.upload.tooltiptext"));
 
 		connectionStatusIcon = new CLabelPadding(statusbarComp,borderFlag);
 		connectionStatusIcon.addListener(SWT.MouseDoubleClick, new Listener(){
@@ -1488,7 +1485,6 @@ public class DownloadManagerShell {
 
 		sslStatusIcon = new CLabelPadding(statusbarComp, borderFlag);
 		sslStatusIcon.setImage(ImageRepository.getImage("ssl_disabled"));
-		sslStatusIcon.setToolTipText("SSL Disabled");
 		sslStatusIcon.setEnabled(false);
 		sslStatusIcon.addListener(SWT.MouseDoubleClick, new Listener(){
 			public void handleEvent(Event arg0) {
