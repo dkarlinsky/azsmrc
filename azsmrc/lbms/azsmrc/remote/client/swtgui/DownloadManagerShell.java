@@ -123,7 +123,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 
 public class DownloadManagerShell {
-	
+
 	private static final String PFX = "downloadmanagershell.";
 
 	private static final long DONATION_INTERVAL = 24*60*60*1000;
@@ -290,7 +290,7 @@ public class DownloadManagerShell {
 							RCMain.getRCMain().connect(true);
 							initializeConnection();
 						} else if (login.hasUsername() && login.hasHost()){
-							InputShell is = new InputShell(I18N.translate(PFX + "menu.main.quickconnect.inputshell.title"), 
+							InputShell is = new InputShell(I18N.translate(PFX + "menu.main.quickconnect.inputshell.title"),
 									I18N.translate(PFX + "menu.main.quickconnect.inputshell.text1") + " " +
 									login.getUsername() +
 									I18N.translate(PFX + "menu.main.quickconnect.inputshell.text2") + " " +
@@ -505,7 +505,7 @@ public class DownloadManagerShell {
 
 		login = new ToolItem(bar,SWT.PUSH);
 		login.setImage(ImageRepository.getImage("connect"));
-		login.setToolTipText("Connect to server");
+		login.setToolTipText(I18N.translate(PFX + "toolbar.login.tooltiptext"));
 		login.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				ConnectionDialog.open(RCMain.getRCMain().getDisplay());
@@ -515,7 +515,7 @@ public class DownloadManagerShell {
 
 		quickconnect = new ToolItem(bar,SWT.PUSH);
 		quickconnect.setImage(ImageRepository.getImage("connect_quick"));
-		quickconnect.setToolTipText("Quickconnect using last saved settings");
+		quickconnect.setToolTipText(I18N.translate(PFX + "toolbar.quickconnect.tooltiptext"));
 		quickconnect.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				Properties properties = RCMain.getRCMain().getProperties();
@@ -526,9 +526,11 @@ public class DownloadManagerShell {
 							RCMain.getRCMain().connect(true);
 							initializeConnection();
 						} else if (login.hasUsername() && login.hasHost()){
-							InputShell is = new InputShell("Enter Password", "Please enter password for\nUser: "+
+							InputShell is = new InputShell(I18N.translate(PFX + "toolbar.quickconnect.inputshell.title"),
+									I18N.translate(PFX + "toolbar.quickconnect.inputshell.text1") + " " +
 									login.getUsername() +
-									"\nServer: " +login.getHost());
+									I18N.translate(PFX + "toolbar.quickconnect.inputshell.text2") + " " +
+									login.getHost());
 							is.setIsPassword(true);
 							String pw = is.open();
 							if(pw != null){
@@ -548,7 +550,7 @@ public class DownloadManagerShell {
 
 		logout = new ToolItem(bar,SWT.PUSH);
 		logout.setImage(ImageRepository.getImage("logout"));
-		logout.setToolTipText("Disconnect from server");
+		logout.setToolTipText(I18N.translate(PFX + "toolbar.logout.tooltiptext"));
 		logout.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				RCMain.getRCMain().disconnect();
@@ -561,7 +563,7 @@ public class DownloadManagerShell {
 
 		refresh = new ToolItem(bar,SWT.PUSH);
 		refresh.setImage(ImageRepository.getImage("refresh"));
-		refresh.setToolTipText("Refresh");
+		refresh.setToolTipText(I18N.translate(PFX + "toolbar.refresh.tooltiptext"));
 		refresh.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				if(RCMain.getRCMain().connected())
@@ -579,7 +581,7 @@ public class DownloadManagerShell {
 
 		addTorrent_by_file = new ToolItem(bar,SWT.PUSH);
 		addTorrent_by_file.setImage(ImageRepository.getImage("open_by_file"));
-		addTorrent_by_file.setToolTipText("Add a torrent from a local file");
+		addTorrent_by_file.setToolTipText(I18N.translate(PFX + "toolbar.openbyfile.tooltiptext"));
 		addTorrent_by_file.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
 				OpenByFileDialog.open();
@@ -589,7 +591,7 @@ public class DownloadManagerShell {
 
 		addTorrent_by_url = new ToolItem(bar,SWT.PUSH);
 		addTorrent_by_url.setImage(ImageRepository.getImage("open_by_url"));
-		addTorrent_by_url.setToolTipText("Add a torrent from a URL");
+		addTorrent_by_url.setToolTipText(I18N.translate(PFX + "toolbar.openbyurl.tooltiptext"));
 		addTorrent_by_url.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
 				OpenByURLDialog.open();
@@ -603,7 +605,7 @@ public class DownloadManagerShell {
 
 		top = new ToolItem(bar, SWT.PUSH);
 		top.setImage(ImageRepository.getImage("top"));
-		top.setToolTipText("Move selected torrent to top of list");
+		top.setToolTipText(I18N.translate(PFX + "toolbar.top.tooltiptext"));
 		top.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				if(downloadsTable.isFocusControl()){
@@ -629,7 +631,7 @@ public class DownloadManagerShell {
 
 		up = new ToolItem(bar, SWT.PUSH);
 		up.setImage(ImageRepository.getImage("up"));
-		up.setToolTipText("Move selected torrent up one position");
+		up.setToolTipText(I18N.translate(PFX + "toolbar.up.tooltiptext"));
 		up.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				if(downloadsTable.isFocusControl()){
@@ -655,7 +657,7 @@ public class DownloadManagerShell {
 
 		down = new ToolItem(bar, SWT.PUSH);
 		down.setImage(ImageRepository.getImage("down"));
-		down.setToolTipText("Move selected torrent down one position");
+		down.setToolTipText(I18N.translate(PFX + "toolbar.down.tooltiptext"));
 		down.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				if(downloadsTable.isFocusControl()){
@@ -683,7 +685,7 @@ public class DownloadManagerShell {
 
 		bottom = new ToolItem(bar, SWT.PUSH);
 		bottom.setImage(ImageRepository.getImage("bottom"));
-		bottom.setToolTipText("Move selected torrent to bottom of list");
+		bottom.setToolTipText(I18N.translate(PFX + "toolbar.bottom.tooltiptext"));
 		bottom.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				if(downloadsTable.isFocusControl()){
@@ -714,7 +716,7 @@ public class DownloadManagerShell {
 
 		queueTorrent = new ToolItem(bar, SWT.PUSH);
 		queueTorrent.setImage(ImageRepository.getImage("toolbar_queue"));
-		queueTorrent.setToolTipText("Queue Torrent(s)");
+		queueTorrent.setToolTipText(I18N.translate(PFX + "toolbar.queuetorrent.tooltiptext"));
 		queueTorrent.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				TableItem[] items;
@@ -742,7 +744,7 @@ public class DownloadManagerShell {
 
 		stopTorrent = new ToolItem(bar, SWT.PUSH);
 		stopTorrent.setImage(ImageRepository.getImage("toolbar_stop"));
-		stopTorrent.setToolTipText("Stop Torrent(s)");
+		stopTorrent.setToolTipText(I18N.translate(PFX + "toolbar.stoptorrents.tooltiptext"));
 		stopTorrent.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				TableItem[] items;
@@ -773,7 +775,7 @@ public class DownloadManagerShell {
 
 		removeTorrent = new ToolItem(bar, SWT.PUSH);
 		removeTorrent.setImage(ImageRepository.getImage("toolbar_remove"));
-		removeTorrent.setToolTipText("Remove Torrent(s)");
+		removeTorrent.setToolTipText(I18N.translate(PFX + "toolbar.removetorrents.tooltiptext"));
 		removeTorrent.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				TableItem[] items;
@@ -807,7 +809,7 @@ public class DownloadManagerShell {
 
 		pauseAll = new ToolItem(bar, SWT.DROP_DOWN);
 		pauseAll.setImage(ImageRepository.getImage("pause"));
-		pauseAll.setToolTipText("Pause all torrents");
+		pauseAll.setToolTipText(I18N.translate(PFX + "toolbar.pauseall.tooltiptext"));
 
 
 
@@ -874,7 +876,7 @@ public class DownloadManagerShell {
 
 		resumeAll = new ToolItem(bar, SWT.PUSH);
 		resumeAll.setImage(ImageRepository.getImage("resume"));
-		resumeAll.setToolTipText("Resume all paused torrents");
+		resumeAll.setToolTipText(I18N.translate(PFX + "toolbar.resumeall.tooltiptext"));
 		resumeAll.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				RCMain.getRCMain().getClient().getDownloadManager().resumeDownloads();
@@ -887,7 +889,7 @@ public class DownloadManagerShell {
 
 		preferences = new ToolItem(bar,SWT.PUSH);
 		preferences.setImage(ImageRepository.getImage("preferences"));
-		preferences.setToolTipText("Open Preferences");
+		preferences.setToolTipText(I18N.translate(PFX + "toolbar.openprefs.tooltiptext"));
 		preferences.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
 				PreferencesTab.open(tabFolder);
@@ -899,7 +901,7 @@ public class DownloadManagerShell {
 
 		manage_users = new ToolItem(bar,SWT.PUSH);
 		manage_users.setImage(ImageRepository.getImage("manager_users"));
-		manage_users.setToolTipText("Manage Users");
+		manage_users.setToolTipText(I18N.translate(PFX + "toolbar.manageusers.tooltiptext"));
 		manage_users.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
 				User user = RCMain.getRCMain().getClient().getUserManager().getActiveUser();
@@ -918,7 +920,7 @@ public class DownloadManagerShell {
 
 		console = new ToolItem(bar,SWT.PUSH);
 		console.setImage(ImageRepository.getImage("console"));
-		console.setToolTipText("Open Console");
+		console.setToolTipText(I18N.translate(PFX + "toolbar.openconsole.tooltiptext"));
 		console.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e){
 				ConsoleTab.open(tabFolder, true);
@@ -927,7 +929,7 @@ public class DownloadManagerShell {
 
 		ToolItem information = new ToolItem(bar,SWT.PUSH);
 		information.setImage(ImageRepository.getImage("information"));
-		information.setToolTipText("About AzSMRC");
+		information.setToolTipText(I18N.translate(PFX + "toolbar.about.tooltiptext"));
 		information.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				ReadmeTab.open(tabFolder);
