@@ -80,7 +80,7 @@ public class ConnectionDialog {
 			}
 
 		//Shell
-		shell = new Shell(display);
+		shell = new Shell(display, SWT.APPLICATION_MODAL | SWT.SHELL_TRIM);
 		shell.setLayout(new GridLayout(1,false));
 		shell.setText(I18N.translate(PFX + "shell.text"));
 		if(!lbms.azsmrc.remote.client.Utilities.isOSX)
@@ -552,11 +552,11 @@ public class ConnectionDialog {
 
 	/**
 	 * Deletes a connection.
-	 * 
+	 *
 	 * @param id connection ID to delete
 	 */
 	public void deleteConnection (int id) {
-		if (loginDataList.size()<=id) return;
+		if (loginDataList.size()<=id || id == -1) return;
 		loginDataList.remove(id);
 		saveToConfig ();
 		fillCombo();
@@ -578,8 +578,8 @@ public class ConnectionDialog {
 		} else {
 			loginDataList.add(logData);
 			Collections.sort(loginDataList);
-			fillCombo();
 			saveToConfig ();
+			fillCombo();
 		}
 	}
 
