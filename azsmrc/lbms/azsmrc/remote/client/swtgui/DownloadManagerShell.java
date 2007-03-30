@@ -568,8 +568,6 @@ public class DownloadManagerShell {
 			public void handleEvent (Event e){
 				if(RCMain.getRCMain().connected())
 					RCMain.getRCMain().getClient().getDownloadManager().update(true);
-					StartupWizard.open();
-
 			}
 		});
 
