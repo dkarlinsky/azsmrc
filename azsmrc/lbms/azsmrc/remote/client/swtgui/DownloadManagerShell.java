@@ -2075,6 +2075,9 @@ public class DownloadManagerShell {
 
 		//Be sure to save down the column widths
 		RCMain.getRCMain().getMainWindow().saveColumnWidthsToPreferencesFile();
+
+		//readd downloads
+		redrawTables();
 	}
 
 	private void addDownloadManagerMenu(final Table table){
