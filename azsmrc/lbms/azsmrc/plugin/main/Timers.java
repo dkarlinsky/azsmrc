@@ -1,7 +1,7 @@
 /*
  * Created on Dec 2, 2005
  * Created by omschaub
- * 
+ *
  */
 package lbms.azsmrc.plugin.main;
 
@@ -14,7 +14,6 @@ import org.gudy.azureus2.plugins.download.Download;
 import org.gudy.azureus2.plugins.download.DownloadException;
 import org.gudy.azureus2.plugins.download.DownloadManager;
 import org.gudy.azureus2.plugins.torrent.Torrent;
-import org.gudy.azureus2.plugins.torrent.TorrentAttribute;
 import org.gudy.azureus2.plugins.torrent.TorrentManager;
 import org.gudy.azureus2.plugins.utils.UTTimer;
 import org.gudy.azureus2.plugins.utils.UTTimerEvent;
@@ -45,7 +44,6 @@ public class Timers {
 					String[] userList = conf.getUserList();
 					TorrentManager torrentManager = pluginInterface.getTorrentManager();
 					DownloadManager dm = Plugin.getPluginInterface().getDownloadManager();
-					TorrentAttribute ta = torrentManager.getAttribute(TorrentAttribute.TA_CATEGORY);
 					Plugin.addToLog("Checking AutoImpdirs...");
 					boolean dlAdded = false;
 					for (String userName:userList) {
@@ -68,12 +66,9 @@ public class Timers {
 										fin.close();
 										Download dl = dm.addDownload(new_torrent);
 										if (dl.isComplete()) continue;
-										if (dl.getAttribute(ta) == null) {
-											dl.setAttribute(ta, user.getUsername());
-											dl.addListener(MultiUserDownloadListener.getInstance());
-										} else {
-											dl.setAttribute(ta, MultiUser.SHARED_CAT_NAME);
-										}
+
+										MultiUser.addUserToDownload(user, dl);
+
 										dlAdded = true;
 										user.addDownload(dl);
 										Plugin.addToLog("Moving Torrent to: "+Plugin.getPluginInterface().getPluginconfig().getStringParameter("General_sDefaultTorrent_Directory")+"/"+torrent.getName());
