@@ -68,7 +68,6 @@ import org.gudy.azureus2.pluginsimpl.local.ui.config.IntParameterImpl;
 import org.gudy.azureus2.pluginsimpl.local.ui.config.ParameterImpl;
 import org.gudy.azureus2.pluginsimpl.local.ui.config.StringParameterImpl;
 import org.gudy.azureus2.ui.swt.views.ConfigView;
-import org.jdom.Attribute;
 import org.jdom.DataConversionException;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -236,7 +235,7 @@ public class RequestManager {
 
 	private Torrent getTorrentFromXML (Element e) throws TorrentException {
 		String torrentData = e.getText();
-		return Plugin.getPluginInterface().getTorrentManager().createFromBEncodedData(EncodingUtil.decode(torrentData));
+		return Plugin.getPluginInterface().getTorrentManager().createFromBEncodedData(EncodingUtil.decode(torrentData),TorrentManager.PRESERVE_ENCODING);
 	}
 
 	private Download getDownloadByHash (String hash) throws DownloadException {
