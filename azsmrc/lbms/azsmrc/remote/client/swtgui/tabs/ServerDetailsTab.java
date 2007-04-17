@@ -13,9 +13,6 @@ import lbms.azsmrc.remote.client.events.ClientUpdateListener;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
-import lbms.azsmrc.remote.client.util.TimerEvent;
-import lbms.azsmrc.remote.client.util.TimerEventPerformer;
-import lbms.azsmrc.remote.client.util.TimerEventPeriodic;
 import lbms.azsmrc.shared.SWTSafeRunnable;
 import lbms.tools.stats.StatsStreamGlobalManager;
 
@@ -221,15 +218,18 @@ public class ServerDetailsTab {
 
 		//Update Listener
 
+		//CUL
+		final ClientUpdateListener serverDetails = new ClientUpdateListener(){
 
-		final TimerEventPeriodic updateTimerEvent =  RCMain.getRCMain().getMainTimer().addPeriodicEvent(1000,
-				new TimerEventPerformer() {
-			public void perform(TimerEvent event) {
+			public void update(long updateSwitches) {
+
 				RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
 					public void runSafe() {
 						try{
 							totalDown.setText(DisplayFormatters.formatByteCountToBase10KBEtc(StatsStreamGlobalManager.getTotalDownload()));
+							totalDown.setToolTipText(StatsStreamGlobalManager.getTotalDownload()+" bytes");
 							totalUp.setText(DisplayFormatters.formatByteCountToBase10KBEtc(StatsStreamGlobalManager.getTotalUpload()));
+							totalUp.setToolTipText(StatsStreamGlobalManager.getTotalUpload()+" bytes");
 							details2.layout();
 							parent.layout();
 						}catch(SWTException e){
@@ -237,13 +237,7 @@ public class ServerDetailsTab {
 						}
 					}
 				});
-			}
-		});
 
-		//CUL
-		final ClientUpdateListener serverDetails = new ClientUpdateListener(){
-
-			public void update(long updateSwitches) {
 				if((updateSwitches & Constants.UPDATE_REMOTE_INFO) != 0){
 					RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
 						public void runSafe() {
@@ -304,7 +298,6 @@ public class ServerDetailsTab {
 		detailsTab.addDisposeListener(new DisposeListener (){
 
 			public void widgetDisposed(DisposeEvent arg0) {
-				updateTimerEvent.cancel();
 				RCMain.getRCMain().getClient().removeClientUpdateListener(serverDetails);
 			}
 
