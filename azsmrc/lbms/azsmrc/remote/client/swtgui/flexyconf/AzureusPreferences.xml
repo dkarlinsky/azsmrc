@@ -2,7 +2,7 @@
 <FlexyConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:noNamespaceSchemaLocation="../../../../../tools/flexyconf/flexyconf.xsd">
 	<Section label="Azureus Remote" index="0">
-		<Entry key="" label="Warning:  These settings will directly change the settings in Azureus itslef" type="label" index="0"/>
+		<Entry key="" label="Warning: These settings will directly change the settings in Azureus itself" type="label" index="0"/>
 		<Section label="ConfigView.section.server" index="0">
 			<Entry key="TCP.Listen.Port" label="ConfigView.label.serverport" type="integer" index="0" validate="1..65535"/>
 			<Group label="ConfigView.section.connection.group.peersources" index="1">
