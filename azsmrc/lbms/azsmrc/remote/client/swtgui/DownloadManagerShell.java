@@ -1238,11 +1238,13 @@ public class DownloadManagerShell {
 				if(items == null) return;
 				if(items.length == 1){
 					//Single line selection
+					Container container = (Container)items[0].getData();
+					Download download = container.getDownload();					
 					setTorrentMoveButtons(false,false,false,false);
-					int index = downloadsTable.indexOf(items[0]);
-					if(index==0 && downloadsTable.getItemCount() == 1)
+					int index = download.getPosition();
+					if(index==1 && downloadsTable.getItemCount() == 1)
 						setTorrentMoveButtons(false,true,true,false);
-					else if(index == 0)
+					else if(index == 1)
 						setTorrentMoveButtons(false,true,true,true);
 					else if(index == downloadsTable.getItemCount()-1)
 						setTorrentMoveButtons(true,true,true,false);
@@ -1250,8 +1252,6 @@ public class DownloadManagerShell {
 						setTorrentMoveButtons(true,true,true,true);
 
 					//torrent control
-					Container container = (Container)items[0].getData();
-					Download download = container.getDownload();
 					if(download.getState() == Download.ST_QUEUED || download.getState() == Download.ST_DOWNLOADING){
 						setToolBarTorrentIcons(false,true,true);
 					}else if(download.getState() == Download.ST_STOPPED){
@@ -1358,13 +1358,15 @@ public class DownloadManagerShell {
 			public void handleEvent(Event arg0) {
 				TableItem[] items = seedsTable.getSelection();
 				if(items == null) return;
-				if(items.length == 1){
+				if(items.length == 1){					
+					Container container = (Container)items[0].getData();
+					Download download = container.getDownload();					
+					int index = download.getPosition();
 					//Single line selection
-					setTorrentMoveButtons(false,false,false,false);
-					int index = seedsTable.indexOf(items[0]);
-					if(index==0 && seedsTable.getItemCount() == 1)
+					setTorrentMoveButtons(false,false,false,false);					
+					if(index==1 && seedsTable.getItemCount() == 1)
 						setTorrentMoveButtons(false,true,true,false);
-					else if(index == 0)
+					else if(index == 1)
 						setTorrentMoveButtons(false,true,true,true);
 					else if(index == seedsTable.getItemCount()-1)
 						setTorrentMoveButtons(true,true,true,false);
@@ -1373,8 +1375,6 @@ public class DownloadManagerShell {
 
 
 					//Torrent Control
-					Container container = (Container)items[0].getData();
-					Download download = container.getDownload();
 					if(download.getState() == Download.ST_QUEUED || download.getState() == Download.ST_SEEDING){
 						setToolBarTorrentIcons(false,true,true);
 					}else if(download.getState() == Download.ST_STOPPED){
