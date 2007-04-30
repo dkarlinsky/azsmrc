@@ -8,7 +8,6 @@ import lbms.azsmrc.plugin.main.User;
 import lbms.azsmrc.plugin.main.Utilities;
 import lbms.azsmrc.shared.DuplicatedUserException;
 import lbms.azsmrc.shared.RemoteConstants;
-import lbms.azsmrc.shared.UserNotFoundException;
 import lbms.tools.flexyconf.ContentProvider;
 import lbms.tools.flexyconf.FCInterface;
 import lbms.tools.flexyconf.FlexyConfiguration;
@@ -367,13 +366,9 @@ public class GUIEditUser {
 			rights3.setEnabled(true);
 		}
 
-		try {
-			if(!Plugin.getXMLConfig().getUser(Plugin.LOGGED_IN_USER).checkRight(RemoteConstants.RIGHTS_ADMIN)){
-				combo.setEnabled(false);
-			}
-		} catch (UserNotFoundException e3) {
-			//The user himself is always logged in to do this, so this error should never happen
-			e3.printStackTrace();
+
+		if(!Plugin.getCurrentUser().checkRight(RemoteConstants.RIGHTS_ADMIN)){
+			combo.setEnabled(false);
 		}
 
 

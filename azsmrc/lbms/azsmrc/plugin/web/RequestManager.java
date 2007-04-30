@@ -592,7 +592,7 @@ public class RequestManager {
 
 				String hash = xmlRequest.getAttributeValue("hash");
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
-				if (singleUser || user.hasDownload(hash)) {
+				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
 					try {
 						Download dl = getDownloadByHash (hash);
 						User[] users = Plugin.getXMLConfig().getUsersOfDownload(dl);
@@ -624,7 +624,7 @@ public class RequestManager {
 
 				String hash = xmlRequest.getAttributeValue("hash");
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
-				if (singleUser || user.hasDownload(hash)) {
+				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
 					try {
 						Download dl = getDownloadByHash (hash);
 						dl.stop();
@@ -641,7 +641,7 @@ public class RequestManager {
 
 				String hash = xmlRequest.getAttributeValue("hash");
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
-				if (singleUser || user.hasDownload(hash)) {
+				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
 					try {
 						Download dl = getDownloadByHash (hash);
 						dl.stopAndQueue();
@@ -658,7 +658,7 @@ public class RequestManager {
 
 				String hash = xmlRequest.getAttributeValue("hash");
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
-				if (singleUser || user.hasDownload(hash)) {
+				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
 					try {
 						Download dl = getDownloadByHash (hash);
 						dl.restart();
@@ -692,7 +692,7 @@ public class RequestManager {
 
 				String hash = xmlRequest.getAttributeValue("hash");
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
-				if (singleUser || user.hasDownload(hash)) {
+				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
 					try {
 						Download dl = getDownloadByHash (hash);
 						dl.setMaximumDownloadKBPerSecond(xmlRequest.getAttribute("limit").getIntValue());
@@ -711,7 +711,7 @@ public class RequestManager {
 
 				String hash = xmlRequest.getAttributeValue("hash");
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
-				if (singleUser || user.hasDownload(hash)) {
+				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
 					try {
 						Download dl = getDownloadByHash (hash);
 						dl.setUploadRateLimitBytesPerSecond(xmlRequest.getAttribute("limit").getIntValue());
@@ -730,7 +730,7 @@ public class RequestManager {
 
 				String hash = xmlRequest.getAttributeValue("hash");
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
-				if (singleUser || user.hasDownload(hash)) {
+				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
 					try {
 						Download dl = getDownloadByHash (hash);
 						dl.start();
@@ -747,7 +747,7 @@ public class RequestManager {
 
 				String hash = xmlRequest.getAttributeValue("hash");
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
-				if (singleUser || user.hasDownload(hash)) {
+				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
 					try {
 						int newpos = xmlRequest.getAttribute("position").getIntValue();
 						Download dl = getDownloadByHash (hash);
@@ -767,7 +767,7 @@ public class RequestManager {
 
 				String hash = xmlRequest.getAttributeValue("hash");
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
-				if ((singleUser || user.hasDownload(hash)) && user.checkAccess(RemoteConstants.RIGHTS_FORCESTART)) {
+				if ((singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) && user.checkAccess(RemoteConstants.RIGHTS_FORCESTART)) {
 					try {
 						Download dl = getDownloadByHash (hash);
 						dl.setForceStart(Boolean.parseBoolean(xmlRequest.getAttributeValue("start")));
@@ -784,7 +784,7 @@ public class RequestManager {
 
 				String hash = xmlRequest.getAttributeValue("hash");
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
-				if (singleUser || user.hasDownload(hash)) {
+				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
 					try {
 						int newpos = xmlRequest.getAttribute("position").getIntValue();
 						Download dl = getDownloadByHash (hash);
@@ -804,7 +804,7 @@ public class RequestManager {
 
 				String hash = xmlRequest.getAttributeValue("hash");
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
-				if (singleUser || user.hasDownload(hash)) {
+				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
 					try {
 						Download dl = getDownloadByHash (hash);
 						dl.moveUp();
@@ -821,7 +821,7 @@ public class RequestManager {
 
 				String hash = xmlRequest.getAttributeValue("hash");
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
-				if (singleUser || user.hasDownload(hash)) {
+				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
 					try {
 						Download dl = getDownloadByHash (hash);
 						dl.moveDown();
@@ -838,7 +838,7 @@ public class RequestManager {
 
 				String hash = xmlRequest.getAttributeValue("hash");
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
-				if (singleUser || user.hasDownload(hash)) {
+				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
 					try {
 						Download dl = getDownloadByHash (hash);
 						dl.requestTrackerScrape(false);
@@ -855,7 +855,7 @@ public class RequestManager {
 
 				String hash = xmlRequest.getAttributeValue("hash");
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
-				if (singleUser || user.hasDownload(hash)) {
+				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
 					try {
 						Download dl = getDownloadByHash (hash);
 						dl.requestTrackerAnnounce(false);
@@ -872,7 +872,7 @@ public class RequestManager {
 
 				String hash = xmlRequest.getAttributeValue("hash");
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
-				if (singleUser || user.hasDownload(hash)) {
+				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
 					try {
 						final Download dl = getDownloadByHash (hash);
 						final File target = new File (xmlRequest.getAttributeValue("target"));
@@ -907,7 +907,7 @@ public class RequestManager {
 				String hash = xmlRequest.getAttributeValue("hash");
 				response.setAttribute("switch", "listTransfers");
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
-				if (singleUser || user.hasDownload(hash)) {
+				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
 					try {
 						Element transferList = new Element("Transfers");
 						int options = xmlRequest.getAttribute("options").getIntValue();
@@ -998,7 +998,7 @@ public class RequestManager {
 				String hash = xmlRequest.getAttributeValue("hash");
 				response.setAttribute("hash", hash);
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
-				if (singleUser || user.hasDownload(hash)) {
+				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
 					try {
 						Download dl = getDownloadByHash (hash);
 						DiskManagerFileInfo[] dmfi=  dl.getDiskManagerFileInfo();
@@ -1028,7 +1028,7 @@ public class RequestManager {
 
 				String hash = xmlRequest.getAttributeValue("hash");
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
-				if (singleUser || user.hasDownload(hash)) {
+				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
 					try {
 						Download dl = getDownloadByHash (hash);
 						DiskManagerFileInfo[] dmfi=  dl.getDiskManagerFileInfo();
@@ -1059,7 +1059,7 @@ public class RequestManager {
 			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException{
 				String hash = xmlRequest.getAttributeValue("hash");
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
-				if (singleUser || user.hasDownload(hash)) {
+				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
 					try {
 						Download dl = getDownloadByHash (hash);
 						Torrent tor = dl.getTorrent();

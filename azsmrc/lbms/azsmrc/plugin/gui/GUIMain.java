@@ -42,28 +42,8 @@ public class GUIMain {
 	 * @param composite
 	 */
 	public static void open(Composite composite){
-		final User currentUser;
-		try {
-			currentUser = Plugin.getXMLConfig().getUser(Plugin.LOGGED_IN_USER);
-		} catch (UserNotFoundException e2) {
+		final User currentUser = Plugin.getCurrentUser();
 
-			Plugin.addToLog(e2.toString());
-			e2.printStackTrace();
-
-			MessageBox mb = new MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
-			mb.setText(Plugin.getLocaleUtilities().getLocalisedMessageText("General.UserNotFoundError.MessageBox.title"));
-			mb.setMessage(Plugin.getLocaleUtilities().getLocalisedMessageText("General.UserNotFoundError.MessageBox.message"));
-			mb.open();
-			//Destroy the login on the main composite
-			Control[] controls = View.composite.getChildren();
-			for(int i = 0; i < controls.length; i++){
-				controls[i].dispose();
-			}
-
-			//Redraw the Composite
-			GUILogin.openLogin(View.composite);
-			return;
-		}
 		final boolean isAdmin = currentUser.checkAccess(RemoteConstants.RIGHTS_ADMIN);
 
 		//------------UserTable and it's toolbar-----------\\
@@ -183,7 +163,7 @@ public class GUIMain {
 		logout.setToolTipText(Plugin.getLocaleUtilities().getLocalisedMessageText("GUIMain.userTable_toolbar.logout"));
 		logout.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
-				Plugin.LOGGED_IN_USER = null;
+				Plugin.setCurrentUser(null);
 				Plugin.getDisplay().asyncExec(new Runnable (){
 					public void run () {
 
@@ -261,7 +241,7 @@ public class GUIMain {
 				if(users == null || users.length == 0) return;
 				UserTableItemAdapter utia;
 				try {
-					utia = new UserTableItemAdapter(users[index],Plugin.getXMLConfig().getUser(Plugin.LOGGED_IN_USER));
+					utia = new UserTableItemAdapter(users[index],Plugin.getCurrentUser());
 					item = utia.getTableItem(item);
 
 					//gray if needed

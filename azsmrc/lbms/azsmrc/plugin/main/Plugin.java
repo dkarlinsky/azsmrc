@@ -43,8 +43,14 @@ import org.gudy.azureus2.plugins.tracker.web.TrackerWebContext;
 import org.gudy.azureus2.plugins.ui.UIInstance;
 import org.gudy.azureus2.plugins.ui.UIManager;
 import org.gudy.azureus2.plugins.ui.UIManagerListener;
+import org.gudy.azureus2.plugins.ui.menus.MenuItem;
+import org.gudy.azureus2.plugins.ui.menus.MenuItemFillListener;
+import org.gudy.azureus2.plugins.ui.menus.MenuItemListener;
 import org.gudy.azureus2.plugins.ui.model.BasicPluginConfigModel;
 import org.gudy.azureus2.plugins.ui.model.BasicPluginViewModel;
+import org.gudy.azureus2.plugins.ui.tables.TableContextMenuItem;
+import org.gudy.azureus2.plugins.ui.tables.TableManager;
+import org.gudy.azureus2.plugins.ui.tables.TableRow;
 import org.gudy.azureus2.plugins.update.Update;
 import org.gudy.azureus2.plugins.update.UpdateCheckInstance;
 import org.gudy.azureus2.plugins.update.UpdateCheckInstanceListener;
@@ -63,8 +69,6 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 	private static LocaleUtilities locale_utils;
 
-	public static String LOGGED_IN_USER;
-
 	PluginInterface pluginInterface;
 	private static PluginInterface pi;
 	private static Display display;
@@ -82,6 +86,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 	private static Map<String,Section> psSections = new HashMap<String, Section>();
 
 	private static boolean firstRun;
+	private static User currentUser = null;
 
 	//new API startup code
 	UISWTInstance swtInstance = null;
@@ -420,6 +425,99 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 			}
 		});
 
+		TableContextMenuItem incompleteMenuItem = pluginInterface.getUIManager().getTableManager().addContextMenuItem(TableManager.TABLE_MYTORRENTS_INCOMPLETE, "azsmrc.tablemenu.useritem");
+		TableContextMenuItem completeMenuItem = pluginInterface.getUIManager().getTableManager().addContextMenuItem(TableManager.TABLE_MYTORRENTS_COMPLETE, "azsmrc.tablemenu.useritem");
+
+		incompleteMenuItem.setStyle(MenuItem.STYLE_MENU);
+		completeMenuItem.setStyle(MenuItem.STYLE_MENU);
+
+
+		MenuItemFillListener fillListener = new MenuItemFillListener () {
+			/* (non-Javadoc)
+			 * @see org.gudy.azureus2.plugins.ui.menus.MenuItemFillListener#menuWillBeShown(org.gudy.azureus2.plugins.ui.menus.MenuItem, java.lang.Object)
+			 */
+			public void menuWillBeShown(MenuItem menu, Object data) {
+				menu.removeAllChildItems();
+				TableManager tm = pluginInterface.getUIManager().getTableManager();
+				if (getCurrentUser() != null || getCurrentUser().checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+					TableRow[] rows = (TableRow[])data;
+					if (rows.length == 0) return;
+					if (rows.length == 1) {
+						TableContextMenuItem displayState = tm.addContextMenuItem((TableContextMenuItem)menu, "");
+						displayState.setEnabled(false);
+
+						TableContextMenuItem separator = tm.addContextMenuItem((TableContextMenuItem)menu, "");
+						separator.setStyle(MenuItem.STYLE_SEPARATOR);
+
+						Download dl = (Download)rows[0].getDataSource();
+
+						if (MultiUser.isPublicDownload(dl)) {
+
+							displayState.setText("PUBLIC");
+
+						} else {
+
+							TableContextMenuItem removeAllUsers = tm.addContextMenuItem((TableContextMenuItem)menu, "azsmrc.tablemenu.removeallusers");
+							removeAllUsers.addMultiListener(new MenuItemListener() {
+								/* (non-Javadoc)
+								 * @see org.gudy.azureus2.plugins.ui.menus.MenuItemListener#selected(org.gudy.azureus2.plugins.ui.menus.MenuItem, java.lang.Object)
+								 */
+								public void selected(MenuItem menu, Object target) {
+									TableRow[] rows = (TableRow[])target;
+									for (int i=0;i<rows.length;i++) {
+										Download dl = (Download)rows[i].getDataSource();
+										MultiUser.removeUsersFromDownload(dl);
+									}
+								}
+							});
+
+							if (MultiUser.isSharedDownload(dl)) {
+								displayState.setText("SHARED");
+							} else {
+								displayState.setText(config.getUsersOfDownload(dl)[0].getUsername());
+							}
+						}
+
+					} else {
+						TableContextMenuItem removeAllUsers = tm.addContextMenuItem((TableContextMenuItem)menu, "azsmrc.tablemenu.removeallusers");
+						removeAllUsers.addMultiListener(new MenuItemListener() {
+							/* (non-Javadoc)
+							 * @see org.gudy.azureus2.plugins.ui.menus.MenuItemListener#selected(org.gudy.azureus2.plugins.ui.menus.MenuItem, java.lang.Object)
+							 */
+							public void selected(MenuItem menu, Object target) {
+								TableRow[] rows = (TableRow[])target;
+								for (int i=0;i<rows.length;i++) {
+									Download dl = (Download)rows[i].getDataSource();
+									MultiUser.removeUsersFromDownload(dl);
+								}
+							}
+						});
+					}
+					User[] users = config.getUsers();
+					for (final User u:users) {
+						TableContextMenuItem addToUser = tm.addContextMenuItem((TableContextMenuItem)menu, "");
+						addToUser.setText("Add to: "+u.getUsername());
+						addToUser.addMultiListener(new MenuItemListener() {
+							public void selected(MenuItem menu, Object target) {
+								TableRow[] rows = (TableRow[])target;
+								for (int i=0;i<rows.length;i++) {
+									Download dl = (Download)rows[i].getDataSource();
+									MultiUser.addUserToDownload(u, dl);
+									System.out.println("Adding "+dl.getName()+" to "+u.getUsername());
+								}
+							};
+						});
+					}
+				} else {
+					TableContextMenuItem displayState = tm.addContextMenuItem((TableContextMenuItem)menu, "");
+					displayState.setEnabled(false);
+					displayState.setText("You are not logged in or don't have Admin access.");
+				}
+			}
+		};
+		incompleteMenuItem.addFillListener(fillListener);
+		completeMenuItem.addFillListener(fillListener);
+
 	}
 
 	/**
@@ -550,6 +648,19 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		return logger;
 	}
 
+	/**
+	 * @return the currentUser
+	 */
+	public static User getCurrentUser() {
+		return currentUser;
+	}
+
+	/**
+	 * @param currentUser the currentUser to set
+	 */
+	public static void setCurrentUser(User currentUser) {
+		Plugin.currentUser = currentUser;
+	}
 
 	/**
 	 * Returns the localeUtilities as defined by the pluginInterface
@@ -558,7 +669,6 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 	public static LocaleUtilities getLocaleUtilities(){
 		return locale_utils;
 	}
-
 
 	/**
 	 * @return Returns the latestUpdate.
