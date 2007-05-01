@@ -6,9 +6,9 @@ import org.eclipse.swt.SWT;
 
 import lbms.azsmrc.remote.client.plugins.AzSMRCInterface;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
-import lbms.azsmrc.remote.client.swtgui.dialogs.MessageDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.MessageSlideShell;
-import lbms.azsmrc.remote.client.swtgui.dialogs.ScrapeDialog;
+import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByFileDialog;
+
 
 /**
  * @author Damokles
@@ -78,10 +78,10 @@ public class AzSMRCInterfaceImpl implements AzSMRCInterface {
 	}
 
 	public void scrapeTorrent(File file) {
-		ScrapeDialog.openFileAndScrape(file);
+		OpenByFileDialog.openFilesAndScrape(new File[]{file});
 	}
 
 	public void scrapeTorrent(String url) {
-		ScrapeDialog.openURLandScrape(url);
+		OpenByFileDialog.openURLandScrape(url);
 	}
 }

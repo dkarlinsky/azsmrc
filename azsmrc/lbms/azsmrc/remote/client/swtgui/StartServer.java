@@ -14,7 +14,6 @@ import java.util.StringTokenizer;
 
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByFileDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByURLDialog;
-import lbms.azsmrc.remote.client.swtgui.dialogs.ScrapeDialog;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.tools.HTTPDownload;
 
@@ -224,7 +223,7 @@ public class StartServer {
 								dl.call();
 								torFile.deleteOnExit();
 								if (!dl.hasFailed()) {
-									ScrapeDialog.openFileAndScrape(torFile);
+									OpenByFileDialog.openFilesAndScrape(new File[]{torFile});
 								}
 							} catch (Throwable e) {
 								e.printStackTrace();
@@ -235,8 +234,11 @@ public class StartServer {
 					t.setPriority(Thread.MIN_PRIORITY);
 					t.start();
 				}
-				else
-					ScrapeDialog.openFileAndScrape(new File(file_name));
+				else{
+					File file = new File(file_name);
+					OpenByFileDialog.openFilesAndScrape(new File[]{file});
+				}
+					
 
 			} else {
 				if( file_name.toUpperCase().startsWith( "HTTP" ) || file_name.toUpperCase().startsWith( "MAGNET:" ) )

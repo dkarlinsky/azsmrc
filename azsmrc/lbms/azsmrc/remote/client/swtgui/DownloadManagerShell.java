@@ -54,7 +54,6 @@ import lbms.azsmrc.remote.client.swtgui.dialogs.MoveDataDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.NormalUserDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByFileDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByURLDialog;
-import lbms.azsmrc.remote.client.swtgui.dialogs.ScrapeDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ServerUpdateDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.TableColumnEditorDialog;
 import lbms.azsmrc.remote.client.swtgui.tabs.ConsoleTab;
@@ -426,14 +425,6 @@ public class DownloadManagerShell {
 		});
 
 
-
-		MenuItem menuScraper = new MenuItem(toolSubmenu,SWT.PUSH);
-		menuScraper.setText(I18N.translate(PFX + "menu.tools.scrapetorrent"));
-		menuScraper.addListener(SWT.Selection, new Listener(){
-			public void handleEvent(Event e){
-				ScrapeDialog.open();
-			}
-		});
 
 
 		MenuItem menuConsole = new MenuItem(toolSubmenu,SWT.PUSH);

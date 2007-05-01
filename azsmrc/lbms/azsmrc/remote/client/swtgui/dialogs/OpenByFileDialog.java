@@ -7,6 +7,7 @@ package lbms.azsmrc.remote.client.swtgui.dialogs;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -33,6 +34,8 @@ import lbms.azsmrc.remote.client.torrent.scraper.Scraper;
 import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.shared.EncodingUtil;
 import lbms.azsmrc.shared.SWTSafeRunnable;
+import lbms.tools.DownloadListener;
+import lbms.tools.TorrentDownload;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
@@ -640,7 +643,7 @@ public class OpenByFileDialog {
 					messageBox.open();
 					return;
 				} else {
-					Iterator iterator = tMap.keySet().iterator();
+					Iterator<String> iterator = tMap.keySet().iterator();
 					while (iterator.hasNext()) {
 						AddTorrentContainer container = tMap.get(iterator.next());
 
@@ -731,7 +734,9 @@ public class OpenByFileDialog {
 
 	}
 
-
+	/*
+	 * Add files to the instance as a string[]
+	 */
 	private void addFileToInstance(final String[] fileNames){
 		// See if we come in with a file already
 		if (fileNames != null) {
@@ -758,6 +763,34 @@ public class OpenByFileDialog {
 		}
 	}
 
+	
+	/*
+	 * Add files to the instance as a string[]
+	 */
+	private void addFileToInstance(final File[] files){
+		// See if we come in with a file already
+		if (files != null) {
+			try {
+				for (File file : files) {					
+					if (file.isFile() && file.canRead()) {
+						AddTorrentContainer container = new AddTorrentContainer(file);
+						TableItem item = new TableItem(filesTable, SWT.NULL);
+						item.setText(0, container.getName());
+						item.setText(1, container.getFilePath());
+						item.setData(container);
+						tMap.put(container.getName(), container);
+						filesTable.setSelection(item);
+						generateDetails(container.getName());
+						lastDir = container.getFilePath();
+						setTotalSize();
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 
 	private void createDragDrop(final Table parent) {
 		try {
@@ -918,7 +951,7 @@ public class OpenByFileDialog {
 
 	public void setTotalSize(){
 		long totalSize = 0;
-		Iterator it = tMap.keySet().iterator();
+		Iterator<String> it = tMap.keySet().iterator();
 		while (it.hasNext()){
 			AddTorrentContainer atc = tMap.get(it.next());
 			if(atc != null)
@@ -1039,44 +1072,6 @@ public class OpenByFileDialog {
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		scrape.setLayoutData(gd);
 
-/*		//button for Add Torrent
-		final Button add = new Button(comboComp, SWT.PUSH);
-		add.setText(I18N.translate(PFX + "add_button.text"));
-		add.setToolTipText(I18N.translate(PFX + "add_button.tooltip"));
-		gd = new GridData(GridData.FILL_HORIZONTAL | GridData.HORIZONTAL_ALIGN_END);
-		add.setLayoutData(gd);
-		add.addListener(SWT.Selection, new Listener(){
-			public void handleEvent(Event arg0) {
-				if(RCMain.getRCMain().connected()){
-					if(atc.isWholeFileSent()){
-						RCMain.getRCMain().getClient().getDownloadManager().addDownload(atc.getTorrentFile());
-					}else{
-						int[] props = atc.getFileProperties();
-						//Main add to Azureus
-						RCMain.getRCMain().getClient().getDownloadManager().addDownload(atc.getTorrentFile(), props);
-					}
-					if(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty("delete.on.send", "false"))){
-						if(!atc.deleteFile()){
-							MessageBox messageBox = new MessageBox(shell,
-									SWT.ICON_ERROR | SWT.OK);
-							messageBox.setText(I18N.translate("global.error"));
-							messageBox.setMessage(I18N.translate(PFX + "add_button.error1.message") + " " + atc.getTorrentFile().getName());
-							messageBox.open();
-						}
-					}
-				}else{
-					//we are not connected .. so alert the user
-					MessageBox messageBox = new MessageBox(add.getShell(),SWT.ICON_INFORMATION | SWT.OK);
-					messageBox.setText(I18N.translate(PFX + "add_button.error2.title"));
-					messageBox.setMessage(I18N.translate(PFX + "add_button.error2.message"));
-					messageBox.open();
-					return;
-				}
-
-			}
-
-		});
-*/
 		//Label for status
 		final Label status = new Label(parent,SWT.NULL);
 		if(sr != null)
@@ -1355,5 +1350,84 @@ public class OpenByFileDialog {
 		tab.setControl(parent);
 		tabFolder.setSelection(tab);
 	}
+	
+
+
+
+
+	/**
+	 * Opens the scrape dialog with an array of files already in place
+	 * @param File[] torrents
+	 */
+	public static void openFilesAndScrape(final File[] torrents) {
+		
+			final Display display = RCMain.getRCMain().getDisplay();
+			if(display == null) return;
+			display.syncExec(new SWTSafeRunnable() {
+				/* (non-Javadoc)
+				 * @see lbms.azsmrc.shared.SWTSafeRunnable#runSafe()
+				 */
+				@Override
+				public void runSafe() {
+					if (instance == null || instance.shell == null || instance.shell.isDisposed()){
+						new OpenByFileDialog(display);
+						instance.addFileToInstance(torrents);
+					} else{
+						instance.shell.setActive();
+						instance.addFileToInstance(torrents);						
+					}
+				}
+			});	
+	}
+	
+	
+	
+
+	/**
+	 * Opens the scrape dialog with a Torrent that needs to be downloaded first.
+	 *
+	 * It may fail to download the torrent and to display the scrapeDialog.
+	 * @param urlStr torrent URL
+	 */
+	public static void openURLandScrape (String urlStr) {
+		try {
+			final URL url = new URL (urlStr);
+			Thread t = new Thread (new Runnable() {
+				public void run() {
+					try {
+						File torTemp = File.createTempFile("azsmrc", ".torrent");
+						torTemp.deleteOnExit();
+						TorrentDownload tdl = new TorrentDownload (url,torTemp);
+						if (RCMain.getRCMain().getProxy() != null)
+							tdl.setProxy(RCMain.getRCMain().getProxy());
+						tdl.addDownloadListener(new DownloadListener() {
+
+							public void debugMsg(String msg) {
+								logger.debug(msg);
+							}
+
+							public void progress(long bytesRead, long bytesTotal) {}
+							public void stateChanged(int oldState, int newState) {}
+						});
+						tdl.call();
+						if (!tdl.hasFailed() && tdl.hasFinished()) {
+							openFilesAndScrape(new File[] {torTemp});
+						} else {
+							logger.debug("Download torrent for scrape failed: "+tdl.getFailureReason());
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+			t.setDaemon(true);
+			t.setPriority(Thread.MIN_PRIORITY);
+			t.start();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 
 }// EOF
