@@ -99,6 +99,7 @@ public class ImageRepository {
 		registerImage("lbms/azsmrc/remote/client/swtgui/resources/toolbar/queue_large.png","toolbar_queue",255);
 		registerImage("lbms/azsmrc/remote/client/swtgui/resources/toolbar/remove_large.png","toolbar_remove",255);
 		registerImage("lbms/azsmrc/remote/client/swtgui/resources/toolbar/stop_large.png","toolbar_stop",255);
+		registerImage("lbms/azsmrc/remote/client/swtgui/resources/toolbar/scrape_large.png","scrape",255);
 
 		//paypal and amazon
 		registerImage("lbms/azsmrc/remote/client/swtgui/resources/paypal.gif","paypal",255);

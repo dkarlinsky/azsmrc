@@ -152,7 +152,7 @@ public class OpenByFileDialog {
 
 		Composite buttonComp = new Composite(comp, SWT.NULL);
 		GridLayout gl = new GridLayout();
-		gl.numColumns = 2;
+		gl.numColumns = 3;
 		gl.marginHeight = 0;
 		gl.marginWidth = 0;
 		buttonComp.setLayout(gl);
@@ -163,8 +163,7 @@ public class OpenByFileDialog {
 		Button open_file_button = new Button(buttonComp, SWT.PUSH);
 		open_file_button.setToolTipText(I18N.translate(PFX + "openfile.tooltip"));
 		open_file_button.setText(I18N.translate(PFX + "openfile.text"));
-		if(Utilities.isLinux())
-			open_file_button.setImage(ImageRepository.getImage("open_by_file"));
+		open_file_button.setImage(ImageRepository.getImage("open_by_file"));
 		open_file_button.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				FileDialog dialog = new FileDialog(shell, SWT.OPEN);
@@ -250,10 +249,9 @@ public class OpenByFileDialog {
 		Button remove = new Button(buttonComp, SWT.PUSH);
 		remove.setText(I18N.translate(PFX + "remove.text"));
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
-		gridData.grabExcessHorizontalSpace = true;
+		gridData.grabExcessHorizontalSpace = false;
 		remove.setLayoutData(gridData);
-		if(Utilities.isLinux())
-			remove.setImage(ImageRepository.getImage("toolbar_remove"));
+		remove.setImage(ImageRepository.getImage("toolbar_remove"));
 		remove.addSelectionListener(new SelectionListener() {
 
 			public void widgetSelected(SelectionEvent arg0) {
@@ -285,8 +283,31 @@ public class OpenByFileDialog {
 			}
 
 		});
+		
+		Button scrapeSelected = new Button(buttonComp, SWT.PUSH);
+		scrapeSelected.setText(I18N.translate(PFX + "scrapeSelected.button.text"));
+		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		gridData.grabExcessHorizontalSpace = true;
+		scrapeSelected.setLayoutData(gridData);
+		scrapeSelected.setImage(ImageRepository.getImage("scrape"));
+		scrapeSelected.addSelectionListener(new SelectionListener() {
 
+			public void widgetSelected(SelectionEvent arg0) {
+				int[] items = filesTable.getSelectionIndices();
+				if (items.length == 0)
+					return;
+				for (int index : items) {
+					TableItem item = filesTable.getItem(index);
+					if(tMap.containsKey(item.getText(0))){
+						torrentTabOpen(tabFolder,tMap.get(item.getText(0)));						
+					}
+				}
+			}
 
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+			}
+
+		});
 
 		//      -------Server Free Disk stuff -----------\\
 		final Group details3 = new Group(comp,SWT.NULL);
@@ -409,7 +430,7 @@ public class OpenByFileDialog {
 		gridData.grabExcessVerticalSpace = true;
 		sash.setLayoutData(gridData);
 
-		filesTable = new Table(sash, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION);
+		filesTable = new Table(sash, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION);
 		gridData = new GridData(GridData.FILL_BOTH);
 		gridData.horizontalSpan = 3;
 		gridData.verticalSpan = 30;
@@ -1069,6 +1090,7 @@ public class OpenByFileDialog {
 		//button for Scrape -- still in comboComp
 		Button scrape = new Button(comboComp,SWT.PUSH);
 		scrape.setText(I18N.translate(PFX + "scrape_button.text"));
+		scrape.setImage(ImageRepository.getImage("scrape"));
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		scrape.setLayoutData(gd);
 
@@ -1372,9 +1394,14 @@ public class OpenByFileDialog {
 					if (instance == null || instance.shell == null || instance.shell.isDisposed()){
 						new OpenByFileDialog(display);
 						instance.addFileToInstance(torrents);
+						
+						for(File torrent:torrents)
+							instance.torrentTabOpen(instance.tabFolder,instance.tMap.get(torrent.getName()));
 					} else{
 						instance.shell.setActive();
-						instance.addFileToInstance(torrents);						
+						instance.addFileToInstance(torrents);	
+						for(File torrent:torrents)
+							instance.torrentTabOpen(instance.tabFolder,instance.tMap.get(torrent.getName()));
 					}
 				}
 			});	

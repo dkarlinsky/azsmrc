@@ -107,6 +107,7 @@ dialog.openbyfiledialog.openfile.filedialog.text=Choose Torrent File to Send to 
 dialog.openbyfiledialog.openfile.text=Choose a file to upload
 dialog.openbyfiledialog.openfile.tooltip=Choose a file to upload
 dialog.openbyfiledialog.remove.text=Remove selected from list
+dialog.openbyfiledialog.scrapeSelected.button.text=Scrape selected
 dialog.openbyfiledialog.scrape_button.text=Scrape
 dialog.openbyfiledialog.sendfiles.error1=Please provide a file to upload.
 dialog.openbyfiledialog.sendfiles.error2=Error deleting
