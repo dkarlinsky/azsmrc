@@ -31,13 +31,14 @@ public class MultiUserDownloadListener implements org.gudy.azureus2.plugins.down
 			final boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 
 
-			if (user_attrib != null && !user_attrib.equals(MultiUser.PUBLIC_USER_NAME)) {
+			if (user_attrib != null && !MultiUser.isPublicDownload(download)) {
 				try {
+
+					//only notify and not move if download is not in def save dir
 					if (!download.getSavePath().contains(Plugin.getPluginInterface().getPluginconfig().getUnsafeStringParameter("Default save path",null))) {
 
-
 						if (!singleUser){
-							if (user_attrib.equalsIgnoreCase(MultiUser.SHARED_USER_NAME) ) {
+							if (MultiUser.isSharedDownload(download)) {
 								User[] users = Plugin.getXMLConfig().getUsersOfDownload(download);
 								for (int i=0;i<users.length-1;i++) {
 									users[i].eventDownloadFinished(download);
@@ -55,8 +56,8 @@ public class MultiUserDownloadListener implements org.gudy.azureus2.plugins.down
 						return;//not in standart save path
 					}
 
-
-					if (user_attrib.equalsIgnoreCase(MultiUser.SHARED_USER_NAME) ) { //Multiple owner
+					//move download as well
+					if (MultiUser.isSharedDownload(download)) { //Multiple owner
 						DiskManagerFileInfo[] fileInfo = download.getDiskManagerFileInfo();
 						final File[] files = new File[fileInfo.length];
 						for (int i=0;i<files.length;i++) {
@@ -115,10 +116,7 @@ public class MultiUserDownloadListener implements org.gudy.azureus2.plugins.down
 				}
 
 
-			} else if (!singleUser){
-
 			}
-
 
 			if (singleUser) {
 				User[] users = Plugin.getXMLConfig().getUsers();

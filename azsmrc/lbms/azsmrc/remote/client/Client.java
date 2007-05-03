@@ -56,10 +56,10 @@ import org.jdom.output.XMLOutputter;
 
 /**
  * This class is the connection to the Azureus Server.
- * 
+ *
  * This class is responsible for all requests send to the Azureus server.
  * The response is handled by @see ResponseManager.
- * 
+ *
  * @author Damokles
  *
  */
@@ -79,6 +79,7 @@ public class Client {
 	private int failedConnections;
 	private static Logger logger;
 	private boolean connect;
+	private HttpURLConnection connection = null;
 
 	//special send variables
 	private boolean updateDownloads;
@@ -145,7 +146,7 @@ public class Client {
 
 	/**
 	 * Reset Variables that are Server specific.
-	 * 
+	 *
 	 * Call this when you disconnect from a Server.
 	 */
 	private void reset() {
@@ -170,6 +171,9 @@ public class Client {
 	 */
 	public void disconnect() {
 		connect = false;
+		if (connection != null) {
+			connection.disconnect();
+		}
 		callConnectionListener(ConnectionListener.ST_DISCONNECTED);
 	}
 
@@ -182,7 +186,7 @@ public class Client {
 
 	/**
 	 * Starts a transaction.
-	 * 
+	 *
 	 * A transaction will queue all requests while until it is commited
 	 * or send by timeout.
 	 * @return true if a transaction was active already
@@ -203,7 +207,7 @@ public class Client {
 
 	/**
 	 * Commits the transaction.
-	 * 
+	 *
 	 * Commits the active transaction.
 	 */
 	public void transactionCommit() {
@@ -215,7 +219,7 @@ public class Client {
 
 	/**
 	 * Sends the queue to the server.
-	 * 
+	 *
 	 * This is Threaded, if a transaction is active
 	 * it will return immediately.
 	 */
@@ -274,7 +278,7 @@ public class Client {
 		if (server == null) return;
 		InputStream is = null;
 		GZIPOutputStream gos = null;
-		HttpURLConnection connection = null;
+		connection = null;
 		try {
 			for (int i=0;i<2;i++)
 				try {
@@ -297,6 +301,7 @@ public class Client {
 					callConnectionListener(ConnectionListener.ST_CONNECTING);
 					connection.setDoOutput(true);
 					connection.setDoInput(true);
+					connection.setConnectTimeout(5000);
 
 					connection.setRequestProperty("X-Content-Encoding", "gzip");
 					connection.setRequestProperty("Content-type", "text/xml");
@@ -315,6 +320,7 @@ public class Client {
 					} else {
 						is = sis;
 					}
+
 					try {
 						logger.debug("Request ("+DisplayFormatters.formatByteCountToBase10KBEtc(sos.getBytesWritten())+"):");
 						new XMLOutputter(Format.getPrettyFormat()).output(req, System.out);		//Request
@@ -364,6 +370,7 @@ public class Client {
 				if (gos!=null) gos.close();
 			} catch (IOException e) {
 			}
+			connection = null;
 		}
 	}
 
@@ -380,7 +387,7 @@ public class Client {
 
 	/**
 	 * Add an Element to the Transaction Queue.
-	 * 
+	 *
 	 * NOTE: This is only public because it is used by PluginClientImpl
 	 * otherwise it should not be called.
 	 * @param e
@@ -831,7 +838,7 @@ public class Client {
 
 	/**
 	 * Send an IPC call to Azureus
-	 * 
+	 *
 	 * @param pluginID the pluginID of the target plugin
 	 * @param senderID the local (plugin)ID of the sender
 	 * @param method the remote method to call
@@ -879,9 +886,9 @@ public class Client {
 
 	/**
 	 * Loads a Torrent file into an XML element.
-	 * 
+	 *
 	 * The Torrent Data is Base64 encoded
-	 * 
+	 *
 	 * @param torrentFile the Torrent to read
 	 * @return the Element containing the Torrent data
 	 * @throws IOException
@@ -914,9 +921,9 @@ public class Client {
 
 	/**
 	 * Loads a Torrent file into an XML element.
-	 * 
+	 *
 	 * The Torrent Data is Base64 encoded
-	 * 
+	 *
 	 * @param torrentFile the Torrent to read
 	 * @return the Element containing the Torrent data
 	 * @throws TOTorrentException
@@ -1039,7 +1046,7 @@ public class Client {
 
 	/**
 	 * Verifies Parameters
-	 * 
+	 *
 	 * @param key
 	 * @param value
 	 * @param type
@@ -1191,9 +1198,9 @@ public class Client {
 
 	/**
 	 * Set the proxy to use.
-	 * 
+	 *
 	 * Set either proxy, or null to deactivate proxy use.
-	 * 
+	 *
 	 * @param proxy the proxy to set
 	 */
 	public void setProxy(Proxy proxy) {
