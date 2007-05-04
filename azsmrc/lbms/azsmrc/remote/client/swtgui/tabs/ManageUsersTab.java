@@ -567,14 +567,6 @@ public class ManageUsersTab {
 							return;
 						}
 
-						if(outputDir.getText().equals("")){
-							MessageBox mb = new MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
-							mb.setText("Error");
-							mb.setMessage("Output directory cannot be empty.");
-							mb.open();
-							return;
-						}
-
 						if(password.getText().equalsIgnoreCase(verify.getText())){
 							try {
 								//System.out.println("Password to send: "+ password.getText());
