@@ -49,6 +49,7 @@ import lbms.azsmrc.remote.client.swtgui.container.Container;
 import lbms.azsmrc.remote.client.swtgui.container.DownloadContainer;
 import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ConnectionDialog;
+import lbms.azsmrc.remote.client.swtgui.dialogs.CreateTorrentDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.InputShell;
 import lbms.azsmrc.remote.client.swtgui.dialogs.MoveDataDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.NormalUserDialog;
@@ -424,7 +425,13 @@ public class DownloadManagerShell {
 			}
 		});
 
-
+		MenuItem menuCreateTorrent = new MenuItem(toolSubmenu, SWT.PUSH);
+		menuCreateTorrent.setText(I18N.translate(PFX + "menu.tools.createTorrent"));
+		menuCreateTorrent.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {				
+				CreateTorrentDialog.open();
+			}			
+		});
 
 
 		MenuItem menuConsole = new MenuItem(toolSubmenu,SWT.PUSH);
@@ -558,7 +565,7 @@ public class DownloadManagerShell {
 		refresh.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				if(RCMain.getRCMain().connected())
-					RCMain.getRCMain().getClient().getDownloadManager().update(true);
+					RCMain.getRCMain().getClient().getDownloadManager().update(true);				
 			}
 		});
 
