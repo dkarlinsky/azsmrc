@@ -9,14 +9,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Vector;
 
-import lbms.azsmrc.remote.client.RemoteInfo;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.tools.CryptoTools;
 
@@ -29,12 +31,16 @@ import org.eclipse.swt.program.Program;
  */
 public class ErrorReporter {
 
-	public final static String REPORT_URL = "http://azsmrc.sourceforge.net/reportError.php";
+	public final static String REPORT_URL = "http://azsmrc.sourceforge.net/reportError2.php";
 
 	private String errorLog = "";
 	private String email = "";
 	private String additionalInfo = "";
 	private String systemInfo = "";
+	private String os;
+	private String jvm;
+	private String swtVer;
+	private String azsmrcVersion;
 	private String hash = "";
 	private boolean init;
 
@@ -42,23 +48,44 @@ public class ErrorReporter {
 
 	public ErrorReporter () {
 		init();
+		readErrorLog();
+	}
+
+	public ErrorReporter (Throwable cause) {
+		init();
+		StringWriter buffer = new StringWriter();
+		PrintWriter writer = new PrintWriter(buffer);
+		while (cause != null) {
+			cause.printStackTrace(writer);
+			cause = cause.getCause();
+		}
+		errorLog = buffer.toString();
+		try {
+			hash = CryptoTools.formatByte(CryptoTools.messageDigest(errorLog.getBytes(), "SHA-1"),true);
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void init() {
 		if (init) return;
 		gatherSystemInfo();
-		readErrorLog();
 		init = true;
 	}
 
 	private void gatherSystemInfo() {
-		RemoteInfo rInfo = RCMain.getRCMain().getClient().getRemoteInfo();
-		systemInfo  = "OS: "+System.getProperty("os.name")+"\n"
-					+ "JVM: "+System.getProperty( "java.version" ) +" "+ System.getProperty( "java.vendor" ) +"\n"
-		 			+ "SWT Version: "+SWT.getVersion()+" "+SWT.getPlatform()+"\n"
-		 			+ "AzSMRC Version: "+RCMain.getRCMain().getAzsmrcProperties().getProperty("version")+"\n"
-		 			+ "AzSMRC Plugin: "+rInfo.getPluginVersion()+"\n"
-		 			+ "Azureus Version: "+rInfo.getAzureusVersion();
+		os = System.getProperty("os.name");
+		jvm = System.getProperty( "java.version" ) +" "+ System.getProperty( "java.vendor" );
+		swtVer = SWT.getVersion()+" "+SWT.getPlatform();
+		try {
+			azsmrcVersion = RCMain.getRCMain().getAzsmrcProperties().getProperty("version");
+		} catch (RuntimeException e) {
+			azsmrcVersion = "unkown please add this in the additional info field.";
+		}
+		systemInfo  = "OS: "+os+"\n"
+					+ "JVM: "+jvm +"\n"
+		 			+ "SWT Version: "+swtVer+"\n"
+		 			+ "AzSMRC Version: "+azsmrcVersion;
 	}
 
 	private void readErrorLog() {
@@ -104,7 +131,7 @@ public class ErrorReporter {
 						conn.setDoInput(true);
 						os = conn.getOutputStream();
 						OutputStreamWriter osw = new OutputStreamWriter(os);
-						String send = "error_log="+errorLog+"&hash="+hash+"&email="+email+"&additional_info="+additionalInfo+"&system_info="+systemInfo;
+						String send = "error_log="+errorLog+"&hash="+hash+"&email="+email+"&additional_info="+additionalInfo+"&os="+os+"&jvm="+jvm+"&swt="+swtVer+"&version="+azsmrcVersion;
 						System.out.println("Error Report: "+send);
 						osw.write(send);
 						osw.close();

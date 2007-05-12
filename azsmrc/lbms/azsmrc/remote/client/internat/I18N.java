@@ -49,6 +49,12 @@ public class I18N {
 	}
 
 	public static String translate (String key) {
+		if (!isInitialized() && defLocation != null)
+			try {
+				reload();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		return i18n.translate(key);
 	}
 

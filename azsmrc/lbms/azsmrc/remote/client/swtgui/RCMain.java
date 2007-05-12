@@ -51,6 +51,7 @@ import lbms.azsmrc.remote.client.events.HTTPErrorListener;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.pluginsimpl.PluginLoader;
 import lbms.azsmrc.remote.client.pluginsimpl.PluginManagerImpl;
+import lbms.azsmrc.remote.client.swing.CrashHandler;
 import lbms.azsmrc.remote.client.swtgui.container.DownloadContainer;
 import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ErrorDialog;
@@ -183,6 +184,7 @@ public class RCMain implements Launchable {
 			} finally {
 				if (fout != null)fout.close();
 			}
+			new CrashHandler(e);
 		}
 	}
 
@@ -589,7 +591,6 @@ public class RCMain implements Launchable {
 
 		SplashScreen.setProgressAndText("Loading I18N.",15);
 		try {
-			I18N.setDefault("lbms/azsmrc/remote/client/internat/default.lang");
 			if (properties.getProperty("language") != null) {
 				I18N.setLocalized("lbms/azsmrc/remote/client/internat/"+properties.getProperty("language")+".lang");
 			}
@@ -919,6 +920,8 @@ public class RCMain implements Launchable {
 
 	public RCMain () {
 		rcMain = this;
+		//set the langfile in case something needs it from the start
+		I18N.setDefault("lbms/azsmrc/remote/client/internat/default.lang");
 	}
 
 	private void shutdown() {
