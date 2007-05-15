@@ -6,11 +6,15 @@
 
 package lbms.azsmrc.remote.client.swing;
 
+import lbms.azsmrc.remote.client.internat.I18N;
+
 /**
  *
  * @author  Leonard
  */
 public class Helper extends javax.swing.JFrame {
+
+	private static final String PFX = "dialog.helperdialog.";
 
 	/** Creates new form Helper */
 	public Helper(String suggestion) {
@@ -32,7 +36,7 @@ public class Helper extends javax.swing.JFrame {
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-		jLabel1.setText("AzSMRC Helper:");
+		jLabel1.setText(I18N.translate(PFX+"title"));
 
 		helpPane.setEditable(false);
 		jScrollPane1.setViewportView(helpPane);

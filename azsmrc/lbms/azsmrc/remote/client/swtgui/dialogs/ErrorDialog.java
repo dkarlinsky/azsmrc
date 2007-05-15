@@ -1,8 +1,12 @@
 package lbms.azsmrc.remote.client.swtgui.dialogs;
 
+import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import lbms.azsmrc.remote.client.Utilities;
 import lbms.azsmrc.remote.client.internat.I18N;
@@ -33,7 +37,7 @@ public class ErrorDialog {
 	private String errorLog;
 
 	private String systemInfo;
-	
+
 	private String errorID;
 
 	private String title;
@@ -51,11 +55,11 @@ public class ErrorDialog {
 
 		this.systemInfo = er.getSystemInfo();
 		this.errorID = er.getErrorID();
-		
-		this.errorLog = er.getErrorLog();
+
+		this.errorLog = er.getStackTrace();
 		if(errorLog == null || errorLog.equalsIgnoreCase(""))
 			errorLog = "The error that triggered this did not get reported in the error log file.";
-		
+
 	}
 
 	public void open() {
@@ -88,6 +92,26 @@ public class ErrorDialog {
 					});
 				}
 			}
+			/* (non-Javadoc)
+			 * @see lbms.azsmrc.remote.client.swtgui.ErrorReporterListener#redirectTo(java.lang.String)
+			 */
+			public void redirectTo(String url) {
+				try {
+					Desktop.getDesktop().browse(new URI (url));
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (URISyntaxException e) {
+					e.printStackTrace();
+				}
+
+			}
+			/* (non-Javadoc)
+			 * @see lbms.azsmrc.remote.client.swtgui.ErrorReporterListener#showText(java.lang.String)
+			 */
+			public void showText(String text) {
+				// TODO Auto-generated method stub
+
+			}
 		});
 
 		GridLayout layout = new GridLayout(1,false);
@@ -109,10 +133,10 @@ public class ErrorDialog {
 		gridData.heightHint = 75;
 		text.setLayoutData(gridData);
 		text.setText(errorLog);
-		
+
 		Label errorIDTextLabel = new Label(shell,SWT.NULL);
-		errorIDTextLabel.setText(I18N.translate(PFX + "errorIDTextLabel.text"));		
-		
+		errorIDTextLabel.setText(I18N.translate(PFX + "errorIDTextLabel.text"));
+
 		final Text errorIDText = new Text(shell, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		errorIDText.setLayoutData(gridData);

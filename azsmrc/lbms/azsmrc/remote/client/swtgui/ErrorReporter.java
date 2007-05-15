@@ -3,10 +3,12 @@
  */
 package lbms.azsmrc.remote.client.swtgui;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -33,7 +35,7 @@ public class ErrorReporter {
 
 	public final static String REPORT_URL = "http://azsmrc.sourceforge.net/reportError2.php";
 
-	private String errorLog = "";
+	private String stackTrace = "";
 	private String email = "";
 	private String additionalInfo = "";
 	private String systemInfo = "";
@@ -59,9 +61,9 @@ public class ErrorReporter {
 			cause.printStackTrace(writer);
 			cause = cause.getCause();
 		}
-		errorLog = buffer.toString();
+		stackTrace = buffer.toString();
 		try {
-			hash = CryptoTools.formatByte(CryptoTools.messageDigest(errorLog.getBytes(), "SHA-1"),true);
+			hash = CryptoTools.formatByte(CryptoTools.messageDigest(stackTrace.getBytes(), "SHA-1"),true);
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
@@ -98,9 +100,9 @@ public class ErrorReporter {
 				for (int i=0;-1!=(i=fis.read());) {
 					sb.append((char)i);
 				}
-				errorLog = sb.toString();
-				hash = CryptoTools.formatByte(CryptoTools.messageDigest(errorLog.getBytes(), "SHA-1"),true);
-				System.out.println("Errorlog: "+errorLog);
+				stackTrace = sb.toString();
+				hash = CryptoTools.formatByte(CryptoTools.messageDigest(stackTrace.getBytes(), "SHA-1"),true);
+				System.out.println("StackTrace: "+stackTrace);
 			} else {
 				System.out.println(error+" did not exist");
 			}
@@ -118,7 +120,7 @@ public class ErrorReporter {
 	 * This will transmit the Error report to the sf.net site
 	 */
 	public void sendToServer () {
-		Thread t = new Thread (new Runnable() {
+		/*Thread t = new Thread (new Runnable() {
 			public void run() {
 				boolean submitted = false;
 				for (int i=0;i<3;i++) {
@@ -131,14 +133,28 @@ public class ErrorReporter {
 						conn.setDoInput(true);
 						os = conn.getOutputStream();
 						OutputStreamWriter osw = new OutputStreamWriter(os);
-						String send = "error_log="+errorLog+"&hash="+hash+"&email="+email+"&additional_info="+additionalInfo+"&os="+os+"&jvm="+jvm+"&swt="+swtVer+"&version="+azsmrcVersion;
+						String send = "stacktrace="+stackTrace+"&hash="+hash+"&email="+email+"&additional_info="+additionalInfo+"&os="+os+"&jvm="+jvm+"&swt="+swtVer+"&version="+azsmrcVersion;
 						System.out.println("Error Report: "+send);
 						osw.write(send);
 						osw.close();
 						conn.connect();
 						is = conn.getInputStream();
-						if ("OK".equalsIgnoreCase(""+(char)is.read()+(char)is.read())) {
+						BufferedReader br = new BufferedReader(new InputStreamReader(is));
+
+						if ("OK".equalsIgnoreCase(br.readLine())) {
 							submitted = true;
+							String line = br.readLine();
+							if (line.startsWith("REDIRECT:")) {
+								String redirectUrl = line.substring(10);
+								for (ErrorReporterListener l:listener) {
+									l.redirectTo(redirectUrl);
+								}
+							} else if (line.startsWith("TEXT:")) {
+								for (ErrorReporterListener l:listener) {
+									l.showText("");
+								}
+							}
+
 							break;
 						}
 					} catch (Exception e) {
@@ -161,18 +177,23 @@ public class ErrorReporter {
 		t.setDaemon(true);
 		t.setPriority(Thread.MIN_PRIORITY);
 		t.start();
+		*/
+		for (ErrorReporterListener l:listener) {
+			l.redirectTo("http://damo.ath.cx");
+			l.errorSubmitted(false);
+		}
 	}
 
 	public void sendPerEMail () {
 		try {
-			Program.launch(("mailto:azsmrc-devs@list.sourceforge.net?subject=AzSMRC+ErrorReport&body="+URLEncoder.encode("System Info:\n"+systemInfo+"\n\nAdditional Info:\n"+additionalInfo+"\n\nStackTrace ("+hash+"):\n"+errorLog,RemoteConstants.DEFAULT_ENCODING)).replace('+', ' '));
+			Program.launch(("mailto:azsmrc-devs@list.sourceforge.net?subject=AzSMRC+ErrorReport&body="+URLEncoder.encode("System Info:\n"+systemInfo+"\n\nAdditional Info:\n"+additionalInfo+"\n\nStackTrace ("+hash+"):\n"+stackTrace,RemoteConstants.DEFAULT_ENCODING)).replace('+', ' '));
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 	}
 
 	public String getFormattedReport() {
-		return "System Info:\n"+systemInfo+"\n\nAdditional Info:\n"+additionalInfo+"\n\nStackTrace ("+hash+"):\n"+errorLog;
+		return "System Info:\n"+systemInfo+"\n\nAdditional Info:\n"+additionalInfo+"\n\nStackTrace ("+hash+"):\n"+stackTrace;
 	}
 
 	/**
@@ -206,8 +227,8 @@ public class ErrorReporter {
 	/**
 	 * @return the errorLog
 	 */
-	public String getErrorLog() {
-		return errorLog;
+	public String getStackTrace() {
+		return stackTrace;
 	}
 
 	/**

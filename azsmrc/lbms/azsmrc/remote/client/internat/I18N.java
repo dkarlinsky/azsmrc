@@ -48,6 +48,14 @@ public class I18N {
 		localizedLocation = location;
 	}
 
+	/**
+	 * Returns a Localized Message identified by the key.
+	 * 
+	 * Returns the key if no entry was found.
+	 * 
+	 * @param key the key of the message.
+	 * @return Localized Message or key
+	 */
 	public static String translate (String key) {
 		if (!isInitialized() && defLocation != null)
 			try {
@@ -56,6 +64,27 @@ public class I18N {
 				e.printStackTrace();
 			}
 		return i18n.translate(key);
+	}
+
+	/**
+	 * Returns a Localized Message identified by the key.
+	 *
+	 * Returns the key if no entry was found.
+	 * It will replace every instance of {i} with params[i].toString(),
+	 * only the length of params is repectet so no ArrayOutOfBoundsException.
+	 * 
+	 * @param key the key of the message.
+	 * @param params replacements for placeholder
+	 * @return fully replaced message or key
+	 */
+	public String translate (String key, Object ...params) {
+		if (!isInitialized() && defLocation != null)
+			try {
+				reload();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		return i18n.translate(key, params);
 	}
 
 	/**

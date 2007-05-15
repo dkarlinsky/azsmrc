@@ -63,6 +63,29 @@ public class I18NTranslator {
 	}
 
 	/**
+	 * Returns a Localized Message identified by the key.
+	 *
+	 * Returns the key if no entry was found.
+	 * It will replace every instance of {i} with params[i].toString(),
+	 * only the length of params is repectet so no ArrayOutOfBoundsException.
+	 * 
+	 * @param key the key of the message.
+	 * @param params replacements for placeholder
+	 * @return fully replaced message or key
+	 */
+	public String translate (String key, Object[] params) {
+		if (messages.containsKey(key)) {
+			String msg = messages.get(key);
+			for (int i=0; i < params.length; i++) {
+				msg = msg.replace("{"+i+"}", params[i].toString());
+			}
+			return msg;
+		}
+		else
+			return key;
+	}
+
+	/**
 	 * @return Returns the initialized.
 	 */
 	public boolean isInitialized() {
