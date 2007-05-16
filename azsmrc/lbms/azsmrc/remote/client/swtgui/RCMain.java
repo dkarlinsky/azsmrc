@@ -164,11 +164,10 @@ public class RCMain implements Launchable {
 			if (rcMain == null) { //if it is launched by launchable then rcMain should already exist
 				new RCMain();
 			}
-			throw new RuntimeException("DEBUGGING");
-			/*rcMain.initConfig();
+			rcMain.initConfig();
 			if (!rcMain.checkInstance(args)) return;
 			rcMain.init();
-			rcMain.open();*/
+			rcMain.open();
 		} catch (Throwable e) {
 			e.printStackTrace();
 			File error = new File(System.getProperty("user.dir")+System.getProperty("file.separator")+"error.log");
