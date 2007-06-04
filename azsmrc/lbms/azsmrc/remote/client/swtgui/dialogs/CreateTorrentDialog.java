@@ -11,6 +11,7 @@ import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
+import lbms.azsmrc.remote.client.util.DisplayFormatters;
 import lbms.azsmrc.shared.SWTSafeRunnable;
 
 import org.eclipse.swt.SWT;
@@ -22,6 +23,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
@@ -47,8 +49,11 @@ public class CreateTorrentDialog {
 	private Display display;
 	private StackLayout sLayout;
 	private int pageNum = 0;
-	private Label fileDirLabel, statusLabel;
-	private Text fileDirText;
+	private Label fileDirLabel, statusLabel, validFile;
+	private Label fileSizeLabel, pieceCountLabel, pieceSizeLabel;
+	private Text fileDirText, torrentNameText;
+	private Combo pieceSizeCombo;
+	private Button bOpenForSeeding, bHostTorrent, bPrivateTorrent, bAllowDecentralized;
 
 	//Settings
 	private int trackerInt;
@@ -57,7 +62,13 @@ public class CreateTorrentDialog {
 	private boolean boolOtherHashes = false;
 	private boolean boolFile = true;
 	private String comment = "";
-	private String fileDir = "";
+	private File fileToShare;
+	private String pieceSize = "32.0kB";
+	private boolean boolOpenForSeeding = false;
+	private boolean boolHostTorrent = false;
+	private boolean boolPrivateTorrent = false;
+	private boolean boolAllowDecentralized = true;
+
 
 
 	private CreateTorrentDialog(final String url){
@@ -141,8 +152,23 @@ public class CreateTorrentDialog {
 				break;
 				case (1):
 					sLayout.topControl = page1;
-				bPrevious.setEnabled(true);
-				bNext.setEnabled(true);
+					bPrevious.setEnabled(true);
+					try{
+						File testFile = new File(fileDirText.getText());
+						if(boolFile && testFile.isFile()){
+							bNext.setEnabled(true);
+							statusLabel.setVisible(false);
+						}else if(!boolFile && testFile.isDirectory()){
+							bNext.setEnabled(true);
+							statusLabel.setVisible(false);
+						}else{
+							bNext.setEnabled(false);
+							statusLabel.setVisible(true);
+						}
+					}catch(Exception e1){
+						bNext.setEnabled(false);
+						statusLabel.setVisible(true);
+					}
 				break;
 				//previous will not handle pageNum = 2
 				}
@@ -166,18 +192,46 @@ public class CreateTorrentDialog {
 				case (1):
 					sLayout.topControl = page1;
 					bPrevious.setEnabled(true);
-					bNext.setEnabled(false);
+					try{
+						File testFile = new File(fileDirText.getText());
+						if(boolFile && testFile.isFile()){
+							bNext.setEnabled(true);
+							statusLabel.setVisible(false);
+						}else if(!boolFile && testFile.isDirectory()){
+							bNext.setEnabled(true);
+							statusLabel.setVisible(false);
+						}else{
+							bNext.setEnabled(false);
+							statusLabel.setVisible(true);
+						}
+					}catch(Exception e1){
+						bNext.setEnabled(false);
+						statusLabel.setVisible(true);
+					}
 				break;
 				case (2):
 					sLayout.topControl = page2;
+					torrentNameText.setText(fileToShare.getAbsolutePath() + ".torrent");
+					try{
+						File testFile = new File(torrentNameText.getText());
+						if(testFile.isDirectory()){
+							bFinish.setEnabled(false);
+							validFile.setVisible(true);
+						}else{
+							bFinish.setEnabled(true);
+							validFile.setVisible(false);
+						}
+					}catch(Exception e1){
+						bFinish.setEnabled(false);
+						validFile.setVisible(true);
+					}
 					bPrevious.setEnabled(true);
 					bNext.setEnabled(false);
+					//set the filesize based on choosen file/dir
+					refreshFileStats();
 				break;
 				}
 				parentComp.layout ();
-
-
-
 			}
 		});
 
@@ -191,7 +245,7 @@ public class CreateTorrentDialog {
 				//first check to make SURE that we are working with a file that is
 				//real and readable
 				try{
-					File test = new File(fileDir);
+					File test = new File(fileDirText.getText());
 					if(!test.canRead()){
 						MessageBox mb = new MessageBox(shell, SWT.OK);
 						mb.setText(I18N.translate(PFX + "finish.messagbox.file_error.title"));
@@ -447,7 +501,6 @@ public class CreateTorrentDialog {
 			public void handleEvent(Event arg0) {
 				boolFile = true;
 				fileDirLabel.setText(I18N.translate(PFX + "page1.fileDirLabel.file.text"));
-				fileDir = "";
 				fileDirText.setText("");
 				fileDirComp.layout();
 			}
@@ -460,7 +513,6 @@ public class CreateTorrentDialog {
 			public void handleEvent(Event arg0) {
 				boolFile = false;
 				fileDirLabel.setText(I18N.translate(PFX + "page1.fileDirLabel.dir.text"));
-				fileDir = "";
 				fileDirText.setText("");
 				fileDirComp.layout();
 			}
@@ -494,11 +546,11 @@ public class CreateTorrentDialog {
 		fileDirText.addListener(SWT.Modify, new Listener(){
 			public void handleEvent(Event arg0) {
 				try{
-					File testFile = new File(fileDirText.getText());
-					if(boolFile && testFile.isFile()){
+					fileToShare = new File(fileDirText.getText());
+					if(boolFile && fileToShare.isFile()){
 						bNext.setEnabled(true);
 						statusLabel.setVisible(false);
-					}else if(!boolFile && testFile.isDirectory()){
+					}else if(!boolFile && fileToShare.isDirectory()){
 						bNext.setEnabled(true);
 						statusLabel.setVisible(false);
 					}else{
@@ -518,19 +570,16 @@ public class CreateTorrentDialog {
 		chooseFileDir.setImage(ImageRepository.getImage("open_by_file"));
 		chooseFileDir.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
+				String fileDir;
 				if(!boolFile){
 					DirectoryDialog dialog = new DirectoryDialog (shell);
 					if((fileDir = dialog.open()) != null){
 						fileDirText.setText(fileDir);
-					}else{
-						fileDir = "";
 					}
 				}else{
 					FileDialog dialog = new FileDialog (shell);
 					if((fileDir = dialog.open()) != null){
 						fileDirText.setText(fileDir);
-					}else{
-						fileDir = "";
 					}
 				}
 			}
@@ -560,7 +609,7 @@ public class CreateTorrentDialog {
 		gridLayout.numColumns = 1;
 		gridLayout.verticalSpacing = 0;
 		gridLayout.horizontalSpacing = 0;
-		page0.setLayout(gridLayout);
+		page2.setLayout(gridLayout);
 
 		//two composits.. top white one and bottom settings one
 
@@ -572,8 +621,211 @@ public class CreateTorrentDialog {
 
 
 		Label label = new Label (topWhiteComp, SWT.NONE);
-		label.setText(I18N.translate(PFX + "page0.topWhiteComp.label.text"));
+		label.setText(I18N.translate(PFX + "page2.topWhiteComp.label.text"));
 		label.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+
+		validFile = new Label(topWhiteComp, SWT.None);
+		validFile.setText(I18N.translate(PFX + "page2.topWhiteComp.validFile.text"));
+		validFile.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+		validFile.setForeground(display.getSystemColor(SWT.COLOR_DARK_RED));
+
+		//below white bar.. main comp
+		final Composite fileDirComp = new Composite(page2, SWT.NULL);
+		fileDirComp.setLayoutData(new GridData(GridData.FILL_BOTH));
+		fileDirComp.setLayout(new GridLayout(3,false));
+
+		Label torrentNameLabel = new Label (fileDirComp, SWT.NULL);
+		torrentNameLabel.setText(I18N.translate(PFX + "page2.torrentNameLabel.text"));
+		torrentNameLabel.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING));
+
+		torrentNameText = new Text(fileDirComp, SWT.BORDER);
+		torrentNameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		torrentNameText.addListener(SWT.Modify, new Listener(){
+			public void handleEvent(Event arg0) {
+				try{
+					File testFile = new File(torrentNameText.getText());
+					if(testFile.isDirectory()){
+						bFinish.setEnabled(false);
+						validFile.setVisible(true);
+					}else{
+						bFinish.setEnabled(true);
+						validFile.setVisible(false);
+					}
+				}catch(Exception e1){
+					bFinish.setEnabled(false);
+					validFile.setVisible(true);
+				}
+			}
+		});
+
+
+		Button fileButton = new Button(fileDirComp, SWT.PUSH);
+		fileButton.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
+		fileButton.setImage(ImageRepository.getImage("open_by_file"));
+		fileButton.addListener(SWT.PUSH, new Listener() {
+			public void handleEvent(Event arg0) {
+				FileDialog dialog = new FileDialog (fileDirComp.getShell(), SWT.SAVE);
+				dialog.setFilterNames (new String [] {"Torrent Files", "All Files (*.*)"});
+				dialog.setFilterExtensions (new String [] {"*.torrent", "*.*"});
+				String chosenFile = "";
+				chosenFile = dialog.open();
+				if(chosenFile!=null){
+					torrentNameText.setText(chosenFile);
+				}
+			}
+		});
+
+
+		//Separator1
+		Label sep1 = new Label(fileDirComp, SWT.SEPARATOR | SWT.HORIZONTAL);
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 3;
+		sep1.setLayoutData(gd);
+
+		//File size label
+		fileSizeLabel = new Label(fileDirComp,SWT.NULL);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 3;
+		fileSizeLabel.setLayoutData(gd);
+
+
+		//Piece Count
+		pieceCountLabel = new Label(fileDirComp, SWT.NULL);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 3;
+		pieceCountLabel.setLayoutData(gd);
+
+		//Piece Size
+		pieceSizeLabel = new Label(fileDirComp, SWT.NULL);
+		pieceSizeLabel.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING));
+
+		//pieceSizeCombo
+		pieceSizeCombo = new Combo(fileDirComp, SWT.READ_ONLY | SWT.FLAT);
+		pieceSizeCombo.setItems(new String[]{
+				"Auto",
+				"32.0kB",
+				"48.0kB",
+				"64.0kB",
+				"96.0kB",
+				"128.0kB",
+				"192.0kB",
+				"256.0kB",
+				"512.0kB",
+				"768.0kB",
+				"1.00MB",
+				"1.50MB",
+				"2.00MB",
+				"3.00MB",
+				"4.00MB",
+		});
+		pieceSizeCombo.setVisibleItemCount(pieceSizeCombo.getItemCount());
+		pieceSizeCombo.select(0);
+
+		pieceSizeCombo.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+
+				//TODO  Calculate piece size here!! and store in 'pieceSize'
+
+
+				refreshFileStats();
+			}
+		});
+
+		//Separator2
+		Label sep2 = new Label(fileDirComp, SWT.SEPARATOR | SWT.HORIZONTAL);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 3;
+		sep2.setLayoutData(gd);
+
+		//Settings
+//		private boolean boolOpenForSeeding = false;
+//		private boolean boolHostTorrent = false;
+//		private boolean boolPrivateTorrent = false;
+//		private boolean boolAllowDecentralized = true;
+		//private Button bOpenForSeeding, bHostTorrent, bPrivateTorrent, bAllowDecentralized;
+
+		bOpenForSeeding = new Button(fileDirComp, SWT.CHECK);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 3;
+		bOpenForSeeding.setLayoutData(gd);
+		bOpenForSeeding.setText(I18N.translate("page2.openForSeeding.button.text"));
+		bOpenForSeeding.setSelection(boolOpenForSeeding);
+		bOpenForSeeding.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				boolOpenForSeeding = bOpenForSeeding.getSelection();
+				bHostTorrent.setEnabled(boolOpenForSeeding);
+			}
+		});
+
+
+		bHostTorrent = new Button(fileDirComp, SWT.CHECK);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 3;
+		bHostTorrent.setLayoutData(gd);
+		bHostTorrent.setText(I18N.translate("page2.bHostTorrent.button.text"));
+		bHostTorrent.setSelection(boolHostTorrent);
+		bHostTorrent.setEnabled(boolOpenForSeeding);
+		bHostTorrent.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				boolHostTorrent = bHostTorrent.getSelection();
+			}
+		});
+
+
+		bPrivateTorrent = new Button(fileDirComp, SWT.CHECK);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 3;
+		bPrivateTorrent.setLayoutData(gd);
+		bPrivateTorrent.setText(I18N.translate("page2.bPrivateTorrent.button.text"));
+		bPrivateTorrent.setSelection(boolPrivateTorrent);
+		bPrivateTorrent.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				boolPrivateTorrent = bPrivateTorrent.getSelection();
+			}
+		});
+
+		bAllowDecentralized = new Button(fileDirComp, SWT.CHECK);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 3;
+		bAllowDecentralized.setLayoutData(gd);
+		bAllowDecentralized.setText(I18N.translate("page2.bAllowDecentralized.button.text"));
+		bAllowDecentralized.setSelection(boolAllowDecentralized);
+		bAllowDecentralized.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				boolAllowDecentralized = bAllowDecentralized.getSelection();
+			}
+		});
+
+	}
+
+	/**
+	 * Resets the total file size used
+	 */
+	private void refreshFileStats(){
+		if(boolFile)
+			fileSizeLabel.setText(I18N.translate(PFX + "page2.fileSizeLabel.text")
+					+ " "
+					+ DisplayFormatters.formatByteCountToKiBEtc(fileToShare.length()));
+		else{
+			Long totalBytes = 0L;
+			File[] filesInDir = fileToShare.listFiles();
+			for(File file: filesInDir){
+				totalBytes = totalBytes+file.length();
+			}
+			fileSizeLabel.setText(I18N.translate(PFX + "page2.fileSizeLabel.text")
+					+ " "
+					+ DisplayFormatters.formatByteCountToKiBEtc(totalBytes));
+		}
+
+		pieceCountLabel.setText(I18N.translate(PFX + "page2.pieceCountLabel.text")
+				+ " "
+				+ "Not sure how to calculate this");  //TODO
+
+		pieceSizeLabel.setText(I18N.translate(PFX + "page2.pieceSizeLabel.text")
+				+ " "
+				+ pieceSize);
+
+
 	}
 
 
