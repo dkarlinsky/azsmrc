@@ -5,6 +5,8 @@
  */
 package lbms.azsmrc.remote.client.swtgui.dialogs;
 
+import java.io.File;
+
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
@@ -21,9 +23,10 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
@@ -40,11 +43,12 @@ public class CreateTorrentDialog {
 
 	private Shell shell;
 	private Button bCancel, bPrevious, bNext, bFinish;
-	private Composite page0, page1;
+	private Composite page0, page1, page2;
 	private Display display;
 	private StackLayout sLayout;
 	private int pageNum = 0;
-	private Label fileDirLabel;
+	private Label fileDirLabel, statusLabel;
+	private Text fileDirText;
 
 	//Settings
 	private int trackerInt;
@@ -87,6 +91,8 @@ public class CreateTorrentDialog {
 		createPage0(parentComp);
 		// create the second page's content
 		createPage1(parentComp);
+		// create the third page's content
+		createPage2(parentComp);
 
 
 		sLayout.topControl = page0;
@@ -126,11 +132,23 @@ public class CreateTorrentDialog {
 		bPrevious.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
 				//TODO
-				pageNum = --pageNum % 2;
-				sLayout.topControl = pageNum == 0 ? page0 : page1;
-				parentComp.layout ();
-				bPrevious.setEnabled(false);
+				--pageNum;
+				switch(pageNum){
+				case (0):
+					sLayout.topControl = page0;
+					bPrevious.setEnabled(false);
+					bNext.setEnabled(true);
+				break;
+				case (1):
+					sLayout.topControl = page1;
+				bPrevious.setEnabled(true);
 				bNext.setEnabled(true);
+				break;
+				//previous will not handle pageNum = 2
+				}
+
+				parentComp.layout ();
+
 			}
 		});
 		bPrevious.setEnabled(false);
@@ -142,12 +160,24 @@ public class CreateTorrentDialog {
 		bNext.setLayoutData(gridData);
 		bNext.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
-				//TODO
-				pageNum = ++pageNum % 2;
-				sLayout.topControl = pageNum == 0 ? page0 : page1;
+				++pageNum;
+				switch(pageNum){
+				//next does not handle pageNum = 0
+				case (1):
+					sLayout.topControl = page1;
+					bPrevious.setEnabled(true);
+					bNext.setEnabled(false);
+				break;
+				case (2):
+					sLayout.topControl = page2;
+					bPrevious.setEnabled(true);
+					bNext.setEnabled(false);
+				break;
+				}
 				parentComp.layout ();
-				bPrevious.setEnabled(true);
-				bNext.setEnabled(false);
+
+
+
 			}
 		});
 
@@ -158,7 +188,33 @@ public class CreateTorrentDialog {
 		bFinish.setText(I18N.translate("global.finish"));
 		bFinish.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event e) {
-				//TODO
+				//first check to make SURE that we are working with a file that is
+				//real and readable
+				try{
+					File test = new File(fileDir);
+					if(!test.canRead()){
+						MessageBox mb = new MessageBox(shell, SWT.OK);
+						mb.setText(I18N.translate(PFX + "finish.messagbox.file_error.title"));
+						mb.setMessage(I18N.translate(PFX + "finish.messagbox.file_error.message"));
+						mb.open();
+					}else{
+
+
+
+
+
+
+					}
+				}catch (Exception exc){
+					MessageBox mb = new MessageBox(shell, SWT.OK);
+					mb.setText(I18N.translate(PFX + "finish.messagbox.file_error.title"));
+					mb.setMessage(I18N.translate(PFX + "finish.messagbox.file_error.message"));
+					mb.open();
+				}
+
+
+
+
 			}
 		});
 		bFinish.setEnabled(false);
@@ -379,11 +435,7 @@ public class CreateTorrentDialog {
 
 		final Composite fileDirComp = new Composite(page1, SWT.NULL);
 		fileDirComp.setLayoutData(new GridData(GridData.FILL_BOTH));
-		fileDirComp.setLayout(new GridLayout(3,true));
-
-
-
-
+		fileDirComp.setLayout(new GridLayout(3,false));
 
 
 		Button bFile = new Button(buttonComp, SWT.RADIO);
@@ -395,6 +447,8 @@ public class CreateTorrentDialog {
 			public void handleEvent(Event arg0) {
 				boolFile = true;
 				fileDirLabel.setText(I18N.translate(PFX + "page1.fileDirLabel.file.text"));
+				fileDir = "";
+				fileDirText.setText("");
 				fileDirComp.layout();
 			}
 		});
@@ -406,6 +460,8 @@ public class CreateTorrentDialog {
 			public void handleEvent(Event arg0) {
 				boolFile = false;
 				fileDirLabel.setText(I18N.translate(PFX + "page1.fileDirLabel.dir.text"));
+				fileDir = "";
+				fileDirText.setText("");
 				fileDirComp.layout();
 			}
 		});
@@ -433,22 +489,91 @@ public class CreateTorrentDialog {
 			fileDirLabel.setText(I18N.translate(PFX + "page1.fileDirLabel.dir.text"));
 
 		//TextBox
-		final Text fileDirText = new Text(fileDirComp,SWT.BORDER);
+		fileDirText = new Text(fileDirComp,SWT.BORDER);
 		fileDirText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		fileDirText.addListener(SWT.Modify, new Listener(){
 			public void handleEvent(Event arg0) {
-				if(!fileDirText.getText().equalsIgnoreCase(""))
-					bFinish.setEnabled(true);
-				else
-					bFinish.setEnabled(false);
+				try{
+					File testFile = new File(fileDirText.getText());
+					if(boolFile && testFile.isFile()){
+						bNext.setEnabled(true);
+						statusLabel.setVisible(false);
+					}else if(!boolFile && testFile.isDirectory()){
+						bNext.setEnabled(true);
+						statusLabel.setVisible(false);
+					}else{
+						bNext.setEnabled(false);
+						statusLabel.setVisible(true);
+					}
+				}catch(Exception e){
+					bNext.setEnabled(false);
+					statusLabel.setVisible(true);
+				}
 			}
 		});
 
 
 		Button chooseFileDir = new Button(fileDirComp, SWT.BORDER);
 		chooseFileDir.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
-		
-		
+		chooseFileDir.setImage(ImageRepository.getImage("open_by_file"));
+		chooseFileDir.addListener(SWT.Selection, new Listener(){
+			public void handleEvent(Event arg0) {
+				if(!boolFile){
+					DirectoryDialog dialog = new DirectoryDialog (shell);
+					if((fileDir = dialog.open()) != null){
+						fileDirText.setText(fileDir);
+					}else{
+						fileDir = "";
+					}
+				}else{
+					FileDialog dialog = new FileDialog (shell);
+					if((fileDir = dialog.open()) != null){
+						fileDirText.setText(fileDir);
+					}else{
+						fileDir = "";
+					}
+				}
+			}
+		});
+
+		statusLabel = new Label(fileDirComp, SWT.NULL);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 3;
+		statusLabel.setLayoutData(gd);
+		statusLabel.setText(I18N.translate(PFX + "page1.statusLabel.text"));
+		statusLabel.setForeground(display.getSystemColor(SWT.COLOR_DARK_RED));
+	}
+
+	/**
+	 * Create contents for page2 (third page (final))
+	 * @param parentComp
+	 */
+	private void createPage2(Composite parentComp){
+		page2 = new Composite (parentComp, SWT.BORDER);
+		GridData gridData = new GridData(GridData.GRAB_HORIZONTAL);
+		page2.setLayoutData(gridData);
+
+
+		GridLayout gridLayout = new GridLayout();
+		gridLayout.marginWidth = 0;
+		gridLayout.marginHeight = 0;
+		gridLayout.numColumns = 1;
+		gridLayout.verticalSpacing = 0;
+		gridLayout.horizontalSpacing = 0;
+		page0.setLayout(gridLayout);
+
+		//two composits.. top white one and bottom settings one
+
+		//top white
+		Composite topWhiteComp = new Composite(page2,SWT.BORDER);
+		topWhiteComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		topWhiteComp.setLayout(new GridLayout(1,false));
+		topWhiteComp.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+
+
+		Label label = new Label (topWhiteComp, SWT.NONE);
+		label.setText(I18N.translate(PFX + "page0.topWhiteComp.label.text"));
+		label.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 	}
 
 
