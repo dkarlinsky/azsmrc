@@ -67,6 +67,8 @@ public class MultiUserDownloadListener implements org.gudy.azureus2.plugins.down
 						if (users != null) {
 							if (users.length == 1) {
 								if (users[0].getOutputDir() != null && !users[0].getOutputDir().equals("")) {
+									File outDir = new File (users[0].getOutputDir());
+									if (!outDir.exists()) outDir.mkdirs();
 									download.moveDataFiles(new File(users[0].getOutputDir()));
 									download.moveTorrentFile(new File(users[0].getOutputDir()));
 								}
@@ -75,7 +77,9 @@ public class MultiUserDownloadListener implements org.gudy.azureus2.plugins.down
 								new Thread(new Runnable (){
 									public void run () {
 										for (int i=0;i<users.length-1;i++) {
-											if (users[i].getOutputDir() != null && !users[i].getOutputDir().equals(""))
+											if (users[i].getOutputDir() != null && !users[i].getOutputDir().equals("")) {
+												File outDir = new File (users[i].getOutputDir());
+												if (!outDir.exists()) outDir.mkdirs();
 												for (File file:files) {
 													try {
 														Utilities.copy(file, new File(users[i].getOutputDir()), false);
@@ -84,10 +88,13 @@ public class MultiUserDownloadListener implements org.gudy.azureus2.plugins.down
 														e.printStackTrace();
 													}
 												}
+											}
 											if (!singleUser)users[i].eventDownloadFinished(download);
 										}
 										try {
 											if (users[users.length-1].getOutputDir() != null && !users[users.length-1].getOutputDir().equals("")) {
+												File outDir = new File (users[users.length-1].getOutputDir());
+												if (!outDir.exists()) outDir.mkdirs();
 												download.moveDataFiles(new File(users[users.length-1].getOutputDir()));
 												download.moveTorrentFile(new File(users[users.length-1].getOutputDir()));
 											}
@@ -104,6 +111,8 @@ public class MultiUserDownloadListener implements org.gudy.azureus2.plugins.down
 					} else { //only a Single Download owner
 						User user = Plugin.getXMLConfig().getUser(user_attrib);
 						if (user.getOutputDir() != null && !user.getOutputDir().equals("")) {
+							File outDir = new File (user.getOutputDir());
+							if (!outDir.exists()) outDir.mkdirs();
 							download.moveDataFiles(new File(user.getOutputDir()));
 							download.moveTorrentFile(new File(user.getOutputDir()));
 						}
