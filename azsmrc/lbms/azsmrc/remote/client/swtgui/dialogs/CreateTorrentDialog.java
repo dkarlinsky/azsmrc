@@ -644,13 +644,22 @@ public class CreateTorrentDialog {
 			public void handleEvent(Event arg0) {
 				try{
 					File testFile = new File(torrentNameText.getText());
-					if(testFile.isDirectory()){
+
+					//Make sure directory exists and is readable
+					//also make sure testFile itself is not a directory
+					if(testFile.getParentFile().exists() &&
+							testFile.getParentFile().canRead() &&
+							!testFile.isDirectory()){
+
+							bFinish.setEnabled(true);
+							validFile.setVisible(false);
+
+					}else{
 						bFinish.setEnabled(false);
 						validFile.setVisible(true);
-					}else{
-						bFinish.setEnabled(true);
-						validFile.setVisible(false);
 					}
+
+
 				}catch(Exception e1){
 					bFinish.setEnabled(false);
 					validFile.setVisible(true);
