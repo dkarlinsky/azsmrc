@@ -757,7 +757,7 @@ public class CreateTorrentDialog {
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 3;
 		bOpenForSeeding.setLayoutData(gd);
-		bOpenForSeeding.setText(I18N.translate("page2.openForSeeding.button.text"));
+		bOpenForSeeding.setText(I18N.translate(PFX + "page2.openForSeeding.button.text"));
 		bOpenForSeeding.setSelection(boolOpenForSeeding);
 		bOpenForSeeding.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
@@ -771,7 +771,7 @@ public class CreateTorrentDialog {
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 3;
 		bHostTorrent.setLayoutData(gd);
-		bHostTorrent.setText(I18N.translate("page2.bHostTorrent.button.text"));
+		bHostTorrent.setText(I18N.translate(PFX + "page2.bHostTorrent.button.text"));
 		bHostTorrent.setSelection(boolHostTorrent);
 		bHostTorrent.setEnabled(boolOpenForSeeding);
 		bHostTorrent.addListener(SWT.Selection, new Listener(){
@@ -785,7 +785,7 @@ public class CreateTorrentDialog {
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 3;
 		bPrivateTorrent.setLayoutData(gd);
-		bPrivateTorrent.setText(I18N.translate("page2.bPrivateTorrent.button.text"));
+		bPrivateTorrent.setText(I18N.translate(PFX + "page2.bPrivateTorrent.button.text"));
 		bPrivateTorrent.setSelection(boolPrivateTorrent);
 		bPrivateTorrent.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
@@ -797,7 +797,7 @@ public class CreateTorrentDialog {
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 3;
 		bAllowDecentralized.setLayoutData(gd);
-		bAllowDecentralized.setText(I18N.translate("page2.bAllowDecentralized.button.text"));
+		bAllowDecentralized.setText(I18N.translate(PFX + "page2.bAllowDecentralized.button.text"));
 		bAllowDecentralized.setSelection(boolAllowDecentralized);
 		bAllowDecentralized.addListener(SWT.Selection, new Listener(){
 			public void handleEvent(Event arg0) {
