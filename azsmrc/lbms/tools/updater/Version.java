@@ -33,6 +33,10 @@ public class Version implements Comparable<Version> {
 		else return 1;
 	}
 
+	public int compareTo(String o) {
+		return compareTo(new Version(o));
+	}
+
 	@Override
 	public String toString() {
 		String out = "";

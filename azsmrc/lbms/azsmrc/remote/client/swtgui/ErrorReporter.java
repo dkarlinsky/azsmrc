@@ -120,7 +120,7 @@ public class ErrorReporter {
 	 * This will transmit the Error report to the sf.net site
 	 */
 	public void sendToServer () {
-		/*Thread t = new Thread (new Runnable() {
+		Thread t = new Thread (new Runnable() {
 			public void run() {
 				boolean submitted = false;
 				for (int i=0;i<3;i++) {
@@ -177,7 +177,7 @@ public class ErrorReporter {
 		t.setDaemon(true);
 		t.setPriority(Thread.MIN_PRIORITY);
 		t.start();
-		*/
+
 		for (ErrorReporterListener l:listener) {
 			l.redirectTo("http://damo.ath.cx");
 			l.errorSubmitted(false);

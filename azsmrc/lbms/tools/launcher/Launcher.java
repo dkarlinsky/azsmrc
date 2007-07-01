@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
+ *
  * AELITIS, SAS au capital de 46,603.30 euros
  * 8 Allee Lenotre, La Grille Royale, 78600 Le Mesnil le Roi, France.
  *
@@ -36,51 +36,6 @@ public class Launcher {
 	main(
 		final String[]		args )
 	{
-			// try and infer the application name. this is only required on OSX as the app name
-			// is a component of the "application path" used to find jars etc.
-
-		if ( Constants.isOSX ){
-
-			/* example class path
-
-			 /Applications/Utilities/Azureus.app/Contents/Resources/ 
-			Java/swt.jar:/Applications/Utilities/Azureus.app/Contents/Resources/
-			Java/swt-pi.jar:/Applications/Utilities/Azureus.app/Contents/Resources/
-			Java/Azureus2.jar:/System/Library/Java
-			*/
-
-			String	classpath = System.getProperty("java.class.path");
-
-			if ( classpath == null ){
-
-				System.out.println( "classpath is null!!!!" );
-
-			}else{
-
-				int	dot_pos = classpath.indexOf( ".app/Contents" );
-
-				if ( dot_pos == -1 ){
-
-					// System.out.println( "can't find .app/Contents" );
-
-				}else{
-
-					int	start_pos = dot_pos;
-
-					while( start_pos >= 0 && classpath.charAt(start_pos) != '/' ){
-
-						start_pos--;
-					}
-
-					String	app_name = classpath.substring( start_pos+1, dot_pos );
-
-					SystemProperties.setApplicationName( app_name );
-				}
-			}
-		}
-
-
-
 		Launchable[]	launchables = findLaunchables();
 
 		if ( launchables.length == 0 ){
@@ -294,16 +249,11 @@ public class Launcher {
 		return( x );
 	}
 
- 	private static File 
+ 	private static File
  	getApplicationFile(
- 		String filename) 
- 	{      
+ 		String filename)
+ 	{
 		 String path = SystemProperties.getApplicationPath();
-
-		 if (Constants.isOSX ){
-
-			 path = path + "/" + SystemProperties.getApplicationName() + ".app/Contents/";
-		 }
 
 		 return new File(path, filename);
  	}
@@ -343,7 +293,7 @@ public class Launcher {
 				String	version;;
 
 
-  				if ( 	sep_pos == -1 || 
+  				if ( 	sep_pos == -1 ||
   						sep_pos == name.length()-1 ||
 						!Character.isDigit(name.charAt(sep_pos+1))){
 

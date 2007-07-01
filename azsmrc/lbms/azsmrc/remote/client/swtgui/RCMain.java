@@ -80,6 +80,7 @@ import lbms.tools.launcher.Launchable;
 import lbms.tools.updater.Update;
 import lbms.tools.updater.UpdateListener;
 import lbms.tools.updater.Updater;
+import lbms.tools.updater.Version;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -184,7 +185,9 @@ public class RCMain implements Launchable {
 			} finally {
 				if (fout != null)fout.close();
 			}
-			new CrashHandler(e);
+			if (new Version(System.getProperty("java.version")).compareTo("1.6.0")>=0) {
+				new CrashHandler(e);
+			}
 		}
 	}
 
