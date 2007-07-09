@@ -16,25 +16,25 @@ import org.jdom.Element;
 
 /**
  * @author Damokles
- *
+ * 
  */
 public class User extends lbms.azsmrc.shared.User {
 
 	private Queue<Element> eventQueue = new LinkedList<Element>();
 
 	/**
-	 * Creates a User object and reads the data
-	 * from xml document
-	 *
+	 * Creates a User object and reads the data from xml document
+	 * 
 	 * @param userElement
 	 */
-	public User (Element userElement) {
+	public User(Element userElement) {
 		super(userElement);
 	}
 
-
-	public User(String username, String password, String autoImportDir, String outputDir, int downloadSlots, int userRights) {
-		super(username, password, autoImportDir, outputDir, downloadSlots, userRights);
+	public User(String username, String password, String autoImportDir,
+			String outputDir, int downloadSlots, int userRights) {
+		super(username, password, autoImportDir, outputDir, downloadSlots,
+				userRights);
 	}
 
 	public User(String username, String password) {
@@ -46,7 +46,7 @@ public class User extends lbms.azsmrc.shared.User {
 	 * 
 	 * @param download
 	 */
-	public void addDownload (Download download) {
+	public void addDownload(Download download) {
 		downloadList.add(getDlHash(download));
 	}
 
@@ -54,9 +54,10 @@ public class User extends lbms.azsmrc.shared.User {
 	 * @param download
 	 */
 	@Override
-	public void addDownload (String downloadHash) {
+	public void addDownload(String downloadHash) {
 		try {
-			Download dl = Plugin.getPluginInterface().getDownloadManager().getDownload(EncodingUtil.decode(downloadHash));
+			Download dl = Plugin.getPluginInterface().getDownloadManager()
+					.getDownload(EncodingUtil.decode(downloadHash));
 			if (dl != null)
 				downloadList.add(downloadHash);
 		} catch (DownloadException e) {
@@ -66,21 +67,20 @@ public class User extends lbms.azsmrc.shared.User {
 
 	/**
 	 * This keeps only Downloads that are in both Collections.
-	 *
-	 * @param dls other collection to intersect with
+	 * 
+	 * @param dls
+	 *            other collection to intersect with
 	 */
-	public void retainDownloads (Collection<String> dls) {
+	public void retainDownloads(Collection<String> dls) {
 		downloadList.retainAll(dls);
 	}
-
-
 
 	/**
 	 * The download will be removed from the user.
 	 * 
 	 * @param download
 	 */
-	public void removeDownload (Download download) {
+	public void removeDownload(Download download) {
 		downloadList.remove(getDlHash(download));
 	}
 
@@ -94,36 +94,32 @@ public class User extends lbms.azsmrc.shared.User {
 		return downloadList.contains(getDlHash(dl));
 	}
 
-
-
 	/**
-	 * This function will return the Base64 String
-	 * represantation of the downloadHash
+	 * This function will return the Base64 String represantation of the
+	 * downloadHash
 	 * 
 	 * @param dl
 	 * @return String represantation of the downloadHash
 	 */
 	public String getDlHash(Download dl) {
-		if (dl.getTorrent()!=null)
+		if (dl.getTorrent() != null)
 			return EncodingUtil.encode(dl.getTorrent().getHash());
 		return "";
 	}
 
 	/**
-	 * This function will convert the User object
-	 * to a xml encoded jdom Element.
+	 * This function will convert the User object to a xml encoded jdom Element.
 	 * 
 	 * @return the jdom Element represantation of the object
 	 */
-	public Element toElement () {
+	public Element toElement() {
 		Element user = super.toElement();
 		return user;
 	}
 
 	/**
-	 * Use this function to check if there are events
-	 * in the eventQueue
-	 *
+	 * Use this function to check if there are events in the eventQueue
+	 * 
 	 * @return true if events are in queue
 	 */
 	public boolean hasEvents() {
@@ -131,10 +127,10 @@ public class User extends lbms.azsmrc.shared.User {
 	}
 
 	/**
-	 * This function will put all events in the root
-	 * Element.
-	 *
-	 * @param root all elements will be added in here
+	 * This function will put all events in the root Element.
+	 * 
+	 * @param root
+	 *            all elements will be added in here
 	 */
 	public void getEvents(Element root) {
 		Element ev = eventQueue.poll();
@@ -150,82 +146,110 @@ public class User extends lbms.azsmrc.shared.User {
 		return event;
 	}
 
-	//--------------------------------------------//
+	// --------------------------------------------//
 
 	public void eventDownloadFinished(Download dl) {
-		Formatters formatters = Plugin.getPluginInterface().getUtilities().getFormatters();
+		Formatters formatters = Plugin.getPluginInterface().getUtilities()
+				.getFormatters();
 		String notificationMessage = "Download Finished: "
-			+dl.getName()+"\nTime: "+formatters.formatTimeFromSeconds(dl.getStats().getSecondsDownloading())
-			+"\nAverage Download Speed: "+formatters.formatByteCountToKiBEtcPerSec(dl.getTorrent().getSize()/dl.getStats().getSecondsDownloading());
-		PSupportStatusMailer mailer = (PSupportStatusMailer)Plugin.getPluginSupport(PSupportStatusMailer.IDENTIFIER);
-		mailer.sendMessage(this, "Download Finished: "+dl.getName(), notificationMessage);
-		PSupportAzJabber jabber = (PSupportAzJabber)Plugin.getPluginSupport(PSupportAzJabber.IDENTIFIER);
+				+ dl.getName()
+				+ "\nTime: "
+				+ formatters.formatTimeFromSeconds(dl.getStats()
+						.getSecondsDownloading())
+				+ "\nAverage Download Speed: "
+				+ (dl.getStats().getSecondsDownloading() != 0 ? formatters
+						.formatByteCountToKiBEtcPerSec(dl.getTorrent()
+								.getSize()
+								/ dl.getStats().getSecondsDownloading())
+						: "undefined");
+
+		PSupportStatusMailer mailer = (PSupportStatusMailer) Plugin
+				.getPluginSupport(PSupportStatusMailer.IDENTIFIER);
+		mailer.sendMessage(this, "Download Finished: " + dl.getName(),
+				notificationMessage);
+		PSupportAzJabber jabber = (PSupportAzJabber) Plugin
+				.getPluginSupport(PSupportAzJabber.IDENTIFIER);
 		jabber.sendMessage(this, notificationMessage);
 
 		Element event = getEventElement();
-		event.setAttribute("type", Integer.toString(RemoteConstants.EV_DL_FINISHED));
+		event.setAttribute("type", Integer
+				.toString(RemoteConstants.EV_DL_FINISHED));
 		event.setAttribute("name", dl.getName());
 		event.setAttribute("hash", getDlHash(dl));
-		event.setAttribute("duration", Long.toString(dl.getStats().getSecondsDownloading()));
+		event.setAttribute("duration", Long.toString(dl.getStats()
+				.getSecondsDownloading()));
 		if (dl.getTorrent() != null)
-			event.setAttribute("avgDownload", formatters.formatByteCountToKiBEtcPerSec(dl.getTorrent().getSize()/dl.getStats().getSecondsDownloading()));
+			event.setAttribute("avgDownload", dl.getStats()
+					.getSecondsDownloading() != 0 ? formatters
+					.formatByteCountToKiBEtcPerSec(dl.getTorrent().getSize()
+							/ dl.getStats().getSecondsDownloading())
+					: "undefined");
 		removeDownload(dl);
 		eventQueue.offer(event);
 	}
 
 	public void eventDownloadRemoved(Download dl) {
 		Element event = getEventElement();
-		event.setAttribute("type", Integer.toString(RemoteConstants.EV_DL_REMOVED));
+		event.setAttribute("type", Integer
+				.toString(RemoteConstants.EV_DL_REMOVED));
 		event.setAttribute("name", dl.getName());
 		event.setAttribute("hash", getDlHash(dl));
 
 		eventQueue.offer(event);
 	}
 
-	public void eventException (String e) {
+	public void eventException(String e) {
 		Element event = getEventElement();
-		event.setAttribute("type", Integer.toString(RemoteConstants.EV_EXCEPTION));
+		event.setAttribute("type", Integer
+				.toString(RemoteConstants.EV_EXCEPTION));
 		event.setAttribute("message", e);
 		eventQueue.offer(event);
 	}
 
-	public void eventException (Exception e) {
+	public void eventException(Exception e) {
 		Element event = getEventElement();
-		event.setAttribute("type", Integer.toString(RemoteConstants.EV_EXCEPTION));
+		event.setAttribute("type", Integer
+				.toString(RemoteConstants.EV_EXCEPTION));
 		event.setAttribute("message", e.getMessage());
 		eventQueue.offer(event);
 	}
 
-	public void eventException (Exception e, String add) {
+	public void eventException(Exception e, String add) {
 		Element event = getEventElement();
-		event.setAttribute("type", Integer.toString(RemoteConstants.EV_EXCEPTION));
-		event.setAttribute("message", e.getMessage()+"; "+add);
+		event.setAttribute("type", Integer
+				.toString(RemoteConstants.EV_EXCEPTION));
+		event.setAttribute("message", e.getMessage() + "; " + add);
 		eventQueue.offer(event);
 	}
 
-	public void eventUpdateAvailable () {
+	public void eventUpdateAvailable() {
 		Element event = getEventElement();
-		event.setAttribute("type", Integer.toString(RemoteConstants.EV_UPDATE_AVAILABLE));
+		event.setAttribute("type", Integer
+				.toString(RemoteConstants.EV_UPDATE_AVAILABLE));
 		eventQueue.offer(event);
 	}
 
-	public void eventMessage (String e) {
+	public void eventMessage(String e) {
 		Element event = getEventElement();
-		event.setAttribute("type", Integer.toString(RemoteConstants.EV_MESSAGE));
+		event
+				.setAttribute("type", Integer
+						.toString(RemoteConstants.EV_MESSAGE));
 		event.setAttribute("message", e);
 		eventQueue.offer(event);
 	}
 
-	public void eventErrorMessage (String e) {
+	public void eventErrorMessage(String e) {
 		Element event = getEventElement();
-		event.setAttribute("type", Integer.toString(RemoteConstants.EV_ERROR_MESSAGE));
+		event.setAttribute("type", Integer
+				.toString(RemoteConstants.EV_ERROR_MESSAGE));
 		event.setAttribute("message", e);
 		eventQueue.offer(event);
 	}
 
-	public void eventPluginMessage (String targetID, Element e) {
+	public void eventPluginMessage(String targetID, Element e) {
 		Element event = getEventElement();
-		event.setAttribute("type", Integer.toString(RemoteConstants.EV_PLUGIN_MESSAGE));
+		event.setAttribute("type", Integer
+				.toString(RemoteConstants.EV_PLUGIN_MESSAGE));
 		event.setAttribute("targetID", targetID);
 		event.addContent(e);
 		eventQueue.offer(event);
