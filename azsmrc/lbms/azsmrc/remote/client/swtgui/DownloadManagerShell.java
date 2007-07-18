@@ -2628,7 +2628,7 @@ public class DownloadManagerShell {
 					itemUpSpeed.setEnabled(false);
 					itemDownSpeed.setEnabled(false);
 					forceRecheck.setEnabled(false);
-					menuRename.setEnabled(false);
+					itemMenuRename.setEnabled(false);
 					try{
 						moveData.setEnabled(false);
 					}catch(Exception e){}
