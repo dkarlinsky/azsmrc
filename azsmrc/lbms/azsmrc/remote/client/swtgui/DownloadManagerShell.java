@@ -428,9 +428,9 @@ public class DownloadManagerShell {
 		MenuItem menuCreateTorrent = new MenuItem(toolSubmenu, SWT.PUSH);
 		menuCreateTorrent.setText(I18N.translate(PFX + "menu.tools.createTorrent"));
 		menuCreateTorrent.addListener(SWT.Selection, new Listener(){
-			public void handleEvent(Event arg0) {				
+			public void handleEvent(Event arg0) {
 				CreateTorrentDialog.open();
-			}			
+			}
 		});
 
 
@@ -565,7 +565,7 @@ public class DownloadManagerShell {
 		refresh.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				if(RCMain.getRCMain().connected())
-					RCMain.getRCMain().getClient().getDownloadManager().update(true);				
+					RCMain.getRCMain().getClient().getDownloadManager().update(true);
 			}
 		});
 
@@ -2475,9 +2475,36 @@ public class DownloadManagerShell {
 			}
 		});
 
+		//-------------------------Rename Menus
 
 
+		final MenuItem itemMenuRename = new MenuItem(menu, SWT.CASCADE);
+		itemMenuRename.setText("Rename");
+		final Menu menuRename = new Menu(DOWNLOAD_MANAGER_SHELL, SWT.DROP_DOWN);
+		itemMenuRename.setMenu(menuRename);
 
+
+		final MenuItem menuRenameDisplayedName = new MenuItem(menuRename, SWT.PUSH);
+		menuRenameDisplayedName.setText("Rename Displayed Name");
+		menuRenameDisplayedName.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				//TODO -- for you Leonard!
+			}
+		});
+		final MenuItem menuRenameSavePath = new MenuItem(menuRename, SWT.PUSH);
+		menuRenameSavePath.setText("Rename Save Path");
+		menuRenameSavePath.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				//TODO -- for you Leonard!
+			}
+		});
+		final MenuItem menuRenameBoth = new MenuItem(menuRename, SWT.PUSH);
+		menuRenameBoth.setText("Rename Both");
+		menuRenameBoth.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				//TODO -- for you Leonard!
+			}
+		});
 
 
 		//----------------------------Move Data
@@ -2535,6 +2562,7 @@ public class DownloadManagerShell {
 					itemDownSpeed.setEnabled(false);
 					removeAnd.setEnabled(false);
 					forceRecheck.setEnabled(false);
+					itemMenuRename.setEnabled(false);
 					try{
 						moveData.setEnabled(false);
 					}catch(Exception e){}
@@ -2543,6 +2571,8 @@ public class DownloadManagerShell {
 					queue.setEnabled(true);
 					remove.setEnabled(true);
 					forceStart.setEnabled(true);
+					itemMenuRename.setEnabled(true);
+					menuRenameDisplayedName.setEnabled(true);
 					itemUpSpeed.setEnabled(true);
 
 
@@ -2577,9 +2607,14 @@ public class DownloadManagerShell {
 							state == Download.ST_QUEUED ||
 							state == Download.ST_ERROR){
 						forceRecheck.setEnabled(true);
-					}else
-						forceRecheck.setEnabled(false);
+						menuRenameSavePath.setEnabled(true);
+						menuRenameBoth.setEnabled(true);
 
+					}else{
+						forceRecheck.setEnabled(false);
+						menuRenameSavePath.setEnabled(false);
+						menuRenameBoth.setEnabled(false);
+					}
 
 
 					removeAnd.setEnabled(true);
@@ -2593,6 +2628,7 @@ public class DownloadManagerShell {
 					itemUpSpeed.setEnabled(false);
 					itemDownSpeed.setEnabled(false);
 					forceRecheck.setEnabled(false);
+					menuRename.setEnabled(false);
 					try{
 						moveData.setEnabled(false);
 					}catch(Exception e){}
@@ -3146,7 +3182,7 @@ public class DownloadManagerShell {
 							setToolBarTorrentIcons(false,false,false);
 						}
 
-						
+
 					}else if(items.length > 1){
 						//Multiple selection here
 						setTorrentMoveButtons(false,false,false,false);
