@@ -6,7 +6,6 @@
 package lbms.azsmrc.remote.client.swtgui.tabs;
 
 
-import lbms.azsmrc.plugin.main.Plugin;
 import lbms.azsmrc.remote.client.Constants;
 import lbms.azsmrc.remote.client.User;
 import lbms.azsmrc.remote.client.UserManager;
@@ -14,15 +13,13 @@ import lbms.azsmrc.remote.client.Utilities;
 import lbms.azsmrc.remote.client.events.ClientUpdateListener;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.ColorUtilities;
-import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
+import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.shared.DuplicatedUserException;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.azsmrc.shared.SWTSafeRunnable;
 import lbms.azsmrc.shared.UserNotFoundException;
-
-
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
