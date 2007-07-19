@@ -169,6 +169,8 @@ public class ResponseManager {
 			dl.implSetAnnounceTimeToWait(Long.parseLong(dle.getAttributeValue("announceTimeToWait")));
 		} catch (Exception e) {}
 
+		if (dle.getAttribute("savePath") != null)
+			dl.implSetSavePath(dle.getAttributeValue("savePath"));
 		if (dle.getAttribute("eta") != null)
 			ds.setEta(dle.getAttributeValue("eta"));
 		if (dle.getAttribute("elapsedTime") != null)

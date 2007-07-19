@@ -833,6 +833,24 @@ public class RequestManager {
 				return false;
 			}
 		});
+		addHandler("setTorrentAttribute", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {
+
+				String hash = xmlRequest.getAttributeValue("hash");
+				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
+				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
+					try {
+						TorrentAttribute ta = Plugin.getPluginInterface().getTorrentManager().getAttribute(xmlRequest.getAttributeValue("attribute"));
+						Download dl = getDownloadByHash (hash);
+						dl.setAttribute(ta, xmlRequest.getAttributeValue("value"));
+					} catch (DownloadException e) {
+						user.eventException(e);
+						e.printStackTrace();
+					}
+				}
+				return false;
+			}
+		});
 		addHandler("requestDownloadScrape", new RequestHandler() {
 			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {
 
@@ -893,6 +911,40 @@ public class RequestManager {
 						}
 						else
 							user.eventException(new Exception("Error Moving Data Files: Directory not found"));
+					} catch (DownloadException e) {
+						user.eventException(e);
+						e.printStackTrace();
+					}
+				}
+				return false;
+			}
+		});
+		addHandler("moveTorrentFile", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response,final User user) throws IOException {
+
+				String hash = xmlRequest.getAttributeValue("hash");
+				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
+				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
+					try {
+						final Download dl = getDownloadByHash (hash);
+						final File target = new File (xmlRequest.getAttributeValue("target"));
+						if (target.exists() && target.isDirectory()) {
+							new Thread(new Runnable() {
+								public void run() {
+									try {
+										if (!dl.isPaused())
+											dl.stop();
+										dl.moveTorrentFile(target);
+										dl.restart();
+									} catch (DownloadException e) {
+										user.eventException(e);
+										e.printStackTrace();
+									}
+								};
+							}).start();
+						}
+						else
+							user.eventException(new Exception("Error Moving Torrent File: Directory not found"));
 					} catch (DownloadException e) {
 						user.eventException(e);
 						e.printStackTrace();

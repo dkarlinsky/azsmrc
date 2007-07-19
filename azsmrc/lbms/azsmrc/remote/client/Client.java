@@ -595,6 +595,21 @@ public class Client {
 		enqueue(sendElement);
 	}
 
+	public void sendMoveTorrentFile (String hash,String target) {
+		Element sendElement = getSendElement("moveTorrentFile");
+		sendElement.setAttribute("hash", hash);
+		sendElement.setAttribute("target", target);
+		enqueue(sendElement);
+	}
+
+	public void sendSetTorrentAttribute (String hash, String attribute, String value) {
+		Element sendElement = getSendElement("setTorrentAttribute");
+		sendElement.setAttribute("hash", hash);
+		sendElement.setAttribute("attribute", attribute);
+		sendElement.setAttribute("value", value);
+		enqueue(sendElement);
+	}
+
 	public void sendMaximumDownloadKBPerSecond (String hash, int limit) {
 		Element sendElement = getSendElement("setMaximumDownload");
 		sendElement.setAttribute("hash", hash);

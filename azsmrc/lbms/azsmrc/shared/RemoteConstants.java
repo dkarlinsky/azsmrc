@@ -128,17 +128,46 @@ public class RemoteConstants {
 	public static final String CORE_PARAM_BOOLEAN_FRIENDLY_HASH_CHECKING				= "CORE_PARAM_BOOLEAN_FRIENDLY_HASH_CHECKING";
 
 
+	//Az Torrent Attributes
+	public static final String	TA_CATEGORY						= "Category";
+	public static final String	TA_NETWORKS						= "Networks";
+	public static final String	TA_PEER_SOURCES					= "PeerSources";
+	public static final String	TA_TRACKER_CLIENT_EXTENSIONS	= "TrackerClientExtensions";
+	public static final String	TA_SHARE_PROPERTIES				= "ShareProperties";	// private=true/false;dht_backup=true/false
+	public static final String  TA_CONTENT_MAP                  = "ContentMap";/**
+	 * Controls the displayed name of a download.
+	 *
+	 * @since 2.5.0.0
+	 */
+	public static final String  TA_DISPLAY_NAME                 = "DisplayName";
+
+	/**
+	 * The user-defined comment for a download.
+	 *
+	 * @since 2.5.0.1
+	 */
+	public static final String  TA_USER_COMMENT                 = "UserComment";
+
+	/**
+	 * Defines a relative file path for this download - this attribute is used
+	 * when moving downloads for completion or removal - this path is relative
+	 * to the default download directories.
+	 *
+	 * @since 2.5.0.1
+	 */
+	public static final String  TA_RELATIVE_SAVE_PATH           = "RelativePath";
+
 
 	//Update URL
 	public static final String UPDATE_URL	= "http://azsmrc.sourceforge.net/AzSMRCupdate.xml.gz";
 	public static final String MOTD_URL		= "http://azsmrc.sourceforge.net/motd.txt.gz";
 	public static final String INFO_URL		= "http://azsmrc.sourceforge.net/info.php";
-	
+
 	//SWT URLS
 	public static final String SWT_WIN = "";
 	public static final String SWT_LINUX = "";
 	public static final String SWT_OSX = "";
-	
+
 	//Encoder stuff
 	public static final String DEFAULT_ENCODING 	= "UTF8";
 	public static final String BYTE_ENCODING 		= "ISO-8859-1";

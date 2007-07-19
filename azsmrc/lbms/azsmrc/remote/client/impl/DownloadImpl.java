@@ -9,11 +9,15 @@ import lbms.azsmrc.remote.client.DownloadAdvancedStats;
 import lbms.azsmrc.remote.client.DownloadFileManager;
 import lbms.azsmrc.remote.client.DownloadStats;
 import lbms.azsmrc.remote.client.events.DownloadListener;
+import lbms.azsmrc.shared.RemoteConstants;
+
+import org.gudy.azureus2.plugins.download.DownloadException;
 
 public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 
 	private String name = "";
 	private String hash;
+	private String savePath = "";
 	private boolean forceStart = false, checking = false, complete = false;
 	private int state, position, uploadLimit = -1,downloadLimit = -1, seeds,leecher, totalSeeds,totalLeecher;
 	private long discarded, size, lastScrape, nextScrape, announceTTW;
@@ -72,7 +76,6 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 	 * @see lbms.azsmrc.remote.client.Download#isChecking()
 	 */
 	public boolean isChecking() {
-		// TODO Auto-generated method stub
 		return checking;
 	}
 
@@ -80,7 +83,6 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 	 * @see lbms.azsmrc.remote.client.Download#isComplete()
 	 */
 	public boolean isComplete() {
-		// TODO Auto-generated method stub
 		return complete;
 	}
 
@@ -124,6 +126,22 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 
 	public void moveTo(int position) {
 		client.sendMoveToPosition(hash, position);
+	}
+
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.Download#getSavePath()
+	 */
+	public String getSavePath() {
+		// TODO Auto-generated method stub
+		return savePath;
+	}
+
+	public void moveTorrentFile(String new_parent_dir) throws DownloadException {
+		client.sendMoveTorrentFile(hash, new_parent_dir);
+	}
+
+	public void renameDownload(String name) throws DownloadException {
+		client.sendSetTorrentAttribute(hash, RemoteConstants.TA_DISPLAY_NAME, name);
 	}
 
 	public DownloadStats getStats() {
@@ -231,6 +249,10 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 	 */
 	public void implSetName(String name) {
 		this.name = name;
+	}
+
+	public void implSetSavePath (String path) {
+		this.savePath = path;
 	}
 
 

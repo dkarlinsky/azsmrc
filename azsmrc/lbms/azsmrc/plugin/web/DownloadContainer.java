@@ -34,6 +34,7 @@ public class DownloadContainer {
 	private String status;
 	private String elapsedTime;
 	private String eta;
+	private String savePath;
 	private float availability;
 	private int completition;
 	private int health;
@@ -109,6 +110,11 @@ public class DownloadContainer {
 		if (state != dl.getState()) {
 			state = dl.getState();
 			dle.setAttribute("state", Integer.toString(state));
+		}
+
+		if (!savePath.equals(dl.getSavePath())) {
+			savePath = dl.getSavePath();
+			dle.setAttribute("savePath", savePath);
 		}
 
 		if (!status.equals(ds.getStatus())) {
@@ -242,6 +248,7 @@ public class DownloadContainer {
 		dle.setAttribute("status", status);
 		dle.setAttribute("elapsedTime", elapsedTime);
 		dle.setAttribute("eta", eta);
+		dle.setAttribute("savePath", savePath);
 		dle.setAttribute("availability", Float.toString(availability));
 		dle.setAttribute("completition", Integer.toString(completition));
 		dle.setAttribute("health", Integer.toString(health));
@@ -278,6 +285,7 @@ public class DownloadContainer {
 		checking = dl.isChecking();
 		complete = dl.isComplete();
 		position = dl.getPosition();
+		savePath = dl.getSavePath();
 		downloaded = ds.getDownloaded();
 		uploaded = ds.getUploaded();
 		downloadAVG = ds.getDownloadAverage();
