@@ -11,8 +11,6 @@ import lbms.azsmrc.remote.client.DownloadStats;
 import lbms.azsmrc.remote.client.events.DownloadListener;
 import lbms.azsmrc.shared.RemoteConstants;
 
-import org.gudy.azureus2.plugins.download.DownloadException;
-
 public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 
 	private String name = "";
@@ -136,12 +134,26 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 		return savePath;
 	}
 
-	public void moveTorrentFile(String new_parent_dir) throws DownloadException {
+	public void moveTorrentFile(String new_parent_dir){
 		client.sendMoveTorrentFile(hash, new_parent_dir);
 	}
 
-	public void renameDownload(String name) throws DownloadException {
+	public void renameDownload(String name){
+		client.sendRenameDownload(hash, name);
+	}
+
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.Download#changeDisplayedName(java.lang.String)
+	 */
+	public void changeDisplayedName(String name){
 		client.sendSetTorrentAttribute(hash, RemoteConstants.TA_DISPLAY_NAME, name);
+	}
+
+	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.Download#setTorrentAttribute(java.lang.String, java.lang.String)
+	 */
+	public void setTorrentAttribute(String name, String value) {
+		client.sendSetTorrentAttribute(hash, name, value);
 	}
 
 	public DownloadStats getStats() {

@@ -16,11 +16,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
@@ -120,7 +118,6 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.gudy.azureus2.plugins.download.DownloadException;
 
 
 public class DownloadManagerShell {
@@ -137,7 +134,7 @@ public class DownloadManagerShell {
 	private CTabItem myTorrents;
 	private MenuItem moveData;
 
-	Map pluginTabs = new HashMap();
+	//Map pluginTabs = new HashMap();
 
 	private DownloadListener dlL = new DownloadListener(){
 
@@ -2500,12 +2497,7 @@ public class DownloadManagerShell {
 							is.setTextValue(container.getDownload().getName());
 							String displayName = is.open();
 							if(displayName != null && !displayName.equals("")){
-								try {
-									container.getDownload().renameDownload(displayName);
-								} catch (DownloadException e) {
-									e.printStackTrace();
-									logger.error(e.toString());
-								}
+								container.getDownload().changeDisplayedName(displayName);
 							}
 						}
 					}
@@ -2526,18 +2518,8 @@ public class DownloadManagerShell {
 							Container container = (Container)items[0].getData();
 							is.setTextValue(container.getDownload().getSavePath());
 							String savepathName = is.open();
-							if(savepathName != null){
-
-								//TODO  Leonard.. I cannot find a setSavePath, only a getSavePath
-								//you need to fix this part!
-								//make sure that if savepathName.equals(""), then setSavePath = download name
-
-/*								try {
-									container.getDownload().renameDownload(savepathName);
-								} catch (DownloadException e) {
-									e.printStackTrace();
-									logger.error(e.toString());
-								}*/
+							if(savepathName != null && !savepathName.equals("")){
+								container.getDownload().renameDownload(savepathName);
 							}
 						}
 					}
@@ -2559,17 +2541,8 @@ public class DownloadManagerShell {
 							is.setTextValue(container.getDownload().getName());
 							String newName = is.open();
 							if(newName != null && !newName.equals("")){
-
-								//TODO  Leonard.. I cannot find a setSavePath, only a getSavePath
-								//you need to fix this part!
-								//This section will set both download name and setSavePath to newName
-
-/*								try {
-									container.getDownload().renameDownload(savepathName);
-								} catch (DownloadException e) {
-									e.printStackTrace();
-									logger.error(e.toString());
-								}*/
+								container.getDownload().changeDisplayedName(newName);
+								container.getDownload().renameDownload(newName);
 							}
 						}
 					}
@@ -3438,7 +3411,7 @@ public class DownloadManagerShell {
 
 						//moveSelectedTorrents(drag_drop_line_start, drag_drop_line_end);
 						if(parent.equals(downloadsTable)){
-							Iterator iter = downloadsMap.keySet().iterator();
+							Iterator<String> iter = downloadsMap.keySet().iterator();
 							while (iter.hasNext()){
 								Container container = downloadsMap.get(iter.next());
 								if(container.getDownload().getPosition() == drag_drop_line_start+1){
@@ -3452,7 +3425,7 @@ public class DownloadManagerShell {
 								}
 							}
 						}else{
-							Iterator iter = seedsMap.keySet().iterator();
+							Iterator<String> iter = seedsMap.keySet().iterator();
 							while (iter.hasNext()){
 								Container container = seedsMap.get(iter.next());
 								if(container.getDownload().getPosition() == drag_drop_line_start){

@@ -885,6 +885,35 @@ public class RequestManager {
 				return false;
 			}
 		});
+		addHandler("renameDownload", new RequestHandler() {
+			public boolean handleRequest(final Element xmlRequest, Element response,final User user) throws IOException {
+
+				String hash = xmlRequest.getAttributeValue("hash");
+				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
+				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
+					try {
+						final Download dl = getDownloadByHash (hash);
+							new Thread(new Runnable() {
+								public void run() {
+									try {
+										if (!dl.isPaused())
+											dl.stop();
+										dl.renameDownload(xmlRequest.getAttributeValue("target"));
+										dl.restart();
+									} catch (DownloadException e) {
+										user.eventException(e);
+										e.printStackTrace();
+									}
+								};
+							}).start();
+					} catch (DownloadException e) {
+						user.eventException(e);
+						e.printStackTrace();
+					}
+				}
+				return false;
+			}
+		});
 		addHandler("moveDataFiles", new RequestHandler() {
 			public boolean handleRequest(Element xmlRequest, Element response,final User user) throws IOException {
 

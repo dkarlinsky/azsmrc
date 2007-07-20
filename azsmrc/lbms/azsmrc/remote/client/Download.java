@@ -25,7 +25,6 @@ import java.io.File;
 
 import lbms.azsmrc.remote.client.events.DownloadListener;
 
-import org.gudy.azureus2.plugins.download.DownloadException;
 import org.gudy.azureus2.plugins.download.DownloadRemovalVetoException;
 
 /**
@@ -270,11 +269,8 @@ public interface Download extends
 	 *
 	 * @since 2.3.0.5
 	 * @param new_parent_dir
-	 * @throws DownloadException
 	 */
-	public void moveTorrentFile(String new_parent_dir)
-
-	throws DownloadException;
+	public void moveTorrentFile(String new_parent_dir);
 
 	/**
 	 * Renames the file (for a single file torrent) or directory (for a multi
@@ -293,7 +289,26 @@ public interface Download extends
 	 *            New name for the download.
 	 * @see #moveDataFiles(File)
 	 */
-	public void renameDownload(String name) throws DownloadException;
+	public void renameDownload(String name);
+
+	/**
+	 * Changes the displayed name for the Download
+	 *
+	 * Note: you could use setTorrentAttribute(RemoteConstants.TA_DISPLAY_NAME, "new name") too
+	 *
+	 * @param name
+	 */
+	public void changeDisplayedName(String name);
+
+	/**
+	 * Sets a TorrentAttribute.
+	 *
+	 * Az Default Attributes can be found at RemoteConstants.TA_*
+	 *
+	 * @param name Attribute name
+	 * @param value new value
+	 */
+	public void setTorrentAttribute (String name, String value);
 
 	/**
 	 * Tests whether or not a download can be removed. Due to synchronization
