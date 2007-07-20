@@ -120,6 +120,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.gudy.azureus2.plugins.download.DownloadException;
 
 
 public class DownloadManagerShell {
@@ -2488,21 +2489,91 @@ public class DownloadManagerShell {
 		menuRenameDisplayedName.setText("Rename Displayed Name");
 		menuRenameDisplayedName.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				//TODO -- for you Leonard!
+				RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
+					public void runSafe() {
+						InputShell is = new InputShell("Rename Displayed Name",
+								"Enter a new name to display for this download" +
+								"\nIf no text is entered, the original name will be used");
+						if(table!= null && !table.isDisposed()){
+							TableItem[] items = table.getSelection();
+							Container container = (Container)items[0].getData();
+							is.setTextValue(container.getDownload().getName());
+							String displayName = is.open();
+							if(displayName != null && !displayName.equals("")){
+								try {
+									container.getDownload().renameDownload(displayName);
+								} catch (DownloadException e) {
+									e.printStackTrace();
+									logger.error(e.toString());
+								}
+							}
+						}
+					}
+				});
 			}
 		});
 		final MenuItem menuRenameSavePath = new MenuItem(menuRename, SWT.PUSH);
 		menuRenameSavePath.setText("Rename Save Path");
 		menuRenameSavePath.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				//TODO -- for you Leonard!
+				RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
+					public void runSafe() {
+						InputShell is = new InputShell("Rename Save Path",
+								"Enter a new save path name for this download" +
+								"\nIf no text is entered, the download's displayed name will be used");
+						if(table!= null && !table.isDisposed()){
+							TableItem[] items = table.getSelection();
+							Container container = (Container)items[0].getData();
+							is.setTextValue(container.getDownload().getSavePath());
+							String savepathName = is.open();
+							if(savepathName != null){
+
+								//TODO  Leonard.. I cannot find a setSavePath, only a getSavePath
+								//you need to fix this part!
+								//make sure that if savepathName.equals(""), then setSavePath = download name
+
+/*								try {
+									container.getDownload().renameDownload(savepathName);
+								} catch (DownloadException e) {
+									e.printStackTrace();
+									logger.error(e.toString());
+								}*/
+							}
+						}
+					}
+				});
 			}
 		});
 		final MenuItem menuRenameBoth = new MenuItem(menuRename, SWT.PUSH);
 		menuRenameBoth.setText("Rename Both");
 		menuRenameBoth.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				//TODO -- for you Leonard!
+				RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
+					public void runSafe() {
+						InputShell is = new InputShell("Rename Download",
+								"Enter a new name for this download" +
+								"\nIf no text is entered, the original values will be used");
+						if(table!= null && !table.isDisposed()){
+							TableItem[] items = table.getSelection();
+							Container container = (Container)items[0].getData();
+							is.setTextValue(container.getDownload().getName());
+							String newName = is.open();
+							if(newName != null && !newName.equals("")){
+
+								//TODO  Leonard.. I cannot find a setSavePath, only a getSavePath
+								//you need to fix this part!
+								//This section will set both download name and setSavePath to newName
+
+/*								try {
+									container.getDownload().renameDownload(savepathName);
+								} catch (DownloadException e) {
+									e.printStackTrace();
+									logger.error(e.toString());
+								}*/
+							}
+						}
+					}
+				});
 			}
 		});
 
