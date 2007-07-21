@@ -10,7 +10,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import lbms.azsmrc.plugin.gui.View;
@@ -439,23 +442,63 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 			public void menuWillBeShown(MenuItem menu, Object data) {
 				menu.removeAllChildItems();
 				TableManager tm = pluginInterface.getUIManager().getTableManager();
-				if (getCurrentUser() != null || getCurrentUser().checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+				if (getCurrentUser() != null && getCurrentUser().checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
 					TableRow[] rows = (TableRow[])data;
 					if (rows.length == 0) return;
 					if (rows.length == 1) {
-						TableContextMenuItem displayState = tm.addContextMenuItem((TableContextMenuItem)menu, "");
-						displayState.setEnabled(false);
 
-						TableContextMenuItem separator = tm.addContextMenuItem((TableContextMenuItem)menu, "");
-						separator.setStyle(MenuItem.STYLE_SEPARATOR);
 
 						Download dl = (Download)rows[0].getDataSource();
+						User[] ownerList = config.getUsersOfDownload(dl);
 
 						if (MultiUser.isPublicDownload(dl)) {
+							TableContextMenuItem owner = tm.addContextMenuItem((TableContextMenuItem)menu, "");
+							//displayState.setEnabled(false);
+							owner.setText("PUBLIC");
 
-							displayState.setText("PUBLIC");
+							TableContextMenuItem separator = tm.addContextMenuItem((TableContextMenuItem)menu, "");
+							separator.setStyle(MenuItem.STYLE_SEPARATOR);
+
 
 						} else {
+
+							if (MultiUser.isSharedDownload(dl)) {
+								for (final User o:ownerList) {
+									TableContextMenuItem owner = tm.addContextMenuItem((TableContextMenuItem)menu, "");
+									owner.setText(o.getUsername());
+									owner.addListener(new MenuItemListener() {
+										/* (non-Javadoc)
+										 * @see org.gudy.azureus2.plugins.ui.menus.MenuItemListener#selected(org.gudy.azureus2.plugins.ui.menus.MenuItem, java.lang.Object)
+										 */
+										public void selected(MenuItem menu,	Object target) {
+											TableRow row = (TableRow) target;
+											Download dl = (Download)row.getDataSource();
+											MultiUser.removeUserFromDownload(o, dl);
+											System.out.println("Removing User "+o.getUsername()+" from "+dl.getName());
+										}
+									});
+								}
+
+							} else {
+								TableContextMenuItem owner = tm.addContextMenuItem((TableContextMenuItem)menu, "");
+								//displayState.setEnabled(false);
+								owner.setText(ownerList[0].getUsername());
+								final User o = ownerList[0];
+								owner.addListener(new MenuItemListener() {
+									/* (non-Javadoc)
+									 * @see org.gudy.azureus2.plugins.ui.menus.MenuItemListener#selected(org.gudy.azureus2.plugins.ui.menus.MenuItem, java.lang.Object)
+									 */
+									public void selected(MenuItem menu,	Object target) {
+										TableRow row = (TableRow) target;
+										Download dl = (Download)row.getDataSource();
+										MultiUser.removeUserFromDownload(o, dl);
+										System.out.println("Removing User "+o.getUsername()+" from "+dl.getName());
+									}
+								});
+							}
+
+							TableContextMenuItem separator = tm.addContextMenuItem((TableContextMenuItem)menu, "");
+							separator.setStyle(MenuItem.STYLE_SEPARATOR);
 
 							TableContextMenuItem removeAllUsers = tm.addContextMenuItem((TableContextMenuItem)menu, "azsmrc.tablemenu.removeallusers");
 							removeAllUsers.addMultiListener(new MenuItemListener() {
@@ -467,15 +510,30 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 									for (int i=0;i<rows.length;i++) {
 										Download dl = (Download)rows[i].getDataSource();
 										MultiUser.removeUsersFromDownload(dl);
+										System.out.println("Removing Users from "+dl.getName());
 									}
 								}
 							});
+						}
 
-							if (MultiUser.isSharedDownload(dl)) {
-								displayState.setText("SHARED");
-							} else {
-								displayState.setText(config.getUsersOfDownload(dl)[0].getUsername());
-							}
+						List<User> users = new ArrayList<User>(Arrays.asList(config.getUsers()));
+						users.removeAll(Arrays.asList(ownerList));
+						if (users.size()>10) {
+							menu = tm.addContextMenuItem((TableContextMenuItem)menu, "azsmrc.tablemenu.adduser");
+						}
+						for (final User u:users) {
+							TableContextMenuItem addToUser = tm.addContextMenuItem((TableContextMenuItem)menu, "");
+							addToUser.setText("Add to: "+u.getUsername());
+							addToUser.addMultiListener(new MenuItemListener() {
+								public void selected(MenuItem menu, Object target) {
+									TableRow[] rows = (TableRow[])target;
+									for (int i=0;i<rows.length;i++) {
+										Download dl = (Download)rows[i].getDataSource();
+										MultiUser.addUserToDownload(u, dl);
+										System.out.println("Adding "+dl.getName()+" to "+u.getUsername());
+									}
+								};
+							});
 						}
 
 					} else {
@@ -489,24 +547,26 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 								for (int i=0;i<rows.length;i++) {
 									Download dl = (Download)rows[i].getDataSource();
 									MultiUser.removeUsersFromDownload(dl);
+									System.out.println("Removing Users from "+dl.getName());
 								}
 							}
 						});
-					}
-					User[] users = config.getUsers();
-					for (final User u:users) {
-						TableContextMenuItem addToUser = tm.addContextMenuItem((TableContextMenuItem)menu, "");
-						addToUser.setText("Add to: "+u.getUsername());
-						addToUser.addMultiListener(new MenuItemListener() {
-							public void selected(MenuItem menu, Object target) {
-								TableRow[] rows = (TableRow[])target;
-								for (int i=0;i<rows.length;i++) {
-									Download dl = (Download)rows[i].getDataSource();
-									MultiUser.addUserToDownload(u, dl);
-									System.out.println("Adding "+dl.getName()+" to "+u.getUsername());
-								}
-							};
-						});
+
+						User[] users = config.getUsers();
+						for (final User u:users) {
+							TableContextMenuItem addToUser = tm.addContextMenuItem((TableContextMenuItem)menu, "");
+							addToUser.setText("Add to: "+u.getUsername());
+							addToUser.addMultiListener(new MenuItemListener() {
+								public void selected(MenuItem menu, Object target) {
+									TableRow[] rows = (TableRow[])target;
+									for (int i=0;i<rows.length;i++) {
+										Download dl = (Download)rows[i].getDataSource();
+										MultiUser.addUserToDownload(u, dl);
+										System.out.println("Adding "+dl.getName()+" to "+u.getUsername());
+									}
+								};
+							});
+						}
 					}
 				} else {
 					TableContextMenuItem displayState = tm.addContextMenuItem((TableContextMenuItem)menu, "");
@@ -710,9 +770,9 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 	/**
 	 * Returns an Array of users.
-	 * 
+	 *
 	 * This Method is intended to be used via IPC.
-	 * 
+	 *
 	 * @return array of User
 	 */
 	public String[] ipcGetUsers () {
@@ -721,9 +781,9 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 	/**
 	 * Adds a Download to a User if he exists.
-	 * 
+	 *
 	 * This Method is intended to be used via IPC.
-	 * 
+	 *
 	 * @param uName username to add Download to
 	 * @param dl Download to add
 	 * @return true on success, false on fail

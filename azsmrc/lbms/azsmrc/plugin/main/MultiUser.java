@@ -36,7 +36,7 @@ public class MultiUser {
 	}
 
 	public static boolean isSharedDownload (Download dl) {
-		return (dl.getAttribute(MultiUser.TA_USER) == null || dl.getAttribute(MultiUser.TA_USER).equals(SHARED_USER_NAME));
+		return (dl.getAttribute(MultiUser.TA_USER) != null && dl.getAttribute(MultiUser.TA_USER).equals(SHARED_USER_NAME));
 	}
 
 	public static void addUserToDownload (User u, Download dl) {
