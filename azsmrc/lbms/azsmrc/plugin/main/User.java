@@ -6,6 +6,7 @@ import java.util.Queue;
 
 import lbms.azsmrc.plugin.pluginsupport.PSupportAzJabber;
 import lbms.azsmrc.plugin.pluginsupport.PSupportStatusMailer;
+import lbms.azsmrc.plugin.web.DownloadContainerManager;
 import lbms.azsmrc.shared.EncodingUtil;
 import lbms.azsmrc.shared.RemoteConstants;
 
@@ -16,15 +17,19 @@ import org.jdom.Element;
 
 /**
  * @author Damokles
- * 
+ *
  */
 public class User extends lbms.azsmrc.shared.User {
 
+	private static final int SESSION_TIMEOUT = 5 * 60 * 1000; // 5min
+
 	private Queue<Element> eventQueue = new LinkedList<Element>();
+	private DownloadContainerManager dcm;
+	private long lastLogin;
 
 	/**
 	 * Creates a User object and reads the data from xml document
-	 * 
+	 *
 	 * @param userElement
 	 */
 	public User(Element userElement) {
@@ -43,7 +48,7 @@ public class User extends lbms.azsmrc.shared.User {
 
 	/**
 	 * Adds the download to the user.
-	 * 
+	 *
 	 * @param download
 	 */
 	public void addDownload(Download download) {
@@ -67,7 +72,7 @@ public class User extends lbms.azsmrc.shared.User {
 
 	/**
 	 * This keeps only Downloads that are in both Collections.
-	 * 
+	 *
 	 * @param dls
 	 *            other collection to intersect with
 	 */
@@ -77,7 +82,7 @@ public class User extends lbms.azsmrc.shared.User {
 
 	/**
 	 * The download will be removed from the user.
-	 * 
+	 *
 	 * @param download
 	 */
 	public void removeDownload(Download download) {
@@ -86,7 +91,7 @@ public class User extends lbms.azsmrc.shared.User {
 
 	/**
 	 * Checks if the user is an owner of the Download
-	 * 
+	 *
 	 * @param dl
 	 * @return
 	 */
@@ -97,7 +102,7 @@ public class User extends lbms.azsmrc.shared.User {
 	/**
 	 * This function will return the Base64 String represantation of the
 	 * downloadHash
-	 * 
+	 *
 	 * @param dl
 	 * @return String represantation of the downloadHash
 	 */
@@ -109,7 +114,7 @@ public class User extends lbms.azsmrc.shared.User {
 
 	/**
 	 * This function will convert the User object to a xml encoded jdom Element.
-	 * 
+	 *
 	 * @return the jdom Element represantation of the object
 	 */
 	public Element toElement() {
@@ -119,7 +124,7 @@ public class User extends lbms.azsmrc.shared.User {
 
 	/**
 	 * Use this function to check if there are events in the eventQueue
-	 * 
+	 *
 	 * @return true if events are in queue
 	 */
 	public boolean hasEvents() {
@@ -128,7 +133,7 @@ public class User extends lbms.azsmrc.shared.User {
 
 	/**
 	 * This function will put all events in the root Element.
-	 * 
+	 *
 	 * @param root
 	 *            all elements will be added in here
 	 */
@@ -144,6 +149,50 @@ public class User extends lbms.azsmrc.shared.User {
 		Element event = new Element("Event");
 		event.setAttribute("time", Long.toString(System.currentTimeMillis()));
 		return event;
+	}
+
+	/**
+	 * @return the dcm
+	 */
+	public DownloadContainerManager getDownloadContainerManager() {
+		if (dcm == null) {
+			dcm = new DownloadContainerManager (Plugin.getPluginInterface().getDownloadManager(), this);
+		}
+		return dcm;
+	}
+
+	/**
+	 * @return the lastLogin
+	 */
+	public long getLastLogin() {
+		return lastLogin;
+	}
+
+	/**
+	 * Returns whether the client was last seen before the session timeout.
+	 * @return
+	 */
+	public boolean isSessionValid () {
+		return System.currentTimeMillis() - lastLogin < SESSION_TIMEOUT;
+	}
+
+	/**
+	 * Update Session Last Login
+	 */
+	public void updateLogin() {
+		lastLogin = System.currentTimeMillis();
+	}
+
+	/**
+	 * If Session has expired delete Session Data
+	 */
+	public void checkAndDeleteOldSession() {
+		if (!isSessionValid()) {
+			if (dcm != null) {
+				dcm.destroy();
+				dcm = null;
+			}
+		}
 	}
 
 	// --------------------------------------------//

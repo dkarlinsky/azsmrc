@@ -212,6 +212,12 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 			}
 		});
 
+		Timers.addPeriodicEvent(1000*60, new UTTimerEventPerformer() {
+			public void perform(UTTimerEvent event) {
+				config.checkAndDeleteOldSessions();
+			}
+		});
+
 		pluginInterface.getPluginconfig().addListener(new PluginConfigListener() {
 			public void configSaved() {
 				if (pluginInterface.getPluginconfig().getPluginBooleanParameter("disableAutoImport",false)) {

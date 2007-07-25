@@ -14,7 +14,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import javax.crypto.*;
+import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import javax.crypto.CipherOutputStream;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import lbms.azsmrc.shared.DuplicatedUserException;
@@ -24,7 +29,9 @@ import lbms.azsmrc.shared.UserNotFoundException;
 
 import org.gudy.azureus2.plugins.PluginException;
 import org.gudy.azureus2.plugins.download.Download;
-import org.jdom.*;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -333,6 +340,12 @@ public class XMLConfig {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+
+	public synchronized void checkAndDeleteOldSessions () {
+		for (User u:userList.values()) {
+			u.checkAndDeleteOldSession();
 		}
 	}
 }

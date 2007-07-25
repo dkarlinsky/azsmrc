@@ -79,7 +79,6 @@ public class RequestManager {
 	private Map<String,RequestHandler> handlerList = new HashMap<String, RequestHandler>();
 	private static RequestManager instance = new RequestManager();
 	private Map<String, Integer[]> downloadControlList = new HashMap<String, Integer[]>();
-	private DownloadContainerManager dcm;
 	private UTTimerEvent resumeTask;
 	private TorrentAttribute taCateory;
 	private TorrentAttribute taUser;
@@ -96,7 +95,7 @@ public class RequestManager {
 	public void initialize (PluginInterface pi) {
 		taCateory = pi.getTorrentManager().getAttribute(TorrentAttribute.TA_CATEGORY);
 		taUser = pi.getTorrentManager().getPluginAttribute("User");
-		dcm = new DownloadContainerManager(pi.getDownloadManager());
+
 		pi.getDownloadManager().addDownloadWillBeAddedListener(new DownloadWillBeAddedListener() {
 			public void initialised(Download dl) {
 				String hash = EncodingUtil.encode(dl.getTorrent().getHash());
@@ -152,6 +151,9 @@ public class RequestManager {
 		} catch (DataConversionException e) {
 			e.printStackTrace();
 		}
+
+		user.updateLogin();
+
 		Document xmlResponse = new Document();
 		Element responseRoot = new Element("Response");
 		for (Element query:queries) {
@@ -432,13 +434,10 @@ public class RequestManager {
 		addHandler("updateDownloads", new RequestHandler() {
 			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException{
 				//response.setAttribute("switch", "listTransfers");
-				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				boolean fullUpdate = Boolean.parseBoolean(xmlRequest.getAttributeValue("fullUpdate"));
-				if (singleUser) {
-					response.addContent(dcm.updateDownload(fullUpdate));
-				} else {
-					response.addContent(dcm.updateDownloadsFromUser(user, fullUpdate));
-				}
+
+				response.addContent(user.getDownloadContainerManager().updateDownload(fullUpdate));
+
 				return true;
 			}
 		});

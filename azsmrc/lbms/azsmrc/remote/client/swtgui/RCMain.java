@@ -953,7 +953,7 @@ public class RCMain implements Launchable {
 							if (properties.getPropertyAsBoolean("statistics.allow")) {
 								url = new URL (RemoteConstants.INFO_URL+"?app=AzSMRC_client&version="+azsmrcProperties.getProperty("version","0")+"&uid="+properties.getProperty("azsmrc.uid"));
 							} else	{
-								url = new URL (RemoteConstants.INFO_URL);
+								url = new URL (RemoteConstants.INFO_URL+"?app=AzSMRC_client&version="+azsmrcProperties.getProperty("version","0"));
 							}
 							HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 							conn.connect();
