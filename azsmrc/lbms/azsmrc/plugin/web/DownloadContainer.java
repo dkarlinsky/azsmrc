@@ -65,6 +65,12 @@ public class DownloadContainer {
 
 		dle.setAttribute("hash", hash);
 
+		if (!name.equals(dl.getName())) {
+			name = dl.getName();
+			dle.setAttribute("name", name);
+		}
+
+
 		if (forceStart != dl.isForceStart()) {
 			forceStart = dl.isForceStart();
 			dle.setAttribute("forceStart", Boolean.toString(forceStart));
