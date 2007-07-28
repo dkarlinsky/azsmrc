@@ -219,7 +219,7 @@ public class DownloadContainer {
 		for (TorrentAttribute ta : TA_LIST) {
 			String dlA = dl.getAttribute(ta);
 			if (dlA != null) {
-				if (!attributes.get(ta.getName()).equals(dlA)) {
+				if (attributes.get(ta.getName()) == null || !attributes.get(ta.getName()).equals(dlA)) {
 					Element a = new Element("Attribute");
 					a.setAttribute("name",ta.getName());
 					a.setAttribute("value", dlA);

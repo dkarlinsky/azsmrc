@@ -33,10 +33,14 @@ public class DownloadContainerManager implements DownloadManagerListener {
 		Element transferList = new Element("Transfers");
 		for (DownloadContainer dc:dcList) {
 			if(user.hasDownload(dc.getDownload()) || (user.checkAccess(RemoteConstants.RIGHTS_SEE_PUBLICDL) && MultiUser.isPublicDownload(dc.getDownload()))) {
-				if (full)
-					transferList.addContent(dc.fullUpdate());
-				else
-					transferList.addContent(dc.updateAndGetDiff());
+				try {
+					if (full)
+						transferList.addContent(dc.fullUpdate());
+					else
+						transferList.addContent(dc.updateAndGetDiff());
+				} catch (RuntimeException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		return transferList;
@@ -45,10 +49,14 @@ public class DownloadContainerManager implements DownloadManagerListener {
 	private Element updateDownloadSingleUser (boolean full) {
 		Element transferList = new Element("Transfers");
 		for (DownloadContainer dc:dcList) {
-			if (full)
-				transferList.addContent(dc.fullUpdate());
-			else
-				transferList.addContent(dc.updateAndGetDiff());
+			try {
+				if (full)
+					transferList.addContent(dc.fullUpdate());
+				else
+					transferList.addContent(dc.updateAndGetDiff());
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+			}
 		}
 		return transferList;
 	}

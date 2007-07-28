@@ -210,6 +210,7 @@ public class RequestManager {
 			}
 		}
 		System.out.println("\nResponse:");
+
 		new XMLOutputter(Format.getPrettyFormat()).output(xmlResponse, System.out);		//Response
 
 		if (restart) {
