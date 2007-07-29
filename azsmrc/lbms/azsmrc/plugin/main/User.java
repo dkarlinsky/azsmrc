@@ -233,7 +233,6 @@ public class User extends lbms.azsmrc.shared.User {
 					.formatByteCountToKiBEtcPerSec(dl.getTorrent().getSize()
 							/ dl.getStats().getSecondsDownloading())
 					: "undefined");
-		removeDownload(dl);
 		eventQueue.offer(event);
 	}
 

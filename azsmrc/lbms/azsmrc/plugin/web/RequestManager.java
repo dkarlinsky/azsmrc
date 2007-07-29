@@ -607,7 +607,7 @@ public class RequestManager {
 							else
 								dl.remove();
 						} else {
-							user.removeDownload(dl);
+							MultiUser.removeUserFromDownload(user, dl);
 						}
 					} catch (DownloadException e) {
 						user.eventException(e);
