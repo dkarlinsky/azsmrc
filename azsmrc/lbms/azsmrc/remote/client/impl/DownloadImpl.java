@@ -130,7 +130,6 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 	 * @see lbms.azsmrc.remote.client.Download#getSavePath()
 	 */
 	public String getSavePath() {
-		// TODO Auto-generated method stub
 		return savePath;
 	}
 
@@ -146,6 +145,7 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 	 * @see lbms.azsmrc.remote.client.Download#changeDisplayedName(java.lang.String)
 	 */
 	public void changeDisplayedName(String name){
+		this.name = name;
 		client.sendSetTorrentAttribute(hash, RemoteConstants.TA_DISPLAY_NAME, name);
 	}
 
