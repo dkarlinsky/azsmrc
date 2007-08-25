@@ -896,11 +896,19 @@ public class RequestManager {
 		});
 		addHandler("renameDownload", new RequestHandler() {
 			public boolean handleRequest(final Element xmlRequest, Element response,final User user) throws IOException {
-
+				if (!user.checkAccess(RemoteConstants.RIGHTS_SET_DL_DIR)) return false;
 				String hash = xmlRequest.getAttributeValue("hash");
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
 					try {
+						File target = new File (xmlRequest.getAttributeValue("target"));
+						if (Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("restrictSaveDir", false)) {
+							String restrictSaveDir = Plugin.getPluginInterface().getPluginconfig().getPluginStringParameter("restrictedSaveDir");
+							if (!target.getCanonicalPath().startsWith(restrictSaveDir)) {
+								user.eventErrorMessage("Desired download location is outside of the restricted download directory: "+restrictSaveDir);
+								return false;
+							}
+						}
 						final Download dl = getDownloadByHash (hash);
 							new Thread(new Runnable() {
 								public void run() {
@@ -925,13 +933,20 @@ public class RequestManager {
 		});
 		addHandler("moveDataFiles", new RequestHandler() {
 			public boolean handleRequest(Element xmlRequest, Element response,final User user) throws IOException {
-
+				if (!user.checkAccess(RemoteConstants.RIGHTS_SET_DL_DIR)) return false;
 				String hash = xmlRequest.getAttributeValue("hash");
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
 					try {
 						final Download dl = getDownloadByHash (hash);
 						final File target = new File (xmlRequest.getAttributeValue("target"));
+						if (Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("restrictSaveDir", false)) {
+							String restrictSaveDir = Plugin.getPluginInterface().getPluginconfig().getPluginStringParameter("restrictedSaveDir");
+							if (!target.getCanonicalPath().startsWith(restrictSaveDir)) {
+								user.eventErrorMessage("Desired download location is outside of the restricted download directory: "+restrictSaveDir);
+								return false;
+							}
+						}
 						if (target.exists() && target.isDirectory()) {
 							new Thread(new Runnable() {
 								public void run() {
