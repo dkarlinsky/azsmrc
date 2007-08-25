@@ -446,9 +446,18 @@ public class RequestManager {
 			public boolean handleRequest(final Element xmlRequest, Element response,final User user) throws IOException {
 				String location = xmlRequest.getAttributeValue("location");
 				File file_location = null;
-				if (user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
-					if (xmlRequest.getAttributeValue("fileLocation") != null)
+				if (user.checkAccess(RemoteConstants.RIGHTS_SET_DL_DIR)) {
+					if (xmlRequest.getAttributeValue("fileLocation") != null) {
 						file_location = new File (xmlRequest.getAttributeValue("fileLocation"));
+						if (Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("restrictSaveDir", false)) {
+							String restrictSaveDir = Plugin.getPluginInterface().getPluginconfig().getPluginStringParameter("restrictedSaveDir");
+							if (!file_location.getCanonicalPath().startsWith(restrictSaveDir)) {
+								file_location = null;
+								user.eventErrorMessage("Desired download location is outside of the restricted download directory: "+restrictSaveDir);
+								return false;
+							}
+						}
+					}
 					if (file_location != null && !file_location.exists()) {
 						file_location = null;
 					}

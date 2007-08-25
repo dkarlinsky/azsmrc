@@ -46,6 +46,8 @@ import org.gudy.azureus2.plugins.tracker.web.TrackerWebContext;
 import org.gudy.azureus2.plugins.ui.UIInstance;
 import org.gudy.azureus2.plugins.ui.UIManager;
 import org.gudy.azureus2.plugins.ui.UIManagerListener;
+import org.gudy.azureus2.plugins.ui.config.BooleanParameter;
+import org.gudy.azureus2.plugins.ui.config.DirectoryParameter;
 import org.gudy.azureus2.plugins.ui.menus.MenuItem;
 import org.gudy.azureus2.plugins.ui.menus.MenuItemFillListener;
 import org.gudy.azureus2.plugins.ui.menus.MenuItemListener;
@@ -116,8 +118,12 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		config_model.addBooleanParameter2("use_ssl","azsmrc.use.ssl",false);
 		config_model.addIntParameter2("remote_port", "azsmrc.remote.port", 49009);
 		config_model.addLabelParameter2("azsmrc.portchange.alert");
+		BooleanParameter restrictDir = config_model.addBooleanParameter2("restrictSaveDir","azsmrc.restrictSaveDir",false);
+		DirectoryParameter restrictedDir = config_model.addDirectoryParameter2("restrictedSaveDir", "azsmrc.restrictedSaveDir", "");
 		config_model.addLabelParameter2("azsmrc.statistics.label");
 		config_model.addBooleanParameter2("statistics.allow", "azsmrc.statistics.allow", false);
+
+		restrictDir.addEnabledOnSelection(restrictedDir);
 
 		//Load the config file
 		config = XMLConfig.loadConfigFile(pluginInterface.getPluginDirectoryName() + System.getProperty("file.separator") + "MultiUserConfig.xml");
