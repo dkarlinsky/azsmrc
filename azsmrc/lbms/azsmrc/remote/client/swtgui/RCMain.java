@@ -267,6 +267,12 @@ public class RCMain implements Launchable {
 		}
 		shutdown();
 		display.dispose();
+		/*
+		 * Have yet to trace the reason why, but OSX will not
+		 * kill the whole application on SWT disposal- call exit to force end.
+		 */
+		if(Utilities.isOSX)
+			System.exit(0);
 	}
 
 	protected void createContents() {
@@ -1345,11 +1351,11 @@ public class RCMain implements Launchable {
 		for(FlavorListener listen:listeners){
 			clipboard.removeFlavorListener(listen);
 		}*/
-
 		clipboard.addFlavorListener(new FlavorListener(){
 			Pattern magnetPattern = Pattern.compile("^magnet:\\?xt=urn:btih:[A-Za-z2-7]{32}$",Pattern.CASE_INSENSITIVE);
 
 			public void flavorsChanged(FlavorEvent event) {
+				System.out.println("2");
 				if(connect && properties.getPropertyAsBoolean("auto_clipboard",Utilities.isLinux()? false : true)){
 					try {
 						Transferable contents = clipboard.getContents(this);
