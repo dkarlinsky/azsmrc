@@ -986,9 +986,7 @@ public class ManageUsersTab {
 				final User u = user;
 				commit.addListener(SWT.Selection, new Listener() {
 					public void handleEvent(Event e) {
-						if(userName.getText().equalsIgnoreCase("")      ||
-								outputDir.getText().equalsIgnoreCase("")||
-								importDir.getText().equalsIgnoreCase("")){
+						if(userName.getText().equalsIgnoreCase("")){
 							MessageBox mb = new MessageBox(RCMain.getRCMain().getDisplay().getActiveShell(),SWT.ICON_ERROR);
 							mb.setText(I18N.translate("global.error"));
 							mb.setMessage(I18N.translate(PFX + "editUserShell.error1.message"));

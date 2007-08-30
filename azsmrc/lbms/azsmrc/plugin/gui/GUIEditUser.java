@@ -430,16 +430,7 @@ public class GUIEditUser {
 			public void focusLost(FocusEvent arg0) {
 				if(outputDir == null || outputDir.isDisposed()) return;
 				if(outputDir.getText().equals(user.getOutputDir())) return;
-
-				if(outputDir.getText().length() > 0){
-					user.setOutputDir(outputDir.getText());
-				}else{
-					MessageBox mb = new MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
-					mb.setText("Error");
-					mb.setMessage("The output directory must be filled out");
-					mb.open();
-					return;
-				}
+				user.setOutputDir(outputDir.getText());
 			}
 		});
 
@@ -508,9 +499,8 @@ public class GUIEditUser {
 				if(importDir == null || importDir.isDisposed()) return;
 				if(importDir.getText().equals(user.getAutoImportDir())) return;
 
-				if(importDir.getText().length() > 0){
-					user.setAutoImportDir(importDir.getText());
-				}
+				user.setAutoImportDir(importDir.getText());
+
 
 			}
 

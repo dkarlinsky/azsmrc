@@ -1,6 +1,7 @@
 package lbms.azsmrc.plugin.web;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
@@ -1515,6 +1516,49 @@ public class RequestManager {
 				response.addContent(fc);
 
 				return true;
+			}
+		});
+		addHandler("getSubDirs", new RequestHandler() {
+			public boolean handleRequest(Element xmlRequest, Element response, final User user) throws IOException {
+
+				if (user.checkAccess(RemoteConstants.RIGHTS_SET_DL_DIR)) {
+					String restrictSaveDir = null;
+					File parent_dir = null;
+
+					if (Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("restrictSaveDir", false)) {
+						restrictSaveDir = Plugin.getPluginInterface().getPluginconfig().getPluginStringParameter("restrictedSaveDir");
+					}
+					if (xmlRequest.getAttribute("dir") != null) {
+						parent_dir = new File (xmlRequest.getAttributeValue("dir"));
+						if (restrictSaveDir != null && !parent_dir.getCanonicalPath().startsWith(restrictSaveDir)) {
+							parent_dir = null;
+							user.eventErrorMessage("Desired location is outside of the restricted download directory: "+restrictSaveDir);
+							return false;
+						} else {
+
+						}
+					} else {
+					    if (restrictSaveDir != null) {
+						parent_dir = new File (restrictSaveDir);
+					    } else {
+						parent_dir = new File (".");
+					    }
+					}
+					if (parent_dir != null) {
+						File[] subdirs = parent_dir.listFiles(new FileFilter () {
+							public boolean accept(File pathname) {
+								return pathname.isDirectory();
+							};
+						});
+						for (int i = 0; i < subdirs.length; i++) {
+							Element dir = new Element("Dir");
+							dir.setAttribute("path", subdirs[i].getCanonicalPath());
+							response.addContent(dir);
+						}
+					}
+					return true;
+
+				} else return false;
 			}
 		});
 		addHandler("getDriveInfo", new RequestHandler() {
