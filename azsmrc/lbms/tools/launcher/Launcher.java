@@ -22,37 +22,54 @@
 
 package lbms.tools.launcher;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-
-import lbms.azsmrc.remote.client.Utilities;
+import java.io.File;
+import java.io.FileInputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.StringTokenizer;
 
 public class Launcher {
 
+	private static URLClassLoader classLoader;
+
 	public static void main(final String[] args) {
-		Launchable[] launchables = findLaunchables();
+		boolean restart = false;
+		do {
 
-		if (launchables.length == 0) {
+			if (restart) {
+				classLoader = null;
+				System.gc();
+			}
 
-			System.out.println("No Launchables found");
+			Launchable[] launchables = findLaunchables();
 
-			return;
+			if (launchables.length == 0) {
 
-		} else if (launchables.length > 1) {
+				System.out.println("No Launchables found");
 
-			System.out.println("Multiple Launchables found, running first");
-		}
-		final Launchable launch = launchables[0];
-		if (!Utilities.isOSX) {  // OS X can't run the main SWT GUI in a non-main Thread
-			new Thread(new Runnable() {
-				public void run() {
-					launch.launch(args);
-				}
-			}).start();
-		} else {
-			launch.launch(args);
-		}
+				return;
+
+			} else if (launchables.length > 1) {
+
+				System.out.println("Multiple Launchables found, running first");
+			}
+			final Launchable launch = launchables[0];
+
+
+			System.out.println("Starting Launchable");
+			restart = launch.launch(args);
+
+			// killAllThreads();
+		} while (restart);
+
 	}
 
 	private static Launchable[] findLaunchables() {
@@ -61,7 +78,7 @@ public class Launcher {
 		// therefore NOT use anything that relies on this (such as logging,
 		// debug....)
 
-		List res = new ArrayList();
+		List<Launchable> res = new ArrayList<Launchable>();
 
 		File app_dir = getApplicationFile(".");
 
@@ -75,7 +92,7 @@ public class Launcher {
 		}
 
 		File[] files = app_dir.listFiles();
-		
+
 		if (files == null || files.length == 0) {
 
 			System.out.println("Application dir '" + app_dir + "' empty");
@@ -85,7 +102,10 @@ public class Launcher {
 
 		try {
 
-			ClassLoader classLoader = Launcher.class.getClassLoader();
+			classLoader = (Launcher.class.getClassLoader() instanceof URLClassLoader) ? (URLClassLoader) Launcher.class
+					.getClassLoader()
+					: new URLClassLoader(new URL[0], Launcher.class
+							.getClassLoader());
 
 			// take only the highest version numbers of jars that look versioned
 
@@ -94,10 +114,7 @@ public class Launcher {
 
 			files = getHighestJarVersions(files, file_version, file_id);
 
-			for (int j = 0; j < files.length; j++) {
-
-				classLoader = addFileToClassPath(classLoader, files[j]);
-			}
+			classLoader = addFilesToClassPath(classLoader, files);
 
 			Properties props = new Properties();
 
@@ -127,7 +144,7 @@ public class Launcher {
 
 				if (classLoader instanceof URLClassLoader) {
 
-					URLClassLoader current = (URLClassLoader) classLoader;
+					URLClassLoader current = classLoader;
 
 					URL url = current.findResource("launch.properties");
 
@@ -180,8 +197,8 @@ public class Launcher {
 		// don't use Debug/lglogger here as we can be called before AZ has been
 		// initialised
 
-		List res = new ArrayList();
-		Map version_map = new HashMap();
+		List<File> res = new ArrayList<File>();
+		Map<String, String> version_map = new HashMap<String, String>();
 
 		for (int i = 0; i < files.length; i++) {
 
@@ -196,10 +213,11 @@ public class Launcher {
 
 				int sep_pos;
 
-				if (cvs_pos <= 0)
+				if (cvs_pos <= 0) {
 					sep_pos = name.lastIndexOf("_");
-				else
+				} else {
 					sep_pos = name.lastIndexOf("_", cvs_pos - 1);
+				}
 
 				String prefix;
 
@@ -218,7 +236,7 @@ public class Launcher {
 					version = name.substring(sep_pos + 1, (cvs_pos <= 0) ? name
 							.length() - 4 : cvs_pos);
 				}
-				String prev_version = (String) version_map.get(prefix);
+				String prev_version = version_map.get(prefix);
 
 				if (prev_version == null) {
 
@@ -234,17 +252,18 @@ public class Launcher {
 			}
 		}
 
-		Iterator it = version_map.keySet().iterator();
+		Iterator<String> it = version_map.keySet().iterator();
 
 		while (it.hasNext()) {
 
-			String prefix = (String) it.next();
-			String version = (String) version_map.get(prefix);
+			String prefix = it.next();
+			String version = version_map.get(prefix);
 			String target;
-			if (version.equalsIgnoreCase("-1.0"))
+			if (version.equalsIgnoreCase("-1.0")) {
 				target = prefix;
-			else
+			} else {
 				target = prefix + "_" + version;
+			}
 
 			version_out[0] = version;
 			id_out[0] = prefix;
@@ -271,47 +290,49 @@ public class Launcher {
 		return (res_array);
 	}
 
-	public static ClassLoader addFileToClassPath(ClassLoader classLoader, File f) {
-		if (f.exists() && (!f.isDirectory()) && f.getName().endsWith(".jar")) {
+	/*
+	 * public static ClassLoader addFileToClassPath(ClassLoader classLoader,
+	 * File f) { if (f.exists() && (!f.isDirectory()) &&
+	 * f.getName().endsWith(".jar")) { try { // URL classloader doesn't seem to
+	 * delegate to parent // classloader properly // so if you get a chain of
+	 * them then it fails to find things. // Here we // make sure that all of
+	 * our added URLs end up within a single // URLClassloader // with its
+	 * parent being the one that loaded this class itself if (classLoader
+	 * instanceof URLClassLoader) { URL[] old = ((URLClassLoader)
+	 * classLoader).getURLs(); URL[] new_urls = new URL[old.length + 1];
+	 * System.arraycopy(old, 0, new_urls, 0, old.length);
+	 * new_urls[new_urls.length - 1] = f.toURL(); classLoader = new
+	 * URLClassLoader( new_urls, classLoader == Launcher.class.getClassLoader() ?
+	 * classLoader : classLoader.getParent()); } else { classLoader = new
+	 * URLClassLoader(new URL[] { f.toURL() }, classLoader); } } catch
+	 * (Exception e) { // don't use Debug/lglogger here as we can be called
+	 * before AZ // has been initialised e.printStackTrace(); } } return
+	 * (classLoader); }
+	 */
 
+	public static URLClassLoader addFilesToClassPath(URLClassLoader classLoader,
+			File[] files) {
+		List<URL> urls = new ArrayList<URL>();
+		URL[] old = (classLoader).getURLs();
+		urls.addAll(Arrays.asList(old));
+		for (int i = 0; i < files.length; i++) {
+			File f = files[i];
 			try {
-
-				// URL classloader doesn't seem to delegate to parent
-				// classloader properly
-				// so if you get a chain of them then it fails to find things.
-				// Here we
-				// make sure that all of our added URLs end up within a single
-				// URLClassloader
-				// with its parent being the one that loaded this class itself
-
-				if (classLoader instanceof URLClassLoader) {
-
-					URL[] old = ((URLClassLoader) classLoader).getURLs();
-
-					URL[] new_urls = new URL[old.length + 1];
-
-					System.arraycopy(old, 0, new_urls, 0, old.length);
-
-					new_urls[new_urls.length - 1] = f.toURL();
-
-					classLoader = new URLClassLoader(
-							new_urls,
-							classLoader == Launcher.class.getClassLoader() ? classLoader
-									: classLoader.getParent());
-				} else {
-
-					classLoader = new URLClassLoader(new URL[] { f.toURL() },
-							classLoader);
+				if (f.exists() && (!f.isDirectory())
+						&& f.getName().endsWith(".jar")) {
+					urls.add(f.toURL());
+					//urls.add(f.toURI().toURL());
 				}
-			} catch (Exception e) {
-
-				// don't use Debug/lglogger here as we can be called before AZ
-				// has been initialised
-
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-
+		URL[] new_urls = new URL[urls.size()];
+		urls.toArray(new_urls);
+		classLoader = new URLClassLoader(new_urls,
+				classLoader == Launcher.class.getClassLoader() ? classLoader
+						: classLoader.getParent());
 		return (classLoader);
 	}
 
@@ -364,4 +385,42 @@ public class Launcher {
 			return (0);
 		}
 	}
+
+	private static void killAllThreads() {
+		// Find the root thread group
+		ThreadGroup root = Thread.currentThread().getThreadGroup().getParent();
+		while (root.getParent() != null) {
+			root = root.getParent();
+		}
+
+		// Visit each thread group
+		visit(root, 0);
+	}
+
+	// This method recursively visits all thread groups under `group'.
+	public static void visit(ThreadGroup group, int level) {
+		System.out.println("Visiting TG: " + group.getName());
+		// Get threads in `group'
+		int numThreads = group.activeCount();
+		Thread[] threads = new Thread[numThreads * 2];
+		numThreads = group.enumerate(threads, false);
+
+		// Enumerate each thread in `group'
+		for (int i = 0; i < numThreads; i++) {
+			// Get thread
+			Thread thread = threads[i];
+			System.out.println("\tThread: " + thread.getName());
+		}
+
+		// Get thread subgroups of `group'
+		int numGroups = group.activeGroupCount();
+		ThreadGroup[] groups = new ThreadGroup[numGroups * 2];
+		numGroups = group.enumerate(groups, false);
+
+		// Recursively visit each subgroup
+		for (int i = 0; i < numGroups; i++) {
+			visit(groups[i], level + 1);
+		}
+	}
+
 }

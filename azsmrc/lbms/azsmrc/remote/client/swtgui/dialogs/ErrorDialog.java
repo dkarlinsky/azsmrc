@@ -10,7 +10,7 @@ import java.net.URISyntaxException;
 
 import lbms.azsmrc.remote.client.Utilities;
 import lbms.azsmrc.remote.client.internat.I18N;
-import lbms.azsmrc.remote.client.swtgui.ErrorReporter;
+import lbms.azsmrc.remote.client.swing.ErrorReporter;
 import lbms.azsmrc.remote.client.swtgui.ErrorReporterListener;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.RCMain;

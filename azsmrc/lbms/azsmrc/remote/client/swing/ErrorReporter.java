@@ -1,7 +1,7 @@
 /**
- * 
+ *
  */
-package lbms.azsmrc.remote.client.swtgui;
+package lbms.azsmrc.remote.client.swing;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,7 +13,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -21,11 +20,12 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Vector;
 
+import lbms.azsmrc.remote.client.swtgui.ErrorReporterHelper;
+import lbms.azsmrc.remote.client.swtgui.ErrorReporterListener;
+import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.tools.CryptoTools;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.program.Program;
 
 /**
  * @author Damokles
@@ -70,7 +70,9 @@ public class ErrorReporter {
 	}
 
 	public void init() {
-		if (init) return;
+		if (init) {
+			return;
+		}
 		gatherSystemInfo();
 		init = true;
 	}
@@ -78,10 +80,15 @@ public class ErrorReporter {
 	private void gatherSystemInfo() {
 		os = System.getProperty("os.name");
 		jvm = System.getProperty( "java.version" ) +" "+ System.getProperty( "java.vendor" );
-		swtVer = SWT.getVersion()+" "+SWT.getPlatform();
+		try {
+			swtVer = ErrorReporterHelper.getSWTVersion();
+		} catch (Throwable e1) {
+			//e1.printStackTrace();
+			swtVer = "No SWT Version found.";
+		}
 		try {
 			azsmrcVersion = RCMain.getRCMain().getAzsmrcProperties().getProperty("version");
-		} catch (RuntimeException e) {
+		} catch (Throwable e) {
 			azsmrcVersion = "unkown please add this in the additional info field.";
 		}
 		systemInfo  = "OS: "+os+"\n"
@@ -112,7 +119,9 @@ public class ErrorReporter {
 			if (fis != null) {
 				try {fis.close();} catch (IOException e1) {}
 			}
-			if (error.exists()) error.delete();
+			if (error.exists()) {
+				error.delete();
+			}
 		}
 	}
 
@@ -186,8 +195,8 @@ public class ErrorReporter {
 
 	public void sendPerEMail () {
 		try {
-			Program.launch(("mailto:azsmrc-devs@list.sourceforge.net?subject=AzSMRC+ErrorReport&body="+URLEncoder.encode("System Info:\n"+systemInfo+"\n\nAdditional Info:\n"+additionalInfo+"\n\nStackTrace ("+hash+"):\n"+stackTrace,RemoteConstants.DEFAULT_ENCODING)).replace('+', ' '));
-		} catch (UnsupportedEncodingException e) {
+			ErrorReporterHelper.sendPerEMail(("mailto:azsmrc-devs@list.sourceforge.net?subject=AzSMRC+ErrorReport&body="+URLEncoder.encode("System Info:\n"+systemInfo+"\n\nAdditional Info:\n"+additionalInfo+"\n\nStackTrace ("+hash+"):\n"+stackTrace,RemoteConstants.DEFAULT_ENCODING)).replace('+', ' '));
+		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 	}

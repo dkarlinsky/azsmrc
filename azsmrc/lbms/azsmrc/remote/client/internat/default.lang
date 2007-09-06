@@ -346,6 +346,13 @@ global.ok=OK
 global.previous=< Previous
 global.save=Save
 global.yes=Yes
+helper.missing.commons=You are missing the commons-codec.jar\n Please Download the Client Libraries here:\nhttp://azsmrc.sf.net/redirect.php?to=libs
+helper.missing.jdom=You are missing the jdom.jar\n Please Download the Client Libraries here:\nhttp://azsmrc.sf.net/redirect.php?to=libs
+helper.missing.log4j=You are missing the log4j.jar\n Please Download the Client Libraries here:\nhttp://azsmrc.sf.net/redirect.php?to=libs
+helper.missing.swt=You need the appropriate SWT.jar\nPlease Visit http://azsmrc.sf.net/redirect.php?to=swt
+helper.wrong.swt.Carbon=You have the wrong SWT.jar\nPlease Visit http://azsmrc.sf.net/redirect.php?to=swt\nand Download SWT for Carbon/OSX
+helper.wrong.swt.gtk=You have the wrong SWT.jar\nPlease Visit http://azsmrc.sf.net/redirect.php?to=swt\nand Download SWT for GTK
+helper.wrong.swt.win=You have the wrong SWT.jar\nPlease Visit http://azsmrc.sf.net/redirect.php?to=swt\nand Download SWT for Windows
 popup.minversion.text=For full functionality the Pluginversion has to be:
 popup.minversion.title=Min. Plugin Version
 rcmain.mainwindow.statusbar.badUsername_badPassword=Bad Username or Password

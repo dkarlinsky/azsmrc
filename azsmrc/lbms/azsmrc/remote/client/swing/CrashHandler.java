@@ -1,9 +1,10 @@
 package lbms.azsmrc.remote.client.swing;
 
+import java.io.IOException;
+
 import org.eclipse.swt.SWT;
 
 import lbms.azsmrc.remote.client.internat.I18N;
-import lbms.azsmrc.remote.client.swtgui.ErrorReporter;
 import lbms.azsmrc.shared.RemoteConstants;
 
 /**
@@ -17,6 +18,15 @@ public class CrashHandler {
 	private String suggestion;
 
 	public CrashHandler (final Throwable cause) {
+		if (!I18N.isInitialized()) {
+			I18N.setDefault("lbms/azsmrc/remote/client/internat/default.lang");
+			try {
+				I18N.reload();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		errorReporter = new ErrorReporter(cause);
 		if (analyse(cause)) {
 			java.awt.EventQueue.invokeLater(new Runnable() {

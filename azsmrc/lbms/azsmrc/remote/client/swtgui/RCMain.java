@@ -12,12 +12,10 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
@@ -51,7 +49,6 @@ import lbms.azsmrc.remote.client.events.HTTPErrorListener;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.pluginsimpl.PluginLoader;
 import lbms.azsmrc.remote.client.pluginsimpl.PluginManagerImpl;
-import lbms.azsmrc.remote.client.swing.CrashHandler;
 import lbms.azsmrc.remote.client.swtgui.container.DownloadContainer;
 import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ErrorDialog;
@@ -76,11 +73,9 @@ import lbms.azsmrc.shared.RemoteConstants;
 import lbms.azsmrc.shared.SWTSafeRunnable;
 import lbms.tools.CryptoTools;
 import lbms.tools.ExtendedProperties;
-import lbms.tools.launcher.Launchable;
 import lbms.tools.updater.Update;
 import lbms.tools.updater.UpdateListener;
 import lbms.tools.updater.Updater;
-import lbms.tools.updater.Version;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -101,7 +96,7 @@ import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
 import org.jdom.Element;
 
-public class RCMain implements Launchable {
+public class RCMain {
 
 	public static final String LOGGER_ROOT = "lbms.azsmrc";
 	public static final String USER_DIR = System.getProperty("user.dir");
@@ -155,40 +150,17 @@ public class RCMain implements Launchable {
 		start(args);
 	}
 
-	public boolean launch(String[] args) {
-		start(args);
-		return false;
-	}
-
-	public static void start(String[] args) {
-		try {
-			if (rcMain == null) { //if it is launched by launchable then rcMain should already exist
-				new RCMain();
-			}
-			rcMain.initConfig();
-			if (!rcMain.checkInstance(args)) return;
-			rcMain.init();
-			rcMain.open();
-		} catch (Throwable e) {
-			e.printStackTrace();
-			File error = new File(System.getProperty("user.dir")+System.getProperty("file.separator")+"error.log");
-			PrintStream fout = null;
-			try {
-				fout = new PrintStream(error);
-				e.printStackTrace(fout);
-				Throwable cause = e.getCause();
-				while (cause != null) {
-					cause.printStackTrace(fout);
-					cause = cause.getCause();
-				}
-			} catch (FileNotFoundException e1) {
-			} finally {
-				if (fout != null)fout.close();
-			}
-			if (new Version(System.getProperty("java.version")).compareTo("1.6.0")>=0) {
-				new CrashHandler(e);
-			}
+	public static boolean start(String[] args) {
+		if (rcMain == null) { //if it is launched by launchable then rcMain should already exist
+			new RCMain();
 		}
+		rcMain.initConfig();
+		if (!rcMain.checkInstance(args)) {
+			return false;
+		}
+		rcMain.init();
+		rcMain.open();
+		return false;
 	}
 
 	public boolean checkInstance (String[] args) {
@@ -217,7 +189,9 @@ public class RCMain implements Launchable {
 			startServer.processArgs(args2);
 		}
 
-		if (closedown) return false;
+		if (closedown) {
+			return false;
+		}
 
 		//let the server wait for connections
 		startServer.pollForConnections();
@@ -230,6 +204,7 @@ public class RCMain implements Launchable {
 		terminated = false;
 
 		display.asyncExec(new SWTSafeRunnable() {
+			@Override
 			public void runSafe() {
 				createContents();
 			}
@@ -260,7 +235,9 @@ public class RCMain implements Launchable {
 		System.out.println("openQueuedTorrents");
 		startServer.openQueuedTorrents();
 		while (!terminated) { //runnig
-			if (!display.readAndDispatch ()) display.sleep ();
+			if (!display.readAndDispatch ()) {
+				display.sleep ();
+			}
 		}
 		if (mainWindow != null) { //cleanup
 			mainWindow.close_shell();
@@ -271,8 +248,9 @@ public class RCMain implements Launchable {
 		 * Have yet to trace the reason why, but OSX will not
 		 * kill the whole application on SWT disposal- call exit to force end.
 		 */
-		if(Utilities.isOSX)
+		if(Utilities.isOSX) {
 			System.exit(0);
+		}
 	}
 
 	protected void createContents() {
@@ -377,8 +355,11 @@ public class RCMain implements Launchable {
 		new MenuItem (menu, SWT.SEPARATOR);
 
 		final MenuItem connectDisconnectMenuItem = new MenuItem(menu, SWT.PUSH);
-		if (!connect) connectDisconnectMenuItem.setText(I18N.translate(PFX + "traymenu.connect"));
-		else connectDisconnectMenuItem.setText(I18N.translate(PFX + "traymenu.disconnect"));
+		if (!connect) {
+			connectDisconnectMenuItem.setText(I18N.translate(PFX + "traymenu.connect"));
+		} else {
+			connectDisconnectMenuItem.setText(I18N.translate(PFX + "traymenu.disconnect"));
+		}
 
 		final MenuItem silentItem = new MenuItem(menu, SWT.CHECK);
 		silentItem.setText(I18N.translate(PFX + "traymenu.silentMode"));
@@ -434,8 +415,9 @@ public class RCMain implements Launchable {
 					if (mainWindow != null) {
 						connect(true);
 						mainWindow.setConnectionStatusBar(2);
-					} else
+					} else {
 						connect(false);
+					}
 				}
 			}
 		});
@@ -552,7 +534,9 @@ public class RCMain implements Launchable {
 				properties = new ExtendedProperties(); //if something happens create empty properties
 				e1.printStackTrace();
 			} finally {
-				if (is!=null) try { is.close(); } catch (IOException e) {}
+				if (is!=null) {
+					try { is.close(); } catch (IOException e) {}
+				}
 			}
 		}
 
@@ -565,7 +549,9 @@ public class RCMain implements Launchable {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}  finally {
-				if (fin!=null) try { fin.close(); } catch (IOException e) {}
+				if (fin!=null) {
+					try { fin.close(); } catch (IOException e) {}
+				}
 			}
 		}
 		azsmrcProperties = new Properties();
@@ -578,7 +564,9 @@ public class RCMain implements Launchable {
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			} finally {
-				if (is!=null) try { is.close(); } catch (IOException e) {}
+				if (is!=null) {
+					try { is.close(); } catch (IOException e) {}
+				}
 			}
 		}
 		firstRun = generateUID();
@@ -641,6 +629,7 @@ public class RCMain implements Launchable {
 				Authenticator.setDefault(new Authenticator() {
 					PasswordAuthentication pw = new PasswordAuthentication(properties.getProperty("connection.proxy.username"),properties.getProperty("connection.proxy.password").toCharArray());
 
+					@Override
 					protected PasswordAuthentication getPasswordAuthentication() {
 						return pw;
 					}
@@ -651,8 +640,9 @@ public class RCMain implements Launchable {
 		client.setFastMode(properties.getPropertyAsBoolean("client.fastmode"));
 		client.addGlobalStatsListener(new GlobalStatsListener() {
 			public void updateStats(final int d, final int u, final int seeding, final int seedqueue, final int downloading, final int downloadqueue) {
-				if(display != null)
+				if(display != null) {
 					display.syncExec(new SWTSafeRunnable() {
+						@Override
 						public void runSafe() {
 							//setTrayToolTip("AzSMRC: D:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d)+" - U:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u));
 
@@ -666,6 +656,7 @@ public class RCMain implements Launchable {
 									+ " "+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u));
 						}
 					});
+				}
 			}
 		});
 
@@ -692,20 +683,23 @@ public class RCMain implements Launchable {
 		client.addConnectionListener(new ConnectionListener() {
 			public void connectionState(final int state) {
 				logger.debug("Connection State: "+state);
-				if(display != null)
+				if(display != null) {
 					display.syncExec(new SWTSafeRunnable() {
+						@Override
 						public void runSafe() {
 							setTrayIcon(state);
 						}
 					});
+				}
 				if (state == ST_CONNECTION_ERROR) {
 					int delay = client.getFailedConnections()*30000;
 					delay = (delay>120000)?120000:delay;
 					logger.warn("Connection failed "+client.getFailedConnections()+" times, delay: "+(delay/1000)+"sec");
-					if (mainWindow != null)
+					if (mainWindow != null) {
 						updateTimer(true,delay);
-					else
+					} else {
 						updateTimer(false,delay);
+					}
 					if (mainWindow != null) {
 						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.failed") + " "
 								+ client.getFailedConnections()
@@ -732,8 +726,9 @@ public class RCMain implements Launchable {
 						updateTimer(true,0);
 						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.connectionSuccessful")
 								, SWT.COLOR_DARK_GREEN);
-					} else
+					} else {
 						updateTimer(false,0);
+					}
 				}
 
 			}
@@ -885,6 +880,7 @@ public class RCMain implements Launchable {
 					updater.doUpdate();
 				}else{
 					display.asyncExec(new SWTSafeRunnable() {
+						@Override
 						public void runSafe() {
 							UpdateDialog.open(display,update,updater);
 						}
@@ -947,9 +943,10 @@ public class RCMain implements Launchable {
 
 	public void checkUpadteAndMotd () {
 		Thread t = new Thread () {
+			@Override
 			public void run() {
 				long lastcheck = properties.getPropertyAsLong("update.lastcheck");
-				if (System.currentTimeMillis()-lastcheck > 1000*60*60*24)
+				if (System.currentTimeMillis()-lastcheck > 1000*60*60*24) {
 					if (properties.getPropertyAsBoolean("update.autocheck") || !properties.getPropertyAsBoolean("motd.disable")) {
 						if (mainWindow != null) {
 							mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.checking"));
@@ -983,6 +980,7 @@ public class RCMain implements Launchable {
 							e.printStackTrace();
 						}
 					}
+				}
 			}
 		};
 		t.setDaemon(true);
@@ -1011,7 +1009,9 @@ public class RCMain implements Launchable {
 	}
 
 	public void setTrayToolTip (String toolTip) {
-		if (systrayItem != null) systrayItem.setToolTipText(toolTip);
+		if (systrayItem != null) {
+			systrayItem.setToolTipText(toolTip);
+		}
 	}
 
 	public boolean connected () {
@@ -1035,18 +1035,25 @@ public class RCMain implements Launchable {
 	}
 
 	public void stopUpdateTimer () {
-		if (updateTimer != null) updateTimer.cancel();
+		if (updateTimer != null) {
+			updateTimer.cancel();
+		}
 	}
 
 	public void updateTimer(boolean open) {
-		if (connect)
+		if (connect) {
 			updateTimer(open,0);
+		}
 	}
 
 	public void updateTimer(boolean open,final int delay) {
-		if (!connect) return;
+		if (!connect) {
+			return;
+		}
 
-		if (updateTimer != null) updateTimer.cancel();
+		if (updateTimer != null) {
+			updateTimer.cancel();
+		}
 		logger.debug("Changing Timer: "+(open?"GUI mode":"Tray mode"));
 		if (open) {
 			updateTimer = timer.addPeriodicEvent(properties.getPropertyAsLong("connection_interval_open")+delay,
@@ -1092,8 +1099,9 @@ public class RCMain implements Launchable {
 	}
 
 	public void nullMainWindow(){
-		if(mainWindow != null)
+		if(mainWindow != null) {
 			mainWindow = null;
+		}
 	}
 
 	public void openMainWindow(){
@@ -1149,7 +1157,9 @@ public class RCMain implements Launchable {
 	 * @param connection -- int -- @see ConnectionListener.ST_*
 	 */
 	public void setTrayIcon (int connection) {
-		if(systrayItem == null || systrayItem.isDisposed()) return;
+		if(systrayItem == null || systrayItem.isDisposed()) {
+			return;
+		}
 		switch (connection) {
 		case ConnectionListener.ST_CONNECTION_ERROR:
 			systrayItem.setToolTipText(I18N.translate(PFX + "tray.tooltip.connectionError"));
@@ -1191,23 +1201,28 @@ public class RCMain implements Launchable {
 		if (properties!=null) {
 			FileOutputStream fos = null;
 			try {
-				if (!confFile.exists()) confFile.createNewFile();
+				if (!confFile.exists()) {
+					confFile.createNewFile();
+				}
 				fos = new FileOutputStream(confFile);
 				properties.storeToXML(fos, null);
 			} catch (IOException e) {
 				e.printStackTrace();
-			} finally {if (fos != null)
+			} finally {if (fos != null) {
 				try {
 					fos.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
+			}
 		}
 	}
 
 	public void loadSounds() {
-		if (!properties.getPropertyAsBoolean("soundManager.active", true)) return;
+		if (!properties.getPropertyAsBoolean("soundManager.active", true)) {
+			return;
+		}
 		loadSound(Sound.ERROR, 					properties.getProperty("sound.Error"));
 		loadSound(Sound.DOWNLOAD_ADDED, 		properties.getProperty("sound.DownloadAdded"));
 		loadSound(Sound.DOWNLOADING_FINISHED,	properties.getProperty("sound.DownloadingFinished"));
@@ -1279,7 +1294,9 @@ public class RCMain implements Launchable {
 	 * @return true if UID was generated, false if UID already present
 	 */
 	private boolean generateUID() {
-		if (properties.containsKey("azsmrc.uid")) return false;
+		if (properties.containsKey("azsmrc.uid")) {
+			return false;
+		}
 
 		long n = System.currentTimeMillis();
 		byte[] b = new byte[8];
@@ -1362,7 +1379,9 @@ public class RCMain implements Launchable {
 						if ( ( contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor) ) {
 							try {
 								final String string = ((String) contents.getTransferData(DataFlavor.stringFlavor)).trim();
-								if(!string.contains("torrent") && !string.contains("magnet")) return;
+								if(!string.contains("torrent") && !string.contains("magnet")) {
+									return;
+								}
 								boolean valid = false;
 
 								if (magnetPattern.matcher(string).find()) {
@@ -1376,6 +1395,7 @@ public class RCMain implements Launchable {
 								if (valid) {
 									clipboard.setContents(emptyTransfer,null); //clear Transfer
 									display.asyncExec(new SWTSafeRunnable(){
+										@Override
 										public void runSafe() {
 											OpenByURLDialog.openWithURL(string);
 										}
@@ -1390,10 +1410,10 @@ public class RCMain implements Launchable {
 
 						} else if(( contents != null) && contents.isDataFlavorSupported(DataFlavor.javaFileListFlavor)){
 							try{
-								List list = (List) contents.getTransferData(DataFlavor.javaFileListFlavor);
-								Iterator iter = list.iterator();
+								List<File> list = (List<File>) contents.getTransferData(DataFlavor.javaFileListFlavor);
+								Iterator<File> iter = list.iterator();
 								while(iter.hasNext()){
-									File file = (File) iter.next();
+									File file = iter.next();
 									logger.debug("*******FILE****" + file.getPath());
 								}
 
