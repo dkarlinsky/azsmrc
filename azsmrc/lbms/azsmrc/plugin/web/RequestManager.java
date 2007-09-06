@@ -77,9 +77,9 @@ import org.jdom.output.XMLOutputter;
 
 
 public class RequestManager {
-	private Map<String,RequestHandler> handlerList = new HashMap<String, RequestHandler>();
+	private final Map<String,RequestHandler> handlerList = new HashMap<String, RequestHandler>();
 	private static RequestManager instance = new RequestManager();
-	private Map<String, Integer[]> downloadControlList = new HashMap<String, Integer[]>();
+	private final Map<String, Integer[]> downloadControlList = new HashMap<String, Integer[]>();
 	private UTTimerEvent resumeTask;
 	private TorrentAttribute taCateory;
 	private TorrentAttribute taUser;
@@ -160,21 +160,25 @@ public class RequestManager {
 		for (Element query:queries) {
 			Element newResponse = new Element ("Result");
 			String id = query.getAttributeValue("id");
-			if (id != null) newResponse.setAttribute("id", id);
+			if (id != null) {
+				newResponse.setAttribute("id", id);
+			}
 			String request = query.getAttributeValue("switch");
 			responseRoot.setAttribute("version", Double.toString(RemoteConstants.CURRENT_VERSION));
 
 			if (protocolVersion != RemoteConstants.CURRENT_VERSION) {
-				if (handlerList.get("_InvalidProtocolVersion_").handleRequest(query,newResponse,user))
+				if (handlerList.get("_InvalidProtocolVersion_").handleRequest(query,newResponse,user)) {
 					responseRoot.addContent(newResponse);
+				}
 				continue;
 			}
 
 			if (handlerList.containsKey(request)) {
 				newResponse.setAttribute("switch", request);
 				try {
-					if (handlerList.get(request).handleRequest(query,newResponse,user))
+					if (handlerList.get(request).handleRequest(query,newResponse,user)) {
 						responseRoot.addContent(newResponse);
+					}
 				} catch (Exception e) {
 					Element debug = new Element ("Debug");
 					debug.setAttribute("debugMsg", e.getMessage());
@@ -190,16 +194,18 @@ public class RequestManager {
 				}
 				continue;
 			} else {
-				if (handlerList.get("_UnhandledRequest_").handleRequest(query,newResponse,user))
+				if (handlerList.get("_UnhandledRequest_").handleRequest(query,newResponse,user)) {
 					responseRoot.addContent(newResponse);
+				}
 			}
 		}
 
 		xmlResponse.addContent(responseRoot);
 
 		if (!requestRoot.getAttributeValue("noResponse", "false").equalsIgnoreCase("true")) {
-			if (user.hasEvents() && !requestRoot.getAttributeValue("noEvents", "false").equalsIgnoreCase("true"))
+			if (user.hasEvents() && !requestRoot.getAttributeValue("noEvents", "false").equalsIgnoreCase("true")) {
 				responseRoot.addContent(sendEvents(user));
+			}
 			XMLOutputter out = new XMLOutputter();
 			if (useCompression) {
 				GZIPOutputStream gos = new GZIPOutputStream(response.getOutputStream());
@@ -269,8 +275,9 @@ public class RequestManager {
 				entry.setAttribute("type", "string");
 			} else if(parameter instanceof DirectoryParameterImpl) {
 				entry.setAttribute("type", "string");
-			} else
+			} else {
 				continue;
+			}
 			entry.setAttribute("key", ((ParameterImpl)parameter).getKey());
 			entry.setAttribute("label", parameter.getLabelText());
 			entry.setAttribute("index", Integer.toString(j));
@@ -287,8 +294,9 @@ public class RequestManager {
 				while (iter.hasNext()) {
 					Parameter parameterToEnable = iter.next();
 					Element entry = parameterToElement.get(parameterToEnable);
-					if (entry != null)
+					if (entry != null) {
 						entry.setAttribute("dependsOn", ((ParameterImpl)parameter).getKey());
+					}
 				}
 
 				List<Parameter> parametersToDisable = ((BooleanParameterImpl) parameter)
@@ -309,58 +317,87 @@ public class RequestManager {
 		dle.setAttribute("hash", EncodingUtil.encode(dl.getTorrent().getHash()));
 		dle.setAttribute("forceStart", Boolean.toString(dl.isForceStart()));
 		dle.setAttribute("position", Integer.toString(dl.getPosition()));
-		if ((switches & RemoteConstants.ST_DOWNLOADED) != 0)
+		if ((switches & RemoteConstants.ST_DOWNLOADED) != 0) {
 			dle.setAttribute("downloaded", Long.toString(ds.getDownloaded()));
-		if ((switches & RemoteConstants.ST_UPLOADED) != 0)
+		}
+		if ((switches & RemoteConstants.ST_UPLOADED) != 0) {
 			dle.setAttribute("uploaded", Long.toString(ds.getUploaded()));
-		if ((switches & RemoteConstants.ST_DOWNLOAD_AVG) != 0)
+		}
+		if ((switches & RemoteConstants.ST_DOWNLOAD_AVG) != 0) {
 			dle.setAttribute("downloadAVG", Long.toString(ds.getDownloadAverage()));
-		if ((switches & RemoteConstants.ST_UPLOAD_AVG) != 0)
+		}
+		if ((switches & RemoteConstants.ST_UPLOAD_AVG) != 0) {
 			dle.setAttribute("uploadAVG", Long.toString(ds.getUploadAverage()));
-		if ((switches & RemoteConstants.ST_TOTAL_AVG) != 0)
+		}
+		if ((switches & RemoteConstants.ST_TOTAL_AVG) != 0) {
 			dle.setAttribute("totalAVG", Long.toString(ds.getTotalAverage()));
-		if ((switches & RemoteConstants.ST_STATE) != 0)
+		}
+		if ((switches & RemoteConstants.ST_STATE) != 0) {
 			dle.setAttribute("state", Integer.toString(dl.getState()));
-		if ((switches & RemoteConstants.ST_STATUS) != 0)
+		}
+		if ((switches & RemoteConstants.ST_STATUS) != 0) {
 			dle.setAttribute("status", ds.getStatus());
-		if ((switches & RemoteConstants.ST_ELAPSED_TIME) != 0)
+		}
+		if ((switches & RemoteConstants.ST_ELAPSED_TIME) != 0) {
 			dle.setAttribute("elapsedTime", ds.getElapsedTime());
-		if ((switches & RemoteConstants.ST_ETA) != 0)
+		}
+		if ((switches & RemoteConstants.ST_ETA) != 0) {
 			dle.setAttribute("eta", ds.getETA());
-		if ((switches & RemoteConstants.ST_AVAILABILITY) != 0)
+		}
+		if ((switches & RemoteConstants.ST_AVAILABILITY) != 0) {
 			dle.setAttribute("availability", Float.toString(ds.getAvailability()));
-		if ((switches & RemoteConstants.ST_COMPLETITION) != 0)
+		}
+		if ((switches & RemoteConstants.ST_COMPLETITION) != 0) {
 			dle.setAttribute("completition", Integer.toString(ds.getDownloadCompleted(false)));
-		if ((switches & RemoteConstants.ST_HEALTH) != 0)
+		}
+		if ((switches & RemoteConstants.ST_HEALTH) != 0) {
 			dle.setAttribute("health", Integer.toString(ds.getHealth()));
-		if ((switches & RemoteConstants.ST_SHARE) != 0)
+		}
+		if ((switches & RemoteConstants.ST_SHARE) != 0) {
 			dle.setAttribute("shareRatio", Integer.toString(ds.getShareRatio()));
-		if ((switches & RemoteConstants.ST_TRACKER) != 0)
+		}
+		if ((switches & RemoteConstants.ST_TRACKER) != 0) {
 			dle.setAttribute("tracker",ds.getTrackerStatus());
-		if ((switches & RemoteConstants.ST_LIMIT_DOWN) != 0)
+		}
+		if ((switches & RemoteConstants.ST_LIMIT_DOWN) != 0) {
 			dle.setAttribute("downloadLimit",Integer.toString(dl.getMaximumDownloadKBPerSecond()));
-		if ((switches & RemoteConstants.ST_LIMIT_UP) != 0)
+		}
+		if ((switches & RemoteConstants.ST_LIMIT_UP) != 0) {
 			dle.setAttribute("uploadLimit",Integer.toString(dl.getUploadRateLimitBytesPerSecond()));
+		}
 
 		if (dl.getState() == Download.ST_DOWNLOADING || dl.getState() == Download.ST_SEEDING) { //Stopped DLs don't have a PeerManager
 			PeerManagerStats pms = dl.getPeerManager().getStats();
-			if ((switches & RemoteConstants.ST_SEEDS) != 0)
+			if ((switches & RemoteConstants.ST_SEEDS) != 0) {
 				dle.setAttribute("seeds",Integer.toString(pms.getConnectedSeeds()));
-			if ((switches & RemoteConstants.ST_LEECHER) != 0)
+			}
+			if ((switches & RemoteConstants.ST_LEECHER) != 0) {
 				dle.setAttribute("leecher",Integer.toString(pms.getConnectedLeechers()));
-			if ((switches & RemoteConstants.ST_DISCARDED) != 0)
+			}
+			if ((switches & RemoteConstants.ST_DISCARDED) != 0) {
 				dle.setAttribute("discarded",Long.toString(pms.getDiscarded()));
+			}
 		}
-		if ((switches & RemoteConstants.ST_TOTAL_SEEDS) != 0)
+		if ((switches & RemoteConstants.ST_TOTAL_SEEDS) != 0) {
 			dle.setAttribute("total_seeds",Integer.toString(dl.getLastScrapeResult().getSeedCount()));
-		if ((switches & RemoteConstants.ST_TOTAL_LEECHER) != 0)
+		}
+		if ((switches & RemoteConstants.ST_TOTAL_LEECHER) != 0) {
 			dle.setAttribute("total_leecher",Integer.toString(dl.getLastScrapeResult().getNonSeedCount()));
+		}
 		if ((switches & RemoteConstants.ST_SCRAPE_TIMES) != 0) {
 			dle.setAttribute("last_scrape",Long.toString(dl.getLastScrapeResult().getScrapeStartTime()));
 			dle.setAttribute("next_scrape",Long.toString(dl.getLastScrapeResult().getNextScrapeStartTime()));
 		}
-		if ((switches & RemoteConstants.ST_SIZE) != 0)
+		if ((switches & RemoteConstants.ST_SIZE) != 0) {
 			dle.setAttribute("size",Long.toString(dl.getTorrent().getSize()));
+		}
+
+		if ((switches & RemoteConstants.ST_CATEGORY) != 0) {
+			String cat_String = dl.getAttribute(taCateory);
+			if (cat_String != null) {
+				dle.setAttribute("category", cat_String);
+			}
+		}
 	}
 
 
@@ -423,7 +460,9 @@ public class RequestManager {
 				Download[] dlList = Plugin.getPluginInterface().getDownloadManager().getDownloads(true);
 				for (Download dl:dlList) {
 					if(singleUser || user.hasDownload(dl) || (user.checkAccess(RemoteConstants.RIGHTS_SEE_PUBLICDL) && MultiUser.isPublicDownload(dl))) {
-						if (dl.getTorrent() == null) continue;
+						if (dl.getTorrent() == null) {
+							continue;
+						}
 						Element dle = new Element ("Transfer");
 						setDlStats(dle, dl, switches);
 						transferList.addContent(dle);
@@ -487,8 +526,9 @@ public class RequestManager {
 										return;
 									}
 									newTorrent = torrentManager.createFromBEncodedData(tdl.getBuffer().toByteArray());
-									if (newTorrent.getAdditionalProperty("encoding") == null)
+									if (newTorrent.getAdditionalProperty("encoding") == null) {
 										newTorrent.setEncoding("UTF8");
+									}
 								}
 
 								Download dl = Plugin.getPluginInterface().getDownloadManager().addDownload(newTorrent,null,file);
@@ -607,15 +647,17 @@ public class RequestManager {
 						Download dl = getDownloadByHash (hash);
 						User[] users = Plugin.getXMLConfig().getUsersOfDownload(dl);
 						if (users.length==1 || users.length == 0) {
-							if (dl.getState() != Download.ST_STOPPED)dl.stop();
+							if (dl.getState() != Download.ST_STOPPED) {
+								dl.stop();
+							}
 							if (xmlRequest.getAttributeValue("delTorrent")!=null) {
 								try {
 									dl.remove(Boolean.parseBoolean(xmlRequest.getAttributeValue("delTorrent")),Boolean.parseBoolean(xmlRequest.getAttributeValue("delData")));
 								} catch(NullPointerException e) {
 								}
-							}
-							else
+							} else {
 								dl.remove();
+							}
 						} else {
 							MultiUser.removeUserFromDownload(user, dl);
 						}
@@ -897,7 +939,9 @@ public class RequestManager {
 		});
 		addHandler("renameDownload", new RequestHandler() {
 			public boolean handleRequest(final Element xmlRequest, Element response,final User user) throws IOException {
-				if (!user.checkAccess(RemoteConstants.RIGHTS_SET_DL_DIR)) return false;
+				if (!user.checkAccess(RemoteConstants.RIGHTS_SET_DL_DIR)) {
+					return false;
+				}
 				String hash = xmlRequest.getAttributeValue("hash");
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
@@ -914,8 +958,9 @@ public class RequestManager {
 							new Thread(new Runnable() {
 								public void run() {
 									try {
-										if (!dl.isPaused())
+										if (!dl.isPaused()) {
 											dl.stop();
+										}
 										dl.renameDownload(xmlRequest.getAttributeValue("target"));
 										dl.restart();
 									} catch (DownloadException e) {
@@ -934,7 +979,9 @@ public class RequestManager {
 		});
 		addHandler("moveDataFiles", new RequestHandler() {
 			public boolean handleRequest(Element xmlRequest, Element response,final User user) throws IOException {
-				if (!user.checkAccess(RemoteConstants.RIGHTS_SET_DL_DIR)) return false;
+				if (!user.checkAccess(RemoteConstants.RIGHTS_SET_DL_DIR)) {
+					return false;
+				}
 				String hash = xmlRequest.getAttributeValue("hash");
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser || user.hasDownload(hash) || MultiUser.isPublicDownload(hash)) {
@@ -952,8 +999,9 @@ public class RequestManager {
 							new Thread(new Runnable() {
 								public void run() {
 									try {
-										if (!dl.isPaused())
+										if (!dl.isPaused()) {
 											dl.stop();
+										}
 										dl.moveDataFiles(target);
 										dl.restart();
 									} catch (DownloadException e) {
@@ -962,9 +1010,9 @@ public class RequestManager {
 									}
 								};
 							}).start();
-						}
-						else
+						} else {
 							user.eventException(new Exception("Error Moving Data Files: Directory not found"));
+						}
 					} catch (DownloadException e) {
 						user.eventException(e);
 						e.printStackTrace();
@@ -986,8 +1034,9 @@ public class RequestManager {
 							new Thread(new Runnable() {
 								public void run() {
 									try {
-										if (!dl.isPaused())
+										if (!dl.isPaused()) {
 											dl.stop();
+										}
 										dl.moveTorrentFile(target);
 										dl.restart();
 									} catch (DownloadException e) {
@@ -996,9 +1045,9 @@ public class RequestManager {
 									}
 								};
 							}).start();
-						}
-						else
+						} else {
 							user.eventException(new Exception("Error Moving Torrent File: Directory not found"));
+						}
 					} catch (DownloadException e) {
 						user.eventException(e);
 						e.printStackTrace();
@@ -1038,13 +1087,15 @@ public class RequestManager {
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser) {
 					Plugin.getPluginInterface().getDownloadManager().startAllDownloads();
-				} else	for (Download dl:dlList) {
-					if(user.hasDownload(dl)) {
-						try {
-							dl.restart();
-						} catch (DownloadException e) {
-							user.eventException(e);
-							e.printStackTrace();
+				} else {
+					for (Download dl:dlList) {
+						if(user.hasDownload(dl)) {
+							try {
+								dl.restart();
+							} catch (DownloadException e) {
+								user.eventException(e);
+								e.printStackTrace();
+							}
 						}
 					}
 				}
@@ -1057,13 +1108,15 @@ public class RequestManager {
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser) {
 					Plugin.getPluginInterface().getDownloadManager().stopAllDownloads();
-				} else	for (Download dl:dlList) {
-					if(user.hasDownload(dl)) {
-						try {
-							dl.stop();
-						} catch (DownloadException e) {
-							user.eventException(e);
-							e.printStackTrace();
+				} else {
+					for (Download dl:dlList) {
+						if(user.hasDownload(dl)) {
+							try {
+								dl.stop();
+							} catch (DownloadException e) {
+								user.eventException(e);
+								e.printStackTrace();
+							}
 						}
 					}
 				}
@@ -1076,7 +1129,9 @@ public class RequestManager {
 				if (singleUser || user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
 					Plugin.getPluginInterface().getDownloadManager().pauseDownloads();
 					if (xmlRequest.getAttribute("timeout") != null) {
-						if (resumeTask != null) resumeTask.cancel();
+						if (resumeTask != null) {
+							resumeTask.cancel();
+						}
 						long timeout = System.currentTimeMillis() + Long.parseLong(xmlRequest.getAttributeValue("timeout"))*1000;
 						resumeTask = Timers.getTimer().addEvent(timeout, new UTTimerEventPerformer() {
 							public void perform(UTTimerEvent event) {
@@ -1092,7 +1147,9 @@ public class RequestManager {
 			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException{
 				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter("singleUserMode", false);
 				if (singleUser || user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
-					if (resumeTask != null) resumeTask.cancel();
+					if (resumeTask != null) {
+						resumeTask.cancel();
+					}
 					Plugin.getPluginInterface().getDownloadManager().resumeDownloads();
 				}
 				return false;
@@ -1144,12 +1201,15 @@ public class RequestManager {
 								boolean skipped = Boolean.parseBoolean(xmlRequest.getAttributeValue("skipped"));
 								boolean deleted = Boolean.parseBoolean(xmlRequest.getAttributeValue("deleted"));
 								int index = Integer.parseInt(xmlRequest.getAttributeValue("index"));
-								if (dmfi[index].isPriority() != priority)
+								if (dmfi[index].isPriority() != priority) {
 									dmfi[index].setPriority(priority);
-								if (dmfi[index].isSkipped() != skipped)
+								}
+								if (dmfi[index].isSkipped() != skipped) {
 									dmfi[index].setSkipped(skipped);
-								if (dmfi[index].isDeleted() != deleted)
+								}
+								if (dmfi[index].isDeleted() != deleted) {
 									dmfi[index].setDeleted(deleted);
+								}
 							} catch(NullPointerException e) {
 							}
 						}
@@ -1177,10 +1237,11 @@ public class RequestManager {
 						as.setAttribute("pieceCount", Long.toString(tor.getPieceCount()));
 						as.setAttribute("pieceSize",Long.toString(tor.getPieceSize()));
 						File saveDir = new File(dl.getSavePath());
-						if (saveDir.isDirectory())
+						if (saveDir.isDirectory()) {
 							as.setAttribute("saveDir", saveDir.getAbsolutePath());
-						else
+						} else {
 							as.setAttribute("saveDir", saveDir.getParent());
+						}
 						response.addContent(as);
 
 					} catch (DownloadException e) {
@@ -1188,7 +1249,9 @@ public class RequestManager {
 						e.printStackTrace();
 					}
 					return true;
-				} else return false;
+				} else {
+					return false;
+				}
 			}
 		});
 		addHandler("globalStats", new RequestHandler() {
@@ -1538,11 +1601,11 @@ public class RequestManager {
 
 						}
 					} else {
-					    if (restrictSaveDir != null) {
+						if (restrictSaveDir != null) {
 						parent_dir = new File (restrictSaveDir);
-					    } else {
+						} else {
 						parent_dir = new File (".");
-					    }
+						}
 					}
 					if (parent_dir != null) {
 						File[] subdirs = parent_dir.listFiles(new FileFilter () {
@@ -1558,7 +1621,9 @@ public class RequestManager {
 					}
 					return true;
 
-				} else return false;
+				} else {
+					return false;
+				}
 			}
 		});
 		addHandler("getDriveInfo", new RequestHandler() {
@@ -1597,10 +1662,11 @@ public class RequestManager {
 
 					Update[] updates = uci.getUpdates();
 
-					if (updates.length==0)
+					if (updates.length==0) {
 						response.setAttribute("updateAvailable", Boolean.toString(false));
-					else
+					} else {
 						response.setAttribute("updateAvailable", Boolean.toString(true));
+					}
 
 					for (Update update:updates) {
 						Element uElement = new Element ("Update");
@@ -1628,7 +1694,9 @@ public class RequestManager {
 								public void run() {
 									Update[] updates = uci.getUpdates();
 									for (Update update:updates) {
-										if (!apply.contains(update.getName()))continue;
+										if (!apply.contains(update.getName())) {
+											continue;
+										}
 										ResourceDownloader[] downloader = update.getDownloaders();
 										for (ResourceDownloader dl:downloader) {
 											try {
@@ -1655,15 +1723,18 @@ public class RequestManager {
 					String alias = xmlRequest.getAttributeValue("alias");
 					String dn = xmlRequest.getAttributeValue("dn");
 					int strength =Integer.parseInt(xmlRequest.getAttributeValue("strength"));
-					if (strength < 512) strength = 1024;
+					if (strength < 512) {
+						strength = 1024;
+					}
 					if (alias == null || dn == null || alias.equals("") || dn.equals("")) {
 						user.eventException("CreateSSLCert: Parameter incorrect");
-					} else
-					try {
-						SESecurityManager.createSelfSignedCertificate( alias, dn, strength );
-						user.eventMessage("SSL Certificate successfully created.");
-					} catch (Exception e) {
-						user.eventException(e,"CreateSSLCert");
+					} else {
+						try {
+							SESecurityManager.createSelfSignedCertificate( alias, dn, strength );
+							user.eventMessage("SSL Certificate successfully created.");
+						} catch (Exception e) {
+							user.eventException(e,"CreateSSLCert");
+						}
 					}
 				}
 				return false;
@@ -1717,7 +1788,9 @@ public class RequestManager {
 					PluginConfigModel[] pluginSections = Plugin.getPluginInterface().getUIManager().getPluginConfigModels();
 					System.out.println("PluginFlexyConf Size: "+pluginSections.length);
 
-					if (pluginSections.length == 0) return false; //don't reply if we don't have any ConfigModels
+					if (pluginSections.length == 0) {
+						return false; //don't reply if we don't have any ConfigModels
+					}
 
 					for (PluginConfigModel o:pluginSections) {
 						System.out.println(o.getClass());
@@ -1826,7 +1899,9 @@ public class RequestManager {
 
 		addHandler("hostTorrent", new RequestHandler() {
 			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {
-				if (!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) return false;
+				if (!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+					return false;
+				}
 
 				String location = xmlRequest.getAttributeValue("location");
 				Torrent torrent = null;
@@ -1861,7 +1936,9 @@ public class RequestManager {
 		});
 		addHandler("publishTorrent", new RequestHandler() {
 			public boolean handleRequest(Element xmlRequest, Element response, User user) throws IOException {
-				if (!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) return false;
+				if (!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+					return false;
+				}
 
 				String location = xmlRequest.getAttributeValue("location");
 				Torrent torrent = null;
@@ -2044,7 +2121,9 @@ public class RequestManager {
 						response.setText(e.getMessage());
 						return true;
 					}
-					if (result == null) return false;
+					if (result == null) {
+						return false;
+					}
 					Element resultElement = new Element("Result");
 					if (result instanceof Boolean) {
 						resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_BOOLEAN));
@@ -2075,8 +2154,9 @@ public class RequestManager {
 							resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_NOT_FOUND));
 							e1.printStackTrace();
 						}
-					} else
+					} else {
 						resultElement.setAttribute("type", Integer.toString(RemoteConstants.PARAMETER_NOT_FOUND));
+					}
 
 
 					response.addContent(resultElement);

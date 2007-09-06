@@ -75,7 +75,9 @@ public class ResponseManager {
 
 	private void updateDownload (Element dle) {
 		String hash = dle.getAttributeValue("hash");
-		if (hash == null) return;
+		if (hash == null) {
+			return;
+		}
 		DownloadImpl dl;
 		DownloadStatsImpl ds;
 		boolean exists = dm.manHasDownload(hash);
@@ -90,8 +92,9 @@ public class ResponseManager {
 			exists = false;
 		}
 		// Download Attributes
-		if (dle.getAttributeValue("name") != null)
+		if (dle.getAttributeValue("name") != null) {
 			dl.implSetName(dle.getAttributeValue("name"));
+		}
 		dl.implSetForceStart(Boolean.parseBoolean(dle.getAttributeValue("forceStart")));
 		dl.implSetChecking(Boolean.parseBoolean(dle.getAttributeValue("checking")));
 		dl.implSetComplete(Boolean.parseBoolean(dle.getAttributeValue("complete")));
@@ -156,8 +159,9 @@ public class ResponseManager {
 			ds.setShareRatio(dle.getAttribute("shareRatio").getIntValue());
 		} catch (Exception e) {}
 		try {
-			if (dle.getAttribute("tracker") != null)
-			ds.setTrackerStatus(dle.getAttributeValue("tracker"));
+			if (dle.getAttribute("tracker") != null) {
+				ds.setTrackerStatus(dle.getAttributeValue("tracker"));
+			}
 		} catch (Exception e) {}
 
 		try {
@@ -169,15 +173,26 @@ public class ResponseManager {
 			dl.implSetAnnounceTimeToWait(Long.parseLong(dle.getAttributeValue("announceTimeToWait")));
 		} catch (Exception e) {}
 
-		if (dle.getAttribute("savePath") != null)
+		if (dle.getAttribute("savePath") != null) {
 			dl.implSetSavePath(dle.getAttributeValue("savePath"));
-		if (dle.getAttribute("eta") != null)
+		}
+		if (dle.getAttribute("eta") != null) {
 			ds.setEta(dle.getAttributeValue("eta"));
-		if (dle.getAttribute("elapsedTime") != null)
+		}
+		if (dle.getAttribute("elapsedTime") != null) {
 			ds.setElapsedTime(dle.getAttributeValue("elapsedTime"));
-		if (dle.getAttribute("status") != null)
+		}
+		if (dle.getAttribute("status") != null) {
 			ds.setStatus(dle.getAttributeValue("status"));
-		if (!exists) dm.manAddDownload(dl);
+		}
+		if (!exists) {
+			dm.manAddDownload(dl);
+		}
+
+		List<Element> attribs = dle.getChildren("Attribute");
+		for (Element att:attribs) {
+			dl.implSetTorrentAttribute(att.getAttributeValue("name"), att.getAttributeValue("value"));
+		}
 
 	}
 
@@ -235,7 +250,9 @@ public class ResponseManager {
 			public long handleRequest(Element xmlResponse) throws IOException {
 				Element advStats = xmlResponse.getChild("AdvancedStats");
 				DownloadImpl dl = dm.manGetDownload(xmlResponse.getAttributeValue("hash"));
-				if (dl == null) return 0;
+				if (dl == null) {
+					return 0;
+				}
 				DownloadAdvancedStatsImpl das = dl.getAdvancedStatsImpl();
 				das.setComment(advStats.getAttributeValue("comment"));
 				das.setCreatedOn(advStats.getAttributeValue("createdOn"));
@@ -253,7 +270,9 @@ public class ResponseManager {
 				Element fileList = xmlResponse.getChild("Files");
 				String hash = xmlResponse.getAttributeValue("hash");
 				DownloadImpl dl = dm.manGetDownload(hash);
-				if (dl == null) return 0;
+				if (dl == null) {
+					return 0;
+				}
 				DownloadFileManagerImpl dlFm = dl.getFileManagerImpl();
 				List<Element> files = fileList.getChildren("File");
 				DownloadFileImpl[] fileImpl;
@@ -263,7 +282,9 @@ public class ResponseManager {
 					fileImpl = new  DownloadFileImpl[files.size()];
 				}
 				for (int i=0;i<fileImpl.length;i++) {
-					if (fileImpl[i] == null) fileImpl[i] = new DownloadFileImpl(hash, client);
+					if (fileImpl[i] == null) {
+						fileImpl[i] = new DownloadFileImpl(hash, client);
+					}
 					Element e = files.get(i);
 					fileImpl[i].setDownloaded(Long.parseLong(e.getAttributeValue("downloaded")));
 					fileImpl[i].setIndex(i);
@@ -273,8 +294,9 @@ public class ResponseManager {
 					fileImpl[i].setPriorityImpl(Boolean.parseBoolean(e.getAttributeValue("priority")));
 					fileImpl[i].setSkippedImpl(Boolean.parseBoolean(e.getAttributeValue("skipped")));
 				}
-				if (!dlFm._isLoaded())
+				if (!dlFm._isLoaded()) {
 					dlFm.setDlFiles(fileImpl);
+				}
 				dlFm.setLoaded(true);
 				return Constants.UPDATE_DOWNLOAD_FILES;
 			}
@@ -290,15 +312,16 @@ public class ResponseManager {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				if (xmlResponse.getAttribute("seeding") != null)
-				try {
-					s = xmlResponse.getAttribute("seeding").getIntValue();
-					sq = xmlResponse.getAttribute("seedqueue").getIntValue();
-					d = xmlResponse.getAttribute("downloading").getIntValue();
-					dq = xmlResponse.getAttribute("downloadqueue").getIntValue();
-				} catch (DataConversionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if (xmlResponse.getAttribute("seeding") != null) {
+					try {
+						s = xmlResponse.getAttribute("seeding").getIntValue();
+						sq = xmlResponse.getAttribute("seedqueue").getIntValue();
+						d = xmlResponse.getAttribute("downloading").getIntValue();
+						dq = xmlResponse.getAttribute("downloadqueue").getIntValue();
+					} catch (DataConversionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 				client.callGlobalStatsListener(receiveRate,sendRate,s,sq,d,dq);
 				return 0;
@@ -490,7 +513,9 @@ public class ResponseManager {
 					} catch (DataConversionException e) {
 						e.printStackTrace();
 					}
-					if (newTorrent) tracker.addTorrent(tti);
+					if (newTorrent) {
+						tracker.addTorrent(tti);
+					}
 				}
 				return Constants.UPDATE_TRACKER;
 			}

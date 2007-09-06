@@ -301,6 +301,16 @@ public interface Download extends
 	public void changeDisplayedName(String name);
 
 	/**
+	 * gets a TorrentAttribute.
+	 *
+	 * Az Default Attributes can be found at RemoteConstants.TA_*
+	 *
+	 * @param name Attribute name
+	 * @return Attribute or null if not found
+	 */
+	public String getTorrentAttribute (String name);
+
+	/**
 	 * Sets a TorrentAttribute.
 	 *
 	 * Az Default Attributes can be found at RemoteConstants.TA_*

@@ -4,21 +4,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lbms.azsmrc.remote.client.internat.I18N;
+import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
-import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.container.DownloadContainer;
 import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
 import lbms.azsmrc.shared.RemoteConstants;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 
 /**
  * Choose columns to display, and in what order
@@ -27,14 +42,14 @@ public class TableColumnEditorDialog {
 
 	private static TableColumnEditorDialog instance;
 
-	private Shell shell;
-	private Color blue;
-	private Table table;
+	private final Shell shell;
+	private final Color blue;
+	private final Table table;
 
 
 	private List<Integer> tableColumns;
 
-	private boolean bIsDownloadContainer;
+	private final boolean bIsDownloadContainer;
 	private boolean mousePressed;
 	private TableItem selectedItem;
 	private Point oldPoint;
@@ -72,6 +87,7 @@ public class TableColumnEditorDialog {
 		downloadsAllowedColumns.add(RemoteConstants.ST_TOTAL_AVG);
 		downloadsAllowedColumns.add(RemoteConstants.ST_LIMIT_UP);
 		downloadsAllowedColumns.add(RemoteConstants.ST_LIMIT_DOWN);
+		downloadsAllowedColumns.add(RemoteConstants.ST_CATEGORY);
 
 		//Seeds Table allowed columns
 		seedsAllowedColumns.add(RemoteConstants.ST_HEALTH);
@@ -90,6 +106,7 @@ public class TableColumnEditorDialog {
 		seedsAllowedColumns.add(RemoteConstants.ST_ELAPSED_TIME);
 		seedsAllowedColumns.add(RemoteConstants.ST_TOTAL_AVG);
 		seedsAllowedColumns.add(RemoteConstants.ST_LIMIT_UP);
+		seedsAllowedColumns.add(RemoteConstants.ST_CATEGORY);
 
 	}
 
@@ -101,10 +118,11 @@ public class TableColumnEditorDialog {
 		instance = this;
 
 		bIsDownloadContainer = _bIsDownloadConatiner;
-		if(bIsDownloadContainer)
+		if(bIsDownloadContainer) {
 			tableColumns = DownloadContainer.getColumns();
-		else
+		} else {
 			tableColumns = SeedContainer.getColumns();
+		}
 
 
 		RowData rd;
@@ -119,8 +137,9 @@ public class TableColumnEditorDialog {
 		GridLayout layout = new GridLayout();
 		shell.setLayout (layout);
 
-		if(!lbms.azsmrc.remote.client.Utilities.isOSX)
+		if(!lbms.azsmrc.remote.client.Utilities.isOSX) {
 			shell.setImage(ImageRepository.getImage("TrayIcon_Blue"));
+		}
 
 		GridData gridData;
 
@@ -194,19 +213,21 @@ public class TableColumnEditorDialog {
 
 		table.addListener(SWT.Selection,new Listener() {
 			public void handleEvent(Event e) {
-				if (e.detail != SWT.CHECK)
+				if (e.detail != SWT.CHECK) {
 					return;
 				//TableItem item = (TableItem) e.item;
 				//int index = item.getParent().indexOf(item);
 				//in case we need to do anything on a selection event
+				}
 			}
 		});
 
 		table.addListener(SWT.SetData, new Listener() {
 			public void handleEvent(Event event) {
 				final TableItem item = (TableItem) event.item;
-				if (item == null)
+				if (item == null) {
 					return;
+				}
 				Table table = item.getParent();
 				int index = table.indexOf(item);
 
@@ -217,8 +238,9 @@ public class TableColumnEditorDialog {
 					Rectangle r = item.getBounds(0);
 					table.getItem(new Point(r.x, r.y));
 					index = table.indexOf(item);
-					if (index < 0)
+					if (index < 0) {
 						return;
+					}
 				}
 
 				if(bIsDownloadContainer){
@@ -240,18 +262,21 @@ public class TableColumnEditorDialog {
 			}
 		});
 
-		if(bIsDownloadContainer)
+		if(bIsDownloadContainer) {
 			table.setItemCount(downloadsAllowedColumns.size());
-		else
+		} else {
 			table.setItemCount(seedsAllowedColumns.size());
+		}
 
 		table.addMouseListener(new MouseAdapter() {
 
+			@Override
 			public void mouseDown(MouseEvent arg0) {
 				mousePressed = true;
 				selectedItem = table.getItem(new Point(arg0.x,arg0.y));
 			}
 
+			@Override
 			public void mouseUp(MouseEvent e) {
 				mousePressed = false;
 				//1. Restore old image
@@ -267,8 +292,9 @@ public class TableColumnEditorDialog {
 				if(item != null && selectedItem != null) {
 					int index = table.indexOf(item);
 					int oldIndex = table.indexOf(selectedItem);
-					if(index == oldIndex)
+					if(index == oldIndex) {
 						return;
+					}
 
 					if(bIsDownloadContainer){
 						Integer value = downloadsAllowedColumns.get(oldIndex);
@@ -289,13 +315,15 @@ public class TableColumnEditorDialog {
 
 		table.addMouseMoveListener(new MouseMoveListener(){
 			public void mouseMove(MouseEvent e) {
-				if (!mousePressed || selectedItem == null)
+				if (!mousePressed || selectedItem == null) {
 					return;
+				}
 
 				Point p = new Point(e.x,e.y);
 				TableItem item = table.getItem(p);
-				if (item == null)
+				if (item == null) {
 					return;
+				}
 
 				GC gc = new GC(table);
 				Rectangle bounds = item.getBounds(0);
@@ -310,10 +338,11 @@ public class TableColumnEditorDialog {
 					oldPoint = null;
 				}
 				//bounds.y += (-table.getHeaderHeight());
-				if(newPosition <= selectedPosition)
+				if(newPosition <= selectedPosition) {
 					oldPoint = new Point(bounds.x,bounds.y);
-				else
+				} else {
 					oldPoint = new Point(bounds.x,bounds.y+bounds.height);
+				}
 				//2. Store the image
 				oldImage = new Image(display,bounds.width,2);
 				gc.copyArea(oldImage,oldPoint.x,oldPoint.y);
@@ -329,8 +358,9 @@ public class TableColumnEditorDialog {
 		// For Windows, to get rid of the scrollbar
 		p.y += 2;
 
-		if (p.y + 64 > display.getClientArea().height)
+		if (p.y + 64 > display.getClientArea().height) {
 			p.y = display.getBounds().height - 64;
+		}
 
 		shell.setSize(p);
 
@@ -338,10 +368,12 @@ public class TableColumnEditorDialog {
 	}
 
 	private void close() {
-		if(blue != null && ! blue.isDisposed())
+		if(blue != null && ! blue.isDisposed()) {
 			blue.dispose();
-		if (!shell.isDisposed())
+		}
+		if (!shell.isDisposed()) {
 			shell.dispose();
+		}
 	}
 
 	private void saveAndApply() {
@@ -350,10 +382,11 @@ public class TableColumnEditorDialog {
 		int position = 0;
 		for(int i = 0 ; i < items.length ; i++) {
 			if(items[i].getChecked()){
-				if(bIsDownloadContainer)
+				if(bIsDownloadContainer) {
 					tableColumns.add(position, downloadsAllowedColumns.get(i));
-				else
+				} else {
 					tableColumns.add(position, seedsAllowedColumns.get(i));
+				}
 
 				position++;
 			}
@@ -361,8 +394,9 @@ public class TableColumnEditorDialog {
 		//save the tableColumns back to the original set
 		if(bIsDownloadContainer){
 			DownloadContainer.saveColumns();
-		}else
+		} else {
 			SeedContainer.saveColumns();
+		}
 
 		//redraw the tables
 		RCMain.getRCMain().getMainWindow().redrawColumnsonTables();
@@ -461,6 +495,10 @@ public class TableColumnEditorDialog {
 			return new String[] {I18N.translate(PFX + "tableitem.downLimit.title"),
 					I18N.translate(PFX + "tableitem.downLimit.description")};
 
+		case RemoteConstants.ST_CATEGORY:
+			return new String[] {I18N.translate(PFX + "tableitem.category.title"),
+					I18N.translate(PFX + "tableitem.category.description")};
+
 		default:
 			return new String[] {I18N.translate("global.error"),
 				I18N.translate("global.error")};
@@ -473,11 +511,14 @@ public class TableColumnEditorDialog {
 	 */
 	public static void open(final boolean _bIsDownloadConatiner) {
 		final Display display = RCMain.getRCMain().getDisplay();
-		if(display == null) return;
+		if(display == null) {
+			return;
+		}
 		if (instance == null || instance.shell == null || instance.shell.isDisposed()){
 			new TableColumnEditorDialog(_bIsDownloadConatiner);
-		}else
+		} else {
 			instance.shell.setActive();
+		}
 	}
 }//EOF
 

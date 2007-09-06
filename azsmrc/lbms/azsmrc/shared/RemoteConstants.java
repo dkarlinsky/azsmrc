@@ -55,6 +55,7 @@ public class RemoteConstants {
 	public static final int ST_SCRAPE_TIMES		= 1<<24;
 	public static final int ST_ALL_SEEDS		= ST_SEEDS | ST_TOTAL_SEEDS;
 	public static final int ST_ALL_LEECHER		= ST_LEECHER | ST_TOTAL_LEECHER;
+	public static final int ST_CATEGORY		= 1<<25;
 
 	//Events
 	public static final int EV_DL_FINISHED		= 1;

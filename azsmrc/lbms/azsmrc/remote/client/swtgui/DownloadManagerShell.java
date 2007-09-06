@@ -128,7 +128,7 @@ public class DownloadManagerShell {
 
 	private Shell DOWNLOAD_MANAGER_SHELL;
 	private Table downloadsTable, seedsTable;
-	private Semaphore semaphore = new Semaphore(1);
+	private final Semaphore semaphore = new Semaphore(1);
 	private SashForm sash;
 	private CTabFolder tabFolder;
 	private CTabItem myTorrents;
@@ -136,7 +136,7 @@ public class DownloadManagerShell {
 
 	//Map pluginTabs = new HashMap();
 
-	private DownloadListener dlL = new DownloadListener(){
+	private final DownloadListener dlL = new DownloadListener(){
 
 		public void stateChanged(Download download, int old_state, int new_state) {
 			try {
@@ -169,12 +169,12 @@ public class DownloadManagerShell {
 	private boolean redrawTables;
 	private String TITLE;
 
-	private SortedMap<String,DownloadContainer> downloadsMap	= new TreeMap<String,DownloadContainer>();
-	private SortedMap<String,SeedContainer> seedsMap			= new TreeMap<String,SeedContainer>();
+	private final SortedMap<String,DownloadContainer> downloadsMap	= new TreeMap<String,DownloadContainer>();
+	private final SortedMap<String,SeedContainer> seedsMap			= new TreeMap<String,SeedContainer>();
 
 	private Container[] downloadsArray = new Container[0];
 	private Container[] seedsArray = new Container[0];
-	private Container[] emptyArray = new Container[0];
+	private final Container[] emptyArray = new Container[0];
 
 	private ToolItem top,up,bottom,down,login,logout,quickconnect;
 	private ToolItem refresh,manage_users, preferences, console;
@@ -196,7 +196,7 @@ public class DownloadManagerShell {
 	private int downSpeed = 0;
 
 	private static Logger logger = Logger.getLogger("lbms.azsmrc.DownloadManagerShell");;
-	private Set<String> openPluginViews = new HashSet<String>();
+	private final Set<String> openPluginViews = new HashSet<String>();
 
 
 	private int drag_drop_line_start = -1;
@@ -210,7 +210,9 @@ public class DownloadManagerShell {
 		}
 
 
-		if(TITLE == null) TITLE = "AzSMRC";
+		if(TITLE == null) {
+			TITLE = "AzSMRC";
+		}
 
 		DOWNLOAD_MANAGER_SHELL = new Shell(RCMain.getRCMain().getDisplay());
 
@@ -300,8 +302,9 @@ public class DownloadManagerShell {
 								RCMain.getRCMain().connect(true);
 								initializeConnection();
 							}
-						}else
+						} else {
 							ConnectionDialog.open(RCMain.getRCMain().getDisplay());
+						}
 					} catch (MalformedURLException e1) {
 						ConnectionDialog.open(RCMain.getRCMain().getDisplay());
 					}
@@ -534,8 +537,9 @@ public class DownloadManagerShell {
 								RCMain.getRCMain().connect(true);
 								initializeConnection();
 							}
-						}else
+						} else {
 							ConnectionDialog.open(RCMain.getRCMain().getDisplay());
+						}
 					} catch (MalformedURLException e1) {
 						ConnectionDialog.open(RCMain.getRCMain().getDisplay());
 					}
@@ -562,8 +566,9 @@ public class DownloadManagerShell {
 		refresh.setToolTipText(I18N.translate(PFX + "toolbar.refresh.tooltiptext"));
 		refresh.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
-				if(RCMain.getRCMain().connected())
+				if(RCMain.getRCMain().connected()) {
 					RCMain.getRCMain().getClient().getDownloadManager().update(true);
+				}
 			}
 		});
 
@@ -604,7 +609,9 @@ public class DownloadManagerShell {
 			public void handleEvent (Event e){
 				if(downloadsTable.isFocusControl()){
 					TableItem[] items = downloadsTable.getSelection();
-					if(items.length == 0 || items.length > 1) return;
+					if(items.length == 0 || items.length > 1) {
+						return;
+					}
 					Container container = (Container)items[0].getData();
 					int current_position = container.getDownload().getPosition();
 					if((current_position -1) > 0){
@@ -612,7 +619,9 @@ public class DownloadManagerShell {
 					}
 				}else{
 					TableItem[] items = seedsTable.getSelection();
-					if(items.length == 0 || items.length > 1) return;
+					if(items.length == 0 || items.length > 1) {
+						return;
+					}
 					Container container = (Container)items[0].getData();
 					int current_position = container.getDownload().getPosition();
 					if((current_position -1) > 0){
@@ -630,7 +639,9 @@ public class DownloadManagerShell {
 			public void handleEvent (Event e){
 				if(downloadsTable.isFocusControl()){
 					TableItem[] items = downloadsTable.getSelection();
-					if(items.length == 0 || items.length > 1) return;
+					if(items.length == 0 || items.length > 1) {
+						return;
+					}
 					Container container = (Container)items[0].getData();
 					int current_position = container.getDownload().getPosition();
 					if((current_position -1) > 0){
@@ -638,7 +649,9 @@ public class DownloadManagerShell {
 					}
 				}else{
 					TableItem[] items = seedsTable.getSelection();
-					if(items.length == 0 || items.length > 1) return;
+					if(items.length == 0 || items.length > 1) {
+						return;
+					}
 					Container container = (Container)items[0].getData();
 					int current_position = container.getDownload().getPosition();
 					if((current_position -1) > 0){
@@ -656,7 +669,9 @@ public class DownloadManagerShell {
 			public void handleEvent (Event e){
 				if(downloadsTable.isFocusControl()){
 					TableItem[] items = downloadsTable.getSelection();
-					if(items.length == 0 || items.length > 1) return;
+					if(items.length == 0 || items.length > 1) {
+						return;
+					}
 					DownloadContainer container = (DownloadContainer)items[0].getData();
 					int current_position = container.getDownload().getPosition();
 					if((current_position + 1) != (downloadsMap.size() + 1)){
@@ -664,7 +679,9 @@ public class DownloadManagerShell {
 					}
 				}else{
 					TableItem[] items = seedsTable.getSelection();
-					if(items.length == 0 || items.length > 1) return;
+					if(items.length == 0 || items.length > 1) {
+						return;
+					}
 					Container container = (Container)items[0].getData();
 					int current_position = container.getDownload().getPosition();
 					if((current_position  + 1) != (seedsMap.size() + 1)){
@@ -684,7 +701,9 @@ public class DownloadManagerShell {
 			public void handleEvent (Event e){
 				if(downloadsTable.isFocusControl()){
 					TableItem[] items = downloadsTable.getSelection();
-					if(items.length == 0 || items.length > 1) return;
+					if(items.length == 0 || items.length > 1) {
+						return;
+					}
 					Container container = (Container)items[0].getData();
 					int current_position = container.getDownload().getPosition();
 					if(current_position != downloadsMap.size()){
@@ -692,7 +711,9 @@ public class DownloadManagerShell {
 					}
 				}else{
 					TableItem[] items = seedsTable.getSelection();
-					if(items.length == 0 || items.length > 1) return;
+					if(items.length == 0 || items.length > 1) {
+						return;
+					}
 					Container container = (Container)items[0].getData();
 					int current_position = container.getDownload().getPosition();
 					if(current_position != seedsMap.size()){
@@ -714,19 +735,23 @@ public class DownloadManagerShell {
 		queueTorrent.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				TableItem[] items;
-				if(downloadsTable.isFocusControl())
+				if(downloadsTable.isFocusControl()) {
 					items = downloadsTable.getSelection();
-				else
+				} else {
 					items = seedsTable.getSelection();
-				if(items.length == 0) return;
+				}
+				if(items.length == 0) {
+					return;
+				}
 
 				RCMain.getRCMain().getClient().transactionStart();
 
 				for(TableItem item : items){
 					Container container = (Container)item.getData();
 					Download dl = container.getDownload();
-					if(dl.getState() != Download.ST_QUEUED)
+					if(dl.getState() != Download.ST_QUEUED) {
 						dl.stopAndQueue();
+					}
 				}
 
 				RCMain.getRCMain().getClient().transactionCommit();
@@ -742,18 +767,22 @@ public class DownloadManagerShell {
 		stopTorrent.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				TableItem[] items;
-				if(downloadsTable.isFocusControl())
+				if(downloadsTable.isFocusControl()) {
 					items = downloadsTable.getSelection();
-				else
+				} else {
 					items = seedsTable.getSelection();
-				if(items.length == 0) return;
+				}
+				if(items.length == 0) {
+					return;
+				}
 				RCMain.getRCMain().getClient().transactionStart();
 
 				for(TableItem item : items){
 					Container container = (Container)item.getData();
 					Download dl = container.getDownload();
-					if(dl.getState() != Download.ST_STOPPED)
+					if(dl.getState() != Download.ST_STOPPED) {
 						dl.stop();
+					}
 				}
 
 				RCMain.getRCMain().getClient().transactionCommit();
@@ -773,11 +802,14 @@ public class DownloadManagerShell {
 		removeTorrent.addListener(SWT.Selection, new Listener(){
 			public void handleEvent (Event e){
 				TableItem[] items;
-				if(downloadsTable.isFocusControl())
+				if(downloadsTable.isFocusControl()) {
 					items = downloadsTable.getSelection();
-				else
+				} else {
 					items = seedsTable.getSelection();
-				if(items.length == 0) return;
+				}
+				if(items.length == 0) {
+					return;
+				}
 				RCMain.getRCMain().getClient().transactionStart();
 
 				for(TableItem item : items){
@@ -860,8 +892,9 @@ public class DownloadManagerShell {
 					pt = bar.toDisplay (pt);
 					tbmenu.setLocation (pt.x, pt.y);
 					tbmenu.setVisible (true);
-				}else
+				} else {
 					RCMain.getRCMain().getClient().getDownloadManager().pauseDownloads();
+				}
 			}
 		});
 
@@ -903,10 +936,11 @@ public class DownloadManagerShell {
 					manage_users.setEnabled(false);
 					return;
 				}
-				if(user.checkAccess(RemoteConstants.RIGHTS_ADMIN))
+				if(user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
 					ManageUsersTab.open(tabFolder);
-				else
+				} else {
 					NormalUserDialog.open(user.getUsername());
+				}
 			}
 		});
 
@@ -965,6 +999,7 @@ public class DownloadManagerShell {
 					//reset the title of MyTorrents once Logged in
 					RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
 
+						@Override
 						public void runSafe() {
 							String userLoggedIn = RCMain.getRCMain().getClient().getUsername();
 							if(myTorrents != null || !myTorrents.isDisposed()){
@@ -973,18 +1008,20 @@ public class DownloadManagerShell {
 									if(RCMain.getRCMain().getProperties().getPropertyAsBoolean("mainwindow.showHost")){
 										myTorrents.setText(I18N.translate(PFX + "mytorrents.tabtitle.all.text1") +
 												" " + RCMain.getRCMain().getClient().getServer().getHost());
-									}else
+									} else {
 										myTorrents.setText(I18N.translate(PFX + "mytorrents.tabtitle.all.text2"));
+									}
 
 
-								}else if(userLoggedIn != null)
+								}else if(userLoggedIn != null) {
 									if(RCMain.getRCMain().getProperties().getPropertyAsBoolean("mainwindow.showHost")){
 										myTorrents.setText(userLoggedIn + I18N.translate(PFX + "mytorrents.tabtitle.user") + ": " + RCMain.getRCMain().getClient().getServer().getHost());
-									}else
+									} else {
 										myTorrents.setText(userLoggedIn + I18N.translate(PFX + "mytorrents.tabtitle.user"));
-
-								else
+									}
+								} else {
 									myTorrents.setText(I18N.translate(PFX + "mytorrents.tabtitle.fallback"));
+								}
 							}
 
 						}
@@ -1009,6 +1046,7 @@ public class DownloadManagerShell {
 
 					semaphore.acquire();
 					RCMain.getRCMain().getDisplay().syncExec(new SWTSafeRunnable() {
+						@Override
 						public void runSafe() {
 							if(download.getState() == Download.ST_SEEDING || download.isComplete()){
 								if (!seedsMap.containsKey(download.getHash())) {
@@ -1073,8 +1111,9 @@ public class DownloadManagerShell {
 									}
 								}
 								DownloadContainer dc = downloadsMap.get(downloads[i].getHash());
-								if(dc != null)
+								if(dc != null) {
 									dc.update(false);
+								}
 							}else if(seedsMap.containsKey(downloads[i].getHash())){
 								SeedContainer sc = seedsMap.get(downloads[i].getHash());
 								sc.update(false);
@@ -1116,8 +1155,9 @@ public class DownloadManagerShell {
 			public void pluginParameter(String key, String value, int type) {
 				if(key.equalsIgnoreCase("singleUserMode")){
 					bSingleUserMode = Boolean.parseBoolean(value);
-					if(bSingleUserMode)
+					if(bSingleUserMode) {
 						setStatusBarText(I18N.translate("rcmain.mainwindow.statusbar.connectedSingleUser"),SWT.COLOR_DARK_GREEN );
+					}
 
 				}
 
@@ -1198,27 +1238,32 @@ public class DownloadManagerShell {
 		downloadsTable.addListener(SWT.SetData, new Listener(){
 			public void handleEvent(Event event) {
 				downloadsArray = downloadsMap.values().toArray(emptyArray);
-				if(downloadsArray.length == 0)
+				if(downloadsArray.length == 0) {
 					return;
+				}
 				Comparator<Container> data = (Comparator<Container>) downloadsTable.getData("comparator");
 
-				if(!Boolean.parseBoolean((String)downloadsTable.getData("sort")))
+				if(!Boolean.parseBoolean((String)downloadsTable.getData("sort"))) {
 					data = Collections.reverseOrder(data);
+				}
 
 				//if(downloadsArray.length > 1)
 				Arrays.sort(downloadsArray, data);
 
 				TableItem item = (TableItem) event.item;
 				int index = downloadsTable.indexOf(item);
-				if(index + 1 > downloadsArray.length) return;
+				if(index + 1 > downloadsArray.length) {
+					return;
+				}
 				//System.out.println("Table count: " + downloadsTable.getItemCount() + " Index: " + index + " | downloadsArray: " + downloadsArray.length + " | downloadsMap: " + downloadsMap.size());
 				DownloadContainer container = (DownloadContainer) downloadsArray[index];
 				container.setTableItem(item);
 				if(index%2!=0){
 					item.setBackground(ColorUtilities.getBackgroundColor());
 				}
-				if(container.getTableItem() != null)
+				if(container.getTableItem() != null) {
 					container.update(true);
+				}
 			}
 		});
 
@@ -1231,21 +1276,24 @@ public class DownloadManagerShell {
 
 			public void handleEvent(Event arg0) {
 				TableItem[] items = downloadsTable.getSelection();
-				if(items == null) return;
+				if(items == null) {
+					return;
+				}
 				if(items.length == 1){
 					//Single line selection
 					Container container = (Container)items[0].getData();
 					Download download = container.getDownload();
 					setTorrentMoveButtons(false,false,false,false);
 					int index = download.getPosition();
-					if(index==1 && downloadsTable.getItemCount() == 1)
+					if(index==1 && downloadsTable.getItemCount() == 1) {
 						setTorrentMoveButtons(false,true,true,false);
-					else if(index == 1)
+					} else if(index == 1) {
 						setTorrentMoveButtons(false,true,true,true);
-					else if(index == downloadsTable.getItemCount()-1)
+					} else if(index == downloadsTable.getItemCount()-1) {
 						setTorrentMoveButtons(true,true,true,false);
-					else
+					} else {
 						setTorrentMoveButtons(true,true,true,true);
+					}
 
 					//torrent control
 					if(download.getState() == Download.ST_QUEUED || download.getState() == Download.ST_DOWNLOADING){
@@ -1271,6 +1319,7 @@ public class DownloadManagerShell {
 		});
 
 		downloadsTable.addMouseListener(new MouseAdapter() {
+			@Override
 			public void mouseDown(MouseEvent e) {
 				if(e.button == 1) {
 					if(downloadsTable.getItem(new Point(e.x,e.y))==null){
@@ -1284,6 +1333,7 @@ public class DownloadManagerShell {
 		});
 
 		downloadsTable.addMouseListener(new MouseAdapter() {
+			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 				if(e.button == 1) {
 					if(downloadsTable.getItem(new Point(e.x,e.y))==null){
@@ -1291,7 +1341,9 @@ public class DownloadManagerShell {
 						setTorrentMoveButtons(false,false,false,false);
 					}else{
 						TableItem[] items = downloadsTable.getSelection();
-						if(items.length != 1) return;
+						if(items.length != 1) {
+							return;
+						}
 						Container dc = (Container)items[0].getData();
 						//check for dupicate happens IN the tab open now
 						TorrentDetailsTab.open(tabFolder,dc.getDownload());
@@ -1323,20 +1375,25 @@ public class DownloadManagerShell {
 
 			public void handleEvent(Event event) {
 				seedsArray = seedsMap.values().toArray(emptyArray);
-				if(seedsArray.length == 0)return;
+				if(seedsArray.length == 0) {
+					return;
+				}
 
 				Comparator<Container> data = (Comparator<Container>) seedsTable.getData("comparator");
 
 
-				if(!Boolean.parseBoolean((String)seedsTable.getData("sort")))
+				if(!Boolean.parseBoolean((String)seedsTable.getData("sort"))) {
 					data = Collections.reverseOrder(data);
+				}
 
 				//if(seedsArray.length > 1)
 				Arrays.sort(seedsArray, data);
 
 				TableItem item = (TableItem) event.item;
 				int index = seedsTable.indexOf(item);
-				if(index + 1 > seedsArray.length) return;
+				if(index + 1 > seedsArray.length) {
+					return;
+				}
 				SeedContainer container = (SeedContainer) seedsArray[index];
 				container.setTableItem(item);
 
@@ -1344,8 +1401,9 @@ public class DownloadManagerShell {
 					item.setBackground(ColorUtilities.getBackgroundColor());
 				}
 
-				if(container.getTableItem() != null)
+				if(container.getTableItem() != null) {
 					container.update(true);
+				}
 			}
 		});
 
@@ -1353,21 +1411,24 @@ public class DownloadManagerShell {
 
 			public void handleEvent(Event arg0) {
 				TableItem[] items = seedsTable.getSelection();
-				if(items == null) return;
+				if(items == null) {
+					return;
+				}
 				if(items.length == 1){
 					Container container = (Container)items[0].getData();
 					Download download = container.getDownload();
 					int index = download.getPosition();
 					//Single line selection
 					setTorrentMoveButtons(false,false,false,false);
-					if(index==1 && seedsTable.getItemCount() == 1)
+					if(index==1 && seedsTable.getItemCount() == 1) {
 						setTorrentMoveButtons(false,true,true,false);
-					else if(index == 1)
+					} else if(index == 1) {
 						setTorrentMoveButtons(false,true,true,true);
-					else if(index == seedsTable.getItemCount()-1)
+					} else if(index == seedsTable.getItemCount()-1) {
 						setTorrentMoveButtons(true,true,true,false);
-					else
+					} else {
 						setTorrentMoveButtons(true,true,true,true);
+					}
 
 
 					//Torrent Control
@@ -1389,6 +1450,7 @@ public class DownloadManagerShell {
 
 
 		seedsTable.addMouseListener(new MouseAdapter() {
+			@Override
 			public void mouseDown(MouseEvent e) {
 				if(e.button == 1) {
 					if(seedsTable.getItem(new Point(e.x,e.y))==null){
@@ -1402,6 +1464,7 @@ public class DownloadManagerShell {
 		});
 
 		seedsTable.addMouseListener(new MouseAdapter() {
+			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 				if(e.button == 1) {
 					if(seedsTable.getItem(new Point(e.x,e.y))==null){
@@ -1409,7 +1472,9 @@ public class DownloadManagerShell {
 						setTorrentMoveButtons(false,false,false,false);
 					}else{
 						TableItem[] items = seedsTable.getSelection();
-						if(items.length > 1) return;
+						if(items.length > 1) {
+							return;
+						}
 						Container sc = (Container)items[0].getData();
 						//check for dupicate happens IN the tab open now
 						TorrentDetailsTab.open(tabFolder,sc.getDownload());
@@ -1427,12 +1492,13 @@ public class DownloadManagerShell {
 				properties.getPropertyAsInt("dms.sash.1")});
 
 		String userLoggedIn = RCMain.getRCMain().getClient().getUsername();
-		if(bSingleUserMode)
+		if(bSingleUserMode) {
 			myTorrents.setText(I18N.translate(PFX + "mytorrents.tabtitle.all.text2"));
-		else if(userLoggedIn != null)
+		} else if(userLoggedIn != null) {
 			myTorrents.setText(userLoggedIn + I18N.translate(PFX + "mytorrents.tabtitle.user"));
-		else
+		} else {
 			myTorrents.setText(I18N.translate(PFX + "mytorrents.tabtitle.fallback"));
+		}
 
 		//------------bottom status bar---------------\\
 		final int borderFlag = (Utilities.isOSX) ? SWT.NONE : SWT.SHADOW_IN;
@@ -1470,8 +1536,9 @@ public class DownloadManagerShell {
 		connectionStatusIcon = new CLabelPadding(statusbarComp,borderFlag);
 		connectionStatusIcon.addListener(SWT.MouseDoubleClick, new Listener(){
 			public void handleEvent(Event arg0) {
-				if(RCMain.getRCMain().connected())
+				if(RCMain.getRCMain().connected()) {
 					ServerDetailsTab.open(tabFolder);
+				}
 			}
 		});
 		setConnectionStatusBar(0);
@@ -1482,8 +1549,9 @@ public class DownloadManagerShell {
 		sslStatusIcon.setEnabled(false);
 		sslStatusIcon.addListener(SWT.MouseDoubleClick, new Listener(){
 			public void handleEvent(Event arg0) {
-				if(RCMain.getRCMain().connected())
+				if(RCMain.getRCMain().connected()) {
 					ServerDetailsTab.open(tabFolder);
+				}
 			}
 		});
 
@@ -1523,10 +1591,11 @@ public class DownloadManagerShell {
 
 				int upLimit;
 
-				if(azureusUpload.equalsIgnoreCase("N/S") || azureusUpload.equalsIgnoreCase("0"))
+				if(azureusUpload.equalsIgnoreCase("N/S") || azureusUpload.equalsIgnoreCase("0")) {
 					upLimit = 0;
-				else
+				} else {
 					upLimit = Integer.valueOf(azureusUpload);
+				}
 
 
 				MenuItem item = new MenuItem(menuUpSpeed,SWT.RADIO);
@@ -1541,7 +1610,9 @@ public class DownloadManagerShell {
 						refreshStatusBar();
 					}
 				});
-				if(upLimit == 0) item.setSelection(true);
+				if(upLimit == 0) {
+					item.setSelection(true);
+				}
 
 				final SelectionListener speedChangeListener = new SelectionListener() {
 					public void widgetSelected(SelectionEvent e) {
@@ -1577,7 +1648,9 @@ public class DownloadManagerShell {
 							item.setData("speed", new Long(iAboveBelow[j]));
 							item.addSelectionListener(speedChangeListener);
 
-							if (upLimit == iAboveBelow[j]) item.setSelection(true);
+							if (upLimit == iAboveBelow[j]) {
+								item.setSelection(true);
+							}
 						}
 					}
 
@@ -1604,8 +1677,9 @@ public class DownloadManagerShell {
 					downLimit = Integer.valueOf(azureusDownload);
 				}
 				final boolean unlim = (downLimit == 0);
-				if(downLimit == 0)
+				if(downLimit == 0) {
 					downLimit = 275;
+				}
 
 				MenuItem item = new MenuItem(menuDownSpeed,SWT.RADIO);
 				item.setText("Unlimited");
@@ -1619,7 +1693,9 @@ public class DownloadManagerShell {
 						refreshStatusBar();
 					}
 				});
-				if(unlim) item.setSelection(true);
+				if(unlim) {
+					item.setSelection(true);
+				}
 				final SelectionListener speedChangeListener = new SelectionListener() {
 					public void widgetSelected(SelectionEvent e) {
 						if(((MenuItem)e.widget).getSelection()){
@@ -1723,11 +1799,13 @@ public class DownloadManagerShell {
 						if(colWidth == 0){
 							b_ok = false;
 							break;
-						}else
+						} else {
 							dl_column_list.add(colWidth);
+						}
 					}
-					if(b_ok)
+					if(b_ok) {
 						properties.setProperty("downloadsTable.columns.widths", EncodingUtil.IntListToString(dl_column_list));
+					}
 				}
 
 				//save the seedsTable column widths
@@ -1741,12 +1819,14 @@ public class DownloadManagerShell {
 						if(colWidth == 0){
 							b_ok = false;
 							break;
-						}else
+						} else {
 							seed_column_list.add(colWidth);
+						}
 
 					}
-					if(b_ok)
+					if(b_ok) {
 						properties.setProperty("seedsTable.columns.widths", EncodingUtil.IntListToString(seed_column_list));
+					}
 				}
 
 				//Save Everything!
@@ -1812,8 +1892,9 @@ public class DownloadManagerShell {
 		});
 
 		//check to see if the console is auto open and open it up if it is
-		if(properties.getPropertyAsBoolean("auto_console", false))
+		if(properties.getPropertyAsBoolean("auto_console", false)) {
 			ConsoleTab.open(tabFolder, false);
+		}
 
 
 		tabFolder.setSelection(myTorrents);
@@ -1843,8 +1924,9 @@ public class DownloadManagerShell {
 			//TODO MARC Popup donation tab
 		}
 
-		if (RCMain.getRCMain().connected())
+		if (RCMain.getRCMain().connected()) {
 			RCMain.getRCMain().updateTimer(true);
+		}
 
 		/*		//---------- Plugin Initialization -------------------\\
 
@@ -1912,11 +1994,15 @@ public class DownloadManagerShell {
 	 */
 	public void setConnectionStatusBar(final int connection){
 		Display display = RCMain.getRCMain().getDisplay();
-		if(display == null) return;
+		if(display == null) {
+			return;
+		}
 		display.syncExec(new SWTSafeRunnable(){
+			@Override
 			public void runSafe() {
-				if(connectionStatusIcon == null || connectionStatusIcon.isDisposed())
+				if(connectionStatusIcon == null || connectionStatusIcon.isDisposed()) {
 					return;
+				}
 				if(connection == 0){
 					connectionStatusIcon.setImage(ImageRepository.getImage("connect_no"));
 					connectionStatusIcon.setToolTipText("Not Connected to server");
@@ -1936,8 +2022,11 @@ public class DownloadManagerShell {
 
 	public void setSSLStatusBar(final boolean benabled, final boolean buse_ssl){
 		Display display = RCMain.getRCMain().getDisplay();
-		if(display == null || display.isDisposed()) return;
+		if(display == null || display.isDisposed()) {
+			return;
+		}
 		display.asyncExec(new SWTSafeRunnable() {
+			@Override
 			public void runSafe() {
 				if(benabled){
 					if(buse_ssl){
@@ -1960,29 +2049,40 @@ public class DownloadManagerShell {
 
 	public void setTorrentMoveButtons(final boolean bTop, final boolean bUp, final boolean bDown, final boolean bBottom){
 		Display display = RCMain.getRCMain().getDisplay();
-		if(display == null || display.isDisposed()) return;
+		if(display == null || display.isDisposed()) {
+			return;
+		}
 		display.asyncExec(new SWTSafeRunnable() {
+			@Override
 			public void runSafe() {
-				if (top.isEnabled() != bTop)
+				if (top.isEnabled() != bTop) {
 					top.setEnabled(bTop);
-				if (up.isEnabled() != bUp)
+				}
+				if (up.isEnabled() != bUp) {
 					up.setEnabled(bUp);
-				if (down.isEnabled() != bDown)
+				}
+				if (down.isEnabled() != bDown) {
 					down.setEnabled(bDown);
-				if (bottom.isEnabled() != bBottom)
+				}
+				if (bottom.isEnabled() != bBottom) {
 					bottom.setEnabled(bBottom);
+				}
 			}
 		});
 	}
 
 	public void setUserButton () {
 		Display display = RCMain.getRCMain().getDisplay();
-		if(display == null || display.isDisposed()) return;
+		if(display == null || display.isDisposed()) {
+			return;
+		}
 		display.asyncExec(new SWTSafeRunnable() {
+			@Override
 			public void runSafe() {
 				User user = RCMain.getRCMain().getClient().getUserManager().getActiveUser();
-				if (user != null)
+				if (user != null) {
 					manage_users.setEnabled(true);
+				}
 			}
 		});
 	}
@@ -1990,8 +2090,11 @@ public class DownloadManagerShell {
 
 	public void setLogInOutButtons(final boolean bLoggedIn){
 		Display display = RCMain.getRCMain().getDisplay();
-		if(display == null || display.isDisposed()) return;
+		if(display == null || display.isDisposed()) {
+			return;
+		}
 		display.asyncExec(new SWTSafeRunnable() {
+			@Override
 			public void runSafe() {
 				if(bLoggedIn){
 					login.setEnabled(false);
@@ -2307,7 +2410,9 @@ public class DownloadManagerShell {
 			public void handleEvent(Event arg0) {
 				if(table != null || !table.isDisposed()){
 					TableItem[] items = table.getSelection();
-					if(items.length > 1) return;
+					if(items.length > 1) {
+						return;
+					}
 
 					RCMain.getRCMain().getClient().transactionStart();
 					for(TableItem item : items){
@@ -2368,13 +2473,15 @@ public class DownloadManagerShell {
 		final MenuItem itemDownSpeedManual = new MenuItem(menuDownSpeed, SWT.PUSH);
 		itemDownSpeedManual.setText("Manual");
 		itemDownSpeedManual.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				InputShell is = new InputShell(
 						"Set Download Speed","Enter a number in kb/s to change download to:");
 
 				String sReturn = is.open();
-				if (sReturn == null)
+				if (sReturn == null) {
 					return;
+				}
 
 				int newSpeed;
 				try {
@@ -2444,13 +2551,15 @@ public class DownloadManagerShell {
 		final MenuItem itemUpSpeedManual = new MenuItem(menuUpSpeed, SWT.PUSH);
 		itemUpSpeedManual.setText("Manual");
 		itemUpSpeedManual.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				InputShell is = new InputShell(
 						"Set Upload Speed","Enter a number in kb/s to change upload to:");
 
 				String sReturn = is.open();
-				if (sReturn == null)
+				if (sReturn == null) {
 					return;
+				}
 
 				int newSpeed;
 				try {
@@ -2485,8 +2594,10 @@ public class DownloadManagerShell {
 		final MenuItem menuRenameDisplayedName = new MenuItem(menuRename, SWT.PUSH);
 		menuRenameDisplayedName.setText("Rename Displayed Name");
 		menuRenameDisplayedName.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
+					@Override
 					public void runSafe() {
 						InputShell is = new InputShell("Rename Displayed Name",
 								"Enter a new name to display for this download" +
@@ -2507,8 +2618,10 @@ public class DownloadManagerShell {
 		final MenuItem menuRenameSavePath = new MenuItem(menuRename, SWT.PUSH);
 		menuRenameSavePath.setText("Rename Save Path");
 		menuRenameSavePath.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
+					@Override
 					public void runSafe() {
 						InputShell is = new InputShell("Rename Save Path",
 								"Enter a new save path name for this download" +
@@ -2529,8 +2642,10 @@ public class DownloadManagerShell {
 		final MenuItem menuRenameBoth = new MenuItem(menuRename, SWT.PUSH);
 		menuRenameBoth.setText("Rename Both");
 		menuRenameBoth.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				RCMain.getRCMain().getDisplay().asyncExec(new SWTSafeRunnable(){
+					@Override
 					public void runSafe() {
 						InputShell is = new InputShell("Rename Download",
 								"Enter a new name for this download" +
@@ -2559,7 +2674,9 @@ public class DownloadManagerShell {
 
 				public void handleEvent(Event arg0) {
 					TableItem[] items = table.getSelection();
-					if(items.length > 1) return;
+					if(items.length > 1) {
+						return;
+					}
 
 					for(TableItem item : items){
 						Container container = (Container)item.getData();
@@ -2623,15 +2740,17 @@ public class DownloadManagerShell {
 					Container container = (Container)items[0].getData();
 					int currentDownSpeed = container.getDownload().getMaximumDownloadKBPerSecond();
 					int currentUpSpeed = container.getDownload().getUploadRateLimitBytesPerSecond();
-					if(currentUpSpeed <= 0)
+					if(currentUpSpeed <= 0) {
 						itemCurrentUpSpeed.setText("Current: " + "Unlimited");
-					else
+					} else {
 						itemCurrentUpSpeed.setText("Current: " + DisplayFormatters.formatByteCountToBase10KBEtcPerSec(currentUpSpeed));
+					}
 
-					if(currentDownSpeed <= 0)
+					if(currentDownSpeed <= 0) {
 						itemCurrentDownSpeed.setText("Current: " + "Unlimited");
-					else
+					} else {
 						itemCurrentDownSpeed.setText("Current: " + DisplayFormatters.formatByteCountToBase10KBEtcPerSec(currentDownSpeed));
+					}
 
 
 
@@ -2643,8 +2762,9 @@ public class DownloadManagerShell {
 
 					if(container.getDownload().isForceStart()){
 						forceStart.setSelection(true);
-					}else
+					} else {
 						forceStart.setSelection(false);
+					}
 
 					int state = container.getDownload().getState();
 					if(state == Download.ST_STOPPED ||
@@ -2690,8 +2810,11 @@ public class DownloadManagerShell {
 	 */
 	public void setGUItoLoggedOut(){
 		final Display display = RCMain.getRCMain().getDisplay();
-		if(display == null || display.isDisposed()) return;
+		if(display == null || display.isDisposed()) {
+			return;
+		}
 		display.asyncExec(new SWTSafeRunnable(){
+			@Override
 			public void runSafe() {
 				if(DOWNLOAD_MANAGER_SHELL != null){
 					setLogInOutButtons(false);
@@ -2705,14 +2828,16 @@ public class DownloadManagerShell {
 					//close all open stray tabs and dialogs
 					CTabItem[] items = tabFolder.getItems();
 					for(CTabItem item:items){
-						if(item != myTorrents)
+						if(item != myTorrents) {
 							item.dispose();
+						}
 					}
 
 					Shell[] shells = display.getShells();
 					for(Shell shell:shells){
-						if(shell != DOWNLOAD_MANAGER_SHELL)
+						if(shell != DOWNLOAD_MANAGER_SHELL) {
 							shell.dispose();
+						}
 					}
 
 				}
@@ -2729,12 +2854,16 @@ public class DownloadManagerShell {
 	 */
 	public void setStatusBarText(final String text, final int color){
 		final Display display = RCMain.getRCMain().getDisplay();
-		if(display == null || display.isDisposed()) return;
+		if(display == null || display.isDisposed()) {
+			return;
+		}
 		display.asyncExec(new SWTSafeRunnable(){
+			@Override
 			public void runSafe() {
 				try {
-					if(statusBarText == null || statusBarText.isDisposed())
+					if(statusBarText == null || statusBarText.isDisposed()) {
 						return;
+					}
 					if(text == null){
 						statusBarText.setText("");
 						return;
@@ -2775,6 +2904,7 @@ public class DownloadManagerShell {
 	 */
 	public void setToolBarTorrentIcons(final boolean bQueue, final boolean bStop, final boolean bRemove){
 		RCMain.getRCMain().getDisplay().syncExec(new SWTSafeRunnable(){
+			@Override
 			public void runSafe() {
 				if(queueTorrent != null || !queueTorrent.isDisposed()){
 					queueTorrent.setEnabled(bQueue);
@@ -2809,11 +2939,13 @@ public class DownloadManagerShell {
 		List<Integer> column_width_list = new ArrayList<Integer>();
 		Properties properties = RCMain.getRCMain().getProperties();
 		if(table.equals(downloadsTable)){
-			if(properties.containsKey("downloadsTable.columns.widths"))
+			if(properties.containsKey("downloadsTable.columns.widths")) {
 				column_width_list =  EncodingUtil.StringToIntegerList(properties.getProperty("downloadsTable.columns.widths"));
+			}
 		}else{
-			if(properties.containsKey("seedsTable.columns.widths"))
+			if(properties.containsKey("seedsTable.columns.widths")) {
 				column_width_list =  EncodingUtil.StringToIntegerList(properties.getProperty("seedsTable.columns.widths"));
+			}
 		}
 
 
@@ -3096,6 +3228,20 @@ public class DownloadManagerShell {
 
 				break;
 
+			case RemoteConstants.ST_CATEGORY:
+				TableColumn category = new TableColumn(table, SWT.RIGHT);
+				category.setText("Category");
+				category.setMoveable(true);
+				category.addControlListener(resizeListener);
+				category.addListener(SWT.Selection, getSortListener(table,RemoteConstants.ST_CATEGORY));
+				try{
+					category.setWidth(column_width_list.get(i));
+				}catch(Exception e){
+					category.pack();
+				}
+
+				break;
+
 
 			}
 		}
@@ -3164,13 +3310,18 @@ public class DownloadManagerShell {
 		seedsMap.clear();
 		seedsArray = seedsMap.values().toArray(emptyArray);
 		RCMain.getRCMain().getDisplay().syncExec(new SWTSafeRunnable(){
+			@Override
 			public void runSafe() {
 				downloadsTable.removeAll();
 				seedsTable.removeAll();
 				Control[] children_downloads = downloadsTable.getChildren();
-				for(Control child:children_downloads) child.dispose();
+				for(Control child:children_downloads) {
+					child.dispose();
+				}
 				Control[] children_seeds = seedsTable.getChildren();
-				for(Control child:children_seeds) child.dispose();
+				for(Control child:children_seeds) {
+					child.dispose();
+				}
 			}
 		});
 	}
@@ -3179,8 +3330,11 @@ public class DownloadManagerShell {
 		downloadsArray = downloadsMap.values().toArray(emptyArray);
 		seedsArray = seedsMap.values().toArray(emptyArray);
 		Display display = RCMain.getRCMain().getDisplay();
-		if(display == null || display.isDisposed()) return;
+		if(display == null || display.isDisposed()) {
+			return;
+		}
 		display.asyncExec(new SWTSafeRunnable(){
+			@Override
 			public void runSafe() {
 				if(downloadsTable != null || !downloadsTable.isDisposed()){
 					downloadsTable.clearAll();
@@ -3199,21 +3353,24 @@ public class DownloadManagerShell {
 					setToolBarTorrentIcons(false,false,false);
 				}else if(downloadsTable.getSelectionCount() > 0){ //Something is selected in downloadsTable, refresh Toolbars
 					TableItem[] items = downloadsTable.getSelection();
-					if(items == null) return;
+					if(items == null) {
+						return;
+					}
 					if(items.length == 1){
 						Container container = (Container)items[0].getData();
 						Download download = container.getDownload();
 						//Single line selection
 						setTorrentMoveButtons(false,false,false,false);
 						int index = download.getPosition();
-						if(index==1 && downloadsTable.getItemCount() == 1)
+						if(index==1 && downloadsTable.getItemCount() == 1) {
 							setTorrentMoveButtons(false,true,true,false);
-						else if(index == 1)
+						} else if(index == 1) {
 							setTorrentMoveButtons(false,true,true,true);
-						else if(index == downloadsTable.getItemCount()-1)
+						} else if(index == downloadsTable.getItemCount()-1) {
 							setTorrentMoveButtons(true,true,true,false);
-						else
+						} else {
 							setTorrentMoveButtons(true,true,true,true);
+						}
 
 						//torrent control
 						if(download.getState() == Download.ST_QUEUED || download.getState() == Download.ST_DOWNLOADING){
@@ -3235,21 +3392,24 @@ public class DownloadManagerShell {
 					}
 				}else if(seedsTable.getSelectionCount() > 0){ //SeedsTable has selection, Refresh toolbars
 					TableItem[] items = seedsTable.getSelection();
-					if(items == null) return;
+					if(items == null) {
+						return;
+					}
 					if(items.length == 1){
 						Container container = (Container)items[0].getData();
 						Download download = container.getDownload();
 						//Single line selection
 						setTorrentMoveButtons(false,false,false,false);
 						int index = download.getPosition();
-						if(index==1 && seedsTable.getItemCount() == 1)
+						if(index==1 && seedsTable.getItemCount() == 1) {
 							setTorrentMoveButtons(false,true,true,false);
-						else if(index == 1)
+						} else if(index == 1) {
 							setTorrentMoveButtons(false,true,true,true);
-						else if(index == seedsTable.getItemCount()-1)
+						} else if(index == seedsTable.getItemCount()-1) {
 							setTorrentMoveButtons(true,true,true,false);
-						else
+						} else {
 							setTorrentMoveButtons(true,true,true,true);
+						}
 
 
 						//Torrent Control
@@ -3272,21 +3432,24 @@ public class DownloadManagerShell {
 
 	public void refreshStatusBar(){
 		RCMain.getRCMain().getDisplay().syncExec(new SWTSafeRunnable(){
+			@Override
 			public void runSafe() {
 				if(statusDown != null || !statusDown.isDisposed()){
-					if(azureusDownload.equalsIgnoreCase("0"))
+					if(azureusDownload.equalsIgnoreCase("0")) {
 						statusDown.setText(DisplayFormatters.formatByteCountToBase10KBEtcPerSec(downSpeed));
-					else if(azureusDownload.equalsIgnoreCase("N/S"))
+					} else if(azureusDownload.equalsIgnoreCase("N/S")) {
 						statusDown.setText("[" + azureusDownload + "] " + DisplayFormatters.formatByteCountToBase10KBEtcPerSec(downSpeed));
-					else
+					} else {
 						statusDown.setText("[" + azureusDownload + "K] " + DisplayFormatters.formatByteCountToBase10KBEtcPerSec(downSpeed));
+					}
 
-					if(azureusUpload.equalsIgnoreCase("0"))
+					if(azureusUpload.equalsIgnoreCase("0")) {
 						statusUp.setText(DisplayFormatters.formatByteCountToBase10KBEtcPerSec(upSpeed));
-					else if(azureusUpload.equalsIgnoreCase("N/S"))
+					} else if(azureusUpload.equalsIgnoreCase("N/S")) {
 						statusUp.setText("[" + azureusUpload + "] " + DisplayFormatters.formatByteCountToBase10KBEtcPerSec(upSpeed));
-					else
+					} else {
 						statusUp.setText("[" + azureusUpload + "K] " + DisplayFormatters.formatByteCountToBase10KBEtcPerSec(upSpeed));
+					}
 
 					statusbarComp.layout();
 				}
@@ -3329,6 +3492,7 @@ public class DownloadManagerShell {
 			DragSource dragSource = new DragSource(parent, DND.DROP_MOVE);
 			dragSource.setTransfer(types);
 			dragSource.addDragListener(new DragSourceAdapter() {
+				@Override
 				public void dragStart(DragSourceEvent event) {
 					Table table = parent;
 					if (table.getSelectionCount() != 0 &&
@@ -3343,6 +3507,7 @@ public class DownloadManagerShell {
 					}
 				}
 
+				@Override
 				public void dragSetData(DragSourceEvent event) {
 					event.data = "moveRow";
 				}
@@ -3365,6 +3530,7 @@ public class DownloadManagerShell {
 
 			dropTarget.addDropListener(new DropTargetAdapter() {
 
+				@Override
 				public void dragEnter(DropTargetEvent event) {
 					// no event.data on dragOver, use drag_drop_line_start to determine if
 					// ours
@@ -3373,10 +3539,11 @@ public class DownloadManagerShell {
 						event.detail = DND.DROP_COPY;
 					} else 	if(drag_drop_line_start < 0) {
 						if(event.detail != DND.DROP_COPY) {
-							if ((event.operations & DND.DROP_LINK) > 0)
+							if ((event.operations & DND.DROP_LINK) > 0) {
 								event.detail = DND.DROP_LINK;
-							else if ((event.operations & DND.DROP_COPY) > 0)
+							} else if ((event.operations & DND.DROP_COPY) > 0) {
 								event.detail = DND.DROP_COPY;
+							}
 						}
 					} else if(TextTransfer.getInstance().isSupportedType(event.currentDataType)) {
 						event.feedback = DND.FEEDBACK_EXPAND | DND.FEEDBACK_SCROLL | DND.FEEDBACK_SELECT | DND.FEEDBACK_INSERT_BEFORE | DND.FEEDBACK_INSERT_AFTER;
@@ -3384,6 +3551,7 @@ public class DownloadManagerShell {
 					}
 				}
 
+				@Override
 				public void drop(DropTargetEvent event) {
 					if (!(event.data instanceof String) || !((String)event.data).equals("moveRow")) {
 						openDroppedTorrents(event);
@@ -3405,8 +3573,9 @@ public class DownloadManagerShell {
 					// Torrent file from shell dropped
 					if(drag_drop_line_start >= 0) { // event.data == null
 						event.detail = DND.DROP_NONE;
-						if(event.item == null)
+						if(event.item == null) {
 							return;
+						}
 						int drag_drop_line_end = parent.indexOf((TableItem)event.item);
 
 						//moveSelectedTorrents(drag_drop_line_start, drag_drop_line_end);
@@ -3417,8 +3586,9 @@ public class DownloadManagerShell {
 								if(container.getDownload().getPosition() == drag_drop_line_start+1){
 									System.out.println("Moving " + container.getDownload().getName()+ " From position " + (drag_drop_line_start +1) + " to " + (drag_drop_line_end+1));
 									container.getDownload().moveTo(drag_drop_line_end+1);
-									if(RCMain.getRCMain().connected())
+									if(RCMain.getRCMain().connected()) {
 										RCMain.getRCMain().getClient().getDownloadManager().update(false);
+									}
 
 									//make sure to redraw the table here so a resort happens
 									redrawTables();
@@ -3431,8 +3601,9 @@ public class DownloadManagerShell {
 								if(container.getDownload().getPosition() == drag_drop_line_start){
 									System.out.println("Moving " + container.getDownload().getName()+ " From position " + (drag_drop_line_start +1) + " to " + (drag_drop_line_end+1));
 									container.getDownload().moveTo(drag_drop_line_end+1);
-									if(RCMain.getRCMain().connected())
+									if(RCMain.getRCMain().connected()) {
 										RCMain.getRCMain().getClient().getDownloadManager().update(false);
+									}
 
 									//make sure to redraw the table here so a resort happens
 									redrawTables();
@@ -3466,18 +3637,21 @@ public class DownloadManagerShell {
 	}
 
 	public static void openDroppedTorrents(DropTargetEvent event) {
-		if (event.data == null)
+		if (event.data == null) {
 			return;
+		}
 
 		//boolean bOverrideToStopped = event.detail == DND.DROP_COPY;
 
 		if (event.data instanceof String[] || event.data instanceof String) {
 			final String[] sourceNames = (event.data instanceof String[])
 			? (String[]) event.data : new String[] { (String) event.data };
-			if (sourceNames == null)
+			if (sourceNames == null) {
 				event.detail = DND.DROP_NONE;
-			if (event.detail == DND.DROP_NONE)
+			}
+			if (event.detail == DND.DROP_NONE) {
 				return;
+			}
 			List<String> files = new ArrayList<String>();
 			for (int i = 0; (i < sourceNames.length); i++) {
 				final File source = new File(sourceNames[i]);
@@ -3537,10 +3711,12 @@ public class DownloadManagerShell {
 
 	public static boolean isTorrentFile(String filename) throws FileNotFoundException, IOException {
 		File check = new File(filename);
-		if (!check.exists())
+		if (!check.exists()) {
 			throw new FileNotFoundException("File "+filename+" not found.");
-		if (!check.canRead())
+		}
+		if (!check.canRead()) {
 			throw new IOException("File "+filename+" cannot be read.");
+		}
 		if (check.isDirectory()){
 			logger.info("File "+filename+" is a directory.");
 			return false;
@@ -3591,9 +3767,12 @@ public class DownloadManagerShell {
 
 	public void saveColumnWidthsToPreferencesFile(){
 		Display display = RCMain.getRCMain().getDisplay();
-		if(display == null || display.isDisposed()) return;
+		if(display == null || display.isDisposed()) {
+			return;
+		}
 		display.asyncExec(new SWTSafeRunnable(){
 
+			@Override
 			public void runSafe() {
 				Properties properties = RCMain.getRCMain().getProperties();
 				//save the downloadsTable column widths
@@ -3655,6 +3834,7 @@ public class DownloadManagerShell {
 		/* (non-Javadoc)
 		 * @see org.eclipse.swt.custom.CLabel#computeSize(int, int, boolean)
 		 */
+		@Override
 		public Point computeSize(int wHint, int hHint, boolean changed) {
 			if ( !isVisible()){
 				return( new Point(0,0));
@@ -3666,8 +3846,9 @@ public class DownloadManagerShell {
 			if (lastWidth > pt.x && now - widthSetOn < KEEPWIDTHFOR_MS) {
 				pt.x = lastWidth;
 			} else {
-				if (lastWidth != pt.x)
+				if (lastWidth != pt.x) {
 					lastWidth = pt.x;
+				}
 				widthSetOn = now;
 			}
 
@@ -3683,7 +3864,9 @@ public class DownloadManagerShell {
 	public void openPluginView(final String pluginViewID) {
 
 		//check if already open and return
-		if (!openPluginViews.add(pluginViewID)) return;
+		if (!openPluginViews.add(pluginViewID)) {
+			return;
+		}
 
 		//Pull the pluginManager
 		PluginManagerImpl pm = RCMain.getRCMain().getPluginManagerImpl();
@@ -3692,7 +3875,9 @@ public class DownloadManagerShell {
 		final UIPluginViewImpl vi = pm.getUIManager().getViewInstance(ViewID.MAIN, pluginViewID, null);
 
 		//the vi can be null, so check if the vi is null and if so return
-		if(vi == null) return;
+		if(vi == null) {
+			return;
+		}
 
 		//add in the plugin's ctabitem and make it a closable tab
 		CTabItem pluginTab = new CTabItem(tabFolder, SWT.CLOSE);

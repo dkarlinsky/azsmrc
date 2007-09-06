@@ -1,6 +1,7 @@
 package lbms.azsmrc.remote.client.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import lbms.azsmrc.remote.client.Client;
@@ -23,6 +24,7 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 	private List<DownloadListener> listener = new ArrayList<DownloadListener>();
 	private DownloadAdvancedStatsImpl advStats;
 	private DownloadFileManagerImpl dlFileMgr;
+	private HashMap<String, String> torrentAttributes = new HashMap<String, String>();
 	private Client client;
 
 	public DownloadImpl (String hash) {
@@ -150,10 +152,18 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 	}
 
 	/* (non-Javadoc)
+	 * @see lbms.azsmrc.remote.client.Download#getTorrentAttribute(java.lang.String)
+	 */
+	public String getTorrentAttribute(String name) {
+		return torrentAttributes.get(name);
+	}
+
+	/* (non-Javadoc)
 	 * @see lbms.azsmrc.remote.client.Download#setTorrentAttribute(java.lang.String, java.lang.String)
 	 */
 	public void setTorrentAttribute(String name, String value) {
 		client.sendSetTorrentAttribute(hash, name, value);
+		torrentAttributes.put(name, value);
 	}
 
 	public DownloadStats getStats() {
@@ -206,12 +216,16 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 	}
 
 	public DownloadAdvancedStats getAdvancedStats() {
-		if (advStats == null) advStats = new DownloadAdvancedStatsImpl(hash, client);
+		if (advStats == null) {
+			advStats = new DownloadAdvancedStatsImpl(hash, client);
+		}
 		return advStats;
 	}
 
 	public DownloadFileManager getFileManager() {
-		if (dlFileMgr == null) dlFileMgr = new DownloadFileManagerImpl(hash, client);
+		if (dlFileMgr == null) {
+			dlFileMgr = new DownloadFileManagerImpl(hash, client);
+		}
 		return dlFileMgr;
 	}
 
@@ -272,8 +286,9 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 	 * @param state The state to set.
 	 */
 	public void implSetState(int state) {
-		if (this.state != state)
+		if (this.state != state) {
 			stateChanged(this.state, state);
+		}
 		this.state = state;
 	}
 
@@ -286,8 +301,9 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 	}
 
 	public void implSetPosition (int pos) {
-		if (this.position != pos)
+		if (this.position != pos) {
 			positionChanged(position, pos);
+		}
 		this.position = pos;
 	}
 
@@ -401,11 +417,17 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 		this.discarded = discarded;
 	}
 
+	public void implSetTorrentAttribute (String key, String value) {
+		this.torrentAttributes.put(key, value);
+	}
+
 	/**
 	 * @return Returns the advStats.
 	 */
 	public DownloadAdvancedStatsImpl getAdvancedStatsImpl() {
-		if (advStats == null) advStats = new DownloadAdvancedStatsImpl(hash, client);
+		if (advStats == null) {
+			advStats = new DownloadAdvancedStatsImpl(hash, client);
+		}
 		return advStats;
 	}
 
@@ -418,7 +440,10 @@ public class DownloadImpl implements Download, Comparable<DownloadImpl> {
 
 	@Override
 	public String toString() {
-		if (name != null) return name;
-		else return super.toString();
+		if (name != null) {
+			return name;
+		} else {
+			return super.toString();
+		}
 	}
 }
