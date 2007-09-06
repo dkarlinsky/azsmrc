@@ -1,5 +1,6 @@
 package lbms.azsmrc.remote.client.swing;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.swt.SWT;
@@ -32,6 +33,10 @@ public class CrashHandler {
 			java.awt.EventQueue.invokeLater(new Runnable() {
 				public void run() {
 					new Helper(suggestion).setVisible(true);
+					File error = new File(System.getProperty("user.dir")+System.getProperty("file.separator")+"error.log");
+					if (error.exists()) {
+						error.delete();
+					}
 				}
 			});
 		} else {

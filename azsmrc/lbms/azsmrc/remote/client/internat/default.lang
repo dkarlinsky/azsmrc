@@ -67,6 +67,7 @@ dialog.errordialog.send_button.text=Send
 dialog.errordialog.sendemail.text=Send email address with report
 dialog.errordialog.shell.text=Error Report
 dialog.errordialog.sysTextLabel.text=System Information
+dialog.helperdialog.title=AzSMRC Error Helper
 dialog.messagedialog.hideall.text=Hide All
 dialog.motd.shell.text=Announcements
 dialog.movedatadialog.move.message=Your move data request has been sent to the server.
