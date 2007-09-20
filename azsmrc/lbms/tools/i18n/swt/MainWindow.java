@@ -736,7 +736,7 @@ public class MainWindow {
 				mb.setText("About");
 				mb
 						.setMessage("ETC:  EasyTranslationCreator"
-								+ "\n\nVersion 1.0"
+								+ "\n\nVersion 1.3"
 								+ "\n\nAuthors:  Leonard Br\u00FCnings and Marc Schaubach"
 								+ "\n\nhttp://azsmrc.sourceforge.net");
 				mb.open();

@@ -21,7 +21,7 @@ http://download.eclipse.org/eclipse/downloads/index.php
 
 For example, to get the latest stable version of SWT go here:
 
-http://download.eclipse.org/eclipse/downloads/drops/R-3.1.2-200601181600/index.php
+http://download.eclipse.org/eclipse/downloads/drops/R-3.3-200706251500/index.php#swt
 
 For which ever version you choose, scroll down until you see
 the title "SWT Binary and Source"
@@ -29,6 +29,9 @@ the title "SWT Binary and Source"
 From here, simply download the version that matches your computer.
 
 This file will need to be unzipped in your ETC directory for it to work.
+
+OR: you can extract ETC in your AzSMRC directory, since it usually contains
+a working SWT version.
 
 _______________________________________________________________________
 
@@ -50,6 +53,13 @@ Step 2:  Either start translating the red text by clicking on it and
 
 			 Open up an existing Localized file through the File menu
 
+_______________________________________________________________________
+
+Some Shortcuts:
+
+CTRL+A Adds a new Key
+
+RightClick on a field opens the extend Editor
 _______________________________________________________________________
 
 Developers:
