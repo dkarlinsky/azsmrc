@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import lbms.azsmrc.remote.client.history.DownloadHistory;
 import lbms.azsmrc.remote.client.impl.DownloadAdvancedStatsImpl;
 import lbms.azsmrc.remote.client.impl.DownloadFileImpl;
 import lbms.azsmrc.remote.client.impl.DownloadFileManagerImpl;
@@ -29,37 +30,37 @@ import org.jdom.Document;
 import org.jdom.Element;
 
 public class ResponseManager {
-	private Map<String,ResponseHandler> handlerList = new HashMap<String, ResponseHandler>();
-	private Client client;
-	private DownloadManagerImpl dm;
-	private Logger debug;
+	private Map<String, ResponseHandler>	handlerList	= new HashMap<String, ResponseHandler>();
+	private Client							client;
+	private DownloadManagerImpl				dm;
+	private Logger							debug;
 
-	public void addHandler (String request, ResponseHandler handler) {
+	public void addHandler(String request, ResponseHandler handler) {
 		handlerList.put(request, handler);
 	}
 
-	public void removeHandler (String request) {
+	public void removeHandler(String request) {
 		handlerList.remove(request);
 	}
 
-
-	public void handleResponse (Document xmlResponse) throws IOException {
+	public void handleResponse(Document xmlResponse) throws IOException {
 		Element requestRoot = xmlResponse.getRootElement();
 		List<Element> queries = requestRoot.getChildren("Result");
 		double protocolVersion = 1;
 		long updates = 0;
 
 		try {
-			protocolVersion = requestRoot.getAttribute("version").getDoubleValue();
+			protocolVersion = requestRoot.getAttribute("version")
+					.getDoubleValue();
 		} catch (DataConversionException e) {
 			e.printStackTrace();
 		}
-		for (Element query:queries) {
+		for (Element query : queries) {
 
 			String request = query.getAttributeValue("switch");
 
 			if (protocolVersion != RemoteConstants.CURRENT_VERSION) {
-				//TODO call listener
+				// TODO call listener
 				continue;
 			}
 
@@ -67,13 +68,13 @@ public class ResponseManager {
 				updates |= handlerList.get(request).handleRequest(query);
 				continue;
 			} else {
-				//TODO call listener
+				// TODO call listener
 			}
 		}
 		client.callClientUpdateListeners(updates);
 	}
 
-	private void updateDownload (Element dle) {
+	private void updateDownload(Element dle) {
 		String hash = dle.getAttributeValue("hash");
 		if (hash == null) {
 			return;
@@ -86,7 +87,7 @@ public class ResponseManager {
 			ds = dl.getStatsImpl();
 			exists = true;
 		} else {
-			dl = new DownloadImpl(hash,client);
+			dl = new DownloadImpl(hash, client);
 			ds = new DownloadStatsImpl();
 			dl.implSetStats(ds);
 			exists = false;
@@ -95,83 +96,117 @@ public class ResponseManager {
 		if (dle.getAttributeValue("name") != null) {
 			dl.implSetName(dle.getAttributeValue("name"));
 		}
-		dl.implSetForceStart(Boolean.parseBoolean(dle.getAttributeValue("forceStart")));
-		dl.implSetChecking(Boolean.parseBoolean(dle.getAttributeValue("checking")));
-		dl.implSetComplete(Boolean.parseBoolean(dle.getAttributeValue("complete")));
+		dl.implSetForceStart(Boolean.parseBoolean(dle
+				.getAttributeValue("forceStart")));
+		dl.implSetChecking(Boolean.parseBoolean(dle
+				.getAttributeValue("checking")));
+		dl.implSetComplete(Boolean.parseBoolean(dle
+				.getAttributeValue("complete")));
 		try {
 			dl.implSetPosition(dle.getAttribute("position").getIntValue());
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 		try {
 			dl.implSetState(dle.getAttribute("state").getIntValue());
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 		try {
-			dl.implSetDownloadLimit(dle.getAttribute("downloadLimit").getIntValue());
-		} catch (Exception e) {}
+			dl.implSetDownloadLimit(dle.getAttribute("downloadLimit")
+					.getIntValue());
+		} catch (Exception e) {
+		}
 		try {
-			dl.implSetUploadLimit(dle.getAttribute("uploadLimit").getIntValue());
-		} catch (Exception e) {}
+			dl
+					.implSetUploadLimit(dle.getAttribute("uploadLimit")
+							.getIntValue());
+		} catch (Exception e) {
+		}
 		try {
 			dl.implSetSeeds(dle.getAttribute("seeds").getIntValue());
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 		try {
 			dl.implSetLeecher(dle.getAttribute("leecher").getIntValue());
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 		try {
 			dl.implSetTotalSeeds(dle.getAttribute("total_seeds").getIntValue());
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 		try {
-			dl.implSetTotalLeecher(dle.getAttribute("total_leecher").getIntValue());
-		} catch (Exception e) {}
+			dl.implSetTotalLeecher(dle.getAttribute("total_leecher")
+					.getIntValue());
+		} catch (Exception e) {
+		}
 		try {
 			dl.implSetDiscarded(dle.getAttribute("discarded").getLongValue());
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 
 		// Download Stats
 
 		try {
-			ds.setAvailability(dle.getAttribute("availability").getFloatValue());
-		} catch (Exception e) {}
+			ds
+					.setAvailability(dle.getAttribute("availability")
+							.getFloatValue());
+		} catch (Exception e) {
+		}
 		try {
 			ds.setDownloaded(dle.getAttribute("downloaded").getLongValue());
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 		try {
 			ds.setUploaded(dle.getAttribute("uploaded").getLongValue());
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 		try {
 			ds.setDownAvg(dle.getAttribute("downloadAVG").getLongValue());
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 		try {
 			ds.setTotalAverage(dle.getAttribute("totalAVG").getLongValue());
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 		try {
 			ds.setUpAvg(dle.getAttribute("uploadAVG").getLongValue());
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 		try {
 			ds.setHealth(dle.getAttribute("health").getIntValue());
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 		try {
 			ds.setCompleted(dle.getAttribute("completition").getIntValue());
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 		try {
 			dl.implSetSize(dle.getAttribute("size").getLongValue());
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 		try {
 			ds.setShareRatio(dle.getAttribute("shareRatio").getIntValue());
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 		try {
 			if (dle.getAttribute("tracker") != null) {
 				ds.setTrackerStatus(dle.getAttributeValue("tracker"));
 			}
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 
 		try {
-			dl.implSetLastScrapeTime(Long.parseLong(dle.getAttributeValue("last_scrape")));
-			dl.implSetNextScrapeTime(Long.parseLong(dle.getAttributeValue("next_scrape")));
-		} catch (Exception e) {}
+			dl.implSetLastScrapeTime(Long.parseLong(dle
+					.getAttributeValue("last_scrape")));
+			dl.implSetNextScrapeTime(Long.parseLong(dle
+					.getAttributeValue("next_scrape")));
+		} catch (Exception e) {
+		}
 
 		try {
-			dl.implSetAnnounceTimeToWait(Long.parseLong(dle.getAttributeValue("announceTimeToWait")));
-		} catch (Exception e) {}
+			dl.implSetAnnounceTimeToWait(Long.parseLong(dle
+					.getAttributeValue("announceTimeToWait")));
+		} catch (Exception e) {
+		}
 
 		if (dle.getAttribute("savePath") != null) {
 			dl.implSetSavePath(dle.getAttributeValue("savePath"));
@@ -190,8 +225,9 @@ public class ResponseManager {
 		}
 
 		List<Element> attribs = dle.getChildren("Attribute");
-		for (Element att:attribs) {
-			dl.implSetTorrentAttribute(att.getAttributeValue("name"), att.getAttributeValue("value"));
+		for (Element att : attribs) {
+			dl.implSetTorrentAttribute(att.getAttributeValue("name"), att
+					.getAttributeValue("value"));
 		}
 
 	}
@@ -201,14 +237,16 @@ public class ResponseManager {
 		this.dm = caller.getDownloadManagerImpl();
 		debug = Logger.getLogger("lbms.azsmrc.client");
 		addHandler("_InvalidProtocolVersion_", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException{
+			public long handleRequest(Element xmlResponse) throws IOException {
 				return 0;
 			}
 		});
 		addHandler("_UnhandledRequest_", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException{
+			public long handleRequest(Element xmlResponse) throws IOException {
 				try {
-					debug.warning("Unhandled Request: "+xmlResponse.getChild("Error").getChild("Query").getAttributeValue("switch"));
+					debug.warning("Unhandled Request: "
+							+ xmlResponse.getChild("Error").getChild("Query")
+									.getAttributeValue("switch"));
 					return 0;
 				} catch (Exception e) {
 
@@ -218,7 +256,7 @@ public class ResponseManager {
 			}
 		});
 		addHandler("Ping", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException{
+			public long handleRequest(Element xmlResponse) throws IOException {
 				System.out.println("Received Pong.");
 				return 0;
 			}
@@ -227,7 +265,7 @@ public class ResponseManager {
 			public long handleRequest(Element xmlResponse) throws IOException {
 				Element root = xmlResponse.getChild("Transfers");
 				List<Element> transfers = root.getChildren("Transfer");
-				for (Element t:transfers) {
+				for (Element t : transfers) {
 					updateDownload(t);
 				}
 				return Constants.UPDATE_LIST_TRANSFERS;
@@ -238,7 +276,7 @@ public class ResponseManager {
 				Element root = xmlResponse.getChild("Transfers");
 				List<Element> transfers = root.getChildren("Transfer");
 				List<String> dls = new ArrayList<String>();
-				for (Element t:transfers) {
+				for (Element t : transfers) {
 					updateDownload(t);
 					dls.add(t.getAttributeValue("hash"));
 				}
@@ -249,15 +287,18 @@ public class ResponseManager {
 		addHandler("getAdvancedStats", new ResponseHandler() {
 			public long handleRequest(Element xmlResponse) throws IOException {
 				Element advStats = xmlResponse.getChild("AdvancedStats");
-				DownloadImpl dl = dm.manGetDownload(xmlResponse.getAttributeValue("hash"));
+				DownloadImpl dl = dm.manGetDownload(xmlResponse
+						.getAttributeValue("hash"));
 				if (dl == null) {
 					return 0;
 				}
 				DownloadAdvancedStatsImpl das = dl.getAdvancedStatsImpl();
 				das.setComment(advStats.getAttributeValue("comment"));
 				das.setCreatedOn(advStats.getAttributeValue("createdOn"));
-				das.setPieceCount(Long.parseLong(advStats.getAttributeValue("pieceCount")));
-				das.setPieceSize(Long.parseLong(advStats.getAttributeValue("pieceSize")));
+				das.setPieceCount(Long.parseLong(advStats
+						.getAttributeValue("pieceCount")));
+				das.setPieceSize(Long.parseLong(advStats
+						.getAttributeValue("pieceSize")));
 				das.setSaveDir(advStats.getAttributeValue("saveDir"));
 				das.setTrackerUrl(advStats.getAttributeValue("trackerUrl"));
 				das.setLoaded(true);
@@ -266,7 +307,7 @@ public class ResponseManager {
 			}
 		});
 		addHandler("getFiles", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException{
+			public long handleRequest(Element xmlResponse) throws IOException {
 				Element fileList = xmlResponse.getChild("Files");
 				String hash = xmlResponse.getAttributeValue("hash");
 				DownloadImpl dl = dm.manGetDownload(hash);
@@ -279,20 +320,25 @@ public class ResponseManager {
 				if (dlFm._isLoaded()) {
 					fileImpl = dlFm.getFilesImpl();
 				} else {
-					fileImpl = new  DownloadFileImpl[files.size()];
+					fileImpl = new DownloadFileImpl[files.size()];
 				}
-				for (int i=0;i<fileImpl.length;i++) {
+				for (int i = 0; i < fileImpl.length; i++) {
 					if (fileImpl[i] == null) {
 						fileImpl[i] = new DownloadFileImpl(hash, client);
 					}
 					Element e = files.get(i);
-					fileImpl[i].setDownloaded(Long.parseLong(e.getAttributeValue("downloaded")));
+					fileImpl[i].setDownloaded(Long.parseLong(e
+							.getAttributeValue("downloaded")));
 					fileImpl[i].setIndex(i);
-					fileImpl[i].setLength(Long.parseLong(e.getAttributeValue("length")));
+					fileImpl[i].setLength(Long.parseLong(e
+							.getAttributeValue("length")));
 					fileImpl[i].setName(e.getAttributeValue("name"));
-					fileImpl[i].setNumPieces(Integer.parseInt(e.getAttributeValue("numPieces")));
-					fileImpl[i].setPriorityImpl(Boolean.parseBoolean(e.getAttributeValue("priority")));
-					fileImpl[i].setSkippedImpl(Boolean.parseBoolean(e.getAttributeValue("skipped")));
+					fileImpl[i].setNumPieces(Integer.parseInt(e
+							.getAttributeValue("numPieces")));
+					fileImpl[i].setPriorityImpl(Boolean.parseBoolean(e
+							.getAttributeValue("priority")));
+					fileImpl[i].setSkippedImpl(Boolean.parseBoolean(e
+							.getAttributeValue("skipped")));
 				}
 				if (!dlFm._isLoaded()) {
 					dlFm.setDlFiles(fileImpl);
@@ -303,11 +349,13 @@ public class ResponseManager {
 		});
 		addHandler("globalStats", new ResponseHandler() {
 			public long handleRequest(Element xmlResponse) throws IOException {
-				int receiveRate = 0,sendRate = 0;
+				int receiveRate = 0, sendRate = 0;
 				int s = 0, sq = 0, d = 0, dq = 0;
 				try {
-					sendRate = xmlResponse.getAttribute("sendRate").getIntValue();
-					receiveRate = xmlResponse.getAttribute("receiveRate").getIntValue();
+					sendRate = xmlResponse.getAttribute("sendRate")
+							.getIntValue();
+					receiveRate = xmlResponse.getAttribute("receiveRate")
+							.getIntValue();
 				} catch (DataConversionException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -315,24 +363,29 @@ public class ResponseManager {
 				if (xmlResponse.getAttribute("seeding") != null) {
 					try {
 						s = xmlResponse.getAttribute("seeding").getIntValue();
-						sq = xmlResponse.getAttribute("seedqueue").getIntValue();
-						d = xmlResponse.getAttribute("downloading").getIntValue();
-						dq = xmlResponse.getAttribute("downloadqueue").getIntValue();
+						sq = xmlResponse.getAttribute("seedqueue")
+								.getIntValue();
+						d = xmlResponse.getAttribute("downloading")
+								.getIntValue();
+						dq = xmlResponse.getAttribute("downloadqueue")
+								.getIntValue();
 					} catch (DataConversionException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
-				client.callGlobalStatsListener(receiveRate,sendRate,s,sq,d,dq);
+				client.callGlobalStatsListener(receiveRate, sendRate, s, sq, d,
+						dq);
 				return 0;
 			}
 		});
 		addHandler("getUsers", new ResponseHandler() {
 			public long handleRequest(Element xmlResponse) throws IOException {
 				UserManagerImpl um = client.getUserManagerImpl();
-				List<Element> userList = xmlResponse.getChild("Users").getChildren("User");
+				List<Element> userList = xmlResponse.getChild("Users")
+						.getChildren("User");
 				List<String> userNames = new ArrayList<String>();
-				for (Element u:userList) {
+				for (Element u : userList) {
 					userNames.add(u.getAttributeValue("username"));
 					try {
 						User user = um.getUser(u.getAttributeValue("username"));
@@ -351,13 +404,14 @@ public class ResponseManager {
 		addHandler("Events", new ResponseHandler() {
 			public long handleRequest(Element xmlResponse) throws IOException {
 				List<Element> events = xmlResponse.getChildren("Event");
-				for (Element event:events) {
+				for (Element event : events) {
 					try {
 						int type = event.getAttribute("type").getIntValue();
 						long time = event.getAttribute("time").getLongValue();
 						switch (type) {
 						case RemoteConstants.EV_DL_REMOVED:
-							dm.manRemoveDownload(event.getAttributeValue("hash"));
+							dm.manRemoveDownload(event
+									.getAttributeValue("hash"));
 							break;
 						}
 						client.callClientEventListener(type, time, event);
@@ -372,7 +426,10 @@ public class ResponseManager {
 		addHandler("getAzParameter", new ResponseHandler() {
 			public long handleRequest(Element xmlResponse) throws IOException {
 				try {
-					client.callAzParameterListener(xmlResponse.getAttributeValue("key"),xmlResponse.getAttributeValue("value"),xmlResponse.getAttribute("type").getIntValue());
+					client.callAzParameterListener(xmlResponse
+							.getAttributeValue("key"), xmlResponse
+							.getAttributeValue("value"), xmlResponse
+							.getAttribute("type").getIntValue());
 				} catch (DataConversionException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -383,7 +440,10 @@ public class ResponseManager {
 		addHandler("getPluginParameter", new ResponseHandler() {
 			public long handleRequest(Element xmlResponse) throws IOException {
 				try {
-					client.callPluginParameterListener(xmlResponse.getAttributeValue("key"),xmlResponse.getAttributeValue("value"),xmlResponse.getAttribute("type").getIntValue());
+					client.callPluginParameterListener(xmlResponse
+							.getAttributeValue("key"), xmlResponse
+							.getAttributeValue("value"), xmlResponse
+							.getAttribute("type").getIntValue());
 				} catch (DataConversionException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -394,7 +454,10 @@ public class ResponseManager {
 		addHandler("getCoreParameter", new ResponseHandler() {
 			public long handleRequest(Element xmlResponse) throws IOException {
 				try {
-					client.callCoreParameterListener(xmlResponse.getAttributeValue("key"),xmlResponse.getAttributeValue("value"),xmlResponse.getAttribute("type").getIntValue());
+					client.callCoreParameterListener(xmlResponse
+							.getAttributeValue("key"), xmlResponse
+							.getAttributeValue("value"), xmlResponse
+							.getAttribute("type").getIntValue());
 				} catch (DataConversionException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -403,52 +466,64 @@ public class ResponseManager {
 			}
 		});
 		addHandler("getRemoteInfo", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException{
+			public long handleRequest(Element xmlResponse) throws IOException {
 				RemoteInfoImpl ri = client.getRemoteInfoImpl();
-				ri.setAzureusVersion(xmlResponse.getAttributeValue("azureusVersion"));
-				ri.setPluginVersion(xmlResponse.getAttributeValue("pluginVersion"));
-				ri.setAzSMRCPluginSupportFlexyConf(xmlResponse.getChild("FlexyConfiguration"));
+				ri.setAzureusVersion(xmlResponse
+						.getAttributeValue("azureusVersion"));
+				ri.setPluginVersion(xmlResponse
+						.getAttributeValue("pluginVersion"));
+				ri.setAzSMRCPluginSupportFlexyConf(xmlResponse
+						.getChild("FlexyConfiguration"));
 				ri.setLoaded(true);
 				return Constants.UPDATE_REMOTE_INFO;
 			}
 		});
 		addHandler("getPluginsFlexyConfig", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException{
+			public long handleRequest(Element xmlResponse) throws IOException {
 				RemoteInfoImpl ri = client.getRemoteInfoImpl();
-				ri.setPluginFlexyConf(xmlResponse.getChild("FlexyConfiguration"));
+				ri.setPluginFlexyConf(xmlResponse
+						.getChild("FlexyConfiguration"));
 				return Constants.UPDATE_REMOTE_INFO;
 			}
 		});
 		addHandler("listPlugins", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException{
+			public long handleRequest(Element xmlResponse) throws IOException {
 				RemoteInfoImpl ri = client.getRemoteInfoImpl();
 				List<RemotePluginImpl> rPlugins = new ArrayList<RemotePluginImpl>();
 				List<Element> plugsE = xmlResponse.getChildren("Plugin");
-				for (Element pe : plugsE ) {
+				for (Element pe : plugsE) {
 					RemotePluginImpl rp = new RemotePluginImpl(client);
 					rp.implSetId(pe.getAttributeValue("id"));
 					rp.implSetDir(pe.getAttributeValue("dir"));
 					rp.implSetName(pe.getAttributeValue("name"));
 					rp.implSetVersion(pe.getAttributeValue("version"));
-					rp.implSetDisabled(Boolean.parseBoolean(pe.getAttributeValue("disabled")));
-					rp.implSetBuiltIn(Boolean.parseBoolean(pe.getAttributeValue("builtin")));
-					rp.implSetMandatory(Boolean.parseBoolean(pe.getAttributeValue("mandatory")));
-					rp.implSetOperational(Boolean.parseBoolean(pe.getAttributeValue("operational")));
-					rp.implSetUnloadable(Boolean.parseBoolean(pe.getAttributeValue("unloadable")));
+					rp.implSetDisabled(Boolean.parseBoolean(pe
+							.getAttributeValue("disabled")));
+					rp.implSetBuiltIn(Boolean.parseBoolean(pe
+							.getAttributeValue("builtin")));
+					rp.implSetMandatory(Boolean.parseBoolean(pe
+							.getAttributeValue("mandatory")));
+					rp.implSetOperational(Boolean.parseBoolean(pe
+							.getAttributeValue("operational")));
+					rp.implSetUnloadable(Boolean.parseBoolean(pe
+							.getAttributeValue("unloadable")));
 					rPlugins.add(rp);
 				}
-				ri.setRemotePlugins(rPlugins.toArray(new RemotePluginImpl[rPlugins.size()]));
+				ri.setRemotePlugins(rPlugins
+						.toArray(new RemotePluginImpl[rPlugins.size()]));
 				return Constants.UPDATE_REMOTE_INFO;
 			}
 		});
 		addHandler("getDriveInfo", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException{
+			public long handleRequest(Element xmlResponse) throws IOException {
 				RemoteInfoImpl ri = client.getRemoteInfoImpl();
 				Map<String, String> map = new HashMap<String, String>();
 				List<Element> eList = xmlResponse.getChildren("Directory");
-				for (Element e:eList) {
-					map.put(e.getAttributeValue("name"), e.getAttributeValue("free"));
-					map.put(e.getAttributeValue("name")+".path", e.getAttributeValue("path"));
+				for (Element e : eList) {
+					map.put(e.getAttributeValue("name"), e
+							.getAttributeValue("free"));
+					map.put(e.getAttributeValue("name") + ".path", e
+							.getAttributeValue("path"));
 				}
 				ri.setDriveInfo(map);
 				ri.setLoading(false);
@@ -456,14 +531,16 @@ public class ResponseManager {
 			}
 		});
 		addHandler("getUpdateInfo", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException{
-				RemoteUpdateManagerImpl rum = client.getRemoteUpdateManagerImpl();
-				boolean avail = Boolean.parseBoolean(xmlResponse.getAttributeValue("updateAvailable"));
+			public long handleRequest(Element xmlResponse) throws IOException {
+				RemoteUpdateManagerImpl rum = client
+						.getRemoteUpdateManagerImpl();
+				boolean avail = Boolean.parseBoolean(xmlResponse
+						.getAttributeValue("updateAvailable"));
 				if (avail) {
 					rum.clear();
 					rum.setUpdatesAvailable(avail);
 					List<Element> updates = xmlResponse.getChildren("Update");
-					for (Element u:updates) {
+					for (Element u : updates) {
 						rum.addUpdate(new RemoteUpdateImpl(u));
 					}
 				} else {
@@ -475,8 +552,9 @@ public class ResponseManager {
 		addHandler("getTrackerTorrents", new ResponseHandler() {
 			public long handleRequest(Element xmlResponse) throws IOException {
 				TrackerImpl tracker = client.getTrackerImpl();
-				List<Element> trackerTorrents = xmlResponse.getChild("TrackerTorrents").getChildren("TrackerTorrent");
-				for (Element tt:trackerTorrents) {
+				List<Element> trackerTorrents = xmlResponse.getChild(
+						"TrackerTorrents").getChildren("TrackerTorrent");
+				for (Element tt : trackerTorrents) {
 					TrackerTorrentImpl tti = null;
 					boolean newTorrent = false;
 					if (tracker.hasTorrent(tt.getAttributeValue("hash"))) {
@@ -486,30 +564,52 @@ public class ResponseManager {
 						newTorrent = true;
 					}
 					try {
-						tti.setHash(			tt.getAttributeValue("hash"));
-						tti.setName(			tt.getAttributeValue("name"));
-						tti.setAnnounceCount(	tt.getAttribute("announceCount").getLongValue());
-						tti.setAvgAnnounceCount(tt.getAttribute("avgAnnounceCount").getLongValue());
-						tti.setAnnounceCount(	tt.getAttribute("avgAnnounceCount").getLongValue());
-						tti.setAvgBytesIn(		tt.getAttribute("avgBytesIn").getLongValue());
-						tti.setAvgBytesOut(		tt.getAttribute("avgBytesOut").getLongValue());
-						tti.setAvgDownloaded(	tt.getAttribute("avgDownloaded").getLongValue());
-						tti.setAvgUploaded(		tt.getAttribute("avgUploaded").getLongValue());
-						tti.setAvgScrapeCount(	tt.getAttribute("avgScrapeCount").getLongValue());
-						tti.setCompletedCount(	tt.getAttribute("completedCount").getLongValue());
-						tti.setTotalLeft(		tt.getAttribute("totalLeft").getLongValue());
-						tti.setDateAdded(		tt.getAttribute("dateAdded").getLongValue());
-						tti.setScrapeCount(		tt.getAttribute("scrapeCount").getLongValue());
-						tti.setTotalBytesOut(	tt.getAttribute("totalBytesOut").getLongValue());
-						tti.setTotalBytesIn(	tt.getAttribute("totalBytesIn").getLongValue());
-						tti.setTotalDownloaded(	tt.getAttribute("totalDownloaded").getLongValue());
-						tti.setTotalUploaded(	tt.getAttribute("totalUploaded").getLongValue());
-						tti.setSeedCount(		tt.getAttribute("seedCount").getIntValue());
-						tti.setLeecherCount(	tt.getAttribute("leecherCount").getIntValue());
-						tti.setStatus(			tt.getAttribute("status").getIntValue());
-						tti.setBadNATCount(		tt.getAttribute("badNATCount").getIntValue());
-						tti.setPassive(			tt.getAttribute("isPassive").getBooleanValue());
-						tti.setCanBeRemoved(	tt.getAttribute("canBeRemoved").getBooleanValue());
+						tti.setHash(tt.getAttributeValue("hash"));
+						tti.setName(tt.getAttributeValue("name"));
+						tti.setAnnounceCount(tt.getAttribute("announceCount")
+								.getLongValue());
+						tti.setAvgAnnounceCount(tt.getAttribute(
+								"avgAnnounceCount").getLongValue());
+						tti.setAnnounceCount(tt
+								.getAttribute("avgAnnounceCount")
+								.getLongValue());
+						tti.setAvgBytesIn(tt.getAttribute("avgBytesIn")
+								.getLongValue());
+						tti.setAvgBytesOut(tt.getAttribute("avgBytesOut")
+								.getLongValue());
+						tti.setAvgDownloaded(tt.getAttribute("avgDownloaded")
+								.getLongValue());
+						tti.setAvgUploaded(tt.getAttribute("avgUploaded")
+								.getLongValue());
+						tti.setAvgScrapeCount(tt.getAttribute("avgScrapeCount")
+								.getLongValue());
+						tti.setCompletedCount(tt.getAttribute("completedCount")
+								.getLongValue());
+						tti.setTotalLeft(tt.getAttribute("totalLeft")
+								.getLongValue());
+						tti.setDateAdded(tt.getAttribute("dateAdded")
+								.getLongValue());
+						tti.setScrapeCount(tt.getAttribute("scrapeCount")
+								.getLongValue());
+						tti.setTotalBytesOut(tt.getAttribute("totalBytesOut")
+								.getLongValue());
+						tti.setTotalBytesIn(tt.getAttribute("totalBytesIn")
+								.getLongValue());
+						tti.setTotalDownloaded(tt.getAttribute(
+								"totalDownloaded").getLongValue());
+						tti.setTotalUploaded(tt.getAttribute("totalUploaded")
+								.getLongValue());
+						tti.setSeedCount(tt.getAttribute("seedCount")
+								.getIntValue());
+						tti.setLeecherCount(tt.getAttribute("leecherCount")
+								.getIntValue());
+						tti.setStatus(tt.getAttribute("status").getIntValue());
+						tti.setBadNATCount(tt.getAttribute("badNATCount")
+								.getIntValue());
+						tti.setPassive(tt.getAttribute("isPassive")
+								.getBooleanValue());
+						tti.setCanBeRemoved(tt.getAttribute("canBeRemoved")
+								.getBooleanValue());
 					} catch (DataConversionException e) {
 						e.printStackTrace();
 					}
@@ -522,9 +622,19 @@ public class ResponseManager {
 		});
 		addHandler("ipcCall", new ResponseHandler() {
 			public long handleRequest(Element xmlResponse) throws IOException {
-				client.callIPCResponseListeners	(Integer.parseInt(xmlResponse.getAttributeValue("status")),
-						xmlResponse.getAttributeValue("senderID"),	xmlResponse.getAttributeValue("pluginID"),
-						xmlResponse.getAttributeValue("method"), xmlResponse.getChild("Result"));
+				client.callIPCResponseListeners(Integer.parseInt(xmlResponse
+						.getAttributeValue("status")), xmlResponse
+						.getAttributeValue("senderID"), xmlResponse
+						.getAttributeValue("pluginID"), xmlResponse
+						.getAttributeValue("method"), xmlResponse
+						.getChild("Result"));
+				return 0;
+			}
+		});
+		addHandler("getDownloadHistory", new ResponseHandler() {
+			public long handleRequest(Element xmlResponse) throws IOException {
+				DownloadHistory.getInstance().addEntries(
+						xmlResponse.getChildren("Entry"));
 				return 0;
 			}
 		});

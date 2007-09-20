@@ -21,452 +21,404 @@
 package lbms.azsmrc.remote.client.internat;
 
 import java.io.UnsupportedEncodingException;
-
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import lbms.azsmrc.remote.client.torrent.*;
+import lbms.azsmrc.remote.client.torrent.TOTorrent;
+import lbms.azsmrc.remote.client.torrent.TOTorrentException;
+import lbms.azsmrc.remote.client.torrent.TOTorrentFile;
 import lbms.azsmrc.shared.RemoteConstants;
 
+public class LocaleUtil {
 
+	private static final String		systemEncoding	= System
+															.getProperty("file.encoding");
 
-
-public class
-LocaleUtil
-{
-
-  private static final String systemEncoding = System.getProperty("file.encoding");
-
-  private static final String[] manual_charset = {
-	systemEncoding,	// must be first entry due to code below that gets the system decoder
-	"Big5","EUC-JP","EUC-KR","GB18030","GB2312","GBK","ISO-2022-JP","ISO-2022-KR",
-	"Shift_JIS","KOI8-R",
-	"TIS-620",	// added for bug #1008848
-	RemoteConstants.DEFAULT_ENCODING,"windows-1251",RemoteConstants.BYTE_ENCODING
-  };
+	private static final String[]	manual_charset	= {
+			systemEncoding, // must be first entry due to code below that gets
+			// the system decoder
+			"Big5", "EUC-JP", "EUC-KR", "GB18030", "GB2312", "GBK",
+			"ISO-2022-JP", "ISO-2022-KR", "Shift_JIS", "KOI8-R",
+			"TIS-620", // added for bug #1008848
+			RemoteConstants.DEFAULT_ENCODING, "windows-1251",
+			RemoteConstants.BYTE_ENCODING			};
 
 	// the general ones *must* also be members of the above manual ones
 
-  protected static final String[] generalCharsets = {
-	RemoteConstants.BYTE_ENCODING, RemoteConstants.DEFAULT_ENCODING, systemEncoding
-  };
+	protected static final String[]	generalCharsets	= {
+			RemoteConstants.BYTE_ENCODING, RemoteConstants.DEFAULT_ENCODING,
+			systemEncoding							};
 
-   private static LocaleUtil singleton = new LocaleUtil();
+	private static LocaleUtil		singleton		= new LocaleUtil();
 
-   public static LocaleUtil
-   getSingleton()
-   {
-   	return( singleton );
-   }
-
-   private LocaleUtilDecoder[] 	all_decoders;
-   private LocaleUtilDecoder[]	general_decoders;
-   private LocaleUtilDecoder	system_decoder;
-   private LocaleUtilDecoder	fallback_decoder;
-
-   private List				listeners	= new ArrayList();
-
-
-  private 
-  LocaleUtil() 
-  {
-	List	decoders 		= new ArrayList();
-  	List	decoder_names	= new ArrayList();
-
-	for (int i = 0; i < manual_charset.length; i++) {
-	   try {
-		 String	name = manual_charset[i];
-
-		 CharsetDecoder decoder = Charset.forName(name).newDecoder();
-
-		 if ( decoder != null ){
-
-			 LocaleUtilDecoder	lu_decoder =  new LocaleUtilDecoderReal(decoders.size(),decoder);
-
-			 decoder_names.add( lu_decoder.getName());
-
-			 if ( i == 0 ){
-
-			 	system_decoder = lu_decoder;
-			 }
-
-			 decoders.add( lu_decoder );
-
-		 }else if ( i == 0 ){
-
-		 	System.out.println( "System decoder failed to be found!!!!" );
-		 }
-
-	   }catch (Exception ignore) {
-	   }
-	 }
-
-	general_decoders = new LocaleUtilDecoder[generalCharsets.length];
-
-	for (int i=0;i<general_decoders.length;i++){
-
-		int	gi = decoder_names.indexOf( generalCharsets[i]);
-
-		if ( gi != -1 ){
-
-			general_decoders[i] = (LocaleUtilDecoder)decoders.get(gi);
-		}
+	public static LocaleUtil getSingleton() {
+		return (singleton);
 	}
 
-	boolean show_all = true;
+	private LocaleUtilDecoder[]			all_decoders;
+	private LocaleUtilDecoder[]			general_decoders;
+	private LocaleUtilDecoder			system_decoder;
+	private LocaleUtilDecoder			fallback_decoder;
 
-	if ( show_all ){
+	private List<LocaleUtilListener>	listeners	= new ArrayList<LocaleUtilListener>();
 
-		Map m = Charset.availableCharsets();
+	private LocaleUtil() {
+		List<LocaleUtilDecoder> decoders = new ArrayList<LocaleUtilDecoder>();
+		List<String> decoder_names = new ArrayList<String>();
 
-		Iterator it = m.keySet().iterator();
+		for (int i = 0; i < manual_charset.length; i++) {
+			try {
+				String name = manual_charset[i];
 
-		while(it.hasNext()){
+				CharsetDecoder decoder = Charset.forName(name).newDecoder();
 
-			String	charset_name = (String)it.next();
+				if (decoder != null) {
 
-			if ( !decoder_names.contains( charset_name)){
+					LocaleUtilDecoder lu_decoder = new LocaleUtilDecoderReal(
+							decoders.size(), decoder);
 
-				try {
-				  CharsetDecoder decoder = Charset.forName(charset_name).newDecoder();
+					decoder_names.add(lu_decoder.getName());
 
-				  if ( decoder != null ){
+					if (i == 0) {
 
-				  	LocaleUtilDecoder	lu_decoder = new LocaleUtilDecoderReal(decoders.size(),decoder);
+						system_decoder = lu_decoder;
+					}
 
-				  	decoders.add( lu_decoder);
+					decoders.add(lu_decoder);
 
-				  	decoder_names.add( lu_decoder.getName());
-				  }
+				} else if (i == 0) {
 
-				} catch (Exception ignore) {
+					System.out.println("System decoder failed to be found!!!!");
+				}
+
+			} catch (Exception ignore) {
+			}
+		}
+
+		general_decoders = new LocaleUtilDecoder[generalCharsets.length];
+
+		for (int i = 0; i < general_decoders.length; i++) {
+
+			int gi = decoder_names.indexOf(generalCharsets[i]);
+
+			if (gi != -1) {
+
+				general_decoders[i] = decoders.get(gi);
+			}
+		}
+
+		boolean show_all = true;
+
+		if (show_all) {
+
+			Map<String, Charset> m = Charset.availableCharsets();
+
+			Iterator<String> it = m.keySet().iterator();
+
+			while (it.hasNext()) {
+
+				String charset_name = it.next();
+
+				if (!decoder_names.contains(charset_name)) {
+
+					try {
+						CharsetDecoder decoder = Charset.forName(charset_name)
+								.newDecoder();
+
+						if (decoder != null) {
+
+							LocaleUtilDecoder lu_decoder = new LocaleUtilDecoderReal(
+									decoders.size(), decoder);
+
+							decoders.add(lu_decoder);
+
+							decoder_names.add(lu_decoder.getName());
+						}
+
+					} catch (Exception ignore) {
+					}
 				}
 			}
 		}
+
+		fallback_decoder = new LocaleUtilDecoderFallback(decoders.size());
+
+		decoders.add(fallback_decoder);
+
+		all_decoders = new LocaleUtilDecoder[decoders.size()];
+
+		decoders.toArray(all_decoders);
 	}
 
-	fallback_decoder = new LocaleUtilDecoderFallback(decoders.size());
-
-	decoders.add( fallback_decoder );
-
-	all_decoders	= new LocaleUtilDecoder[ decoders.size()];
-
-	decoders.toArray( all_decoders);
-  }
-
-  public String
-  getSystemEncoding()
-  {
-  	return( systemEncoding );
-  }
-
-  public LocaleUtilDecoder[]
-  getDecoders()
-  {
-  	return( all_decoders );
-  }
-
-	public LocaleUtilDecoder[]
-	getGeneralDecoders()
-	{
-	   	return( general_decoders );
+	public String getSystemEncoding() {
+		return (systemEncoding);
 	}
 
-  public LocaleUtilDecoder
-  getSystemDecoder()
-  {
-  	return( system_decoder );
-  }
-
-  /**
-   * Determine which locales are candidates for handling the supplied type of 
-   * string
-   * 
-   * @param array String in an byte array 
-   * @return list of candidates.  Valid candidates have getDecoder() non-null
-   */
-  protected LocaleUtilDecoderCandidate[] 
-  getCandidates(
-	byte[] array )
-  {
-	LocaleUtilDecoderCandidate[] candidates = new LocaleUtilDecoderCandidate[all_decoders.length];
-
-	boolean show_less_likely_conversions = true;
-
-	for (int i = 0; i < all_decoders.length; i++){
-
-	  candidates[i] = new LocaleUtilDecoderCandidate(i);
-
-	  try{
-			LocaleUtilDecoder decoder = all_decoders[i];
-
-			String str = decoder.tryDecode( array, show_less_likely_conversions );
-
-			if ( str != null ){
-
-				candidates[i].setDetails( decoder, str );
-			}
-	  } catch (Exception ignore) {
-
-	  }
+	public LocaleUtilDecoder[] getDecoders() {
+		return (all_decoders);
 	}
 
-	/*
-	System.out.println( "getCandidates: = " + candidates.length );
+	public LocaleUtilDecoder[] getGeneralDecoders() {
+		return (general_decoders);
+	}
 
-	for (int i=0;i<candidates.length;i++){
+	public LocaleUtilDecoder getSystemDecoder() {
+		return (system_decoder);
+	}
 
-		LocaleUtilDecoderCandidate	cand = candidates[i];
+	/**
+	 * Determine which locales are candidates for handling the supplied type of
+	 * string
+	 * 
+	 * @param array String in an byte array
+	 * @return list of candidates. Valid candidates have getDecoder() non-null
+	 */
+	protected LocaleUtilDecoderCandidate[] getCandidates(byte[] array) {
+		LocaleUtilDecoderCandidate[] candidates = new LocaleUtilDecoderCandidate[all_decoders.length];
 
-		if ( cand != null ){
+		boolean show_less_likely_conversions = true;
 
-			String	value = cand.getValue();
+		for (int i = 0; i < all_decoders.length; i++) {
 
-			if ( value != null ){
+			candidates[i] = new LocaleUtilDecoderCandidate(i);
 
-				System.out.println( cand.getDecoder().getName() + "/" + (value==null?-1:value.length()) + "/" + value );
+			try {
+				LocaleUtilDecoder decoder = all_decoders[i];
+
+				String str = decoder.tryDecode(array,
+						show_less_likely_conversions);
+
+				if (str != null) {
+
+					candidates[i].setDetails(decoder, str);
+				}
+			} catch (Exception ignore) {
+
 			}
 		}
+
+		/*
+		 * System.out.println( "getCandidates: = " + candidates.length ); for
+		 * (int i=0;i<candidates.length;i++){ LocaleUtilDecoderCandidate cand =
+		 * candidates[i]; if ( cand != null ){ String value = cand.getValue();
+		 * if ( value != null ){ System.out.println( cand.getDecoder().getName() +
+		 * "/" + (value==null?-1:value.length()) + "/" + value ); } } }
+		 */
+
+		return candidates;
 	}
-	*/
 
-	return candidates;
-  }
-
-  /**
-   * Determine which decoders are candidates for handling the supplied type of
-   * string
-   * 
-   * @param array String in a byte array
-   * @return list of possibly valid decoders.  LocaleUtilDecoder
-   */
-  protected List
-  getCandidateDecoders(
-  	byte[]		array )
-  {
-  	LocaleUtilDecoderCandidate[] 	candidates = getCandidates( array );
-
-  	List	decoders = new ArrayList();
-
-  	for (int i=0;i<candidates.length;i++){
-
-  		LocaleUtilDecoder	d = candidates[i].getDecoder();
-
-  		if (d != null)
-  			decoders.add(d);
-  	}
-
-  	return decoders;
-  }
-
-  /**
-   * 
-   * @param array
-   * @return List of LocaleUtilDecoderCandidate
-   */
-  protected List getCandidatesAsList(byte[] array) {
+	/**
+	 * Determine which decoders are candidates for handling the supplied type of
+	 * string
+	 * 
+	 * @param array String in a byte array
+	 * @return list of possibly valid decoders. LocaleUtilDecoder
+	 */
+	protected List<LocaleUtilDecoder> getCandidateDecoders(byte[] array) {
 		LocaleUtilDecoderCandidate[] candidates = getCandidates(array);
 
-		List candidatesList = new ArrayList();
+		List<LocaleUtilDecoder> decoders = new ArrayList<LocaleUtilDecoder>();
 
 		for (int i = 0; i < candidates.length; i++) {
-			if (candidates[i].getDecoder() != null)
+
+			LocaleUtilDecoder d = candidates[i].getDecoder();
+
+			if (d != null) {
+				decoders.add(d);
+			}
+		}
+
+		return decoders;
+	}
+
+	/**
+	 * 
+	 * @param array
+	 * @return List of LocaleUtilDecoderCandidate
+	 */
+	protected List<LocaleUtilDecoderCandidate> getCandidatesAsList(byte[] array) {
+		LocaleUtilDecoderCandidate[] candidates = getCandidates(array);
+
+		List<LocaleUtilDecoderCandidate> candidatesList = new ArrayList<LocaleUtilDecoderCandidate>();
+
+		for (int i = 0; i < candidates.length; i++) {
+			if (candidates[i].getDecoder() != null) {
 				candidatesList.add(candidates[i]);
+			}
 		}
 
 		return candidatesList;
 	}
 
-  public void
-  addListener(
-  	LocaleUtilListener	l )
-  {
-  	listeners.add(l);
-  }
+	public void addListener(LocaleUtilListener l) {
+		listeners.add(l);
+	}
 
-  public void
-  removeListener(
-  	LocaleUtilListener	l )
-  {
-  	listeners.remove(l);
-  }
+	public void removeListener(LocaleUtilListener l) {
+		listeners.remove(l);
+	}
 
-  public LocaleUtilDecoder
-  getTorrentEncodingIfAvailable(
-  		TOTorrent		torrent )
+	public LocaleUtilDecoder getTorrentEncodingIfAvailable(TOTorrent torrent)
 
-  	throws TOTorrentException, UnsupportedEncodingException
-  {
-  	String	encoding = torrent.getAdditionalStringProperty( "encoding" );
+	throws TOTorrentException, UnsupportedEncodingException {
+		String encoding = torrent.getAdditionalStringProperty("encoding");
 
-  	if ( encoding != null ){
+		if (encoding != null) {
 
-  			// get canonical name
+			// get canonical name
 
-		String canonical_name;
+			String canonical_name;
 
-		try{
-			canonical_name = Charset.forName(encoding).name();
+			try {
+				canonical_name = Charset.forName(encoding).name();
 
-		}catch( Throwable e ){
+			} catch (Throwable e) {
 
-			canonical_name	= encoding;
+				canonical_name = encoding;
+			}
+
+			for (int i = 0; i < all_decoders.length; i++) {
+
+				if (all_decoders[i].getName().equals(canonical_name)) {
+
+					return (all_decoders[i]);
+				}
+			}
 		}
 
-  		for (int i=0;i<all_decoders.length;i++){
+		return (system_decoder); // TODO original is return null
+	}
 
-  			if ( all_decoders[i].getName().equals( canonical_name )){
+	public LocaleUtilDecoder getTorrentEncoding(TOTorrent torrent)
 
-  				return( all_decoders[i] );
-  			}
-  		}
-  	}
+	throws TOTorrentException, UnsupportedEncodingException {
+		String encoding = torrent.getAdditionalStringProperty("encoding");
 
-  	return( system_decoder ); //TODO original is return null
-  }
+		// we can only persist the torrent if it has a filename defined for it
 
-	public LocaleUtilDecoder
-	getTorrentEncoding(
-  		TOTorrent		torrent )
+		if (encoding != null) {
 
-  		throws TOTorrentException, UnsupportedEncodingException
-  	{
-		String	encoding = torrent.getAdditionalStringProperty( "encoding" );
+			// get canonical name
 
-			// we can only persist the torrent if it has a filename defined for it
+			try {
+				String canonical_name = encoding.equals(fallback_decoder
+						.getName()) ? encoding : Charset.forName(encoding)
+						.name();
 
-		boolean bSaveToFile;
+				for (int i = 0; i < all_decoders.length; i++) {
 
-		/*try{
-			TorrentUtils.getTorrentFileName( torrent );
+					if (all_decoders[i].getName().equals(canonical_name)) {
 
-			bSaveToFile	= true;
-
-		}catch( Throwable e ){
-
-			bSaveToFile	= false;
-		}*/
-		bSaveToFile	= false;
-
-		if ( encoding != null ){
-
- 			// get canonical name
-
-			try{
-				String canonical_name = encoding.equals(fallback_decoder.getName())?
-												encoding:
-												Charset.forName(encoding).name();
-
-				for (int i=0;i<all_decoders.length;i++){
-
-					if ( all_decoders[i].getName().equals( canonical_name )){
-
-						return( all_decoders[i] );
+						return (all_decoders[i]);
 					}
 				}
-			}catch( Throwable e ){
+			} catch (Throwable e) {
 				e.printStackTrace();
 			}
 		}
 
-			// get the decoders valid for various localisable parts of torrent content
-			// not in any particular order
+		// get the decoders valid for various localisable parts of torrent
+		// content
+		// not in any particular order
 
-		//LocaleUtilDecoder[]	valid_decoders = getTorrentCandidateDecoders( torrent );
+		// LocaleUtilDecoder[] valid_decoders = getTorrentCandidateDecoders(
+		// torrent );
 		LocaleUtilDecoderCandidate[] candidates = getTorrentCandidates(torrent);
 
-		boolean	system_decoder_is_valid = false;
+		boolean system_decoder_is_valid = false;
 
-	for (int i=0;i<candidates.length;i++){
-		if (candidates[i].getDecoder() == system_decoder) {
-			system_decoder_is_valid = true;
-			break;
+		for (int i = 0; i < candidates.length; i++) {
+			if (candidates[i].getDecoder() == system_decoder) {
+				system_decoder_is_valid = true;
+				break;
+			}
 		}
-	}
 
+		LocaleUtilDecoder selected_decoder = null;
 
-		LocaleUtilDecoder	selected_decoder = null;
-
-		for (int i=0;i<listeners.size();i++){
+		for (int i = 0; i < listeners.size(); i++) {
 
 			LocaleUtilDecoderCandidate candidate = null;
-				try {
-					candidate = ((LocaleUtilListener)listeners.get(i)).selectDecoder( this, torrent, candidates );
-				} catch (LocaleUtilEncodingException e) {
-				}
+			try {
+				candidate = (listeners.get(i)).selectDecoder(this, torrent,
+						candidates);
+			} catch (LocaleUtilEncodingException e) {
+			}
 
-			if ( candidate != null ){
+			if (candidate != null) {
 
 				selected_decoder = candidate.getDecoder();
 
 				break;
+			}
+		}
+
+		if (selected_decoder == null) {
+
+			// go for system decoder, if valid, fallback if not
+
+			if (system_decoder_is_valid) {
+
+				selected_decoder = system_decoder;
+
 			} else {
 
-				bSaveToFile = false;
+				selected_decoder = fallback_decoder;
 			}
 		}
 
-		if ( selected_decoder == null ){
+		torrent.setAdditionalStringProperty("encoding", selected_decoder
+				.getName());
 
-				// go for system decoder, if valid, fallback if not
+		/*
+		 * if (bSaveToFile){ TorrentUtils.writeToFile( torrent ); }
+		 */
 
-			if ( system_decoder_is_valid ){
-
-				selected_decoder	= system_decoder;
-
-			}else{
-
-				selected_decoder	= fallback_decoder;
-			}
-		}
-
-		torrent.setAdditionalStringProperty("encoding", selected_decoder.getName());
-
-		/*if (bSaveToFile){
-			TorrentUtils.writeToFile( torrent );
-		}*/
-
-		return( selected_decoder );
-  	}
-
+		return (selected_decoder);
+	}
 
 	/**
-	 * Checks the Torrent's text fields (path, comment, etc) against a list
-	 * of locals, returning only those that can handle all the fields.
+	 * Checks the Torrent's text fields (path, comment, etc) against a list of
+	 * locals, returning only those that can handle all the fields.
 	 * 
 	 * @param torrent
 	 * @return
 	 * @throws TOTorrentException
 	 * @throws UnsupportedEncodingException
 	 */
-	public LocaleUtilDecoderCandidate[]
-	getTorrentCandidates(
-  		TOTorrent		torrent )
+	public LocaleUtilDecoderCandidate[] getTorrentCandidates(TOTorrent torrent)
 
-  		throws TOTorrentException, UnsupportedEncodingException
-	{
+	throws TOTorrentException, UnsupportedEncodingException {
 		long lMinCandidates;
 		byte[] minCandidatesArray;
 
-		Set	cand_set = new HashSet();
+		Set<LocaleUtilDecoder> cand_set = new HashSet<LocaleUtilDecoder>();
 
-		List candidateDecoders = getCandidateDecoders(torrent.getName());
+		List<LocaleUtilDecoder> candidateDecoders = getCandidateDecoders(torrent
+				.getName());
 		lMinCandidates = candidateDecoders.size();
 		minCandidatesArray = torrent.getName();
 
 		cand_set.addAll(candidateDecoders);
 
+		TOTorrentFile[] files = torrent.getFiles();
 
-		TOTorrentFile[]	files = torrent.getFiles();
+		for (int i = 0; i < files.length; i++) {
 
-		for (int i=0;i<files.length;i++){
-
-			TOTorrentFile	file = files[i];
+			TOTorrentFile file = files[i];
 
 			byte[][] comps = file.getPathComponents();
 
-			for (int j=0;j<comps.length;j++){
+			for (int j = 0; j < comps.length; j++) {
 				candidateDecoders = getCandidateDecoders(comps[j]);
 				if (candidateDecoders.size() < lMinCandidates) {
 					lMinCandidates = candidateDecoders.size();
@@ -476,9 +428,9 @@ LocaleUtil
 			}
 		}
 
-		byte[]	comment = torrent.getComment();
+		byte[] comment = torrent.getComment();
 
-		if ( comment != null ){
+		if (comment != null) {
 			candidateDecoders = getCandidateDecoders(comment);
 			if (candidateDecoders.size() < lMinCandidates) {
 				lMinCandidates = candidateDecoders.size();
@@ -487,9 +439,9 @@ LocaleUtil
 			cand_set.retainAll(candidateDecoders);
 		}
 
-		byte[]	created = torrent.getCreatedBy();
+		byte[] created = torrent.getCreatedBy();
 
-		if ( created != null ){
+		if (created != null) {
 			candidateDecoders = getCandidateDecoders(created);
 			if (candidateDecoders.size() < lMinCandidates) {
 				lMinCandidates = candidateDecoders.size();
@@ -498,106 +450,102 @@ LocaleUtil
 			cand_set.retainAll(candidateDecoders);
 		}
 
-		List candidatesList = getCandidatesAsList(minCandidatesArray);
+		List<LocaleUtilDecoderCandidate> candidatesList = getCandidatesAsList(minCandidatesArray);
 		LocaleUtilDecoderCandidate[] candidates;
 		candidates = new LocaleUtilDecoderCandidate[candidatesList.size()];
 		candidatesList.toArray(candidates);
 
-		Arrays.sort(candidates, new Comparator() {
-			public int compare(Object o1, Object o2) {
-				LocaleUtilDecoderCandidate luc1 = (LocaleUtilDecoderCandidate) o1;
-				LocaleUtilDecoderCandidate luc2 = (LocaleUtilDecoderCandidate) o2;
+		Arrays.sort(candidates, new Comparator<LocaleUtilDecoderCandidate>() {
+			public int compare(LocaleUtilDecoderCandidate o1,
+					LocaleUtilDecoderCandidate o2) {
+				LocaleUtilDecoderCandidate luc1 = o1;
+				LocaleUtilDecoderCandidate luc2 = o2;
 
-				return (luc1.getDecoder().getIndex() - luc2.getDecoder().getIndex());
+				return (luc1.getDecoder().getIndex() - luc2.getDecoder()
+						.getIndex());
 			}
 		});
 
 		return candidates;
-  	}
+	}
 
-	public void
-	setTorrentEncoding(
-		TOTorrent		torrent,
-		String			encoding )
+	public void setTorrentEncoding(TOTorrent torrent, String encoding)
 
-		throws LocaleUtilEncodingException
-	{
-		try{
-			LocaleUtilDecoderCandidate[]	candidates = getTorrentCandidates(torrent);
+	throws LocaleUtilEncodingException {
+		try {
+			LocaleUtilDecoderCandidate[] candidates = getTorrentCandidates(torrent);
 
-			String	canonical_requested_name;
+			String canonical_requested_name;
 
-				// "System" means use the system encoding
+			// "System" means use the system encoding
 
-			if ( encoding.equalsIgnoreCase("system" )){
+			if (encoding.equalsIgnoreCase("system")) {
 
-				canonical_requested_name	= getSystemEncoding();
+				canonical_requested_name = getSystemEncoding();
 
-			}else if ( encoding.equalsIgnoreCase( LocaleUtilDecoderFallback.NAME )){
+			} else if (encoding
+					.equalsIgnoreCase(LocaleUtilDecoderFallback.NAME)) {
 
-				canonical_requested_name	= LocaleUtilDecoderFallback.NAME;
+				canonical_requested_name = LocaleUtilDecoderFallback.NAME;
 
-			}else{
+			} else {
 
-				CharsetDecoder requested_decoder = Charset.forName(encoding).newDecoder();
+				CharsetDecoder requested_decoder = Charset.forName(encoding)
+						.newDecoder();
 
-				canonical_requested_name	= requested_decoder.charset().name();
+				canonical_requested_name = requested_decoder.charset().name();
 			}
 
-			boolean	 ok = false;
+			boolean ok = false;
 
-			for (int i=0;i<candidates.length;i++){
+			for (int i = 0; i < candidates.length; i++) {
 
-				if ( candidates[i].getDecoder().getName().equals( canonical_requested_name )){
+				if (candidates[i].getDecoder().getName().equals(
+						canonical_requested_name)) {
 
-					ok	= true;
+					ok = true;
 
 					break;
 				}
 			}
 
-			if ( !ok ){
+			if (!ok) {
 
-				String[]	charsets 	= new String[candidates.length];
-				String[]	names		= new String[candidates.length];
+				String[] charsets = new String[candidates.length];
+				String[] names = new String[candidates.length];
 
-				for (int i=0;i<candidates.length;i++){
+				for (int i = 0; i < candidates.length; i++) {
 
-					LocaleUtilDecoder	decoder = candidates[i].getDecoder();
+					LocaleUtilDecoder decoder = candidates[i].getDecoder();
 
 					charsets[i] = decoder.getName();
-					names[i]	= decoder.decodeString( torrent.getName());
+					names[i] = decoder.decodeString(torrent.getName());
 				}
 
-				throw( new LocaleUtilEncodingException(charsets, names));
+				throw (new LocaleUtilEncodingException(charsets, names));
 			}
 
-			torrent.setAdditionalStringProperty("encoding", canonical_requested_name );
+			torrent.setAdditionalStringProperty("encoding",
+					canonical_requested_name);
 
-		}catch( Throwable e ){
+		} catch (Throwable e) {
 
-			if ( e instanceof LocaleUtilEncodingException ){
+			if (e instanceof LocaleUtilEncodingException) {
 
-				throw((LocaleUtilEncodingException)e);
+				throw ((LocaleUtilEncodingException) e);
 			}
 
-			throw( new LocaleUtilEncodingException(e));
+			throw (new LocaleUtilEncodingException(e));
 		}
 	}
 
-	public void
-	setDefaultTorrentEncoding(
-		TOTorrent		torrent )
+	public void setDefaultTorrentEncoding(TOTorrent torrent)
 
-		throws LocaleUtilEncodingException
-	{
-		setTorrentEncoding( torrent, RemoteConstants.DEFAULT_ENCODING );
+	throws LocaleUtilEncodingException {
+		setTorrentEncoding(torrent, RemoteConstants.DEFAULT_ENCODING);
 	}
 
-	public String
-	getCurrentTorrentEncoding(
-		TOTorrent	torrent )
-	{
-		return( torrent.getAdditionalStringProperty("encoding"));
+	public String getCurrentTorrentEncoding(TOTorrent torrent) {
+		return (torrent.getAdditionalStringProperty("encoding"));
 	}
 }

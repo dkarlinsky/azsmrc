@@ -43,122 +43,117 @@ import org.eclipse.swt.widgets.TreeItem;
 
 public class GUIEditUser {
 
-	private Tree tree;
+	private Tree				tree;
 
-	private User user;
+	private User				user;
 
-	private ScrolledComposite sc;
+	private ScrolledComposite	sc;
 
-	private Composite cOptions;
+	private Composite			cOptions;
 
-	private GUIEditUser instance;
+	private GUIEditUser			instance;
 
-	private Shell shell;
+	private Shell				shell;
 
 	/**
 	 * Private method for actually drawing the dialog
+	 * 
 	 * @param User _user
 	 */
-	private void loadGUI(User _user){
+	private void loadGUI(User _user) {
 
 		instance = this;
 		user = _user;
-		System.out.println("USERNAME: "+user);
+		System.out.println("USERNAME: " + user);
 
-		//Shell Initialize
+		// Shell Initialize
 		shell = new Shell(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 		shell.setImage(ImageRepository.getImage("plus"));
 
-		//Grid Layout
+		// Grid Layout
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 1;
 		shell.setLayout(layout);
 
-		//composite for shell
-		Composite parent = new Composite(shell,SWT.NULL);
+		// composite for shell
+		Composite parent = new Composite(shell, SWT.NULL);
 
-		//Grid Layout
+		// Grid Layout
 		layout = new GridLayout();
 		layout.numColumns = 1;
 		parent.setLayout(layout);
 
-		//Gd for comp
+		// Gd for comp
 
 		GridData gridData = new GridData(GridData.FILL_BOTH);
 		parent.setLayoutData(gridData);
 
-		//shell title
+		// shell title
 		shell.setText("Edit User Information");
 
-		//Sash
-		final SashForm sash = new SashForm(parent,SWT.HORIZONTAL);
+		// Sash
+		final SashForm sash = new SashForm(parent, SWT.HORIZONTAL);
 		gridData = new GridData(GridData.FILL_BOTH);
 		gridData.widthHint = 600;
 		gridData.heightHint = 400;
 		sash.setLayoutData(gridData);
-		sash.setLayout(new GridLayout(1,false));
+		sash.setLayout(new GridLayout(1, false));
 
-
-		//Tree on left side
-		tree = new Tree(sash,SWT.BORDER | SWT.H_SCROLL);
+		// Tree on left side
+		tree = new Tree(sash, SWT.BORDER | SWT.H_SCROLL);
 		gridData = new GridData(GridData.FILL_BOTH);
 		gridData.horizontalSpan = 1;
 		tree.setLayoutData(gridData);
 
-		//SC on right side
+		// SC on right side
 		sc = new ScrolledComposite(sash, SWT.V_SCROLL);
 
-		cOptions = new Composite(sc,SWT.BORDER);
+		cOptions = new Composite(sc, SWT.BORDER);
 		gridData = new GridData(GridData.FILL_BOTH);
 		gridData.horizontalSpan = 1;
 		cOptions.setLayoutData(gridData);
-		cOptions.setLayout(new GridLayout(2,false));
+		cOptions.setLayout(new GridLayout(2, false));
 
 		sc.setContent(cOptions);
 		sc.setExpandVertical(true);
 		sc.setExpandHorizontal(true);
 		sc.addControlListener(new ControlAdapter() {
+			@Override
 			public void controlResized(ControlEvent e) {
 				sc.setMinSize(cOptions.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 			}
 		});
 
-		//set the sash weight
-		sash.setWeights(new int[] {30,70});
+		// set the sash weight
+		sash.setWeights(new int[] { 30, 70 });
 
-
-		//Button comp for below the sash
+		// Button comp for below the sash
 		Composite bComp = new Composite(parent, SWT.NULL);
-		bComp.setLayout(new GridLayout(1,false));
+		bComp.setLayout(new GridLayout(1, false));
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		bComp.setLayoutData(gridData);
 
-/*		//Save button
-		Button save = new Button(bComp, SWT.PUSH);
-		save.setText("Save");
-		save.addListener(SWT.Selection, new Listener(){
-			public void handleEvent(Event arg0) {
-				// TODO Feed me!
-			}
-		});
-*/
+		/*
+		 * //Save button Button save = new Button(bComp, SWT.PUSH);
+		 * save.setText("Save"); save.addListener(SWT.Selection, new Listener(){
+		 * public void handleEvent(Event arg0) { // TODO Feed me! } });
+		 */
 
-		//Close button
+		// Close button
 		Button close = new Button(bComp, SWT.PUSH);
 		close.setText("Close");
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		gridData.grabExcessHorizontalSpace = true;
 		close.setLayoutData(gridData);
 
-		close.addListener(SWT.Selection, new Listener(){
+		close.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event arg0) {
 				shell.dispose();
 				instance = null;
 			}
 		});
 
-
-		shell.addDisposeListener(new DisposeListener(){
+		shell.addDisposeListener(new DisposeListener() {
 
 			public void widgetDisposed(DisposeEvent arg0) {
 				GUIMain.redrawTable();
@@ -166,11 +161,10 @@ public class GUIEditUser {
 
 		});
 
-
-		//pack and open shell
+		// pack and open shell
 		Utilities.centerShellandOpen(shell);
 
-		//Non-Flexy config items
+		// Non-Flexy config items
 		final TreeItem item1 = new TreeItem(tree, SWT.NULL);
 		item1.setText("General Settings");
 
@@ -179,100 +173,122 @@ public class GUIEditUser {
 
 		tree.addSelectionListener(new SelectionListener() {
 
-			public void widgetDefaultSelected(SelectionEvent arg0) {}
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+			}
 
 			public void widgetSelected(SelectionEvent arg0) {
-				TreeItem [] selections = tree.getSelection ();
-				if(selections.length != 1) return;
-				if(selections[0].equals(item1)){
-					//If true then this is the General Settings
+				TreeItem[] selections = tree.getSelection();
+				if (selections.length != 1) {
+					return;
+				}
+				if (selections[0].equals(item1)) {
+					// If true then this is the General Settings
 
-					//First remove all from cOptions
+					// First remove all from cOptions
 					Control[] controls = cOptions.getChildren();
-					for(Control control:controls)
+					for (Control control : controls) {
 						control.dispose();
+					}
 
-					//populate cOptions
+					// populate cOptions
 					addGeneralItems(cOptions);
 
-				}else{
-					//Flexyconfig stuff..
+				} else {
+					// Flexyconfig stuff..
 				}
 			}
 
 		});
 
-
 		FlexyConfiguration fc = Plugin.getPSFlexyConf();
 		FCInterface fci = fc.getFCInterface();
 		fci.setContentProvider(new ContentProvider() {
-			/* (non-Javadoc)
-			 * @see lbms.tools.flexyconf.ContentProvider#getDefaultValue(java.lang.String, int)
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see lbms.tools.flexyconf.ContentProvider#getDefaultValue(java.lang.String,
+			 *      int)
 			 */
 			public String getDefaultValue(String key, int type) {
 				return user.getProperty(key);
 			}
-			/* (non-Javadoc)
-			 * @see lbms.tools.flexyconf.ContentProvider#getValue(java.lang.String, int)
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see lbms.tools.flexyconf.ContentProvider#getValue(java.lang.String,
+			 *      int)
 			 */
 			public String getValue(String key, int type) {
 				String v = user.getProperty(key);
-				return (v==null)? "" : v;
+				return (v == null) ? "" : v;
 			}
-			/* (non-Javadoc)
-			 * @see lbms.tools.flexyconf.ContentProvider#setValue(java.lang.String, java.lang.String, int)
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see lbms.tools.flexyconf.ContentProvider#setValue(java.lang.String,
+			 *      java.lang.String, int)
 			 */
 			public void setValue(String key, String value, int type) {
-				System.out.println("Set Property for user ["+user+"]: "+key+" -> "+value);
+				System.out.println("Set Property for user [" + user + "]: "
+						+ key + " -> " + value);
 				user.setProperty(key, value);
 			}
 		});
-		fci.setI18NProvider(new I18NProvider () {
-			/* (non-Javadoc)
+		fci.setI18NProvider(new I18NProvider() {
+			/*
+			 * (non-Javadoc)
+			 * 
 			 * @see lbms.tools.flexyconf.I18NProvider#translate(java.lang.String)
 			 */
 			public String translate(String key) {
 				return Plugin.getLocaleUtilities().getLocalisedMessageText(key);
 			}
 		});
-		fc.reset(); //reset all values before creating menu
-		SWTMenu fcm = new SWTMenu (fc,tree,cOptions);
+		fc.reset(); // reset all values before creating menu
+		SWTMenu fcm = new SWTMenu(fc, tree, cOptions);
 		fcm.addAsRoot();
 	}
 
-
-	private void addGeneralItems(Composite composite){
-		//		User Name Label
+	private void addGeneralItems(Composite composite) {
+		// User Name Label
 		Label nameLabel = new Label(composite, SWT.NONE);
 		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 1;
-		nameLabel.setLayoutData( gridData );
+		nameLabel.setLayoutData(gridData);
 		nameLabel.setText("User Name:");
 
-
-		//User Name Input field
-		final Text userName = new Text(composite,SWT.BORDER);
+		// User Name Input field
+		final Text userName = new Text(composite, SWT.BORDER);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 2;
 		gridData.widthHint = 100;
-		userName.setLayoutData( gridData);
+		userName.setLayoutData(gridData);
 		userName.setText(user.getUsername());
 
 		userName.addFocusListener(new FocusListener() {
 
-			public void focusGained(FocusEvent arg0) {}
+			public void focusGained(FocusEvent arg0) {
+			}
 
 			public void focusLost(FocusEvent arg0) {
-				if(userName == null || userName.isDisposed()) return;
-				if(userName.getText().equals(user.getUsername())) return;
+				if (userName == null || userName.isDisposed()) {
+					return;
+				}
+				if (userName.getText().equals(user.getUsername())) {
+					return;
+				}
 
-				if(userName.getText().length() > 0){
+				if (userName.getText().length() > 0) {
 					try {
-						Plugin.getXMLConfig().renameUser(user.getUsername(),userName.getText());
+						Plugin.getXMLConfig().renameUser(user.getUsername(),
+								userName.getText());
 						Plugin.getXMLConfig().saveConfigFile();
 					} catch (DuplicatedUserException e) {
 						userName.setText(user.getUsername());
-						MessageBox mb = new MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
+						MessageBox mb = new MessageBox(Plugin.getDisplay()
+								.getActiveShell(), SWT.ICON_ERROR);
 						mb.setText("Error");
 						mb.setMessage("User name already exists.");
 						mb.open();
@@ -287,95 +303,90 @@ public class GUIEditUser {
 
 		});
 
+		// Combo Stuff
 
-		//Combo Stuff
-
-		//combo Label
+		// combo Label
 		Label combo_text = new Label(composite, SWT.NONE);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 1;
-		combo_text.setLayoutData( gridData );
+		combo_text.setLayoutData(gridData);
 		combo_text.setText("Select User Type:");
 
 		final Combo combo = new Combo(composite, SWT.DROP_DOWN | SWT.READ_ONLY);
 		combo.add("Normal User");
 		combo.add("Administrator");
 
-
-
 		final Button rights1 = new Button(composite, SWT.CHECK);
 		rights1.setText("User has right to Force Start torrents");
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 2;
 		rights1.setLayoutData(gd);
-		rights1.addListener(SWT.Selection, new Listener(){
+		rights1.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event arg0) {
-				if(!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)){
-					if(rights1.getSelection())
+				if (!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+					if (rights1.getSelection()) {
 						user.setRight(RemoteConstants.RIGHTS_FORCESTART);
-					else
+					} else {
 						user.unsetRight(RemoteConstants.RIGHTS_FORCESTART);
+					}
 				}
 			}
 		});
-
 
 		final Button rights2 = new Button(composite, SWT.CHECK);
 		rights2.setText("User can see public downloads");
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 2;
 		rights2.setLayoutData(gd);
-		rights2.addListener(SWT.Selection, new Listener(){
+		rights2.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event arg0) {
-				if(!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)){
-					if(rights1.getSelection())
+				if (!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+					if (rights1.getSelection()) {
 						user.setRight(RemoteConstants.RIGHTS_SEE_PUBLICDL);
-					else
+					} else {
 						user.unsetRight(RemoteConstants.RIGHTS_SEE_PUBLICDL);
+					}
 				}
 			}
 		});
-
 
 		final Button rights3 = new Button(composite, SWT.CHECK);
 		rights3.setText("User has right to set download directory");
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 2;
 		rights3.setLayoutData(gd);
-		rights3.addListener(SWT.Selection, new Listener(){
+		rights3.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event arg0) {
-				if(!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)){
-					if(rights1.getSelection())
+				if (!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+					if (rights1.getSelection()) {
 						user.setRight(RemoteConstants.RIGHTS_SET_DL_DIR);
-					else
+					} else {
 						user.unsetRight(RemoteConstants.RIGHTS_SET_DL_DIR);
+					}
 				}
 			}
 		});
 
-
-		if(user.checkAccess(RemoteConstants.RIGHTS_ADMIN)){
+		if (user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
 			combo.select(1);
 			rights1.setEnabled(false);
 			rights2.setEnabled(false);
 			rights3.setEnabled(false);
-		}else{
+		} else {
 			combo.select(0);
 			rights1.setEnabled(true);
 			rights2.setEnabled(true);
 			rights3.setEnabled(true);
 		}
 
-
-		if(!Plugin.getCurrentUser().checkRight(RemoteConstants.RIGHTS_ADMIN)){
+		if (!Plugin.getCurrentUser().checkRight(RemoteConstants.RIGHTS_ADMIN)) {
 			combo.setEnabled(false);
 		}
 
-
-		//Combo Listener to save changes to user
-		combo.addListener(SWT.Selection, new Listener(){
+		// Combo Listener to save changes to user
+		combo.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event arg0) {
-				if(combo.getSelectionIndex() == 1){
+				if (combo.getSelectionIndex() == 1) {
 					user.setRight(RemoteConstants.RIGHTS_ADMIN);
 					rights1.setEnabled(false);
 					rights2.setEnabled(false);
@@ -383,7 +394,7 @@ public class GUIEditUser {
 					rights1.setSelection(false);
 					rights2.setSelection(false);
 					rights3.setSelection(false);
-				}else{
+				} else {
 					user.unsetRight(RemoteConstants.RIGHTS_ADMIN);
 					rights1.setEnabled(true);
 					rights2.setEnabled(true);
@@ -392,29 +403,40 @@ public class GUIEditUser {
 			}
 		});
 
+		final Button downloadHistory = new Button(composite, SWT.CHECK);
+		downloadHistory.setText("Enable Download History for this user.");
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
+		downloadHistory.setLayoutData(gd);
+		downloadHistory.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event arg0) {
+				user.setProperty("DownloadHistory", Boolean
+						.toString(downloadHistory.getSelection()));
+			}
+		});
 
-		//---------Directory stuff ------------\\
+		downloadHistory.setSelection(Boolean.parseBoolean(user
+				.getProperty("DownloadHistory")));
 
+		// ---------Directory stuff ------------\\
 
-		//output directory
+		// output directory
 		Label outputDir_text = new Label(composite, SWT.NONE);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 3;
-		outputDir_text.setLayoutData( gridData );
+		outputDir_text.setLayoutData(gridData);
 		outputDir_text.setText("Output Directory for User:");
 
-		//comp for directory input
-		Composite output_comp = new Composite(composite,SWT.NONE);
-		output_comp.setLayout(new GridLayout(3,false));
+		// comp for directory input
+		Composite output_comp = new Composite(composite, SWT.NONE);
+		output_comp.setLayout(new GridLayout(3, false));
 
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 3;
 		output_comp.setLayoutData(gridData);
 
-
-
-		//output directory input field
-		final Text outputDir = new Text(output_comp,SWT.BORDER);
+		// output directory input field
+		final Text outputDir = new Text(output_comp, SWT.BORDER);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 2;
 		gridData.widthHint = 250;
@@ -422,66 +444,67 @@ public class GUIEditUser {
 
 		outputDir.setText(user.getOutputDir());
 
-		//Listener for manual input of outputDir
+		// Listener for manual input of outputDir
 		outputDir.addFocusListener(new FocusListener() {
 
-			public void focusGained(FocusEvent arg0) {}
+			public void focusGained(FocusEvent arg0) {
+			}
 
 			public void focusLost(FocusEvent arg0) {
-				if(outputDir == null || outputDir.isDisposed()) return;
-				if(outputDir.getText().equals(user.getOutputDir())) return;
+				if (outputDir == null || outputDir.isDisposed()) {
+					return;
+				}
+				if (outputDir.getText().equals(user.getOutputDir())) {
+					return;
+				}
 				user.setOutputDir(outputDir.getText());
 			}
 		});
 
-
-
-
-		//icon for output directory
+		// icon for output directory
 		Label outputDir_icon = new Label(output_comp, SWT.NONE);
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		gridData.horizontalSpan = 1;
-		outputDir_icon.setLayoutData( gridData );
+		outputDir_icon.setLayoutData(gridData);
 		outputDir_icon.setToolTipText("Click to choose directory");
 		outputDir_icon.setImage(ImageRepository.getImage("folder"));
 		outputDir_icon.addListener(SWT.MouseDown, new Listener() {
 			public void handleEvent(Event e) {
 				DirectoryDialog dirDialog = new DirectoryDialog(shell);
 				dirDialog.setText("Please Choose Output Directory");
-				dirDialog.setFilterPath(Plugin.getPluginInterface().getPluginDirectoryName());
+				dirDialog.setFilterPath(Plugin.getPluginInterface()
+						.getPluginDirectoryName());
 				String selectedDir = dirDialog.open();
 
-				//need to check if selected dir has files and if so, does it have a comments dir
-				if(selectedDir == null){
+				// need to check if selected dir has files and if so, does it
+				// have a comments dir
+				if (selectedDir == null) {
 					return;
-				}else{
+				} else {
 					outputDir.setText(selectedDir);
 					user.setOutputDir(outputDir.getText());
 				}
 
-
 			}
 		});
 
-		//auto import directory
+		// auto import directory
 		Label importDir_text = new Label(composite, SWT.NONE);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 3;
-		importDir_text.setLayoutData( gridData );
+		importDir_text.setLayoutData(gridData);
 		importDir_text.setText("Automatic Import Directory for User:");
 
-		//comp for directory input
-		Composite importDir_comp = new Composite(composite,SWT.NONE);
-		importDir_comp.setLayout(new GridLayout(3,false));
+		// comp for directory input
+		Composite importDir_comp = new Composite(composite, SWT.NONE);
+		importDir_comp.setLayout(new GridLayout(3, false));
 
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 3;
 		importDir_comp.setLayoutData(gridData);
 
-
-
-		//output directory input field
-		final Text importDir = new Text(importDir_comp,SWT.BORDER);
+		// output directory input field
+		final Text importDir = new Text(importDir_comp, SWT.BORDER);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 2;
 		gridData.widthHint = 250;
@@ -489,130 +512,110 @@ public class GUIEditUser {
 
 		importDir.setText(user.getAutoImportDir());
 
-
-		//Listener for manual input of outputDir
+		// Listener for manual input of outputDir
 		importDir.addFocusListener(new FocusListener() {
 
-			public void focusGained(FocusEvent arg0) {}
+			public void focusGained(FocusEvent arg0) {
+			}
 
 			public void focusLost(FocusEvent arg0) {
-				if(importDir == null || importDir.isDisposed()) return;
-				if(importDir.getText().equals(user.getAutoImportDir())) return;
+				if (importDir == null || importDir.isDisposed()) {
+					return;
+				}
+				if (importDir.getText().equals(user.getAutoImportDir())) {
+					return;
+				}
 
 				user.setAutoImportDir(importDir.getText());
-
 
 			}
 
 		});
 
-
-
-
-		//icon for output directory
+		// icon for output directory
 		Label importDir_icon = new Label(importDir_comp, SWT.NONE);
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		gridData.horizontalSpan = 1;
-		importDir_icon.setLayoutData( gridData );
+		importDir_icon.setLayoutData(gridData);
 		importDir_icon.setToolTipText("Click to choose directory");
 		importDir_icon.setImage(ImageRepository.getImage("folder"));
 		importDir_icon.addListener(SWT.MouseDown, new Listener() {
 			public void handleEvent(Event e) {
 				DirectoryDialog dirDialog = new DirectoryDialog(shell);
 				dirDialog.setText("Please Choose Automatic Import Directory");
-				dirDialog.setFilterPath(Plugin.getPluginInterface().getPluginDirectoryName());
+				dirDialog.setFilterPath(Plugin.getPluginInterface()
+						.getPluginDirectoryName());
 				String selectedDir = dirDialog.open();
 				File selectedDir_file = new File(selectedDir);
-				//need to check if selected dir has files and if so, does it have a comments dir
-				if(selectedDir == null){
+				// need to check if selected dir has files and if so, does it
+				// have a comments dir
+				if (selectedDir == null) {
 					return;
-				}else if(!selectedDir_file.exists() || !selectedDir_file.isDirectory()){
-					MessageBox mb = new MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
+				} else if (!selectedDir_file.exists()
+						|| !selectedDir_file.isDirectory()) {
+					MessageBox mb = new MessageBox(Plugin.getDisplay()
+							.getActiveShell(), SWT.ICON_ERROR);
 					mb.setText("Error");
-					mb.setMessage("Selected Directory does not exist, please choose a valid directory.");
+					mb
+							.setMessage("Selected Directory does not exist, please choose a valid directory.");
 					mb.open();
-				}else{
+				} else {
 					importDir.setText(selectedDir);
 					user.setAutoImportDir(importDir.getText());
 				}
 
-
 			}
 		});
 
-/*		//Button for Accept
-		Button commit = new Button(composite, SWT.PUSH);
-		gridData = new GridData(GridData.CENTER);
-		gridData.horizontalSpan = 1;
-		commit.setLayoutData( gridData);
-		commit.setText( "Accept");
-		commit.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
-				if(userName.getText().equalsIgnoreCase("")      ||
-						outputDir.getText().equalsIgnoreCase("")||
-						importDir.getText().equalsIgnoreCase("")){
-					MessageBox mb = new MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
-					mb.setText("Error");
-					mb.setMessage("Please fill out all of the information.");
-					mb.open();
-					return;
-				}
+		/*
+		 * //Button for Accept Button commit = new Button(composite, SWT.PUSH); gridData =
+		 * new GridData(GridData.CENTER); gridData.horizontalSpan = 1;
+		 * commit.setLayoutData( gridData); commit.setText( "Accept");
+		 * commit.addListener(SWT.Selection, new Listener() { public void
+		 * handleEvent(Event e) { if(userName.getText().equalsIgnoreCase("") ||
+		 * outputDir.getText().equalsIgnoreCase("")||
+		 * importDir.getText().equalsIgnoreCase("")){ MessageBox mb = new
+		 * MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
+		 * mb.setText("Error"); mb.setMessage("Please fill out all of the
+		 * information."); mb.open(); return; } //add the user to the XMLConfig file try {
+		 * if(!user.getUsername().equalsIgnoreCase(userName.getText())){
+		 * Plugin.getXMLConfig().renameUser(user.getUsername(),userName.getText()); }
+		 * Plugin.getXMLConfig().saveConfigFile(); User currentUser =
+		 * Plugin.getXMLConfig().getUser(userName.getText());
+		 * currentUser.setOutputDir(outputDir.getText());
+		 * currentUser.setAutoImportDir(importDir.getText());
+		 * if(combo.getSelectionIndex() != 0)
+		 * currentUser.setRight(RemoteConstants.RIGHTS_ADMIN);
+		 * Plugin.getXMLConfig().saveConfigFile(); } catch (IOException e1) {
+		 * Plugin.addToLog(e1.toString()); } catch (UserNotFoundException e2) {
+		 * MessageBox mb = new
+		 * MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
+		 * mb.setText("Error"); mb.setMessage("Plugin is reporting a 'User Not Found'
+		 * error. \n Possible error in your plugin config file. \nPlease Check your
+		 * settings and try again."); mb.open(); Plugin.addToLog(e2.getMessage());
+		 * e2.printStackTrace(); }catch (DuplicatedUserException e2) { MessageBox mb =
+		 * new MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
+		 * mb.setText("Error"); mb.setMessage("User name already exists."); mb.open();
+		 * return; } } });
+		 */
 
-
-
-				//add the user to the XMLConfig file
-				try {
-					if(!user.getUsername().equalsIgnoreCase(userName.getText())){
-						Plugin.getXMLConfig().renameUser(user.getUsername(),userName.getText());
-					}
-
-					Plugin.getXMLConfig().saveConfigFile();
-
-					User currentUser = Plugin.getXMLConfig().getUser(userName.getText());
-
-
-					currentUser.setOutputDir(outputDir.getText());
-					currentUser.setAutoImportDir(importDir.getText());
-
-					if(combo.getSelectionIndex() != 0)
-						currentUser.setRight(RemoteConstants.RIGHTS_ADMIN);
-
-
-					Plugin.getXMLConfig().saveConfigFile();
-				} catch (IOException e1) {
-					Plugin.addToLog(e1.toString());
-				} catch (UserNotFoundException e2) {
-					MessageBox mb = new MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
-					mb.setText("Error");
-					mb.setMessage("Plugin is reporting a 'User Not Found' error.  \n Possible error in your plugin config file. \nPlease Check your settings and try again.");
-					mb.open();
-					Plugin.addToLog(e2.getMessage());
-					e2.printStackTrace();
-				}catch (DuplicatedUserException e2) {
-					MessageBox mb = new MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
-					mb.setText("Error");
-					mb.setMessage("User name already exists.");
-					mb.open();
-					return;
-				}
-			}
-
-		});*/
-
-		//Redo the composite so the new stuff appears
+		// Redo the composite so the new stuff appears
 		composite.layout();
 
 	}
+
 	/**
 	 * Public method to open the dialog
+	 * 
 	 * @param User _user
 	 */
-	public void open(User _user){
-		if(instance == null)
+	public void open(User _user) {
+		if (instance == null) {
 			loadGUI(_user);
-		else{
-			if(shell != null || !shell.isDisposed())
+		} else {
+			if (shell != null || !shell.isDisposed()) {
 				shell.setFocus();
+			}
 		}
 
 	}
