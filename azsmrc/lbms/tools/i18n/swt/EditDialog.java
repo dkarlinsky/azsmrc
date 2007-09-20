@@ -20,22 +20,21 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 
-public class NewDialog {
-	private String		sTitleKey;
+public class EditDialog {
+	private String	sTitleKey;
 
-	private String[]	textValue			= { "", "" };
+	private String	textValue			= "";
 
-	private Pattern		placeHolderPattern	= Pattern.compile("\\{(\\d+)\\}");
+	private Pattern	placeHolderPattern	= Pattern.compile("\\{(\\d+)\\}");
 
-	public NewDialog(String Title) {
+	public EditDialog(String Title) {
 		this.sTitleKey = Title;
 
-		this.setTextValue("", "");
+		this.setTextValue("");
 	}
 
-	public String[] open() {
+	public String open() {
 		final Display display = ETC.getETC().getDisplay();
 		if (display == null) {
 			return null;
@@ -47,41 +46,18 @@ public class NewDialog {
 		GridLayout layout = new GridLayout();
 		shell.setLayout(layout);
 
-		Label label = new Label(shell, SWT.WRAP);
-		label.setText("New Key Name");
-
-		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
-		gridData.widthHint = 200;
-		label.setLayoutData(gridData);
-
-		final Text textKey = new Text(shell, SWT.BORDER);
-		gridData = new GridData();
-		gridData.widthHint = 300;
-		textKey.setLayoutData(gridData);
-		textKey.setText(textValue[0]);
-		textKey.selectAll();
-
-		try {
-			if (textKey.getText().lastIndexOf(".") > 0) {
-				textKey.setSelection(textKey.getText().lastIndexOf(".") + 1,
-						textKey.getText().length());
-			}
-		} catch (Exception e) {
-		}
-
 		Label label2 = new Label(shell, SWT.WRAP);
 		label2.setText("Default Value");
 
-		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.widthHint = 200;
-		label.setLayoutData(gridData);
 
 		final StyledText textObj = new StyledText(shell, SWT.BORDER);
 		gridData = new GridData();
 		gridData.widthHint = 300;
 		gridData.heightHint = 400;
 		textObj.setLayoutData(gridData);
-		textObj.setText(textValue[1]);
+		textObj.setText(textValue);
 		textObj.selectAll();
 		textObj.addModifyListener(new ModifyListener() {
 			/*
@@ -131,7 +107,7 @@ public class NewDialog {
 			 */
 			public void handleEvent(Event event) {
 				try {
-					setTextValue(textKey.getText(), textObj.getText());
+					setTextValue(textObj.getText());
 					shell.dispose();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -151,6 +127,7 @@ public class NewDialog {
 			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 			 */
 			public void handleEvent(Event event) {
+				setTextValue(null);
 				shell.dispose();
 			}
 		});
@@ -158,7 +135,7 @@ public class NewDialog {
 		shell.pack();
 		centerShellRelativeToandOpen(shell, ETC.getETC().getMainWindow()
 				.getShell());
-		setTextValue(null, null);
+		setTextValue(null);
 		shell.open();
 
 		while (!shell.isDisposed()) {
@@ -173,17 +150,15 @@ public class NewDialog {
 	/**
 	 * @param textValue The textValue to set.
 	 */
-	public void setTextValue(String keyValue, String defaultValue) {
-		this.textValue[0] = keyValue;
-		this.textValue[1] = (defaultValue != null) ? defaultValue.replace(
-				"\\n", "\n") : defaultValue;
+	public void setTextValue(String text) {
+		this.textValue = (text != null) ? text.replace("\\n", "\n") : text;
 	}
 
 	/**
 	 * @return Returns the textValue.
 	 */
-	public String[] getTextValue() {
-		return textValue;
+	public String getTextValue() {
+		return textValue != null ? textValue.replace("\n", "\\n") : null;
 	}
 
 	/**
