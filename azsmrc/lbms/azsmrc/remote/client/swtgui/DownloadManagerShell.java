@@ -46,6 +46,7 @@ import lbms.azsmrc.remote.client.pluginsimpl.ui.swt.UIPluginViewImpl;
 import lbms.azsmrc.remote.client.swtgui.container.Container;
 import lbms.azsmrc.remote.client.swtgui.container.DownloadContainer;
 import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
+import lbms.azsmrc.remote.client.swtgui.dialogs.ChangeCategoryDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ConnectionDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.CreateTorrentDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.InputShell;
@@ -1301,7 +1302,7 @@ public class DownloadManagerShell {
 					}else if(download.getState() == Download.ST_STOPPED){
 						setToolBarTorrentIcons(true,false,true);
 					} else if(download.getState() == Download.ST_ERROR){
-						setToolBarTorrentIcons(false,true,true);
+						setToolBarTorrentIcons(true,true,true);
 					} else {
 						setToolBarTorrentIcons(false,false,false);
 					}
@@ -2687,6 +2688,24 @@ public class DownloadManagerShell {
 
 			});
 		}
+
+		final MenuItem changeCategory = new MenuItem (menu, SWT.PUSH);
+		changeCategory.setText("Change Category");
+		changeCategory.addSelectionListener(new SelectionAdapter() {
+			/* (non-Javadoc)
+			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				TableItem[] items = table.getSelection();
+				List<Container> downloads = new ArrayList<Container>();
+				for(TableItem item : items){
+					Container container = (Container)item.getData();
+					downloads.add(container);
+				}
+				ChangeCategoryDialog.open(downloads.toArray(new Container[downloads.size()]));
+			}
+		});
 
 
 
