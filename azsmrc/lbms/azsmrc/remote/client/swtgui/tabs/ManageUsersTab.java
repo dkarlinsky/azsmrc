@@ -1080,13 +1080,20 @@ public class ManageUsersTab {
 					cancel.setText(I18N.translate("global.cancel"));
 					cancel.addListener(SWT.Selection, new Listener() {
 						public void handleEvent(Event e) {
-							MessageBox mb = new MessageBox(
-									RCMain.getRCMain().getDisplay().getActiveShell(),
-									SWT.ICON_WARNING);
-							mb.setText(I18N.translate("global.warning"));
-							mb.setMessage(I18N.translate(PFX
-									+ "editUserShell.warning.uncommitedchanges.message"));
-							shell.dispose();
+							if (isDirty) {
+								MessageBox mb = new MessageBox(
+										RCMain.getRCMain().getDisplay().getActiveShell(),
+										SWT.ICON_WARNING | SWT.CANCEL | SWT.OK);
+								mb.setText(I18N.translate("global.warning"));
+								mb.setMessage(I18N.translate(PFX
+										+ "editUserShell.warning.uncommitedchanges.message"));
+								int result = mb.open();
+								if (result == SWT.OK) {
+									shell.dispose();
+								}
+							} else {
+								shell.dispose();
+							}
 						}
 					});
 					Element fce = RCMain.getRCMain().getClient().getRemoteInfo().getAzSMRCPluginSupportFlexyConf();
@@ -1210,7 +1217,7 @@ public class ManageUsersTab {
 			});
 
 			final Button rights1 = new Button(composite, SWT.CHECK);
-			rights1.setText("User has right to Force Start torrents");
+			rights1.setText(I18N.translate("global.rights.RIGHTS_FORCESTART.text"));
 			GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 			gd.horizontalSpan = 2;
 			rights1.setLayoutData(gd);
@@ -1228,7 +1235,7 @@ public class ManageUsersTab {
 			});
 
 			final Button rights2 = new Button(composite, SWT.CHECK);
-			rights2.setText("User can see public downloads");
+			rights2.setText(I18N.translate("global.rights.RIGHTS_SEE_PUBLICDL.text"));
 			gd = new GridData(GridData.FILL_HORIZONTAL);
 			gd.horizontalSpan = 2;
 			rights2.setLayoutData(gd);
@@ -1246,7 +1253,7 @@ public class ManageUsersTab {
 			});
 
 			final Button rights3 = new Button(composite, SWT.CHECK);
-			rights3.setText("User has right to set download directory");
+			rights3.setText(I18N.translate("global.rights.RIGHTS_SET_DL_DIR.text"));
 			gd = new GridData(GridData.FILL_HORIZONTAL);
 			gd.horizontalSpan = 2;
 			rights3.setLayoutData(gd);
@@ -1264,7 +1271,7 @@ public class ManageUsersTab {
 			});
 
 			final Button rights4 = new Button(composite, SWT.CHECK);
-			rights4.setText("User has right to add Downloads as public Downloads");
+			rights4.setText(I18N.translate("global.rights.RIGHTS_ADD_PUBLICDL.text"));
 			gd = new GridData(GridData.FILL_HORIZONTAL);
 			gd.horizontalSpan = 2;
 			rights4.setLayoutData(gd);
@@ -1312,7 +1319,8 @@ public class ManageUsersTab {
 			rights4.setSelection(user.checkRight(RemoteConstants.RIGHTS_ADD_PUBLICDL));
 
 			final Button downloadHistory = new Button(composite, SWT.CHECK);
-			downloadHistory.setText("Enable Download History for this user.");
+			downloadHistory.setText(I18N.translate(PFX
+					+ "editUserShell.downloadHistory.text"));
 			gd = new GridData(GridData.FILL_HORIZONTAL);
 			gd.horizontalSpan = 2;
 			downloadHistory.setLayoutData(gd);
