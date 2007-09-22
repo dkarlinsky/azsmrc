@@ -23,25 +23,36 @@ import lbms.tools.flexyconf.ContentProvider;
 import lbms.tools.flexyconf.FCInterface;
 import lbms.tools.flexyconf.FlexyConfiguration;
 import lbms.tools.flexyconf.I18NProvider;
+import lbms.tools.flexyconf.swt.SWTMenu;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
@@ -58,6 +69,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
+import org.jdom.Element;
 
 public class ManageUsersTab {
 	private Table				userTable;
@@ -170,18 +183,13 @@ public class ManageUsersTab {
 								// Check if only one
 								if (items.length > 0) {
 									if (items[0].getText(0).equalsIgnoreCase(
-											RCMain.getRCMain().getClient()
-													.getUsername())) {
-										MessageBox mb = new MessageBox(RCMain
-												.getRCMain().getDisplay()
-												.getActiveShell(),
+											RCMain.getRCMain().getClient().getUsername())) {
+										MessageBox mb = new MessageBox(
+												RCMain.getRCMain().getDisplay().getActiveShell(),
 												SWT.ICON_ERROR);
-										mb.setText(I18N
-												.translate("global.error"));
-										mb
-												.setMessage(I18N
-														.translate(PFX
-																+ "toolbar.deleteuser.messabox.message"));
+										mb.setText(I18N.translate("global.error"));
+										mb.setMessage(I18N.translate(PFX
+												+ "toolbar.deleteuser.messabox.message"));
 										mb.open();
 										return;
 									} else {
@@ -230,8 +238,7 @@ public class ManageUsersTab {
 		outputDir.setWidth(300);
 
 		TableColumn inputDir = new TableColumn(userTable, SWT.LEFT);
-		inputDir
-				.setText(I18N.translate(PFX + "usertable.column.inputdir.text"));
+		inputDir.setText(I18N.translate(PFX + "usertable.column.inputdir.text"));
 		inputDir.setWidth(300);
 
 		// SetData listener for the userTable
@@ -255,8 +262,8 @@ public class ManageUsersTab {
 						item.setText(1, I18N.translate(PFX + "usertable.user"));
 					}
 
-					item.setText(2, Integer.toString(users[index]
-							.getDownloadSlots()));
+					item.setText(2,
+							Integer.toString(users[index].getDownloadSlots()));
 					item.setText(3, users[index].getOutputDir());
 					item.setText(4, users[index].getAutoImportDir());
 
@@ -281,7 +288,7 @@ public class ManageUsersTab {
 					} else {
 						TableItem[] items = userTable.getSelection();
 						if (items.length == 1) {
-							editUserInfo(items[0].getText(0));
+							EditUserDialog.open(items[0].getText(0));
 						}
 					}
 				}
@@ -322,7 +329,7 @@ public class ManageUsersTab {
 			public void handleEvent(Event e) {
 				TableItem[] items = userTable.getSelection();
 				if (items.length == 1) {
-					editUserInfo(items[0].getText(0));
+					EditUserDialog.open(items[0].getText(0));
 				}
 			}
 		});
@@ -415,8 +422,7 @@ public class ManageUsersTab {
 				backup_composite.setLayout(layout);
 
 				// shell title
-				shell.setText(I18N
-						.translate(PFX + "addnewuserShell.shell.text"));
+				shell.setText(I18N.translate(PFX + "addnewuserShell.shell.text"));
 
 				// User Name Label
 				Label nameLabel = new Label(backup_composite, SWT.NONE);
@@ -496,8 +502,8 @@ public class ManageUsersTab {
 				dir_text.setText(" "
 						+ I18N.translate(PFX
 								+ "addnewuserShell.dir_reminder.text") + " ");
-				dir_text.setBackground(RCMain.getRCMain().getDisplay()
-						.getSystemColor(SWT.COLOR_GRAY));
+				dir_text.setBackground(RCMain.getRCMain().getDisplay().getSystemColor(
+						SWT.COLOR_GRAY));
 
 				// output directory
 				Label outputDir_text = new Label(backup_composite, SWT.NONE);
@@ -558,8 +564,8 @@ public class ManageUsersTab {
 						if (userName.getText().equalsIgnoreCase("")
 								|| password.getText().equalsIgnoreCase("")
 								|| verify.getText().equalsIgnoreCase("")) {
-							MessageBox mb = new MessageBox(RCMain.getRCMain()
-									.getDisplay().getActiveShell(),
+							MessageBox mb = new MessageBox(
+									RCMain.getRCMain().getDisplay().getActiveShell(),
 									SWT.ICON_ERROR);
 							mb.setText(I18N.translate("global.error"));
 							mb.setMessage(I18N.translate(PFX
@@ -575,19 +581,17 @@ public class ManageUsersTab {
 								// password.getText());
 								userManager.addUserUser(userName.getText(),
 										password.getText(),
-										importDir.getText(), outputDir
-												.getText(), 1, combo
-												.getSelectionIndex());
+										importDir.getText(),
+										outputDir.getText(), 1,
+										combo.getSelectionIndex());
 
 							} catch (DuplicatedUserException e1) {
-								MessageBox mb = new MessageBox(RCMain
-										.getRCMain().getDisplay()
-										.getActiveShell(), SWT.ICON_ERROR);
+								MessageBox mb = new MessageBox(
+										RCMain.getRCMain().getDisplay().getActiveShell(),
+										SWT.ICON_ERROR);
 								mb.setText(I18N.translate("global.error"));
-								mb
-										.setMessage(I18N
-												.translate(PFX
-														+ "addnewuserShell.duplicateError.messagebox.message"));
+								mb.setMessage(I18N.translate(PFX
+										+ "addnewuserShell.duplicateError.messagebox.message"));
 								mb.open();
 								return;
 							}
@@ -599,14 +603,12 @@ public class ManageUsersTab {
 							redrawTable();
 
 						} else {
-							MessageBox mb = new MessageBox(RCMain.getRCMain()
-									.getDisplay().getActiveShell(),
+							MessageBox mb = new MessageBox(
+									RCMain.getRCMain().getDisplay().getActiveShell(),
 									SWT.ICON_ERROR);
 							mb.setText(I18N.translate("global.error"));
-							mb
-									.setMessage(I18N
-											.translate(PFX
-													+ "addnewuserShell.pwIdenticalError.messagebox.message"));
+							mb.setMessage(I18N.translate(PFX
+									+ "addnewuserShell.pwIdenticalError.messagebox.message"));
 							mb.open();
 							password.setText("");
 							verify.setText("");
@@ -661,8 +663,9 @@ public class ManageUsersTab {
 	 * @return
 	 */
 	public boolean deleteUser(String userName) {
-		MessageBox mb = new MessageBox(RCMain.getRCMain().getDisplay()
-				.getActiveShell(), SWT.YES | SWT.NO | SWT.ICON_QUESTION);
+		MessageBox mb = new MessageBox(
+				RCMain.getRCMain().getDisplay().getActiveShell(), SWT.YES
+						| SWT.NO | SWT.ICON_QUESTION);
 		mb.setText(I18N.translate(PFX + "deleteUser.title.text"));
 		mb.setMessage(I18N.translate(PFX + "deleteUser.message.text") + " "
 				+ userName);
@@ -778,8 +781,8 @@ public class ManageUsersTab {
 						if (password.getText().equalsIgnoreCase("")
 								|| verify.getText().equalsIgnoreCase("")) {
 
-							MessageBox mb = new MessageBox(RCMain.getRCMain()
-									.getDisplay().getActiveShell(),
+							MessageBox mb = new MessageBox(
+									RCMain.getRCMain().getDisplay().getActiveShell(),
 									SWT.ICON_ERROR);
 							mb.setText(I18N.translate("global.error"));
 							mb.setMessage(I18N.translate(PFX
@@ -798,36 +801,28 @@ public class ManageUsersTab {
 
 								if (userManager.getUser(user).equals(
 										userManager.getActiveUser())) {
-									MessageBox mb = new MessageBox(RCMain
-											.getRCMain().getDisplay()
-											.getActiveShell(),
+									MessageBox mb = new MessageBox(
+											RCMain.getRCMain().getDisplay().getActiveShell(),
 											SWT.ICON_INFORMATION);
-									mb
-											.setText(I18N
-													.translate(PFX
-															+ "changePasswordShell.activeuser_conflict.title"));
-									mb
-											.setMessage(I18N
-													.translate(PFX
-															+ "changePasswordShell.activeuser_conflict.message"));
+									mb.setText(I18N.translate(PFX
+											+ "changePasswordShell.activeuser_conflict.title"));
+									mb.setMessage(I18N.translate(PFX
+											+ "changePasswordShell.activeuser_conflict.message"));
 									mb.open();
 
 									RCMain.getRCMain().disconnect();
-									RCMain.getRCMain().getMainWindow()
-											.setGUItoLoggedOut();
+									RCMain.getRCMain().getMainWindow().setGUItoLoggedOut();
 									shell.dispose();
 									manageUsersTab.dispose();
 								}
 							} catch (UserNotFoundException e2) {
 								e2.printStackTrace();
-								MessageBox mb = new MessageBox(RCMain
-										.getRCMain().getDisplay()
-										.getActiveShell(), SWT.ICON_ERROR);
+								MessageBox mb = new MessageBox(
+										RCMain.getRCMain().getDisplay().getActiveShell(),
+										SWT.ICON_ERROR);
 								mb.setText(I18N.translate("global.error"));
-								mb
-										.setMessage(I18N
-												.translate(PFX
-														+ "changePasswordShell.error4.message"));
+								mb.setMessage(I18N.translate(PFX
+										+ "changePasswordShell.error4.message"));
 								mb.open();
 								shell.dispose();
 								redrawTable();
@@ -840,8 +835,8 @@ public class ManageUsersTab {
 							redrawTable();
 
 						} else {
-							MessageBox mb = new MessageBox(RCMain.getRCMain()
-									.getDisplay().getActiveShell(),
+							MessageBox mb = new MessageBox(
+									RCMain.getRCMain().getDisplay().getActiveShell(),
 									SWT.ICON_ERROR);
 							mb.setText(I18N.translate("global.error"));
 							mb.setMessage(I18N.translate(PFX
@@ -893,7 +888,42 @@ public class ManageUsersTab {
 
 	}
 
+	public static void open(final CTabFolder parentTab) {
+		Display display = RCMain.getRCMain().getDisplay();
+		if (display == null) {
+			return;
+		}
+		display.asyncExec(new SWTSafeRunnable() {
+			@Override
+			public void runSafe() {
+				CTabItem[] tabs = parentTab.getItems();
+				for (CTabItem tab : tabs) {
+					if (tab.getText().equalsIgnoreCase(
+							I18N.translate(PFX + "tab.text"))) {
+						parentTab.setSelection(tab);
+						return;
+					}
+				}
+				new ManageUsersTab(parentTab);
+
+			}
+
+		});
+	}
+
 	private static class EditUserDialog {
+
+		private boolean	isDirty	= false;
+		private String	username;
+		private String	importDir;
+		private String	outDir;
+		private int		rights;
+		private User	user;
+
+		private EditUserDialog(String userN) {
+			editUserInfo(userN);
+		}
+
 		public void editUserInfo(final String userN) {
 			if (RCMain.getRCMain().getDisplay() == null
 					&& RCMain.getRCMain().getDisplay().isDisposed()) {
@@ -905,10 +935,12 @@ public class ManageUsersTab {
 					// Shell Initialize
 					User utemp = null;
 					try {
-						utemp = userManager.getUser(userN);
+						utemp = RCMain.getRCMain().getClient().getUserManager().getUser(
+								userN);
 					} catch (UserNotFoundException e1) {
-						MessageBox mb = new MessageBox(RCMain.getRCMain()
-								.getDisplay().getActiveShell(), SWT.ICON_ERROR);
+						MessageBox mb = new MessageBox(
+								RCMain.getRCMain().getDisplay().getActiveShell(),
+								SWT.ICON_ERROR);
 						mb.setText(I18N.translate("global.error"));
 						mb.setMessage(I18N.translate(PFX
 								+ "editUserShell.error2.message"));
@@ -916,7 +948,7 @@ public class ManageUsersTab {
 						e1.printStackTrace();
 						return;
 					}
-					final User user = utemp;
+					user = utemp;
 					final Shell shell = new Shell(SWT.DIALOG_TRIM
 							| SWT.APPLICATION_MODAL);
 					if (!Utilities.isOSX) {
@@ -945,6 +977,67 @@ public class ManageUsersTab {
 					gridData.horizontalSpan = 1;
 					tree.setLayoutData(gridData);
 
+					final ScrolledComposite sc = new ScrolledComposite(sash,
+							SWT.V_SCROLL);
+
+					final Composite cOptions = new Composite(sc, SWT.BORDER);
+					gridData = new GridData(GridData.FILL_BOTH);
+					gridData.horizontalSpan = 1;
+					cOptions.setLayoutData(gridData);
+					cOptions.setLayout(new GridLayout(2, false));
+
+					sc.setContent(cOptions);
+					sc.setExpandVertical(true);
+					sc.setExpandHorizontal(true);
+					sc.addControlListener(new ControlAdapter() {
+						@Override
+						public void controlResized(ControlEvent e) {
+							sc.setMinSize(cOptions.computeSize(SWT.DEFAULT,
+									SWT.DEFAULT));
+						}
+					});
+
+					final TreeItem item1 = new TreeItem(tree, SWT.NULL);
+					item1.setText("General Settings");
+
+					tree.setSelection(item1);
+					addGeneralItems(cOptions);
+
+					tree.addSelectionListener(new SelectionListener() {
+
+						public void widgetDefaultSelected(SelectionEvent arg0) {
+						}
+
+						public void widgetSelected(SelectionEvent arg0) {
+							TreeItem[] selections = tree.getSelection();
+							if (selections.length != 1) {
+								return;
+							}
+							if (selections[0].equals(item1)) {
+								// If true then this is the General Settings
+
+								// First remove all from cOptions
+								Control[] controls = cOptions.getChildren();
+								for (Control control : controls) {
+									control.dispose();
+								}
+
+								// populate cOptions
+								addGeneralItems(cOptions);
+
+							} else {
+								// Flexyconfig stuff..
+							}
+						}
+
+					});
+
+					Composite backup_composite = new Composite(shell, SWT.None);
+					gridData = new GridData(GridData.FILL_HORIZONTAL);
+					backup_composite.setLayoutData(gridData);
+					layout = new GridLayout(2, false);
+					backup_composite.setLayout(layout);
+
 					// Button for Accept
 					Button commit = new Button(backup_composite, SWT.PUSH);
 					gridData = new GridData(GridData.CENTER);
@@ -954,43 +1047,28 @@ public class ManageUsersTab {
 					final User u = user;
 					commit.addListener(SWT.Selection, new Listener() {
 						public void handleEvent(Event e) {
-							if (userName.getText().equalsIgnoreCase("")) {
-								MessageBox mb = new MessageBox(RCMain
-										.getRCMain().getDisplay()
-										.getActiveShell(), SWT.ICON_ERROR);
-								mb.setText(I18N.translate("global.error"));
-								mb.setMessage(I18N.translate(PFX
-										+ "editUserShell.error1.message"));
-								mb.open();
-								return;
+							if (!isDirty) {
+								shell.dispose();
 							} else {
-								RCMain.getRCMain().getClient()
-										.transactionStart();
-								if (!u.getAutoImportDir().equals(
-										importDir.getText())) {
-									u.setAutoImportDir(importDir.getText());
+								RCMain.getRCMain().getClient().transactionStart();
+								if (importDir != null) {
+									u.setAutoImportDir(importDir);
 								}
-								if (!u.getOutputDir().equals(
-										outputDir.getText())) {
-									u.setOutputDir(outputDir.getText());
+								if (outDir != null) {
+									u.setOutputDir(outDir);
 								}
-								switch (combo.getSelectionIndex()) {
+								if (username != null) {
+									u.setUsername(username);
+								}
+								switch (rights) {
 								case (0):
-									// TODO Leonard.. we need to have a
-									// RIGHTS_NORMAL.. where is it?
-									// or a remove rights feature that removes
-									// admin
-									// rights
-									u.setRights(0);
+									u.unsetRight(RemoteConstants.RIGHTS_ADMIN);
 								case (1):
-									u.setRights(RemoteConstants.RIGHTS_ADMIN);
+									u.setRight(RemoteConstants.RIGHTS_ADMIN);
 								}
-
-								RCMain.getRCMain().getClient()
-										.transactionCommit();
+								RCMain.getRCMain().getClient().transactionCommit();
 							}
 							shell.dispose();
-							redrawTable();
 						}
 
 					});
@@ -998,64 +1076,75 @@ public class ManageUsersTab {
 					// Button for Cancel
 					Button cancel = new Button(backup_composite, SWT.PUSH);
 					gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
-					gridData.horizontalSpan = 2;
 					cancel.setLayoutData(gridData);
 					cancel.setText(I18N.translate("global.cancel"));
 					cancel.addListener(SWT.Selection, new Listener() {
 						public void handleEvent(Event e) {
+							MessageBox mb = new MessageBox(
+									RCMain.getRCMain().getDisplay().getActiveShell(),
+									SWT.ICON_WARNING);
+							mb.setText(I18N.translate("global.warning"));
+							mb.setMessage(I18N.translate(PFX
+									+ "editUserShell.warning.uncommitedchanges.message"));
 							shell.dispose();
 						}
 					});
+					Element fce = RCMain.getRCMain().getClient().getRemoteInfo().getAzSMRCPluginSupportFlexyConf();
+					if (fce != null) {
+						FlexyConfiguration fc = new FlexyConfiguration(fce);
+						FCInterface fci = fc.getFCInterface();
+						fci.setContentProvider(new ContentProvider() {
+							/*
+							 * (non-Javadoc)
+							 * 
+							 * @see lbms.tools.flexyconf.ContentProvider#getDefaultValue(java.lang.String,
+							 *      int)
+							 */
+							public String getDefaultValue(String key, int type) {
+								return user.getProperty(key);
+							}
 
-					FlexyConfiguration fc = new FlexyConfiguration(RCMain
-							.getRCMain().getClient().getRemoteInfo()
-							.getAzSMRCPluginSupportFlexyConf());
-					FCInterface fci = fc.getFCInterface();
-					fci.setContentProvider(new ContentProvider() {
-						/*
-						 * (non-Javadoc)
-						 * 
-						 * @see lbms.tools.flexyconf.ContentProvider#getDefaultValue(java.lang.String,
-						 *      int)
-						 */
-						public String getDefaultValue(String key, int type) {
-							return user.getProperty(key);
-						}
+							/*
+							 * (non-Javadoc)
+							 * 
+							 * @see lbms.tools.flexyconf.ContentProvider#getValue(java.lang.String,
+							 *      int)
+							 */
+							public String getValue(String key, int type) {
+								String v = user.getProperty(key);
+								return (v == null) ? "" : v;
+							}
 
-						/*
-						 * (non-Javadoc)
-						 * 
-						 * @see lbms.tools.flexyconf.ContentProvider#getValue(java.lang.String,
-						 *      int)
-						 */
-						public String getValue(String key, int type) {
-							String v = user.getProperty(key);
-							return (v == null) ? "" : v;
-						}
+							/*
+							 * (non-Javadoc)
+							 * 
+							 * @see lbms.tools.flexyconf.ContentProvider#setValue(java.lang.String,
+							 *      java.lang.String, int)
+							 */
+							public void setValue(String key, String value,
+									int type) {
+								System.out.println("Set Property for user ["
+										+ user + "]: " + key + " -> " + value);
+								user.setProperty(key, value);
+								isDirty = true;
+							}
+						});
+						fci.setI18NProvider(new I18NProvider() {
+							/*
+							 * (non-Javadoc)
+							 * 
+							 * @see lbms.tools.flexyconf.I18NProvider#translate(java.lang.String)
+							 */
+							public String translate(String key) {
+								return I18N.translate(key);
+							}
+						});
+						fc.reset(); // reset all values before creating menu
+						SWTMenu fcm = new SWTMenu(fc, tree, cOptions);
+						fcm.addAsRoot();
 
-						/*
-						 * (non-Javadoc)
-						 * 
-						 * @see lbms.tools.flexyconf.ContentProvider#setValue(java.lang.String,
-						 *      java.lang.String, int)
-						 */
-						public void setValue(String key, String value, int type) {
-							System.out.println("Set Property for user [" + user
-									+ "]: " + key + " -> " + value);
-							user.setProperty(key, value);
-						}
-					});
-					fci.setI18NProvider(new I18NProvider() {
-						/*
-						 * (non-Javadoc)
-						 * 
-						 * @see lbms.tools.flexyconf.I18NProvider#translate(java.lang.String)
-						 */
-						public String translate(String key) {
-							return I18N.translate(key);
-						}
-					});
-					fc.reset(); // reset all values before creating menu
+					}
+
 					// pack and open shell
 					GUI_Utilities.centerShellandOpen(shell);
 
@@ -1064,15 +1153,15 @@ public class ManageUsersTab {
 
 		}
 
-		private void addGeneralItems(Composite backup_composite, User user) {
+		private void addGeneralItems(Composite composite) {
 
 			// Grid Layout
 			GridLayout layout = new GridLayout();
 			layout.numColumns = 3;
-			backup_composite.setLayout(layout);
+			composite.setLayout(layout);
 
 			// User Name Label
-			Label nameLabel = new Label(backup_composite, SWT.NONE);
+			Label nameLabel = new Label(composite, SWT.NONE);
 			GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 			gridData.horizontalSpan = 1;
 			nameLabel.setLayoutData(gridData);
@@ -1080,7 +1169,7 @@ public class ManageUsersTab {
 					+ "editUserShell.userName.text"));
 
 			// User Name Input field
-			final Text userName = new Text(backup_composite, SWT.BORDER);
+			final Text userName = new Text(composite, SWT.BORDER);
 			gridData = new GridData(GridData.FILL_HORIZONTAL);
 			gridData.horizontalSpan = 2;
 			gridData.widthHint = 100;
@@ -1090,14 +1179,14 @@ public class ManageUsersTab {
 			// Combo Stuff
 
 			// combo Label
-			Label combo_text = new Label(backup_composite, SWT.NONE);
+			Label combo_text = new Label(composite, SWT.NONE);
 			gridData = new GridData(GridData.FILL_HORIZONTAL);
 			gridData.horizontalSpan = 1;
 			combo_text.setLayoutData(gridData);
 			combo_text.setText(I18N.translate(PFX
 					+ "editUserShell.userType.text"));
 
-			final Combo combo = new Combo(backup_composite, SWT.DROP_DOWN
+			final Combo combo = new Combo(composite, SWT.DROP_DOWN
 					| SWT.READ_ONLY);
 			combo.add(I18N.translate(PFX + "usertable.user"));
 			combo.add(I18N.translate(PFX + "usertable.administrator"));
@@ -1108,10 +1197,137 @@ public class ManageUsersTab {
 				combo.select(0);
 			}
 
+			combo.addModifyListener(new ModifyListener() {
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events.ModifyEvent)
+				 */
+				public void modifyText(ModifyEvent e) {
+					rights = combo.getSelectionIndex();
+					isDirty = true;
+				}
+			});
+
+			final Button rights1 = new Button(composite, SWT.CHECK);
+			rights1.setText("User has right to Force Start torrents");
+			GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+			gd.horizontalSpan = 2;
+			rights1.setLayoutData(gd);
+			rights1.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event arg0) {
+					if (!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+						isDirty = true;
+						if (rights1.getSelection()) {
+							user.setRight(RemoteConstants.RIGHTS_FORCESTART);
+						} else {
+							user.unsetRight(RemoteConstants.RIGHTS_FORCESTART);
+						}
+					}
+				}
+			});
+
+			final Button rights2 = new Button(composite, SWT.CHECK);
+			rights2.setText("User can see public downloads");
+			gd = new GridData(GridData.FILL_HORIZONTAL);
+			gd.horizontalSpan = 2;
+			rights2.setLayoutData(gd);
+			rights2.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event arg0) {
+					if (!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+						isDirty = true;
+						if (rights2.getSelection()) {
+							user.setRight(RemoteConstants.RIGHTS_SEE_PUBLICDL);
+						} else {
+							user.unsetRight(RemoteConstants.RIGHTS_SEE_PUBLICDL);
+						}
+					}
+				}
+			});
+
+			final Button rights3 = new Button(composite, SWT.CHECK);
+			rights3.setText("User has right to set download directory");
+			gd = new GridData(GridData.FILL_HORIZONTAL);
+			gd.horizontalSpan = 2;
+			rights3.setLayoutData(gd);
+			rights3.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event arg0) {
+					if (!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+						isDirty = true;
+						if (rights3.getSelection()) {
+							user.setRight(RemoteConstants.RIGHTS_SET_DL_DIR);
+						} else {
+							user.unsetRight(RemoteConstants.RIGHTS_SET_DL_DIR);
+						}
+					}
+				}
+			});
+
+			final Button rights4 = new Button(composite, SWT.CHECK);
+			rights4.setText("User has right to add Downloads as public Downloads");
+			gd = new GridData(GridData.FILL_HORIZONTAL);
+			gd.horizontalSpan = 2;
+			rights4.setLayoutData(gd);
+			rights4.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event arg0) {
+					if (!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+						isDirty = true;
+						if (rights4.getSelection()) {
+							user.setRight(RemoteConstants.RIGHTS_ADD_PUBLICDL);
+						} else {
+							user.unsetRight(RemoteConstants.RIGHTS_ADD_PUBLICDL);
+						}
+					}
+				}
+			});
+
+			User currentUser = RCMain.getRCMain().getClient().getUserManager().getActiveUser();
+			if (currentUser != null
+					&& currentUser.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+				if (user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+					combo.select(1);
+					rights1.setEnabled(false);
+					rights2.setEnabled(false);
+					rights3.setEnabled(false);
+					rights4.setEnabled(false);
+				} else {
+					combo.select(0);
+					combo.setEnabled(true);
+					rights1.setEnabled(true);
+					rights2.setEnabled(true);
+					rights3.setEnabled(true);
+					rights4.setEnabled(true);
+				}
+			} else {
+				combo.setEnabled(false);
+				rights1.setEnabled(false);
+				rights2.setEnabled(false);
+				rights3.setEnabled(false);
+				rights4.setEnabled(false);
+			}
+
+			rights1.setSelection(user.checkRight(RemoteConstants.RIGHTS_FORCESTART));
+			rights2.setSelection(user.checkRight(RemoteConstants.RIGHTS_SEE_PUBLICDL));
+			rights3.setSelection(user.checkRight(RemoteConstants.RIGHTS_SET_DL_DIR));
+			rights4.setSelection(user.checkRight(RemoteConstants.RIGHTS_ADD_PUBLICDL));
+
+			final Button downloadHistory = new Button(composite, SWT.CHECK);
+			downloadHistory.setText("Enable Download History for this user.");
+			gd = new GridData(GridData.FILL_HORIZONTAL);
+			gd.horizontalSpan = 2;
+			downloadHistory.setLayoutData(gd);
+			downloadHistory.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event arg0) {
+					isDirty = true;
+					user.setProperty("DownloadHistory",
+							Boolean.toString(downloadHistory.getSelection()));
+				}
+			});
+			downloadHistory.setSelection(Boolean.parseBoolean(user.getProperty("DownloadHistory")));
 			// ---------Directory stuff ------------\\
 
 			// output directory
-			Label outputDir_text = new Label(backup_composite, SWT.NONE);
+			Label outputDir_text = new Label(composite, SWT.NONE);
 			gridData = new GridData(GridData.FILL_HORIZONTAL);
 			gridData.horizontalSpan = 3;
 			outputDir_text.setLayoutData(gridData);
@@ -1119,7 +1335,7 @@ public class ManageUsersTab {
 					+ "editUserShell.outputDir.text"));
 
 			// comp for directory input
-			Composite output_comp = new Composite(backup_composite, SWT.NONE);
+			Composite output_comp = new Composite(composite, SWT.NONE);
 			output_comp.setLayout(new GridLayout(3, false));
 
 			gridData = new GridData(GridData.FILL_HORIZONTAL);
@@ -1133,9 +1349,20 @@ public class ManageUsersTab {
 			gridData.widthHint = 250;
 			outputDir.setLayoutData(gridData);
 			outputDir.setText(user.getOutputDir());
+			outputDir.addFocusListener(new FocusListener() {
+				public void focusGained(FocusEvent e) {
+				}
+
+				public void focusLost(FocusEvent e) {
+					if (!outputDir.getText().equals(user.getOutputDir())) {
+						isDirty = true;
+						outDir = outputDir.getText();
+					}
+				}
+			});
 
 			// auto import directory
-			Label importDir_text = new Label(backup_composite, SWT.NONE);
+			Label importDir_text = new Label(composite, SWT.NONE);
 			gridData = new GridData(GridData.FILL_HORIZONTAL);
 			gridData.horizontalSpan = 3;
 			importDir_text.setLayoutData(gridData);
@@ -1143,7 +1370,7 @@ public class ManageUsersTab {
 					+ "editUserShell.inputDir.text"));
 
 			// comp for directory input
-			Composite importDir_comp = new Composite(backup_composite, SWT.NONE);
+			Composite importDir_comp = new Composite(composite, SWT.NONE);
 			importDir_comp.setLayout(new GridLayout(3, false));
 
 			gridData = new GridData(GridData.FILL_HORIZONTAL);
@@ -1157,30 +1384,34 @@ public class ManageUsersTab {
 			gridData.widthHint = 250;
 			importDir.setLayoutData(gridData);
 			importDir.setText(user.getAutoImportDir());
-		}
-	}
+			importDir.addFocusListener(new FocusListener() {
+				public void focusGained(FocusEvent e) {
+				}
 
-	public static void open(final CTabFolder parentTab) {
-		Display display = RCMain.getRCMain().getDisplay();
-		if (display == null) {
-			return;
-		}
-		display.asyncExec(new SWTSafeRunnable() {
-			@Override
-			public void runSafe() {
-				CTabItem[] tabs = parentTab.getItems();
-				for (CTabItem tab : tabs) {
-					if (tab.getText().equalsIgnoreCase(
-							I18N.translate(PFX + "tab.text"))) {
-						parentTab.setSelection(tab);
-						return;
+				public void focusLost(FocusEvent e) {
+					if (!importDir.getText().equals(user.getAutoImportDir())) {
+						isDirty = true;
+						EditUserDialog.this.importDir = importDir.getText();
 					}
 				}
-				new ManageUsersTab(parentTab);
+			});
+			composite.layout();
+		}
 
+		public static void open(final String username) {
+			Display display = RCMain.getRCMain().getDisplay();
+			if (display == null) {
+				return;
 			}
+			display.asyncExec(new SWTSafeRunnable() {
+				@Override
+				public void runSafe() {
+					new EditUserDialog(username);
 
-		});
+				}
+
+			});
+		}
 	}
 
 }// EOF

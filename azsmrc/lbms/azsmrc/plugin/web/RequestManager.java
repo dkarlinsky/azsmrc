@@ -1517,8 +1517,8 @@ public class RequestManager {
 		addHandler("updateUser", new RequestHandler() {
 			public boolean handleRequest(Element xmlRequest, Element response,
 					User user) throws IOException {
+				Element userE = xmlRequest.getChild("User");
 				if (user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
-					Element userE = xmlRequest.getChild("User");
 					try {
 						User userC = Plugin.getXMLConfig().getUser(
 								userE.getAttributeValue("uName"));
@@ -1529,6 +1529,27 @@ public class RequestManager {
 							userE.removeAttribute("username");
 						}
 						userC.updateUser(userE);
+						Plugin.getXMLConfig().saveConfigFile();
+					} catch (UserNotFoundException e) {
+					} catch (DuplicatedUserException e) {
+					}
+				} else if (user.getUsername().equals(
+						userE.getAttributeValue("uName"))) {
+					// allow the self editing
+					try {
+						User userC = Plugin.getXMLConfig().getUser(
+								userE.getAttributeValue("uName"));
+						if (userE.getAttribute("username") != null) {
+							Plugin.getXMLConfig().renameUser(
+									userE.getAttributeValue("uName"),
+									userE.getAttributeValue("username"));
+							userE.removeAttribute("username");
+						}
+						// store old permissions
+						int secRights = userC.getRights();
+						userC.updateUser(userE);
+						// restore old permissions to prevent hacking
+						userC.setRights(secRights);
 						Plugin.getXMLConfig().saveConfigFile();
 					} catch (UserNotFoundException e) {
 					} catch (DuplicatedUserException e) {

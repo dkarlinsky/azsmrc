@@ -287,8 +287,9 @@ public class GUIEditUser {
 						Plugin.getXMLConfig().saveConfigFile();
 					} catch (DuplicatedUserException e) {
 						userName.setText(user.getUsername());
-						MessageBox mb = new MessageBox(Plugin.getDisplay()
-								.getActiveShell(), SWT.ICON_ERROR);
+						MessageBox mb = new MessageBox(
+								Plugin.getDisplay().getActiveShell(),
+								SWT.ICON_ERROR);
 						mb.setText("Error");
 						mb.setMessage("User name already exists.");
 						mb.open();
@@ -341,7 +342,7 @@ public class GUIEditUser {
 		rights2.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event arg0) {
 				if (!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
-					if (rights1.getSelection()) {
+					if (rights2.getSelection()) {
 						user.setRight(RemoteConstants.RIGHTS_SEE_PUBLICDL);
 					} else {
 						user.unsetRight(RemoteConstants.RIGHTS_SEE_PUBLICDL);
@@ -358,10 +359,27 @@ public class GUIEditUser {
 		rights3.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event arg0) {
 				if (!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
-					if (rights1.getSelection()) {
+					if (rights3.getSelection()) {
 						user.setRight(RemoteConstants.RIGHTS_SET_DL_DIR);
 					} else {
 						user.unsetRight(RemoteConstants.RIGHTS_SET_DL_DIR);
+					}
+				}
+			}
+		});
+
+		final Button rights4 = new Button(composite, SWT.CHECK);
+		rights4.setText("User has right to set download directory");
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
+		rights4.setLayoutData(gd);
+		rights4.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event arg0) {
+				if (!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
+					if (rights4.getSelection()) {
+						user.setRight(RemoteConstants.RIGHTS_ADD_PUBLICDL);
+					} else {
+						user.unsetRight(RemoteConstants.RIGHTS_ADD_PUBLICDL);
 					}
 				}
 			}
@@ -372,12 +390,19 @@ public class GUIEditUser {
 			rights1.setEnabled(false);
 			rights2.setEnabled(false);
 			rights3.setEnabled(false);
+			rights4.setEnabled(false);
 		} else {
 			combo.select(0);
 			rights1.setEnabled(true);
 			rights2.setEnabled(true);
 			rights3.setEnabled(true);
+			rights4.setEnabled(false);
 		}
+
+		rights1.setSelection(user.checkRight(RemoteConstants.RIGHTS_FORCESTART));
+		rights2.setSelection(user.checkRight(RemoteConstants.RIGHTS_SEE_PUBLICDL));
+		rights3.setSelection(user.checkRight(RemoteConstants.RIGHTS_SET_DL_DIR));
+		rights4.setSelection(user.checkRight(RemoteConstants.RIGHTS_ADD_PUBLICDL));
 
 		if (!Plugin.getCurrentUser().checkRight(RemoteConstants.RIGHTS_ADMIN)) {
 			combo.setEnabled(false);
@@ -410,13 +435,12 @@ public class GUIEditUser {
 		downloadHistory.setLayoutData(gd);
 		downloadHistory.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event arg0) {
-				user.setProperty("DownloadHistory", Boolean
-						.toString(downloadHistory.getSelection()));
+				user.setProperty("DownloadHistory",
+						Boolean.toString(downloadHistory.getSelection()));
 			}
 		});
 
-		downloadHistory.setSelection(Boolean.parseBoolean(user
-				.getProperty("DownloadHistory")));
+		downloadHistory.setSelection(Boolean.parseBoolean(user.getProperty("DownloadHistory")));
 
 		// ---------Directory stuff ------------\\
 
@@ -472,8 +496,7 @@ public class GUIEditUser {
 			public void handleEvent(Event e) {
 				DirectoryDialog dirDialog = new DirectoryDialog(shell);
 				dirDialog.setText("Please Choose Output Directory");
-				dirDialog.setFilterPath(Plugin.getPluginInterface()
-						.getPluginDirectoryName());
+				dirDialog.setFilterPath(Plugin.getPluginInterface().getPluginDirectoryName());
 				String selectedDir = dirDialog.open();
 
 				// need to check if selected dir has files and if so, does it
@@ -543,8 +566,7 @@ public class GUIEditUser {
 			public void handleEvent(Event e) {
 				DirectoryDialog dirDialog = new DirectoryDialog(shell);
 				dirDialog.setText("Please Choose Automatic Import Directory");
-				dirDialog.setFilterPath(Plugin.getPluginInterface()
-						.getPluginDirectoryName());
+				dirDialog.setFilterPath(Plugin.getPluginInterface().getPluginDirectoryName());
 				String selectedDir = dirDialog.open();
 				File selectedDir_file = new File(selectedDir);
 				// need to check if selected dir has files and if so, does it
@@ -553,11 +575,11 @@ public class GUIEditUser {
 					return;
 				} else if (!selectedDir_file.exists()
 						|| !selectedDir_file.isDirectory()) {
-					MessageBox mb = new MessageBox(Plugin.getDisplay()
-							.getActiveShell(), SWT.ICON_ERROR);
+					MessageBox mb = new MessageBox(
+							Plugin.getDisplay().getActiveShell(),
+							SWT.ICON_ERROR);
 					mb.setText("Error");
-					mb
-							.setMessage("Selected Directory does not exist, please choose a valid directory.");
+					mb.setMessage("Selected Directory does not exist, please choose a valid directory.");
 					mb.open();
 				} else {
 					importDir.setText(selectedDir);
@@ -568,16 +590,17 @@ public class GUIEditUser {
 		});
 
 		/*
-		 * //Button for Accept Button commit = new Button(composite, SWT.PUSH); gridData =
-		 * new GridData(GridData.CENTER); gridData.horizontalSpan = 1;
-		 * commit.setLayoutData( gridData); commit.setText( "Accept");
+		 * //Button for Accept Button commit = new Button(composite, SWT.PUSH);
+		 * gridData = new GridData(GridData.CENTER); gridData.horizontalSpan =
+		 * 1; commit.setLayoutData( gridData); commit.setText( "Accept");
 		 * commit.addListener(SWT.Selection, new Listener() { public void
 		 * handleEvent(Event e) { if(userName.getText().equalsIgnoreCase("") ||
 		 * outputDir.getText().equalsIgnoreCase("")||
 		 * importDir.getText().equalsIgnoreCase("")){ MessageBox mb = new
 		 * MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
 		 * mb.setText("Error"); mb.setMessage("Please fill out all of the
-		 * information."); mb.open(); return; } //add the user to the XMLConfig file try {
+		 * information."); mb.open(); return; } //add the user to the XMLConfig
+		 * file try {
 		 * if(!user.getUsername().equalsIgnoreCase(userName.getText())){
 		 * Plugin.getXMLConfig().renameUser(user.getUsername(),userName.getText()); }
 		 * Plugin.getXMLConfig().saveConfigFile(); User currentUser =
@@ -590,13 +613,14 @@ public class GUIEditUser {
 		 * Plugin.addToLog(e1.toString()); } catch (UserNotFoundException e2) {
 		 * MessageBox mb = new
 		 * MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
-		 * mb.setText("Error"); mb.setMessage("Plugin is reporting a 'User Not Found'
-		 * error. \n Possible error in your plugin config file. \nPlease Check your
-		 * settings and try again."); mb.open(); Plugin.addToLog(e2.getMessage());
-		 * e2.printStackTrace(); }catch (DuplicatedUserException e2) { MessageBox mb =
-		 * new MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
-		 * mb.setText("Error"); mb.setMessage("User name already exists."); mb.open();
-		 * return; } } });
+		 * mb.setText("Error"); mb.setMessage("Plugin is reporting a 'User Not
+		 * Found' error. \n Possible error in your plugin config file. \nPlease
+		 * Check your settings and try again."); mb.open();
+		 * Plugin.addToLog(e2.getMessage()); e2.printStackTrace(); }catch
+		 * (DuplicatedUserException e2) { MessageBox mb = new
+		 * MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
+		 * mb.setText("Error"); mb.setMessage("User name already exists.");
+		 * mb.open(); return; } } });
 		 */
 
 		// Redo the composite so the new stuff appears
