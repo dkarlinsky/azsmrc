@@ -8,63 +8,67 @@ import java.util.TreeSet;
 
 import org.jdom.Element;
 
-public class Section extends AbstractEntryContainer implements Comparable<Section>{
-	private Set<Section> children = new TreeSet<Section>();
-	private List<Group> groups = new ArrayList<Group>();
-	private String label;
-	private FCInterface fci;
-	//private DisplayAdapterSection displayAdapter;
-	private int index;
+public class Section extends AbstractEntryContainer implements
+		Comparable<Section> {
+	private Set<Section>	children	= new TreeSet<Section>();
+	private List<Group>		groups		= new ArrayList<Group>();
+	private String			label;
+	private FCInterface		fci;
+	// private DisplayAdapterSection displayAdapter;
+	private int				index;
 
-	protected Section (String label) {
+	protected Section(String label) {
 		this.label = label;
 	}
 
-	public Section (String label, Section parent) {
+	public Section(String label, Section parent) {
 		this.label = label;
 		this.fci = parent.getFCInterface();
 		this.index = parent.getEntries().length;
 		parent.addSubSection(this);
 	}
 
-	protected Section (String label, FCInterface fci) {
+	protected Section(String label, FCInterface fci) {
 		this.label = label;
 		this.fci = fci;
 	}
 
-	protected Section (Element e, FCInterface fci) {
+	protected Section(Element e, FCInterface fci) {
 		this.fci = fci;
 		label = e.getAttributeValue("label");
 		String indexString = e.getAttributeValue("index");
-		if (indexString!=null)index = Integer.parseInt(indexString);
-		else index = 0;
+		if (indexString != null) {
+			index = Integer.parseInt(indexString);
+		} else {
+			index = 0;
+		}
 		List<Element> elems = e.getChildren("Section");
-		for (Element elem:elems) {
-			children.add(new Section(elem,fci));
+		for (Element elem : elems) {
+			children.add(new Section(elem, fci));
 		}
 		elems = e.getChildren("Group");
-		for (Element elem:elems) {
-			groups.add(new Group(elem,this,fci));
+		for (Element elem : elems) {
+			groups.add(new Group(elem, this, fci));
 		}
 		elems = e.getChildren("Entry");
-		for (Element elem:elems) {
-			Entry en = new Entry(elem,this,fci);
+		for (Element elem : elems) {
+			Entry en = new Entry(elem, this, fci);
 			entries.put(en.getKey(), en);
 		}
 	}
 
 	public Element toElement() {
-		Element s = new Element ("Secetion");
+		Element s = new Element("Section");
 		s.setAttribute("label", label);
 		s.setAttribute("index", Integer.toString(index));
 		Set<String> keys = entries.keySet();
-		for (String k:keys) {
+		for (String k : keys) {
 			s.addContent(entries.get(k).toElement());
 		}
-		for (Section child:children) {
+		for (Section child : children) {
 			s.addContent(child.toElement());
 		}
-		for (Group child:groups) {
+		for (Group child : groups) {
 			s.addContent(child.toElement());
 		}
 		return s;
@@ -75,31 +79,37 @@ public class Section extends AbstractEntryContainer implements Comparable<Sectio
 	}
 
 	@Override
-	public Entry getEntry (String key) {
-		if (entries.containsKey(key))
+	public Entry getEntry(String key) {
+		if (entries.containsKey(key)) {
 			return super.getEntry(key);
-		else {
-			for (Section child:children) {
+		} else {
+			for (Section child : children) {
 				Entry e = child.getEntry(key);
-				if (e!=null) return e;
+				if (e != null) {
+					return e;
+				}
 			}
-			for (Group g:groups) {
+			for (Group g : groups) {
 				Entry e = g.getEntry(key);
-				if (e!=null) return e;
+				if (e != null) {
+					return e;
+				}
 			}
 			return null;
 		}
 	}
 
-	private void addSubSection (Section s) {
+	private void addSubSection(Section s) {
 		children.add(s);
 	}
 
-	protected void addGroup (Group g) {
+	protected void addGroup(Group g) {
 		groups.add(g);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see lbms.tools.flexyconf.AbstractEntryContainer#addEntry(lbms.tools.flexyconf.Entry)
 	 */
 	@Override
@@ -112,12 +122,12 @@ public class Section extends AbstractEntryContainer implements Comparable<Sectio
 	 */
 	public ConfigEntity[] getConfigEntities() {
 		Set<String> keys = entries.keySet();
-		ConfigEntity[] eArray = new ConfigEntity[keys.size()+groups.size()];
+		ConfigEntity[] eArray = new ConfigEntity[keys.size() + groups.size()];
 		int i = 0;
-		for (String key:keys) {
+		for (String key : keys) {
 			eArray[i++] = entries.get(key);
 		}
-		for (Group g:groups) {
+		for (Group g : groups) {
 			eArray[i++] = g;
 		}
 		return eArray;
@@ -146,14 +156,14 @@ public class Section extends AbstractEntryContainer implements Comparable<Sectio
 		return children;
 	}
 
-	public void setFCInterface (FCInterface fci) {
+	public void setFCInterface(FCInterface fci) {
 		this.fci = fci;
 	}
 
 	@Override
 	protected void checkDependency(String key, boolean enabled) {
 		super.checkDependency(key, enabled);
-		for (Group g:groups) {
+		for (Group g : groups) {
 			g.checkDependency(key, enabled);
 		}
 	}
@@ -161,37 +171,39 @@ public class Section extends AbstractEntryContainer implements Comparable<Sectio
 	@Override
 	public void init() {
 		super.init();
-		for (Group g:groups) {
+		for (Group g : groups) {
 			g.init();
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see lbms.tools.flexyconf.AbstractEntryContainer#reset()
 	 */
 	@Override
 	public void reset() {
 		super.reset();
-		for (Group g:groups) {
+		for (Group g : groups) {
 			g.reset();
 		}
 	}
 
 	public void initAll() {
 		init();
-		for (Section child:children) {
+		for (Section child : children) {
 			child.initAll();
 		}
 	}
 
 	public void resetAll() {
 		reset();
-		for (Section child:children) {
+		for (Section child : children) {
 			child.resetAll();
 		}
 	}
 
 	public int compareTo(Section o) {
-		return index-o.index;
+		return index - o.index;
 	}
 }
