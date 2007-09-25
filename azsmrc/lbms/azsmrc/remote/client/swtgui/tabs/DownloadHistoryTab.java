@@ -7,6 +7,8 @@ package lbms.azsmrc.remote.client.swtgui.tabs;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -61,6 +63,91 @@ public class DownloadHistoryTab implements DownloadHistoryListener {
 
 	private SimpleDateFormat		dateFormat		= new SimpleDateFormat(
 															"yyyy-MM-dd HH:mm:ss");
+	private int						sortColumn		= 1;
+	private int						sortDirection	= 1;
+	private Listener				sortListener	= new Listener() {
+														/*
+														 * (non-Javadoc)
+														 * 
+														 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+														 */
+														public void handleEvent(
+																Event e) {
+															TableColumn col = (TableColumn) e.widget;
+															if (entryTable.indexOf(col) == sortColumn) {
+																sortDirection *= -1;
+
+															} else {
+																sortDirection = 1;
+																sortColumn = entryTable.indexOf(col);
+															}
+															switch (sortColumn) {
+															case 0:
+																Arrays.sort(
+																		entryArray,
+																		new Comparator<DownloadHistoryEntry>() {
+																			/*
+																			 * (non-Javadoc)
+																			 * 
+																			 * @see java.util.Comparator#compare(java.lang.Object,
+																			 *      java.lang.Object)
+																			 */
+																			public int compare(
+																					DownloadHistoryEntry o1,
+																					DownloadHistoryEntry o2) {
+																				return sortDirection
+																						* o1.getDlName().compareToIgnoreCase(
+																								o2.getDlName());
+																			}
+																		});
+																break;
+															case 1:
+																Arrays.sort(
+																		entryArray,
+																		new Comparator<DownloadHistoryEntry>() {
+																			/*
+																			 * (non-Javadoc)
+																			 * 
+																			 * @see java.util.Comparator#compare(java.lang.Object,
+																			 *      java.lang.Object)
+																			 */
+																			public int compare(
+																					DownloadHistoryEntry o1,
+																					DownloadHistoryEntry o2) {
+																				return sortDirection
+																						* o1.compareTo(o2);
+																			}
+																		});
+																break;
+															case 2:
+																Arrays.sort(
+																		entryArray,
+																		new Comparator<DownloadHistoryEntry>() {
+																			/*
+																			 * (non-Javadoc)
+																			 * 
+																			 * @see java.util.Comparator#compare(java.lang.Object,
+																			 *      java.lang.Object)
+																			 */
+																			public int compare(
+																					DownloadHistoryEntry o1,
+																					DownloadHistoryEntry o2) {
+																				return sortDirection
+																						* o1.getCategory().compareToIgnoreCase(
+																								o2.getCategory());
+																			}
+																		});
+																break;
+															}
+															if (SWT.getVersion() > 3220) {
+																entryTable.setSortDirection(sortDirection > 0 ? SWT.UP
+																		: SWT.DOWN);
+																entryTable.setSortColumn(col);
+															}
+															entryTable.clearAll();
+
+														}
+													};
 
 	private DownloadHistoryTab(CTabFolder parentTab) {
 		final CTabItem detailsTab = new CTabItem(parentTab, SWT.CLOSE);
@@ -213,15 +300,24 @@ public class DownloadHistoryTab implements DownloadHistoryListener {
 		TableColumn nameColumn = new TableColumn(entryTable, SWT.RIGHT);
 		nameColumn.setText(I18N.translate(PFX + "table.nameColumn"));
 		nameColumn.setWidth(400);
-
+		nameColumn.addListener(SWT.Selection, sortListener);
 		nameColumn.setResizable(true);
+
 		TableColumn dateColumn = new TableColumn(entryTable, SWT.RIGHT);
 		dateColumn.setText(I18N.translate(PFX + "table.dateColumn"));
 		dateColumn.setWidth(160);
+		dateColumn.addListener(SWT.Selection, sortListener);
+
 		TableColumn catColumn = new TableColumn(entryTable, SWT.RIGHT);
 		catColumn.setText(I18N.translate(PFX + "table.catColumn"));
 		catColumn.setWidth(200);
 		catColumn.setResizable(true);
+		catColumn.addListener(SWT.Selection, sortListener);
+
+		if (SWT.getVersion() > 3220) {
+			entryTable.setSortDirection(sortDirection > 0 ? SWT.UP : SWT.DOWN);
+			entryTable.setSortColumn(dateColumn);
+		}
 
 		entryTable.addListener(SWT.SetData, new Listener() {
 			/*
