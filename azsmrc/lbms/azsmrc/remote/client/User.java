@@ -4,7 +4,7 @@ import org.jdom.Element;
 
 public class User extends lbms.azsmrc.shared.User {
 
-	private Client client;
+	private Client	client;
 
 	public User(Element userElement) {
 		super(userElement);
@@ -23,41 +23,41 @@ public class User extends lbms.azsmrc.shared.User {
 		// TODO Auto-generated constructor stub
 	}
 
-	public void setClient (Client client) {
+	public void setClient(Client client) {
 		this.client = client;
 	}
 
 	@Override
 	public void setAutoImportDir(String autoImportDir) {
 		super.setAutoImportDir(autoImportDir);
-		Element user = new Element ("User");
+		Element user = new Element("User");
 		user.setAttribute("uName", username);
-		user.setAttribute("autoImportDir",autoImportDir);
+		user.setAttribute("autoImportDir", autoImportDir);
 		client.sendUpdateUser(user);
 	}
 
 	@Override
 	public void setDownloadSlots(int downloadSlots) {
 		super.setDownloadSlots(downloadSlots);
-		Element user = new Element ("User");
+		Element user = new Element("User");
 		user.setAttribute("uName", username);
-		user.setAttribute("downloadSlots",Integer.toString(downloadSlots));
+		user.setAttribute("downloadSlots", Integer.toString(downloadSlots));
 		client.sendUpdateUser(user);
 	}
 
 	@Override
 	public void setOutputDir(String outputDir) {
 		super.setOutputDir(outputDir);
-		Element user = new Element ("User");
+		Element user = new Element("User");
 		user.setAttribute("uName", username);
-		user.setAttribute("outputDir",outputDir);
+		user.setAttribute("outputDir", outputDir);
 		client.sendUpdateUser(user);
 	}
 
 	@Override
 	public void setPassword(String password) {
 		super.setPassword(password);
-		Element user = new Element ("User");
+		Element user = new Element("User");
 		user.setAttribute("uName", username);
 		user.setAttribute("password", this.password);
 		client.sendUpdateUser(user);
@@ -66,27 +66,45 @@ public class User extends lbms.azsmrc.shared.User {
 	@Override
 	public void setRight(int right) {
 		super.setRight(right);
-		Element user = new Element ("User");
+		Element user = new Element("User");
 		user.setAttribute("uName", username);
-		user.setAttribute("userRights",Integer.toString(userRights));
+		user.setAttribute("userRights", Integer.toString(userRights));
 		client.sendUpdateUser(user);
 	}
 
 	@Override
 	public void setRights(int rights) {
 		super.setRights(rights);
-		Element user = new Element ("User");
+		Element user = new Element("User");
 		user.setAttribute("uName", username);
-		user.setAttribute("userRights",Integer.toString(userRights));
+		user.setAttribute("userRights", Integer.toString(userRights));
 		client.sendUpdateUser(user);
 	}
 
 	@Override
 	public void setUsername(String username) {
-		Element user = new Element ("User");
+		Element user = new Element("User");
 		user.setAttribute("uName", this.username);
 		user.setAttribute("username", username);
 		super.setUsername(username);
+		client.sendUpdateUser(user);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see lbms.azsmrc.shared.User#setProperty(java.lang.String,
+	 *      java.lang.String)
+	 */
+	@Override
+	public void setProperty(String key, String value) {
+		super.setProperty(key, value);
+		Element user = new Element("User");
+		user.setAttribute("uName", username);
+		Element property = new Element("Property");
+		property.setAttribute("key", key);
+		property.setText(value);
+		user.addContent(property);
 		client.sendUpdateUser(user);
 	}
 }

@@ -39,21 +39,24 @@ public class DownloadHistory {
 	/**
 	 * @param start timestamp in seconds
 	 * @param end timestamp in seconds
+	 * @param listener callback listener that will receive the result
 	 */
 	public void getEntries(long start, long end,
 			DownloadHistoryListener listener) {
-		if (start >= startDate && end <= endDate) {
+		boolean ecoMode = RCMain.getRCMain().getProperties().getPropertyAsBoolean(
+				"downloadHistory.ecoMode");
+		if (start >= startDate
+				&& (end <= endDate || (ecoMode && end - 300 <= endDate))) {
 			List<DownloadHistoryEntry> resultList = new ArrayList<DownloadHistoryEntry>();
 			if (entries != null) {
 				for (DownloadHistoryEntry dhe : entries) {
-					if (startDate <= dhe.getTimestamp()
-							&& endDate >= dhe.getTimestamp()) {
+					if (start <= dhe.getTimestamp()
+							&& end >= dhe.getTimestamp()) {
 						resultList.add(dhe);
 					}
 				}
 			}
-			listener.updatedEntries(resultList
-					.toArray(new DownloadHistoryEntry[resultList.size()]));
+			listener.updatedEntries(resultList.toArray(new DownloadHistoryEntry[resultList.size()]));
 		} else {
 			long newStart;
 			long newEnd;
@@ -76,6 +79,33 @@ public class DownloadHistory {
 	}
 
 	/**
+	 * Explicitly forces an update on the Data
+	 * 
+	 * @param start timestamp in seconds
+	 * @param end timestamp in seconds
+	 * @param listener callback listener that will receive the result
+	 */
+	public void getEntriesForce(long start, long end,
+			DownloadHistoryListener listener) {
+		long newStart;
+		long newEnd;
+		if (startDate < start) {
+			newStart = endDate;
+		} else {
+			startDate = start;
+			newStart = start;
+		}
+		if (endDate > end) {
+			newEnd = startDate;
+		} else {
+			endDate = end;
+			newEnd = end;
+		}
+		listeners.add(new ListenerWrapper(start, end, listener));
+		RCMain.getRCMain().getClient().sendGetDownloadHistory(newStart, newEnd);
+	}
+
+	/**
 	 * Should only be invoked from ResponseManager
 	 * 
 	 * @param elements
@@ -91,18 +121,18 @@ public class DownloadHistory {
 				listeners.add(listener);
 				break;
 			}
+
 			if (listener.start >= startDate && listener.end <= endDate) {
 				List<DownloadHistoryEntry> resultList = new ArrayList<DownloadHistoryEntry>();
 				if (entries != null) {
 					for (DownloadHistoryEntry dhe : entries) {
-						if (startDate <= dhe.getTimestamp()
-								&& endDate >= dhe.getTimestamp()) {
+						if (listener.start <= dhe.getTimestamp()
+								&& listener.end >= dhe.getTimestamp()) {
 							resultList.add(dhe);
 						}
 					}
 				}
-				listener.listener.updatedEntries(resultList
-						.toArray(new DownloadHistoryEntry[resultList.size()]));
+				listener.listener.updatedEntries(resultList.toArray(new DownloadHistoryEntry[resultList.size()]));
 
 				listeners.remove(listener);
 			} else {

@@ -18,6 +18,7 @@ import lbms.azsmrc.remote.client.swtgui.ColorUtilities;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.shared.SWTSafeRunnable;
+import lbms.tools.ExtendedProperties;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -92,8 +93,8 @@ public class DownloadHistoryTab implements DownloadHistoryListener {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				long now = System.currentTimeMillis() / 1000;
-				DownloadHistory.getInstance().getEntries(now - currentTimespan,
-						now, DownloadHistoryTab.this);
+				DownloadHistory.getInstance().getEntriesForce(
+						now - currentTimespan, now, DownloadHistoryTab.this);
 			}
 		});
 
@@ -181,9 +182,7 @@ public class DownloadHistoryTab implements DownloadHistoryListener {
 
 		allItem = new ToolItem(toolbar, SWT.CHECK);
 		allItem.setText(I18N.translate(PFX + "toolbar.allItems"));
-		allItem
-				.setToolTipText(I18N
-						.translate(PFX + "toolbar.allItems.tooltip"));
+		allItem.setToolTipText(I18N.translate(PFX + "toolbar.allItems.tooltip"));
 		allItem.addSelectionListener(new SelectionAdapter() {
 			/*
 			 * (non-Javadoc)
@@ -240,8 +239,8 @@ public class DownloadHistoryTab implements DownloadHistoryListener {
 				try {
 					DownloadHistoryEntry entry = entryArray[index];
 					item.setText(0, entry.getDlName());
-					item.setText(1, dateFormat.format(new Date(entry
-							.getTimestamp() * 1000)));
+					item.setText(1, dateFormat.format(new Date(
+							entry.getTimestamp() * 1000)));
 					item.setText(2, entry.getCategory());
 					// gray if needed
 					if (index % 2 != 0) {
@@ -263,6 +262,31 @@ public class DownloadHistoryTab implements DownloadHistoryListener {
 		});
 
 		detailsTab.setControl(parent);
+		ExtendedProperties props = RCMain.getRCMain().getProperties();
+		if (props.getPropertyAsBoolean("downloadHistory.autoLoad")) {
+			int i = props.getPropertyAsInt("downloadHistory.autoLoad.type", 2);
+			switch (i) {
+			case 0:
+				updateSelection(lastHourItem, 60 * 60);
+				break;
+			case 1:
+				updateSelection(last12HoursItem, 60 * 60 * 12);
+				break;
+			case 2:
+				updateSelection(lastDayItem, 60 * 60 * 24);
+				break;
+			case 3:
+				updateSelection(lastWeekItem, 60 * 60 * 24 * 7);
+				break;
+			case 4:
+				updateSelection(lastMonthItem, 60 * 60 * 24 * 30);
+				break;
+			case 5:
+				updateSelection(allItem,
+						(System.currentTimeMillis() / 1000) - 10000);
+				break;
+			}
+		}
 		parentTab.setSelection(detailsTab);
 	}
 

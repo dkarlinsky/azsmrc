@@ -13,37 +13,35 @@ import org.jdom.Element;
 
 /**
  * @author Damokles
- *
+ * 
  */
 public class User {
-	protected String username;
-	protected String password;
-	protected String autoImportDir;
-	protected String outputDir;
-	protected int downloadSlots;
-	protected int userRights;
-	protected Map<String, String> properties = new HashMap<String, String>();
-	protected Set<String> downloadList = new HashSet<String>();
+	protected String				username;
+	protected String				password;
+	protected String				autoImportDir;
+	protected String				outputDir;
+	protected int					downloadSlots;
+	protected int					userRights;
+	protected Map<String, String>	properties		= new HashMap<String, String>();
+	protected Set<String>			downloadList	= new HashSet<String>();
 
 	/**
-	 * Creates a User object and reads the data
-	 * from xml document
-	 *
+	 * Creates a User object and reads the data from xml document
+	 * 
 	 * @param userElement
 	 */
-	public User (Element userElement) {
+	public User(Element userElement) {
 		updateUser(userElement);
 	}
 
 	/**
-	 * Creates a new User object with
-	 * supplied parameters and default
-	 * values for any other attributes
-	 *
+	 * Creates a new User object with supplied parameters and default values for
+	 * any other attributes
+	 * 
 	 * @param username
 	 * @param password
 	 */
-	public User (String username, String password) {
+	public User(String username, String password) {
 		this.username = username;
 		this.password = encryptPassword(password);
 		this.autoImportDir = "";
@@ -51,8 +49,6 @@ public class User {
 		this.outputDir = "";
 		this.userRights = 0;
 	}
-
-
 
 	/**
 	 * @param username
@@ -62,7 +58,8 @@ public class User {
 	 * @param downloadSlots
 	 * @param userRights
 	 */
-	public User(String username, String password, String autoImportDir, String outputDir, int downloadSlots, int userRights) {
+	public User(String username, String password, String autoImportDir,
+			String outputDir, int downloadSlots, int userRights) {
 		this.username = username;
 		this.password = encryptPassword(password);
 		this.autoImportDir = autoImportDir;
@@ -71,67 +68,71 @@ public class User {
 		this.userRights = userRights;
 	}
 
-	public void updateUser (Element userElement) {
+	public void updateUser(Element userElement) {
 		try {
-			if (userElement.getAttribute("username") != null)
-				this.username 		= userElement.getAttribute("username").getValue();
-			if (userElement.getAttribute("password") != null)
-				this.password 		= userElement.getAttribute("password").getValue();
-			if (userElement.getAttribute("autoImportDir") != null)
-				this.autoImportDir 	= userElement.getAttribute("autoImportDir").getValue();
-			if (userElement.getAttribute("outputDir") != null)
-				this.outputDir 		= userElement.getAttribute("outputDir").getValue();
-			if (userElement.getAttribute("downloadSlots") != null)
-				this.downloadSlots 	= userElement.getAttribute("downloadSlots").getIntValue();
-			if (userElement.getAttribute("userRights") != null)
-				this.userRights 	= userElement.getAttribute("userRights").getIntValue();
+			if (userElement.getAttribute("username") != null) {
+				this.username = userElement.getAttribute("username").getValue();
+			}
+			if (userElement.getAttribute("password") != null) {
+				this.password = userElement.getAttribute("password").getValue();
+			}
+			if (userElement.getAttribute("autoImportDir") != null) {
+				this.autoImportDir = userElement.getAttribute("autoImportDir").getValue();
+			}
+			if (userElement.getAttribute("outputDir") != null) {
+				this.outputDir = userElement.getAttribute("outputDir").getValue();
+			}
+			if (userElement.getAttribute("downloadSlots") != null) {
+				this.downloadSlots = userElement.getAttribute("downloadSlots").getIntValue();
+			}
+			if (userElement.getAttribute("userRights") != null) {
+				this.userRights = userElement.getAttribute("userRights").getIntValue();
+			}
 
 			List<Element> downloads = userElement.getChildren("Download");
-			for (Element download:downloads) {
+			for (Element download : downloads) {
 				addDownload(download.getTextTrim());
+			}
+			List<Element> props = userElement.getChildren("Property");
+			try {
+				for (Element e : props) {
+					properties.put(e.getAttributeValue("key"), e.getTextTrim());
+				}
+			} catch (RuntimeException e) {
+				e.printStackTrace();
 			}
 		} catch (DataConversionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		List<Element> props = userElement.getChildren("Property");
-		try {
-			for (Element e:props) {
-				properties.put(e.getAttributeValue("key"), e.getTextTrim());
-			}
-		} catch (RuntimeException e) {
-			e.printStackTrace();
-		}
 	}
 
 	/**
-	 * Since passwords are stored encrypted
-	 * you need to use this method to verify
-	 * a password.
-	 *
+	 * Since passwords are stored encrypted you need to use this method to
+	 * verify a password.
+	 * 
 	 * @param pass password to check
 	 * @return Returns true if the password is correct or false
 	 */
-	public boolean verifyPassword (String pass) {
+	public boolean verifyPassword(String pass) {
 		return this.password.equalsIgnoreCase(encryptPassword(pass));
 	}
 
 	/**
-	 * This functions encrypts the password
-	 * using a one way hash algorithm SHA-1
-	 *
+	 * This functions encrypts the password using a one way hash algorithm SHA-1
+	 * 
 	 * @param pass
 	 * @return String length = 40
 	 */
-	protected static String encryptPassword (String pass) {
+	protected static String encryptPassword(String pass) {
 		String result = "";
 		try {
 			MessageDigest md = MessageDigest.getInstance("SHA-1");
 			md.update(pass.getBytes());
 			byte[] digest = md.digest();
-			for ( byte d : digest )
-				result += Integer.toHexString( d & 0xFF);
+			for (byte d : digest) {
+				result += Integer.toHexString(d & 0xFF);
+			}
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -148,9 +149,8 @@ public class User {
 	}
 
 	/**
-	 * Don't call this function directly,
-	 * call XMLConfig changeUsername instead
-	 *
+	 * Don't call this function directly, call XMLConfig changeUsername instead
+	 * 
 	 * @param username The username to set.
 	 */
 	public void setUsername(String username) {
@@ -164,37 +164,38 @@ public class User {
 		this.password = encryptPassword(password);
 	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString() {
 		return username;
 	}
 
 	/**
-	 * This function will convert the User object
-	 * to a xml encoded jdom Element.
+	 * This function will convert the User object to a xml encoded jdom Element.
 	 * 
 	 * @return the jdom Element represantation of the object
 	 */
-	public Element toElement () {
-		Element user = new Element ("User");
+	public Element toElement() {
+		Element user = new Element("User");
 		user.setAttribute("username", username);
 		user.setAttribute("password", password);
-		user.setAttribute("outputDir",outputDir);
-		user.setAttribute("autoImportDir",autoImportDir);
-		user.setAttribute("downloadSlots",Integer.toString(downloadSlots));
-		user.setAttribute("userRights",Integer.toString(userRights));
+		user.setAttribute("outputDir", outputDir);
+		user.setAttribute("autoImportDir", autoImportDir);
+		user.setAttribute("downloadSlots", Integer.toString(downloadSlots));
+		user.setAttribute("userRights", Integer.toString(userRights));
 
-		for (String download:downloadList) {
+		for (String download : downloadList) {
 			Element downloadElement = new Element("Download");
 			downloadElement.setText(download);
 			user.addContent(downloadElement);
 		}
 
 		try {
-			for (String key:properties.keySet()) {
+			for (String key : properties.keySet()) {
 				Element e = new Element("Property");
 				e.setAttribute("key", key);
 				e.setText(properties.get(key));
@@ -235,15 +236,14 @@ public class User {
 	}
 
 	/**
-	 * This function is similar to checkRight
-	 * with the exception that this function will
-	 * check admin rights too, admin rights overrides
-	 * all, so if one is admin he has access to it.
+	 * This function is similar to checkRight with the exception that this
+	 * function will check admin rights too, admin rights overrides all, so if
+	 * one is admin he has access to it.
 	 * 
 	 * @param right right to check
 	 * @return true if set or admin, false if not
 	 */
-	public boolean checkAccess (int right) {
+	public boolean checkAccess(int right) {
 		return ((right | RemoteConstants.RIGHTS_ADMIN) & userRights) != 0;
 	}
 
@@ -253,7 +253,7 @@ public class User {
 	 * @param right right to check
 	 * @return true if set, false if not
 	 */
-	public boolean checkRight (int right) {
+	public boolean checkRight(int right) {
 		return (right & userRights) != 0;
 	}
 
@@ -262,30 +262,27 @@ public class User {
 	 * 
 	 * @param rights
 	 */
-	public void setRights (int rights) {
+	public void setRights(int rights) {
 		this.userRights = rights;
 	}
 
 	/**
-	 * This will set the right.
-	 * Note you cannot unset anything with this
+	 * This will set the right. Note you cannot unset anything with this
 	 * function.
 	 * 
 	 * @param right
 	 */
-	public void setRight (int right) {
+	public void setRight(int right) {
 		this.userRights |= right;
 	}
 
 	/**
-	 * This function will unset a right.
-	 * Actually you can unset more than one right
-	 * at a time by combining the rights to uset
-	 * using |
+	 * This function will unset a right. Actually you can unset more than one
+	 * right at a time by combining the rights to uset using |
 	 * 
 	 * @param right to unset
 	 */
-	public void unsetRight (int right) {
+	public void unsetRight(int right) {
 		this.userRights &= ~right;
 	}
 
@@ -300,10 +297,10 @@ public class User {
 
 	/**
 	 * Use this function to display the role of the User
-	 *
+	 * 
 	 * @return the name of the role
 	 */
-	public String getRole () {
+	public String getRole() {
 		if ((userRights & RemoteConstants.RIGHTS_ADMIN) != 0) {
 			return "Administrator";
 		}
@@ -349,7 +346,7 @@ public class User {
 	 * 
 	 * @param download
 	 */
-	public void addDownload (String downloadHash) {
+	public void addDownload(String downloadHash) {
 		downloadList.add(downloadHash);
 	}
 
@@ -358,18 +355,16 @@ public class User {
 	 * 
 	 * @param download
 	 */
-	public void removeDownload (String download) {
+	public void removeDownload(String download) {
 		downloadList.remove(download);
 	}
-
 
 	/**
 	 * @return list of Torrentnames
 	 */
-	public String[] getDownloads () {
+	public String[] getDownloads() {
 		return downloadList.toArray(new String[downloadList.size()]);
 	}
-
 
 	/**
 	 * Checks if the user is an owner of the Download
