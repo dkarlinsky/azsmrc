@@ -180,12 +180,13 @@ form > p.description {
 	font-size: 0.8em;
 	font-weight: bold;
 	float: left;
-	height: 5px;
+	height: 15px;
 	margin: 0px 0px 0px 20px;
 	overflow: visible;
 }
 .dragbar img {
-	margin: -1px 1px 1px 0px;
+	margin: 0px 1px 1px 0px;
+	z-index: 2;
 }
 ul.eventDetails {
 	list-style: none outside none;
@@ -248,7 +249,7 @@ div.moveTab {
 	background: #D0D0D9;
 	border: #888 1px solid;
 	display: block;
-	filter:alpha(opacity=80);
+	/* filter:alpha(opacity=80); */
 	max-width: 1000px;
 	min-width: 440px;
 	/* label + file input */
@@ -315,6 +316,11 @@ input.transferCtrl {
 	margin: 0px 0px 0px 5px;
 	padding: 0px 0px 0px 0px;
 }
+#cookie_autorefresh {
+	display: block;
+	margin-left: 199px;
+	width: 15px;
+}
 #eventlist {
 	display: none;
 }
@@ -362,7 +368,7 @@ input.transferCtrl {
 	display: block;
 	height: 22px;
 	margin: 0px 0px 10px 0px;
-	padding: 1px 5% 2px 2%;
+	padding: 0px 5% 3px 2%;
 }
 #picmenu img:hover {
 	cursor: pointer;
@@ -370,7 +376,8 @@ input.transferCtrl {
 #picmenu .subbreak img {
 	border-right: #888 1px solid;
 	margin-right: 0px;
-	padding-right: 5px;
+	padding: 1px 5px 3px 0px;
+	vertical-align: top;
 }
 #splashscreen {
 	left: 50%;
@@ -387,19 +394,20 @@ input.transferCtrl {
 	height: 17px;
 	margin: 0px 0px 0px 0px;
 	text-align: right;
-	padding: 1px 5% 1px 2%;
+	padding: 0px 2% 0px 5%;
 	position: fixed;
-	width: 97%;
+	width: 93%;
 }
 #statusbar > * {
-	border-left: #888 1px solid;
+	border-left: #C0C0C0 1px solid;
 	font-size: 0.9em;
 	margin: 0px 0px 0px 0px;
-	padding: 0px 5px 0px 5px;
-	vertical-align: top;
+	padding: 4px 5px 2px 5px;
+	vertical-align: middle;
 }
 #statusbar img {
 	height: 16px;
+	padding: 0px 5px 0px 5px;
 	width: 16px;
 }
 #tabbar {
@@ -407,15 +415,17 @@ input.transferCtrl {
 	border-bottom: #C4B878 1px solid;
 	display: block;
 	font-size: 0.9em;
-	height: 18px;
+	height: 20px;
 	margin: 0px 0px 10px 0px;
 	padding: 1px 5% 0px 2%;
 }
 #tabbar li {
 	border: #C4B878 1px solid;
-	margin: 0px 10px 0px 0px;
-	padding: 0px 3px 0px 3px;
-	vertical-align: top;
+	display: block;
+	float: left;
+	height: 17px;
+	margin: -1px 10px 0px 0px;
+	padding: 2px 3px 1px 3px;
 }
 #tabbar li:hover {
 	border-bottom: #F7EBAB 1px dashed;
@@ -426,10 +436,11 @@ input.transferCtrl {
 }
 #tabbar li span {
 	color: #00F;
+	vertical-align: top;
 }
 #tabbar img {
 	height: 17px;
-	margin: 0px 0px 1px 4px;
+	margin: -1px 0px 0px 5px;
 	vertical-align: bottom;
 	width: 17px;
 }
