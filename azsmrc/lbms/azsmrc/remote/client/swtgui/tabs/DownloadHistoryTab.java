@@ -27,6 +27,8 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -34,138 +36,137 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
 public class DownloadHistoryTab implements DownloadHistoryListener {
 
 	// I18N prefix
-	public static final String		PFX				= "tab.downloadhistorytab.";
+	public static final String		PFX					= "tab.downloadhistorytab.";
 
-	private long					currentTimespan	= 0;
+	private long					currentTimespan		= 0;
 
-	private ToolItem				lastHourItem	= null;
-	private ToolItem				last12HoursItem	= null;
-	private ToolItem				lastDayItem		= null;
-	private ToolItem				lastWeekItem	= null;
-	private ToolItem				lastMonthItem	= null;
-	private ToolItem				allItem			= null;
+	private ToolItem				lastHourItem		= null;
+	private ToolItem				last12HoursItem		= null;
+	private ToolItem				lastDayItem			= null;
+	private ToolItem				lastWeekItem		= null;
+	private ToolItem				lastMonthItem		= null;
+	private ToolItem				allItem				= null;
 
-	private List<ToolItem>			toolItems		= new ArrayList<ToolItem>();
+	private List<ToolItem>			toolItems			= new ArrayList<ToolItem>();
 
-	private DownloadHistoryEntry[]	entryArray		= null;
+	private DownloadHistoryEntry[]	entryArray			= null;
+	private DownloadHistoryEntry[]	filteredEntryArray	= null;
 
-	private Table					entryTable		= null;
+	private Table					entryTable			= null;
+	private Text					filterInput			= null;
 
-	private SimpleDateFormat		dateFormat		= new SimpleDateFormat(
-															"yyyy-MM-dd HH:mm:ss");
-	private int						sortColumn		= 1;
-	private int						sortDirection	= 1;
-	private Listener				sortListener	= new Listener() {
-														/*
-														 * (non-Javadoc)
-														 * 
-														 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
-														 */
-														public void handleEvent(
-																Event e) {
-															TableColumn col = (TableColumn) e.widget;
-															if (entryTable.indexOf(col) == sortColumn) {
-																sortDirection *= -1;
+	private SimpleDateFormat		dateFormat			= new SimpleDateFormat(
+																"yyyy-MM-dd HH:mm:ss");
+	private int						sortColumn			= 1;
+	private int						sortDirection		= 1;
+	private Listener				sortListener		= new Listener() {
+															/*
+															 * (non-Javadoc)
+															 * 
+															 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+															 */
+															public void handleEvent(
+																	Event e) {
+																TableColumn col = (TableColumn) e.widget;
+																if (entryTable.indexOf(col) == sortColumn) {
+																	sortDirection *= -1;
 
-															} else {
-																sortDirection = 1;
-																sortColumn = entryTable.indexOf(col);
+																} else {
+																	sortDirection = 1;
+																	sortColumn = entryTable.indexOf(col);
+																}
+																switch (sortColumn) {
+																case 0:
+																	Arrays.sort(
+																			entryArray,
+																			new Comparator<DownloadHistoryEntry>() {
+																				/*
+																				 * (non-Javadoc)
+																				 * 
+																				 * @see java.util.Comparator#compare(java.lang.Object,
+																				 *      java.lang.Object)
+																				 */
+																				public int compare(
+																						DownloadHistoryEntry o1,
+																						DownloadHistoryEntry o2) {
+																					return sortDirection
+																							* o1.getDlName().compareToIgnoreCase(
+																									o2.getDlName());
+																				}
+																			});
+																	break;
+																case 1:
+																	Arrays.sort(
+																			entryArray,
+																			new Comparator<DownloadHistoryEntry>() {
+																				/*
+																				 * (non-Javadoc)
+																				 * 
+																				 * @see java.util.Comparator#compare(java.lang.Object,
+																				 *      java.lang.Object)
+																				 */
+																				public int compare(
+																						DownloadHistoryEntry o1,
+																						DownloadHistoryEntry o2) {
+																					return sortDirection
+																							* o1.compareTo(o2);
+																				}
+																			});
+																	break;
+																case 2:
+																	Arrays.sort(
+																			entryArray,
+																			new Comparator<DownloadHistoryEntry>() {
+																				/*
+																				 * (non-Javadoc)
+																				 * 
+																				 * @see java.util.Comparator#compare(java.lang.Object,
+																				 *      java.lang.Object)
+																				 */
+																				public int compare(
+																						DownloadHistoryEntry o1,
+																						DownloadHistoryEntry o2) {
+																					return sortDirection
+																							* o1.getCategory().compareToIgnoreCase(
+																									o2.getCategory());
+																				}
+																			});
+																	break;
+																}
+																if (SWT.getVersion() > 3220) {
+																	entryTable.setSortDirection(sortDirection > 0 ? SWT.UP
+																			: SWT.DOWN);
+																	entryTable.setSortColumn(col);
+																}
+																entryTable.clearAll();
+
 															}
-															switch (sortColumn) {
-															case 0:
-																Arrays.sort(
-																		entryArray,
-																		new Comparator<DownloadHistoryEntry>() {
-																			/*
-																			 * (non-Javadoc)
-																			 * 
-																			 * @see java.util.Comparator#compare(java.lang.Object,
-																			 *      java.lang.Object)
-																			 */
-																			public int compare(
-																					DownloadHistoryEntry o1,
-																					DownloadHistoryEntry o2) {
-																				return sortDirection
-																						* o1.getDlName().compareToIgnoreCase(
-																								o2.getDlName());
-																			}
-																		});
-																break;
-															case 1:
-																Arrays.sort(
-																		entryArray,
-																		new Comparator<DownloadHistoryEntry>() {
-																			/*
-																			 * (non-Javadoc)
-																			 * 
-																			 * @see java.util.Comparator#compare(java.lang.Object,
-																			 *      java.lang.Object)
-																			 */
-																			public int compare(
-																					DownloadHistoryEntry o1,
-																					DownloadHistoryEntry o2) {
-																				return sortDirection
-																						* o1.compareTo(o2);
-																			}
-																		});
-																break;
-															case 2:
-																Arrays.sort(
-																		entryArray,
-																		new Comparator<DownloadHistoryEntry>() {
-																			/*
-																			 * (non-Javadoc)
-																			 * 
-																			 * @see java.util.Comparator#compare(java.lang.Object,
-																			 *      java.lang.Object)
-																			 */
-																			public int compare(
-																					DownloadHistoryEntry o1,
-																					DownloadHistoryEntry o2) {
-																				return sortDirection
-																						* o1.getCategory().compareToIgnoreCase(
-																								o2.getCategory());
-																			}
-																		});
-																break;
-															}
-															if (SWT.getVersion() > 3220) {
-																entryTable.setSortDirection(sortDirection > 0 ? SWT.UP
-																		: SWT.DOWN);
-																entryTable.setSortColumn(col);
-															}
-															entryTable.clearAll();
-
-														}
-													};
+														};
 
 	private DownloadHistoryTab(CTabFolder parentTab) {
 		final CTabItem detailsTab = new CTabItem(parentTab, SWT.CLOSE);
 		detailsTab.setText(I18N.translate(PFX + "tab.text"));
 
 		final Composite parent = new Composite(parentTab, SWT.NONE);
-		parent.setLayout(new GridLayout(1, false));
+		parent.setLayout(new GridLayout(2, false));
 		GridData gridData = new GridData(GridData.GRAB_HORIZONTAL);
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.horizontalSpan = 1;
 		parent.setLayoutData(gridData);
 
 		ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
-		gridData = new GridData(GridData.FILL_HORIZONTAL);
-		// gridData.grabExcessHorizontalSpace = false;
-		// gridData.heightHint = 24;
-		toolbar.setSize(200, 24);
-		toolbar.setLayoutData(gridData);
 
 		ToolItem refreshItem = new ToolItem(toolbar, SWT.PUSH | SWT.FLAT);
 		refreshItem.setImage(ImageRepository.getImage("refresh"));
@@ -292,8 +293,34 @@ public class DownloadHistoryTab implements DownloadHistoryListener {
 		toolItems.add(lastMonthItem);
 		toolItems.add(allItem);
 
+		Composite filterComp = new Composite(parent, SWT.None);
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		filterComp.setLayoutData(gd);
+		filterComp.setLayout(new GridLayout(2, false));
+		Label filterLabel = new Label(filterComp, SWT.NONE);
+		filterLabel.setText(I18N.translate(PFX + "filter.label"));
+
+		filterInput = new Text(filterComp, SWT.BORDER);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		filterInput.setLayoutData(gd);
+		filterInput.addModifyListener(new ModifyListener() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events.ModifyEvent)
+			 */
+			public void modifyText(ModifyEvent e) {
+				if (entryTable != null && !entryTable.isDisposed()) {
+					entryTable.setItemCount(filterItems() ? filteredEntryArray.length
+							: entryArray.length);
+					entryTable.clearAll();
+				}
+			}
+		});
+
 		entryTable = new Table(parent, SWT.VIRTUAL | SWT.BORDER);
-		GridData gd = new GridData(GridData.FILL_BOTH);
+		gd = new GridData(GridData.FILL_BOTH);
+		gd.horizontalSpan = 2;
 		entryTable.setLayoutData(gd);
 		entryTable.setHeaderVisible(true);
 
@@ -328,12 +355,13 @@ public class DownloadHistoryTab implements DownloadHistoryListener {
 			public void handleEvent(Event e) {
 				// pull the item
 				TableItem item = (TableItem) e.item;
-
+				DownloadHistoryEntry[] currentArray = filteredEntryArray == null ? entryArray
+						: filteredEntryArray;
 				// get the index of the item
 				int index = entryTable.indexOf(item);
 
 				try {
-					DownloadHistoryEntry entry = entryArray[index];
+					DownloadHistoryEntry entry = currentArray[index];
 					item.setText(0, entry.getDlName());
 					item.setText(1, dateFormat.format(new Date(
 							entry.getTimestamp() * 1000)));
@@ -419,11 +447,37 @@ public class DownloadHistoryTab implements DownloadHistoryListener {
 			@Override
 			public void runSafe() {
 				if (entryTable != null && !entryTable.isDisposed()) {
-					entryTable.setItemCount(entryArray.length);
+					entryTable.setItemCount(filterItems() ? filteredEntryArray.length
+							: entryArray.length);
 					entryTable.clearAll();
 				}
 			}
 		});
+	}
+
+	private boolean filterItems() {
+		if (entryArray == null || entryArray.length == 0) {
+			filteredEntryArray = null;
+			return false;
+		}
+		if (filterInput == null || filterInput.isDisposed()
+				|| filterInput.getText().length() == 0) {
+			filteredEntryArray = null;
+			return false;
+		}
+		String filterText = filterInput.getText().toLowerCase();
+		List<DownloadHistoryEntry> filtered = new ArrayList<DownloadHistoryEntry>();
+		for (DownloadHistoryEntry e : entryArray) {
+			if (e.getDlName().toLowerCase().contains(filterText)) {
+				filtered.add(e);
+			}
+		}
+		if (filtered.size() == 0) {
+			filteredEntryArray = null;
+			return false;
+		}
+		filteredEntryArray = filtered.toArray(new DownloadHistoryEntry[filtered.size()]);
+		return true;
 	}
 
 	public static void open(final CTabFolder parentTab) {
