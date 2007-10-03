@@ -171,8 +171,7 @@ function addPreferences() {
 			container.appendChild(input);
 		}
 	fieldset.appendChild(container);
-	form.appendChild(fieldset);
-	
+	form.appendChild(fieldset);	
 	
 	fieldset = document.createElement("fieldset");
 	legend = document.createElement("legend");
@@ -195,6 +194,7 @@ function addPreferences() {
 	input = document.createElement("input");
 	input.setAttribute("id", "cookie_tabposonthefly");
 	input.setAttribute("type", "checkbox");
+	input.checked = optionSet("tabposonthefly");
 	container.appendChild(input);
 	fieldset.appendChild(container);
 	p = document.createElement("p");
