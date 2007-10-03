@@ -245,6 +245,7 @@ function getTCState(hash) {
 	return false;
 }
 function initAzSMRCwebUI() {
+	killPlaceholders();
 	initDebugLog();
 	initCookies();
 	initContextMenu();
@@ -260,6 +261,11 @@ function initAzSMRCwebUI() {
 	init_dragdrop('tab', true);
 	//initTableSort();
 	//alert(window.innerWidth);
+}
+function killPlaceholders() {
+	// kill tabbar placeholder
+	tabbar = document.getElementById("tabbar");
+	tabbar.removeChild(tabbar.firstChild);
 }
 function PingToServer() {
 	var img = document.getElementById("connectionstatus");
