@@ -1,4 +1,4 @@
-var registeredCookies = ["autoRefresh", "startupTabs", "selectedDetails"];
+var registeredCookies = ["autoRefresh", "startupTabs", "selectedDetails", "tabPositions"];
 function clearCookies() {
 	for (var i in registeredCookies)
 		deleteCookie(registeredCookies[i]);
