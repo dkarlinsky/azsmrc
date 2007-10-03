@@ -22,10 +22,12 @@ var tabPositions = [];
 function addTab(contentElement, isStartup) {
 	// only create new tab, if no tab with contentElement exists
 	var tabExists = getTabByContent(contentElement);
+	var setTabPos = optionSet("tabposonthefly");
+	var i = 0;		
 	if (tabExists == null) {		
 		var label, labelID = null;
 		label = document.createTextNode("Empty Tab");
-		for (var i in registeredTabs)
+		for (i in registeredTabs)
 			if (registeredTabs[i] == contentElement) {
 				labelID = i;
 				break;
@@ -120,7 +122,7 @@ function addTab(contentElement, isStartup) {
 				var tabID = this.getAttribute("tab");
 				var list = document.getElementById("tabbar");
 				var tab = 0;
-				for (var i = 0; i < list.childNodes.length; i++) {
+				for (i = 0; i < list.childNodes.length; i++) {
 					tab = list.childNodes[i];
 					if (tab.getAttribute("tab_control") == tabID) {
 						tab.lastChild.onclick();
@@ -129,7 +131,7 @@ function addTab(contentElement, isStartup) {
 			}
 			dragbar.appendChild(close);
 		}
-		if (isStartup) {
+		if (isStartup || setTabPos) {
 			var tabPos = tabPositions[labelID];
 			if (tabPos) {
 				tabContent.style.position = "absolute";
@@ -217,6 +219,17 @@ function initTabControl() {
 			addTab(registeredTabs[i], true);
 	ShowTab(0);
 }
+function loadTabPos() {
+	var value = getCookie("tabPositions");
+	var pos;
+	if (value) {
+		value = value.split(";");
+		for (i in value) {
+			pos = value[i].split(",");
+			tabPositions[pos[0]] = [pos[1], pos[2], pos[3]];
+		}
+	}	
+}
 function refreshTabbar() {
 	var tabbar = document.getElementById("tabbar");
 	if (tabbar.hasChildNodes) {
@@ -239,6 +252,21 @@ function refreshTabbar() {
 function reindexStatusbar() {
 	zIndex++;
 	document.getElementById("statusbar").style.zIndex = zIndex;
+}
+function saveTabPosCookie() {		
+	var tabPos = [];
+	for (var i in registeredTabs) {
+		tab = getTabByContent(registeredTabs[i]);
+		if (tab && tab.style.left) {			
+			tabPos.push([i, tab.style.left, tab.style.top, tab.style.zIndex]);
+		}
+	}
+	var now = new Date();
+	fixDate(now);
+	// expires after one year
+	now.setTime(now.getTime() + 365 * 24 * 60 * 60 * 1000);
+	var value = tabPos.join(";");
+	setCookie("tabPositions", value, now); 
 }
 function ShowTab(tab) {
 	var toActivate = document.getElementById("tab_"+tab);

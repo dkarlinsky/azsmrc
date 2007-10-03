@@ -17,6 +17,8 @@ var SI_byte = ["bytes", "kB", "MB", "GB", "TB"];
 var positions = [0, 0];
 // save force states for torrents
 var forceStates = [];
+// several options within this webinterface
+var azsmrcOptions = [];
 function adjustMaxTabWidth() {
 	var maxwidth = Math.floor(window.innerWidth*0.98);
 	for (var s = 0; s < document.styleSheets.length; s++)
@@ -261,11 +263,20 @@ function initAzSMRCwebUI() {
 	init_dragdrop('tab', true);
 	//initTableSort();
 	//alert(window.innerWidth);
+	reindexStatusbar();
 }
 function killPlaceholders() {
 	// kill tabbar placeholder
 	tabbar = document.getElementById("tabbar");
 	tabbar.removeChild(tabbar.firstChild);
+}
+function optionSet(option) {
+	for (var i in azsmrcOptions)
+		if (azsmrcOptions[i] == option) {
+			return true;
+			break;
+		}
+	return false;
 }
 function PingToServer() {
 	var img = document.getElementById("connectionstatus");
@@ -337,11 +348,16 @@ function savePreferences() {
 		value = autoRefresh.join(",");
 		setCookie("autoRefresh", value, now);
 	}
-	saveCookie = document.getElementById("cookie_tabpositions").checked;
-	if (saveCookie) {
-		value = tabPos.join(";");
-		setCookie("tabPositions", value, now); 
-	}
+	if (document.getElementById("cookie_tabpositions").checked)
+		saveTabPosCookie();
+	// misc options for azsmrc
+	value = [];
+	if (document.getElementById("cookie_tabposonthefly").checked)
+		value.push("tabposonthefly");
+	if (value.length) {
+		value = value.join(",");
+		setCookie("azsmrcOptions", value, now);
+	} 
 	addDebugEntry("saved Cookies: "+document.cookie);
 }
 function selectDetails(id) {

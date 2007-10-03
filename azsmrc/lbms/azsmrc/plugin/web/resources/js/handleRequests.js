@@ -173,17 +173,35 @@ function addPreferences() {
 	fieldset.appendChild(container);
 	form.appendChild(fieldset);
 	
+	
+	fieldset = document.createElement("fieldset");
+	legend = document.createElement("legend");
+	legend.appendChild(document.createTextNode("Tab Positions"));
+	fieldset.appendChild(legend);
+	container = document.createElement("div");
+	container.className = "form_checks";
 	label = document.createElement("label");
 	label.appendChild(document.createTextNode("Save Tabpositions in cookie"));
 	label.setAttribute("for", "cookie_tabpositions");
-	form.appendChild(label);
+	container.appendChild(label);
 	input = document.createElement("input");
 	input.setAttribute("id", "cookie_tabpositions");
 	input.setAttribute("type", "checkbox");
-	form.appendChild(input);
+	container.appendChild(input);
+	label = document.createElement("label");
+	label.appendChild(document.createTextNode("Save 'On The Fly'"));
+	label.setAttribute("for", "cookie_tabposonthefly");
+	container.appendChild(label);
+	input = document.createElement("input");
+	input.setAttribute("id", "cookie_tabposonthefly");
+	input.setAttribute("type", "checkbox");
+	container.appendChild(input);
+	fieldset.appendChild(container);
 	p = document.createElement("p");
-	p.appendChild(document.createTextNode("This option allows AzSMRC to remember where you placed your tabs. If you enable this option, tabs that come with startup will be places on their old positions!"));
-	form.appendChild(p);
+	p.className = "description";
+	p.appendChild(document.createTextNode("This option allows AzSMRC to remember where you placed your tabs. If you enable this option, tabs that come with startup will be places on their old positions! 'On The Fly' means your data will be saved as soon as you change a position and will be loaded everytime you (re)open a certain tab - not only on startup."));
+	fieldset.appendChild(p);
+	form.appendChild(fieldset);
 	
 	input = document.createElement("input");
 	input.setAttribute("type", "button");

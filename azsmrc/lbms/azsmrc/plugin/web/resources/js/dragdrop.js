@@ -46,6 +46,10 @@ function drop() {
 		drag_object.className = "tab";
 		drag_object = null;
 	}
+	if (optionSet("tabposonthefly")) {
+		saveTabPosCookie();
+		loadTabPos();
+	}
 }
 function set_dragbar(obj) {
 	if (obj.firstChild) {

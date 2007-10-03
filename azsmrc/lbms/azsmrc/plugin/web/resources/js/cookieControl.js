@@ -1,4 +1,4 @@
-var registeredCookies = ["autoRefresh", "startupTabs", "selectedDetails", "tabPositions"];
+var registeredCookies = ["autoRefresh", "startupTabs", "selectedDetails", "tabPositions", "azsmrcOptions"];
 function clearCookies() {
 	for (var i in registeredCookies)
 		deleteCookie(registeredCookies[i]);
@@ -50,14 +50,10 @@ function initCookies() {
 	value = getCookie("selectedDetails");
 	if (value)
 		selectedDetails = value.split(",");
-	value = getCookie("tabPositions");
-	if (value) {
-		value = value.split(";");
-		for (i in value) {
-			pos = value[i].split(",");
-			tabPositions[pos[0]] = [pos[1], pos[2], pos[3]];
-		}		
-	}		
+	loadTabPos();
+	value = getCookie("azsmrcOptions");
+	if (value)
+		azsmrcOptions = value.split(",");
 }
 function setCookie(name, value, expires, path, domain, secure) {
 	var curCookie = name + "=" + escape(value) +
