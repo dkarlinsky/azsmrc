@@ -34,14 +34,14 @@ function getCookie(name) {
 	return unescape(dc.substring(begin + prefix.length, end));
 }
 function initCookies() {
-	var value;
+	var value, i;
 	value = getCookie("autoRefresh");
 	if (value)
 		autoRefresh = value.split(",");
 	value = getCookie("startupTabs");
 	if (value) {
 		value = value.split(",");
-		for (var i in value)
+		for (i in value)
 			if (value[i] == "true")
 				startupTabs[i] = true;
 			else
@@ -50,6 +50,14 @@ function initCookies() {
 	value = getCookie("selectedDetails");
 	if (value)
 		selectedDetails = value.split(",");
+	value = getCookie("tabPositions");
+	if (value) {
+		value = value.split(";");
+		for (i in value) {
+			pos = value[i].split(",");
+			tabPositions[pos[0]] = [pos[1], pos[2], pos[3]];
+		}		
+	}		
 }
 function setCookie(name, value, expires, path, domain, secure) {
 	var curCookie = name + "=" + escape(value) +

@@ -249,7 +249,7 @@ function initAzSMRCwebUI() {
 	initDebugLog();
 	initCookies();
 	initContextMenu();
-	addTab("listTransfers");
+	addTab("listTransfers", true);
 	initTabControl();
 	adjustMaxTabWidth();
 	setJSHint(); 
@@ -304,6 +304,8 @@ function round(val,dig) {
 function savePreferences() {
 	var value = null;
 	// read data
+	var pos = 0;
+	var tabPos = [];
 	for (var i in registeredTabs) {
 		if (refreshRequests[i] > -1) {
 			value = Math.floor(document.getElementById("cookie_autorefresh_"+i).value);
@@ -313,6 +315,11 @@ function savePreferences() {
 		}
 		if (i > 0)
 			startupTabs[i] = document.getElementById("startup_"+i).checked;
+		tab = getTabByContent(registeredTabs[i]);
+		if (tab && tab.style.left) {			
+			tabPos[pos] = [i, tab.style.left, tab.style.top, tab.style.zIndex];
+			pos++;
+		}
 	}
 	configAutoRefresh();
 	// cookies
@@ -329,6 +336,11 @@ function savePreferences() {
 		// set autorefresh cookie
 		value = autoRefresh.join(",");
 		setCookie("autoRefresh", value, now);
+	}
+	saveCookie = document.getElementById("cookie_tabpositions").checked;
+	if (saveCookie) {
+		value = tabPos.join(";");
+		setCookie("tabPositions", value, now); 
 	}
 	addDebugEntry("saved Cookies: "+document.cookie);
 }

@@ -173,6 +173,18 @@ function addPreferences() {
 	fieldset.appendChild(container);
 	form.appendChild(fieldset);
 	
+	label = document.createElement("label");
+	label.appendChild(document.createTextNode("Save Tabpositions in cookie"));
+	label.setAttribute("for", "cookie_tabpositions");
+	form.appendChild(label);
+	input = document.createElement("input");
+	input.setAttribute("id", "cookie_tabpositions");
+	input.setAttribute("type", "checkbox");
+	form.appendChild(input);
+	p = document.createElement("p");
+	p.appendChild(document.createTextNode("This option allows AzSMRC to remember where you placed your tabs. If you enable this option, tabs that come with startup will be places on their old positions!"));
+	form.appendChild(p);
+	
 	input = document.createElement("input");
 	input.setAttribute("type", "button");
 	input.setAttribute("value", "Save settings");

@@ -17,10 +17,9 @@ var tabs = [];
 var startupTabs = [false, true, false, false, false, false, false];
 // current tab positions and layer (zIndex) in viewport
 var tabPositions = [];
-var tabzIndex = [];
 // an example tab (tabbar is list of tabs)
 // <li><span onclick="SendRequestToServer(1);">ALL Torrents</span><img src="img/delete.png" alt="Close Tab" title="Close Tab" onclick="closeTab(this);" /></li>
-function addTab(contentElement) {
+function addTab(contentElement, isStartup) {
 	// only create new tab, if no tab with contentElement exists
 	var tabExists = getTabByContent(contentElement);
 	if (tabExists == null) {		
@@ -129,7 +128,16 @@ function addTab(contentElement) {
 				}
 			}
 			dragbar.appendChild(close);
-		}		
+		}
+		if (isStartup) {
+			var tabPos = tabPositions[labelID];
+			if (tabPos) {
+				tabContent.style.position = "absolute";
+				tabContent.style.left = tabPos[0];
+				tabContent.style.top = tabPos[1];
+				tabContent.style.zIndex = tabPos[2];
+			}
+		}
 	} else { 
 		window.setTimeout("ShowTab(getTabIdByContent('"+contentElement+"'))", 200);
 	}
@@ -206,7 +214,7 @@ function initTabControl() {
 	// add startup tabs
 	for (var i in startupTabs)
 		if (startupTabs[i])
-			addTab(registeredTabs[i]);
+			addTab(registeredTabs[i], true);
 	ShowTab(0);
 }
 function refreshTabbar() {
