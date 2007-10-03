@@ -228,6 +228,10 @@ function refreshTabbar() {
 		}		
 	}
 }
+function reindexStatusbar() {
+	zIndex++;
+	document.getElementById("statusbar").style.zIndex = zIndex;
+}
 function ShowTab(tab) {
 	var toActivate = document.getElementById("tab_"+tab);
 	if (toActivate != null) {
@@ -239,6 +243,7 @@ function ShowTab(tab) {
 		zIndex++;
 		toActivate.style.zIndex = zIndex;
 		activeTab = tab;
+		reindexStatusbar();
 		refreshTabbar();
 	}
 }
