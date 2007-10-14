@@ -140,43 +140,34 @@ public class DownloadManagerShell {
 
 	private final DownloadListener						dlL						= new DownloadListener() {
 
-																					public void stateChanged(
+																					public void stateChanged (
 																							Download download,
 																							int old_state,
 																							int new_state) {
 																						try {
-																							semaphore
-																									.acquire();
+																							semaphore.acquire();
 																							// Changing
 																							// from
 																							// Downloading
 																							// to
 																							// Seeding
 																							if (new_state == Download.ST_SEEDING
-																									&& downloadsMap
-																											.containsKey(download
-																													.getHash())) {
-																								downloadsMap
-																										.remove(download
-																												.getHash());
+																									&& downloadsMap.containsKey(download.getHash())) {
+																								downloadsMap.remove(download.getHash());
 																								SeedContainer sc = new SeedContainer(
 																										download,
 																										seedsTable,
 																										SWT.NULL);
-																								seedsMap
-																										.put(
-																												download
-																														.getHash(),
-																												sc);
+																								seedsMap.put(
+																										download.getHash(),
+																										sc);
 																								redrawTables = true;
 																							}
 																						} catch (InterruptedException e) {
 
-																							e
-																									.printStackTrace();
+																							e.printStackTrace();
 																						} finally {
-																							semaphore
-																									.release();
+																							semaphore.release();
 																						}
 																						// Other
 																						// changes
@@ -184,17 +175,16 @@ public class DownloadManagerShell {
 																						// here
 																					}
 
-																					public void positionChanged(
+																					public void positionChanged (
 																							Download download,
 																							int oldPosition,
 																							int newPosition) {
-																						logger
-																								.debug("Position changed "
-																										+ download
-																										+ " "
-																										+ oldPosition
-																										+ " -> "
-																										+ newPosition);
+																						logger.debug("Position changed "
+																								+ download
+																								+ " "
+																								+ oldPosition
+																								+ " -> "
+																								+ newPosition);
 																						redrawTables = true;
 																					}
 
@@ -238,13 +228,12 @@ public class DownloadManagerShell {
 	private int											upSpeed					= 0;
 	private int											downSpeed				= 0;
 
-	private static Logger								logger					= Logger
-																						.getLogger("lbms.azsmrc.DownloadManagerShell");	;
+	private static Logger								logger					= Logger.getLogger("lbms.azsmrc.DownloadManagerShell");	;
 	private final Set<String>							openPluginViews			= new HashSet<String>();
 
 	private int											drag_drop_line_start	= -1;
 
-	public void open() {
+	public void open () {
 		if (DOWNLOAD_MANAGER_SHELL != null
 				&& !DOWNLOAD_MANAGER_SHELL.isDisposed()) {
 			DOWNLOAD_MANAGER_SHELL.setVisible(true);
@@ -259,8 +248,7 @@ public class DownloadManagerShell {
 
 		DOWNLOAD_MANAGER_SHELL = new Shell(RCMain.getRCMain().getDisplay());
 
-		DOWNLOAD_MANAGER_SHELL.setImage(ImageRepository
-				.getImage("TrayIcon_Blue"));
+		DOWNLOAD_MANAGER_SHELL.setImage(ImageRepository.getImage("TrayIcon_Blue"));
 
 		// Grid Layout
 		GridLayout gridLayout = new GridLayout();
@@ -312,17 +300,16 @@ public class DownloadManagerShell {
 		menuLogin = new MenuItem(fileSubmenu, SWT.PUSH);
 		menuLogin.setText(I18N.translate(PFX + "menu.main.connect"));
 		menuLogin.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				ConnectionDialog.open(RCMain.getRCMain().getDisplay());
 			}
 		});
 
 		// QuickConnect
 		menuQuickconnect = new MenuItem(fileSubmenu, SWT.PUSH);
-		menuQuickconnect
-				.setText(I18N.translate(PFX + "menu.main.quickconnect"));
+		menuQuickconnect.setText(I18N.translate(PFX + "menu.main.quickconnect"));
 		menuQuickconnect.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				Properties properties = RCMain.getRCMain().getProperties();
 				if (properties.containsKey("lastConnection")) {
 					try {
@@ -333,17 +320,14 @@ public class DownloadManagerShell {
 							initializeConnection();
 						} else if (login.hasUsername() && login.hasHost()) {
 							InputShell is = new InputShell(
-									I18N
-											.translate(PFX
-													+ "menu.main.quickconnect.inputshell.title"),
-									I18N
-											.translate(PFX
-													+ "menu.main.quickconnect.inputshell.text1")
+									I18N.translate(PFX
+											+ "menu.main.quickconnect.inputshell.title"),
+									I18N.translate(PFX
+											+ "menu.main.quickconnect.inputshell.text1")
 											+ " "
 											+ login.getUsername()
-											+ I18N
-													.translate(PFX
-															+ "menu.main.quickconnect.inputshell.text2")
+											+ I18N.translate(PFX
+													+ "menu.main.quickconnect.inputshell.text2")
 											+ " " + login.getHost());
 							is.setIsPassword(true);
 							String pw = is.open();
@@ -353,8 +337,7 @@ public class DownloadManagerShell {
 								initializeConnection();
 							}
 						} else {
-							ConnectionDialog.open(RCMain.getRCMain()
-									.getDisplay());
+							ConnectionDialog.open(RCMain.getRCMain().getDisplay());
 						}
 					} catch (MalformedURLException e1) {
 						ConnectionDialog.open(RCMain.getRCMain().getDisplay());
@@ -368,7 +351,7 @@ public class DownloadManagerShell {
 		menuLogout = new MenuItem(fileSubmenu, SWT.PUSH);
 		menuLogout.setText(I18N.translate(PFX + "menu.main.logout"));
 		menuLogout.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				RCMain.getRCMain().disconnect();
 				setGUItoLoggedOut();
 			}
@@ -382,9 +365,9 @@ public class DownloadManagerShell {
 		exitItem.setText(I18N.translate(PFX + "menu.main.exit") + "\tCtrl+Q");
 		exitItem.setAccelerator(SWT.CTRL + 'Q');
 		exitItem.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
-				boolean confirmExit = RCMain.getRCMain().getProperties()
-						.getPropertyAsBoolean("confirm.exit");
+			public void handleEvent (Event e) {
+				boolean confirmExit = RCMain.getRCMain().getProperties().getPropertyAsBoolean(
+						"confirm.exit");
 				if (confirmExit) {
 					MessageBox messageBox = new MessageBox(
 							DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK
@@ -413,7 +396,7 @@ public class DownloadManagerShell {
 		menuAddByFile = new MenuItem(remoteSubmenu, SWT.PUSH);
 		menuAddByFile.setText(I18N.translate(PFX + "menu.remote.addbyfile"));
 		menuAddByFile.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				OpenByFileDialog.open();
 			}
 		});
@@ -422,7 +405,7 @@ public class DownloadManagerShell {
 		menuAddbyURL = new MenuItem(remoteSubmenu, SWT.PUSH);
 		menuAddbyURL.setText(I18N.translate(PFX + "menu.remote.addbyurl"));
 		menuAddbyURL.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				OpenByURLDialog.open();
 			}
 		});
@@ -435,7 +418,7 @@ public class DownloadManagerShell {
 		menuServerDetails.setText(I18N.translate(PFX
 				+ "menu.remote.serverdetails"));
 		menuServerDetails.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				ServerDetailsTab.open(tabFolder);
 			}
 		});
@@ -443,7 +426,7 @@ public class DownloadManagerShell {
 		menuServerUpdate.setText(I18N.translate(PFX
 				+ "menu.remote.serverupdates"));
 		menuServerUpdate.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				ServerUpdateDialog.open();
 			}
 		});
@@ -456,7 +439,7 @@ public class DownloadManagerShell {
 		menuRestartAzureus.setText(I18N.translate(PFX
 				+ "menu.remote.restartserver"));
 		menuRestartAzureus.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				MessageBox messageBox = new MessageBox(DOWNLOAD_MANAGER_SHELL,
 						SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
 				messageBox.setText(I18N.translate(PFX
@@ -479,7 +462,7 @@ public class DownloadManagerShell {
 		menuMyShares = new MenuItem(toolSubmenu, SWT.PUSH);
 		menuMyShares.setText(I18N.translate(PFX + "menu.tools.mytracker"));
 		menuMyShares.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				MyTracker.open(tabFolder);
 			}
 		});
@@ -488,7 +471,7 @@ public class DownloadManagerShell {
 		menuCreateTorrent.setText(I18N.translate(PFX
 				+ "menu.tools.createTorrent"));
 		menuCreateTorrent.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event arg0) {
+			public void handleEvent (Event arg0) {
 				CreateTorrentDialog.open();
 			}
 		});
@@ -498,7 +481,7 @@ public class DownloadManagerShell {
 				+ "\tCtrl+C");
 		menuConsole.setAccelerator(SWT.CTRL + 'C');
 		menuConsole.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				ConsoleTab.open(tabFolder, true);
 			}
 		});
@@ -506,7 +489,7 @@ public class DownloadManagerShell {
 		MenuItem menuPrefs = new MenuItem(toolSubmenu, SWT.PUSH);
 		menuPrefs.setText(I18N.translate(PFX + "menu.tools.preferences"));
 		menuPrefs.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				PreferencesTab.open(tabFolder);
 			}
 		});
@@ -514,7 +497,7 @@ public class DownloadManagerShell {
 		MenuItem menuHistory = new MenuItem(toolSubmenu, SWT.PUSH);
 		menuHistory.setText(I18N.translate(PFX + "menu.tools.history"));
 		menuHistory.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				DownloadHistoryTab.open(tabFolder);
 			}
 		});
@@ -524,10 +507,10 @@ public class DownloadManagerShell {
 		MenuItem menuUpdate = new MenuItem(toolSubmenu, SWT.PUSH);
 		menuUpdate.setText(I18N.translate(PFX + "menu.tools.update"));
 		menuUpdate.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				RCMain.getRCMain().getUpdater().checkForUpdates(
-						RCMain.getRCMain().getProperties()
-								.getPropertyAsBoolean("update.beta"));
+						RCMain.getRCMain().getProperties().getPropertyAsBoolean(
+								"update.beta"));
 				RCMain.getRCMain().getProperties().setProperty(
 						"update.lastcheck", System.currentTimeMillis());
 				RCMain.getRCMain().saveConfig();
@@ -536,16 +519,16 @@ public class DownloadManagerShell {
 
 		// -----Plugin Submenu
 
-		String[] pluginIDs = RCMain.getRCMain().getPluginManagerImpl()
-				.getUIManager().getViewIDs(ViewID.MAIN);
+		String[] pluginIDs = RCMain.getRCMain().getPluginManagerImpl().getUIManager().getViewIDs(
+				ViewID.MAIN);
 		for (final String pluginID : pluginIDs) {
 			logger.debug("Adding Plugin Item: " + pluginID);
 			MenuItem pluginMenuItem = new MenuItem(pluginSubmenu, SWT.PUSH);
 			pluginMenuItem.setText(pluginID);
 			pluginMenuItem.addListener(SWT.Selection, new Listener() {
-				public void handleEvent(Event e) {
-					RCMain.getRCMain().getPluginManagerImpl().getUIManager()
-							.openMainView(pluginID);
+				public void handleEvent (Event e) {
+					RCMain.getRCMain().getPluginManagerImpl().getUIManager().openMainView(
+							pluginID);
 				}
 			});
 		}
@@ -556,7 +539,7 @@ public class DownloadManagerShell {
 		menuAbout.setText(I18N.translate(PFX + "menu.help.about"));
 
 		menuAbout.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				ReadmeTab.open(tabFolder);
 			}
 		});
@@ -574,7 +557,7 @@ public class DownloadManagerShell {
 		login.setImage(ImageRepository.getImage("connect"));
 		login.setToolTipText(I18N.translate(PFX + "toolbar.login.tooltiptext"));
 		login.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				ConnectionDialog.open(RCMain.getRCMain().getDisplay());
 			}
 		});
@@ -584,7 +567,7 @@ public class DownloadManagerShell {
 		quickconnect.setToolTipText(I18N.translate(PFX
 				+ "toolbar.quickconnect.tooltiptext"));
 		quickconnect.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				Properties properties = RCMain.getRCMain().getProperties();
 				if (properties.containsKey("lastConnection")) {
 					try {
@@ -595,17 +578,14 @@ public class DownloadManagerShell {
 							initializeConnection();
 						} else if (login.hasUsername() && login.hasHost()) {
 							InputShell is = new InputShell(
-									I18N
-											.translate(PFX
-													+ "toolbar.quickconnect.inputshell.title"),
-									I18N
-											.translate(PFX
-													+ "toolbar.quickconnect.inputshell.text1")
+									I18N.translate(PFX
+											+ "toolbar.quickconnect.inputshell.title"),
+									I18N.translate(PFX
+											+ "toolbar.quickconnect.inputshell.text1")
 											+ " "
 											+ login.getUsername()
-											+ I18N
-													.translate(PFX
-															+ "toolbar.quickconnect.inputshell.text2")
+											+ I18N.translate(PFX
+													+ "toolbar.quickconnect.inputshell.text2")
 											+ " " + login.getHost());
 							is.setIsPassword(true);
 							String pw = is.open();
@@ -615,8 +595,7 @@ public class DownloadManagerShell {
 								initializeConnection();
 							}
 						} else {
-							ConnectionDialog.open(RCMain.getRCMain()
-									.getDisplay());
+							ConnectionDialog.open(RCMain.getRCMain().getDisplay());
 						}
 					} catch (MalformedURLException e1) {
 						ConnectionDialog.open(RCMain.getRCMain().getDisplay());
@@ -628,10 +607,9 @@ public class DownloadManagerShell {
 
 		logout = new ToolItem(bar, SWT.PUSH);
 		logout.setImage(ImageRepository.getImage("logout"));
-		logout.setToolTipText(I18N
-				.translate(PFX + "toolbar.logout.tooltiptext"));
+		logout.setToolTipText(I18N.translate(PFX + "toolbar.logout.tooltiptext"));
 		logout.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				RCMain.getRCMain().disconnect();
 				setGUItoLoggedOut();
 			}
@@ -642,7 +620,7 @@ public class DownloadManagerShell {
 		refresh.setToolTipText(I18N.translate(PFX
 				+ "toolbar.refresh.tooltiptext"));
 		refresh.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				if (RCMain.getRCMain().connected()) {
 					RCMain.getRCMain().getClient().getDownloadManager().update(
 							true);
@@ -658,7 +636,7 @@ public class DownloadManagerShell {
 		addTorrent_by_file.setToolTipText(I18N.translate(PFX
 				+ "toolbar.openbyfile.tooltiptext"));
 		addTorrent_by_file.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				OpenByFileDialog.open();
 			}
 		});
@@ -668,7 +646,7 @@ public class DownloadManagerShell {
 		addTorrent_by_url.setToolTipText(I18N.translate(PFX
 				+ "toolbar.openbyurl.tooltiptext"));
 		addTorrent_by_url.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				OpenByURLDialog.open();
 			}
 		});
@@ -680,15 +658,14 @@ public class DownloadManagerShell {
 		top.setImage(ImageRepository.getImage("top"));
 		top.setToolTipText(I18N.translate(PFX + "toolbar.top.tooltiptext"));
 		top.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				if (downloadsTable.isFocusControl()) {
 					TableItem[] items = downloadsTable.getSelection();
 					if (items.length == 0 || items.length > 1) {
 						return;
 					}
 					Container container = (Container) items[0].getData();
-					int current_position = container.getDownload()
-							.getPosition();
+					int current_position = container.getDownload().getPosition();
 					if ((current_position - 1) > 0) {
 						container.getDownload().moveTo(1);
 					}
@@ -698,8 +675,7 @@ public class DownloadManagerShell {
 						return;
 					}
 					Container container = (Container) items[0].getData();
-					int current_position = container.getDownload()
-							.getPosition();
+					int current_position = container.getDownload().getPosition();
 					if ((current_position - 1) > 0) {
 						container.getDownload().moveTo(1);
 					}
@@ -711,15 +687,14 @@ public class DownloadManagerShell {
 		up.setImage(ImageRepository.getImage("up"));
 		up.setToolTipText(I18N.translate(PFX + "toolbar.up.tooltiptext"));
 		up.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				if (downloadsTable.isFocusControl()) {
 					TableItem[] items = downloadsTable.getSelection();
 					if (items.length == 0 || items.length > 1) {
 						return;
 					}
 					Container container = (Container) items[0].getData();
-					int current_position = container.getDownload()
-							.getPosition();
+					int current_position = container.getDownload().getPosition();
 					if ((current_position - 1) > 0) {
 						container.getDownload().moveUp();
 					}
@@ -729,8 +704,7 @@ public class DownloadManagerShell {
 						return;
 					}
 					Container container = (Container) items[0].getData();
-					int current_position = container.getDownload()
-							.getPosition();
+					int current_position = container.getDownload().getPosition();
 					if ((current_position - 1) > 0) {
 						container.getDownload().moveUp();
 					}
@@ -743,16 +717,14 @@ public class DownloadManagerShell {
 		down.setImage(ImageRepository.getImage("down"));
 		down.setToolTipText(I18N.translate(PFX + "toolbar.down.tooltiptext"));
 		down.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				if (downloadsTable.isFocusControl()) {
 					TableItem[] items = downloadsTable.getSelection();
 					if (items.length == 0 || items.length > 1) {
 						return;
 					}
-					DownloadContainer container = (DownloadContainer) items[0]
-							.getData();
-					int current_position = container.getDownload()
-							.getPosition();
+					DownloadContainer container = (DownloadContainer) items[0].getData();
+					int current_position = container.getDownload().getPosition();
 					if ((current_position + 1) != (downloadsMap.size() + 1)) {
 						container.getDownload().moveDown();
 					}
@@ -762,8 +734,7 @@ public class DownloadManagerShell {
 						return;
 					}
 					Container container = (Container) items[0].getData();
-					int current_position = container.getDownload()
-							.getPosition();
+					int current_position = container.getDownload().getPosition();
 					if ((current_position + 1) != (seedsMap.size() + 1)) {
 						container.getDownload().moveDown();
 					}
@@ -776,18 +747,16 @@ public class DownloadManagerShell {
 
 		bottom = new ToolItem(bar, SWT.PUSH);
 		bottom.setImage(ImageRepository.getImage("bottom"));
-		bottom.setToolTipText(I18N
-				.translate(PFX + "toolbar.bottom.tooltiptext"));
+		bottom.setToolTipText(I18N.translate(PFX + "toolbar.bottom.tooltiptext"));
 		bottom.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				if (downloadsTable.isFocusControl()) {
 					TableItem[] items = downloadsTable.getSelection();
 					if (items.length == 0 || items.length > 1) {
 						return;
 					}
 					Container container = (Container) items[0].getData();
-					int current_position = container.getDownload()
-							.getPosition();
+					int current_position = container.getDownload().getPosition();
 					if (current_position != downloadsMap.size()) {
 						container.getDownload().moveTo(downloadsMap.size());
 					}
@@ -797,8 +766,7 @@ public class DownloadManagerShell {
 						return;
 					}
 					Container container = (Container) items[0].getData();
-					int current_position = container.getDownload()
-							.getPosition();
+					int current_position = container.getDownload().getPosition();
 					if (current_position != seedsMap.size()) {
 						container.getDownload().moveTo(seedsMap.size());
 					}
@@ -817,7 +785,7 @@ public class DownloadManagerShell {
 		queueTorrent.setToolTipText(I18N.translate(PFX
 				+ "toolbar.queuetorrent.tooltiptext"));
 		queueTorrent.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				TableItem[] items;
 				if (downloadsTable.isFocusControl()) {
 					items = downloadsTable.getSelection();
@@ -849,7 +817,7 @@ public class DownloadManagerShell {
 		stopTorrent.setToolTipText(I18N.translate(PFX
 				+ "toolbar.stoptorrents.tooltiptext"));
 		stopTorrent.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				TableItem[] items;
 				if (downloadsTable.isFocusControl()) {
 					items = downloadsTable.getSelection();
@@ -880,7 +848,7 @@ public class DownloadManagerShell {
 		removeTorrent.setToolTipText(I18N.translate(PFX
 				+ "toolbar.removetorrents.tooltiptext"));
 		removeTorrent.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				TableItem[] items;
 				if (downloadsTable.isFocusControl()) {
 					items = downloadsTable.getSelection();
@@ -898,8 +866,7 @@ public class DownloadManagerShell {
 					if (seedsMap.containsKey(container.getDownload().getHash())) {
 						seedsMap.remove(container.getDownload().getHash());
 						redrawTables();
-					} else if (downloadsMap.containsKey(container.getDownload()
-							.getHash())) {
+					} else if (downloadsMap.containsKey(container.getDownload().getHash())) {
 						downloadsMap.remove(container.getDownload().getHash());
 						redrawTables();
 					}
@@ -935,47 +902,44 @@ public class DownloadManagerShell {
 
 		pauseDownloads_1min.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
-				RCMain.getRCMain().getClient().getDownloadManager()
-						.pauseDownloads(60);
+			public void widgetSelected (SelectionEvent e) {
+				RCMain.getRCMain().getClient().getDownloadManager().pauseDownloads(
+						60);
 			}
 		});
 
 		pauseDownloads_5min.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
-				RCMain.getRCMain().getClient().getDownloadManager()
-						.pauseDownloads(300);
+			public void widgetSelected (SelectionEvent e) {
+				RCMain.getRCMain().getClient().getDownloadManager().pauseDownloads(
+						300);
 			}
 		});
 
-		pauseDownloads_UserSpecified
-				.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent e) {
-						try {
-							InputShell is = new InputShell(
-									I18N
-											.translate("rcmain."
-													+ "traymenu.quickmenu.pauseUserSpecified.inputShell.title"),
-									I18N
-											.translate("rcmain."
-													+ "traymenu.quickmenu.pauseUserSpecified.inputShell.message"));
-							String str_minutes = is.open();
-							int mins = Integer.parseInt(str_minutes);
-							RCMain.getRCMain().getClient().getDownloadManager()
-									.pauseDownloads(mins * 60);
-							logger.info("Pausing all downloads for " + mins
-									* 60 + " seconds (" + mins + " minutes)");
-						} catch (Exception ex) {
-						}
+		pauseDownloads_UserSpecified.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected (SelectionEvent e) {
+				try {
+					InputShell is = new InputShell(
+							I18N.translate("rcmain."
+									+ "traymenu.quickmenu.pauseUserSpecified.inputShell.title"),
+							I18N.translate("rcmain."
+									+ "traymenu.quickmenu.pauseUserSpecified.inputShell.message"));
+					String str_minutes = is.open();
+					int mins = Integer.parseInt(str_minutes);
+					RCMain.getRCMain().getClient().getDownloadManager().pauseDownloads(
+							mins * 60);
+					logger.info("Pausing all downloads for " + mins * 60
+							+ " seconds (" + mins + " minutes)");
+				} catch (Exception ex) {
+				}
 
-					}
-				});
+			}
+		});
 
 		// main pause listener
 		pauseAll.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
+			public void handleEvent (Event event) {
 				if (event.detail == SWT.ARROW) {
 					Rectangle rect = pauseAll.getBounds();
 					Point pt = new Point(rect.x, rect.y + rect.height);
@@ -983,8 +947,7 @@ public class DownloadManagerShell {
 					tbmenu.setLocation(pt.x, pt.y);
 					tbmenu.setVisible(true);
 				} else {
-					RCMain.getRCMain().getClient().getDownloadManager()
-							.pauseDownloads();
+					RCMain.getRCMain().getClient().getDownloadManager().pauseDownloads();
 				}
 			}
 		});
@@ -994,9 +957,8 @@ public class DownloadManagerShell {
 		resumeAll.setToolTipText(I18N.translate(PFX
 				+ "toolbar.resumeall.tooltiptext"));
 		resumeAll.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
-				RCMain.getRCMain().getClient().getDownloadManager()
-						.resumeDownloads();
+			public void handleEvent (Event e) {
+				RCMain.getRCMain().getClient().getDownloadManager().resumeDownloads();
 			}
 		});
 
@@ -1008,7 +970,7 @@ public class DownloadManagerShell {
 		preferences.setToolTipText(I18N.translate(PFX
 				+ "toolbar.openprefs.tooltiptext"));
 		preferences.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				PreferencesTab.open(tabFolder);
 			}
 		});
@@ -1018,9 +980,8 @@ public class DownloadManagerShell {
 		manage_users.setToolTipText(I18N.translate(PFX
 				+ "toolbar.manageusers.tooltiptext"));
 		manage_users.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
-				User user = RCMain.getRCMain().getClient().getUserManager()
-						.getActiveUser();
+			public void handleEvent (Event e) {
+				User user = RCMain.getRCMain().getClient().getUserManager().getActiveUser();
 				if (user == null) {
 					manage_users.setEnabled(false);
 					return;
@@ -1038,7 +999,7 @@ public class DownloadManagerShell {
 		console.setToolTipText(I18N.translate(PFX
 				+ "toolbar.openconsole.tooltiptext"));
 		console.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				ConsoleTab.open(tabFolder, true);
 			}
 		});
@@ -1048,7 +1009,7 @@ public class DownloadManagerShell {
 		information.setToolTipText(I18N.translate(PFX
 				+ "toolbar.about.tooltiptext"));
 		information.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				ReadmeTab.open(tabFolder);
 			}
 		});
@@ -1061,7 +1022,7 @@ public class DownloadManagerShell {
 		// ------------------- Listeners for the shell ---------------------\\
 
 		final GlobalStatsListener sul = new GlobalStatsListener() {
-			public void updateStats(final int d, final int u, int s, int sq,
+			public void updateStats (final int d, final int u, int s, int sq,
 					int dl, int dlq) {
 				upSpeed = u;
 				downSpeed = d;
@@ -1073,7 +1034,7 @@ public class DownloadManagerShell {
 
 		final ConnectionListener cl = new ConnectionListener() {
 
-			public void connectionState(final int state) {
+			public void connectionState (final int state) {
 				setConnectionStatusBar(state);
 				if (state > 0) {
 					if (RCMain.getRCMain().getClient().isSSLEncrypted()) {
@@ -1091,64 +1052,39 @@ public class DownloadManagerShell {
 							new SWTSafeRunnable() {
 
 								@Override
-								public void runSafe() {
-									String userLoggedIn = RCMain.getRCMain()
-											.getClient().getUsername();
+								public void runSafe () {
+									String userLoggedIn = RCMain.getRCMain().getClient().getUsername();
 									if (myTorrents != null
 											|| !myTorrents.isDisposed()) {
 										if (bSingleUserMode) {
 
-											if (RCMain
-													.getRCMain()
-													.getProperties()
-													.getPropertyAsBoolean(
-															"mainwindow.showHost")) {
-												myTorrents
-														.setText(I18N
-																.translate(PFX
-																		+ "mytorrents.tabtitle.all.text1")
-																+ " "
-																+ RCMain
-																		.getRCMain()
-																		.getClient()
-																		.getServer()
-																		.getHost());
+											if (RCMain.getRCMain().getProperties().getPropertyAsBoolean(
+													"mainwindow.showHost")) {
+												myTorrents.setText(I18N.translate(PFX
+														+ "mytorrents.tabtitle.all.text1")
+														+ " "
+														+ RCMain.getRCMain().getClient().getServer().getHost());
 											} else {
-												myTorrents
-														.setText(I18N
-																.translate(PFX
-																		+ "mytorrents.tabtitle.all.text2"));
+												myTorrents.setText(I18N.translate(PFX
+														+ "mytorrents.tabtitle.all.text2"));
 											}
 
 										} else if (userLoggedIn != null) {
-											if (RCMain
-													.getRCMain()
-													.getProperties()
-													.getPropertyAsBoolean(
-															"mainwindow.showHost")) {
-												myTorrents
-														.setText(userLoggedIn
-																+ I18N
-																		.translate(PFX
-																				+ "mytorrents.tabtitle.user")
-																+ ": "
-																+ RCMain
-																		.getRCMain()
-																		.getClient()
-																		.getServer()
-																		.getHost());
+											if (RCMain.getRCMain().getProperties().getPropertyAsBoolean(
+													"mainwindow.showHost")) {
+												myTorrents.setText(userLoggedIn
+														+ I18N.translate(PFX
+																+ "mytorrents.tabtitle.user")
+														+ ": "
+														+ RCMain.getRCMain().getClient().getServer().getHost());
 											} else {
-												myTorrents
-														.setText(userLoggedIn
-																+ I18N
-																		.translate(PFX
-																				+ "mytorrents.tabtitle.user"));
+												myTorrents.setText(userLoggedIn
+														+ I18N.translate(PFX
+																+ "mytorrents.tabtitle.user"));
 											}
 										} else {
-											myTorrents
-													.setText(I18N
-															.translate(PFX
-																	+ "mytorrents.tabtitle.fallback"));
+											myTorrents.setText(I18N.translate(PFX
+													+ "mytorrents.tabtitle.fallback"));
 										}
 									}
 
@@ -1165,12 +1101,12 @@ public class DownloadManagerShell {
 
 		final DownloadManagerListener dml = new DownloadManagerListener() {
 
-			public void downloadAdded(final Download download) {
+			public void downloadAdded (final Download download) {
 				try {
 					if (DOWNLOAD_MANAGER_SHELL == null
 							|| DOWNLOAD_MANAGER_SHELL.isDisposed()) {
-						RCMain.getRCMain().getClient().getDownloadManager()
-								.removeListener(this);
+						RCMain.getRCMain().getClient().getDownloadManager().removeListener(
+								this);
 						return;
 					}
 
@@ -1178,19 +1114,16 @@ public class DownloadManagerShell {
 					RCMain.getRCMain().getDisplay().syncExec(
 							new SWTSafeRunnable() {
 								@Override
-								public void runSafe() {
+								public void runSafe () {
 									if (download.getState() == Download.ST_SEEDING
 											|| download.isComplete()) {
-										if (!seedsMap.containsKey(download
-												.getHash())) {
+										if (!seedsMap.containsKey(download.getHash())) {
 											SeedContainer sc = new SeedContainer(
 													download);
-											seedsMap
-													.put(download.getHash(), sc);
+											seedsMap.put(download.getHash(), sc);
 										}
 									} else {
-										if (!downloadsMap.containsKey(download
-												.getHash())) {
+										if (!downloadsMap.containsKey(download.getHash())) {
 											DownloadContainer dc = new DownloadContainer(
 													download);
 											downloadsMap.put(
@@ -1208,7 +1141,7 @@ public class DownloadManagerShell {
 				download.addDownloadListener(dlL);
 			}
 
-			public void downloadRemoved(Download download) {
+			public void downloadRemoved (Download download) {
 				if (downloadsMap.containsKey(download.getHash())) {
 					downloadsMap.remove(download.getHash());
 					redrawTables();
@@ -1223,14 +1156,12 @@ public class DownloadManagerShell {
 
 		final ClientUpdateListener cul = new ClientUpdateListener() {
 
-			public void update(long updateSwitches) {
+			public void update (long updateSwitches) {
 				if ((updateSwitches & Constants.UPDATE_LIST_TRANSFERS) != 0) {
-					Download[] downloads = RCMain.getRCMain().getClient()
-							.getDownloadManager().getSortedDownloads();
+					Download[] downloads = RCMain.getRCMain().getClient().getDownloadManager().getSortedDownloads();
 					for (int i = 0; i < downloads.length; i++) {
 						if (!downloadsMap.containsKey(downloads[i].getHash())
-								&& !seedsMap
-										.containsKey(downloads[i].getHash())) {
+								&& !seedsMap.containsKey(downloads[i].getHash())) {
 							if (downloads[i].getState() == Download.ST_SEEDING
 									|| downloads[i].isComplete()) {
 								SeedContainer sc = new SeedContainer(
@@ -1247,30 +1178,23 @@ public class DownloadManagerShell {
 						} else {
 							// is present in one of the maps.. so find it and
 							// update it
-							if (downloadsMap
-									.containsKey(downloads[i].getHash())) {
+							if (downloadsMap.containsKey(downloads[i].getHash())) {
 								if (downloads[i].getState() == Download.ST_SEEDING) {
-									downloadsMap.get(downloads[i].getHash())
-											.removeFromTable();
+									downloadsMap.get(downloads[i].getHash()).removeFromTable();
 									downloadsMap.remove(downloads[i].getHash());
-									if (!seedsMap.containsKey(downloads[i]
-											.getHash())) {
+									if (!seedsMap.containsKey(downloads[i].getHash())) {
 										SeedContainer sc = new SeedContainer(
 												downloads[i], seedsTable,
 												SWT.NULL);
-										seedsMap
-												.put(downloads[i].getHash(), sc);
+										seedsMap.put(downloads[i].getHash(), sc);
 									}
 								}
-								DownloadContainer dc = downloadsMap
-										.get(downloads[i].getHash());
+								DownloadContainer dc = downloadsMap.get(downloads[i].getHash());
 								if (dc != null) {
 									dc.update(false);
 								}
-							} else if (seedsMap.containsKey(downloads[i]
-									.getHash())) {
-								SeedContainer sc = seedsMap.get(downloads[i]
-										.getHash());
+							} else if (seedsMap.containsKey(downloads[i].getHash())) {
+								SeedContainer sc = seedsMap.get(downloads[i].getHash());
 								sc.update(false);
 							}
 							redrawTables = true;
@@ -1292,28 +1216,25 @@ public class DownloadManagerShell {
 
 		final ParameterListener pl = new ParameterListener() {
 
-			public void azParameter(String key, String value, int type) {
-				if (key
-						.equalsIgnoreCase(RemoteConstants.CORE_PARAM_INT_MAX_UPLOAD_SPEED_KBYTES_PER_SEC)) {
+			public void azParameter (String key, String value, int type) {
+				if (key.equalsIgnoreCase(RemoteConstants.CORE_PARAM_INT_MAX_UPLOAD_SPEED_KBYTES_PER_SEC)) {
 					azureusUpload = value;
 					refreshStatusBar();
 				}
 
-				if (key
-						.equalsIgnoreCase(RemoteConstants.CORE_PARAM_INT_MAX_DOWNLOAD_SPEED_KBYTES_PER_SEC)) {
+				if (key.equalsIgnoreCase(RemoteConstants.CORE_PARAM_INT_MAX_DOWNLOAD_SPEED_KBYTES_PER_SEC)) {
 					azureusDownload = value;
 					refreshStatusBar();
 				}
 
 			}
 
-			public void pluginParameter(String key, String value, int type) {
+			public void pluginParameter (String key, String value, int type) {
 				if (key.equalsIgnoreCase("singleUserMode")) {
 					bSingleUserMode = Boolean.parseBoolean(value);
 					if (bSingleUserMode) {
 						setStatusBarText(
-								I18N
-										.translate("rcmain.mainwindow.statusbar.connectedSingleUser"),
+								I18N.translate("rcmain.mainwindow.statusbar.connectedSingleUser"),
 								SWT.COLOR_DARK_GREEN);
 					}
 
@@ -1321,7 +1242,7 @@ public class DownloadManagerShell {
 
 			}
 
-			public void coreParameter(String key, String value, int type) {
+			public void coreParameter (String key, String value, int type) {
 
 			}
 		};
@@ -1341,8 +1262,7 @@ public class DownloadManagerShell {
 
 		// Set the tabs to the OS color scheme
 		Display display = RCMain.getRCMain().getDisplay();
-		tabFolder.setSelectionForeground(display
-				.getSystemColor(SWT.COLOR_TITLE_FOREGROUND));
+		tabFolder.setSelectionForeground(display.getSystemColor(SWT.COLOR_TITLE_FOREGROUND));
 		tabFolder.setSelectionBackground(new Color[] {
 				display.getSystemColor(SWT.COLOR_TITLE_BACKGROUND),
 				display.getSystemColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT) },
@@ -1353,14 +1273,14 @@ public class DownloadManagerShell {
 		myTorrents.setToolTipText("Click here to resort the tables");
 		tabFolder.addMouseListener(new MouseListener() {
 
-			public void mouseDoubleClick(MouseEvent arg0) {
+			public void mouseDoubleClick (MouseEvent arg0) {
 
 			}
 
-			public void mouseDown(MouseEvent arg0) {
+			public void mouseDown (MouseEvent arg0) {
 			}
 
-			public void mouseUp(MouseEvent arg0) {
+			public void mouseUp (MouseEvent arg0) {
 				CTabItem tab = tabFolder.getSelection();
 				if (tab.equals(myTorrents)) {
 					redrawTables();
@@ -1394,16 +1314,14 @@ public class DownloadManagerShell {
 		createTableColumns(downloadsTable, DownloadContainer.getColumns());
 
 		downloadsTable.addListener(SWT.SetData, new Listener() {
-			public void handleEvent(Event event) {
+			public void handleEvent (Event event) {
 				downloadsArray = downloadsMap.values().toArray(emptyArray);
 				if (downloadsArray.length == 0) {
 					return;
 				}
-				Comparator<Container> data = (Comparator<Container>) downloadsTable
-						.getData("comparator");
+				Comparator<Container> data = (Comparator<Container>) downloadsTable.getData("comparator");
 
-				if (!Boolean.parseBoolean((String) downloadsTable
-						.getData("sort"))) {
+				if (!Boolean.parseBoolean((String) downloadsTable.getData("sort"))) {
 					data = Collections.reverseOrder(data);
 				}
 
@@ -1436,7 +1354,7 @@ public class DownloadManagerShell {
 		// Selection listener for the table
 		downloadsTable.addListener(SWT.Selection, new Listener() {
 
-			public void handleEvent(Event arg0) {
+			public void handleEvent (Event arg0) {
 				TableItem[] items = downloadsTable.getSelection();
 				if (items == null) {
 					return;
@@ -1482,7 +1400,7 @@ public class DownloadManagerShell {
 
 		downloadsTable.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseDown(MouseEvent e) {
+			public void mouseDown (MouseEvent e) {
 				if (e.button == 1) {
 					if (downloadsTable.getItem(new Point(e.x, e.y)) == null) {
 						downloadsTable.deselectAll();
@@ -1496,7 +1414,7 @@ public class DownloadManagerShell {
 
 		downloadsTable.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseDoubleClick(MouseEvent e) {
+			public void mouseDoubleClick (MouseEvent e) {
 				if (e.button == 1) {
 					if (downloadsTable.getItem(new Point(e.x, e.y)) == null) {
 						downloadsTable.deselectAll();
@@ -1536,14 +1454,13 @@ public class DownloadManagerShell {
 
 		seedsTable.addListener(SWT.SetData, new Listener() {
 
-			public void handleEvent(Event event) {
+			public void handleEvent (Event event) {
 				seedsArray = seedsMap.values().toArray(emptyArray);
 				if (seedsArray.length == 0) {
 					return;
 				}
 
-				Comparator<Container> data = (Comparator<Container>) seedsTable
-						.getData("comparator");
+				Comparator<Container> data = (Comparator<Container>) seedsTable.getData("comparator");
 
 				if (!Boolean.parseBoolean((String) seedsTable.getData("sort"))) {
 					data = Collections.reverseOrder(data);
@@ -1572,7 +1489,7 @@ public class DownloadManagerShell {
 
 		seedsTable.addListener(SWT.Selection, new Listener() {
 
-			public void handleEvent(Event arg0) {
+			public void handleEvent (Event arg0) {
 				TableItem[] items = seedsTable.getSelection();
 				if (items == null) {
 					return;
@@ -1613,7 +1530,7 @@ public class DownloadManagerShell {
 
 		seedsTable.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseDown(MouseEvent e) {
+			public void mouseDown (MouseEvent e) {
 				if (e.button == 1) {
 					if (seedsTable.getItem(new Point(e.x, e.y)) == null) {
 						seedsTable.deselectAll();
@@ -1627,7 +1544,7 @@ public class DownloadManagerShell {
 
 		seedsTable.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseDoubleClick(MouseEvent e) {
+			public void mouseDoubleClick (MouseEvent e) {
 				if (e.button == 1) {
 					if (seedsTable.getItem(new Point(e.x, e.y)) == null) {
 						seedsTable.deselectAll();
@@ -1700,7 +1617,7 @@ public class DownloadManagerShell {
 
 		connectionStatusIcon = new CLabelPadding(statusbarComp, borderFlag);
 		connectionStatusIcon.addListener(SWT.MouseDoubleClick, new Listener() {
-			public void handleEvent(Event arg0) {
+			public void handleEvent (Event arg0) {
 				if (RCMain.getRCMain().connected()) {
 					ServerDetailsTab.open(tabFolder);
 				}
@@ -1712,7 +1629,7 @@ public class DownloadManagerShell {
 		sslStatusIcon.setImage(ImageRepository.getImage("ssl_disabled"));
 		sslStatusIcon.setEnabled(false);
 		sslStatusIcon.addListener(SWT.MouseDoubleClick, new Listener() {
-			public void handleEvent(Event arg0) {
+			public void handleEvent (Event arg0) {
 				if (RCMain.getRCMain().connected()) {
 					ServerDetailsTab.open(tabFolder);
 				}
@@ -1725,17 +1642,15 @@ public class DownloadManagerShell {
 
 		// Double click listener for down and up
 		Listener speedUpdate = new Listener() {
-			public void handleEvent(Event arg0) {
+			public void handleEvent (Event arg0) {
 				Client client = RCMain.getRCMain().getClient();
 				client.transactionStart();
-				client
-						.sendGetAzParameter(
-								RemoteConstants.CORE_PARAM_INT_MAX_UPLOAD_SPEED_KBYTES_PER_SEC,
-								RemoteConstants.PARAMETER_INT);
-				client
-						.sendGetAzParameter(
-								RemoteConstants.CORE_PARAM_INT_MAX_DOWNLOAD_SPEED_KBYTES_PER_SEC,
-								RemoteConstants.PARAMETER_INT);
+				client.sendGetAzParameter(
+						RemoteConstants.CORE_PARAM_INT_MAX_UPLOAD_SPEED_KBYTES_PER_SEC,
+						RemoteConstants.PARAMETER_INT);
+				client.sendGetAzParameter(
+						RemoteConstants.CORE_PARAM_INT_MAX_DOWNLOAD_SPEED_KBYTES_PER_SEC,
+						RemoteConstants.PARAMETER_INT);
 				client.transactionCommit();
 			}
 		};
@@ -1746,7 +1661,7 @@ public class DownloadManagerShell {
 		// menus
 		final Menu menuUpSpeed = new Menu(DOWNLOAD_MANAGER_SHELL, SWT.POP_UP);
 		menuUpSpeed.addListener(SWT.Show, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				MenuItem[] items = menuUpSpeed.getItems();
 				for (int i = 0; i < items.length; i++) {
 					items[i].dispose();
@@ -1767,13 +1682,10 @@ public class DownloadManagerShell {
 				MenuItem item = new MenuItem(menuUpSpeed, SWT.RADIO);
 				item.setText("Unlimited");
 				item.addListener(SWT.Selection, new Listener() {
-					public void handleEvent(Event e) {
-						RCMain
-								.getRCMain()
-								.getClient()
-								.sendSetAzParameter(
-										RemoteConstants.CORE_PARAM_INT_MAX_UPLOAD_SPEED_KBYTES_PER_SEC,
-										"0", RemoteConstants.PARAMETER_INT);
+					public void handleEvent (Event e) {
+						RCMain.getRCMain().getClient().sendSetAzParameter(
+								RemoteConstants.CORE_PARAM_INT_MAX_UPLOAD_SPEED_KBYTES_PER_SEC,
+								"0", RemoteConstants.PARAMETER_INT);
 						azureusUpload = "0";
 						refreshStatusBar();
 					}
@@ -1783,23 +1695,18 @@ public class DownloadManagerShell {
 				}
 
 				final SelectionListener speedChangeListener = new SelectionListener() {
-					public void widgetSelected(SelectionEvent e) {
+					public void widgetSelected (SelectionEvent e) {
 						if (((MenuItem) e.widget).getSelection()) {
-							String value = String.valueOf(((MenuItem) e.widget)
-									.getData("speed"));
-							RCMain
-									.getRCMain()
-									.getClient()
-									.sendSetAzParameter(
-											RemoteConstants.CORE_PARAM_INT_MAX_UPLOAD_SPEED_KBYTES_PER_SEC,
-											value,
-											RemoteConstants.PARAMETER_INT);
+							String value = String.valueOf(((MenuItem) e.widget).getData("speed"));
+							RCMain.getRCMain().getClient().sendSetAzParameter(
+									RemoteConstants.CORE_PARAM_INT_MAX_UPLOAD_SPEED_KBYTES_PER_SEC,
+									value, RemoteConstants.PARAMETER_INT);
 							azureusUpload = value;
 							refreshStatusBar();
 						}
 					}
 
-					public void widgetDefaultSelected(SelectionEvent arg0) {
+					public void widgetDefaultSelected (SelectionEvent arg0) {
 					}
 				};
 
@@ -1817,9 +1724,8 @@ public class DownloadManagerShell {
 						if (iAboveBelow[j] >= 5) {
 							item = new MenuItem(menuUpSpeed, SWT.RADIO,
 									(j == 0) ? 1 : menuUpSpeed.getItemCount());
-							item.setText(DisplayFormatters
-									.formatByteCountToKiBEtcPerSec(
-											iAboveBelow[j] * 1024, true));
+							item.setText(DisplayFormatters.formatByteCountToKiBEtcPerSec(
+									iAboveBelow[j] * 1024, true));
 							item.setData("speed", new Long(iAboveBelow[j]));
 							item.addSelectionListener(speedChangeListener);
 
@@ -1839,7 +1745,7 @@ public class DownloadManagerShell {
 
 		final Menu menuDownSpeed = new Menu(DOWNLOAD_MANAGER_SHELL, SWT.POP_UP);
 		menuDownSpeed.addListener(SWT.Show, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				MenuItem[] items = menuDownSpeed.getItems();
 				for (int i = 0; i < items.length; i++) {
 					items[i].dispose();
@@ -1852,20 +1758,17 @@ public class DownloadManagerShell {
 					downLimit = Integer.valueOf(azureusDownload);
 				}
 				final boolean unlim = (downLimit == 0);
-				if (downLimit == 0) {
+				if (unlim) {
 					downLimit = 275;
 				}
 
 				MenuItem item = new MenuItem(menuDownSpeed, SWT.RADIO);
 				item.setText("Unlimited");
 				item.addListener(SWT.Selection, new Listener() {
-					public void handleEvent(Event e) {
-						RCMain
-								.getRCMain()
-								.getClient()
-								.sendSetAzParameter(
-										RemoteConstants.CORE_PARAM_INT_MAX_DOWNLOAD_SPEED_KBYTES_PER_SEC,
-										"0", RemoteConstants.PARAMETER_INT);
+					public void handleEvent (Event e) {
+						RCMain.getRCMain().getClient().sendSetAzParameter(
+								RemoteConstants.CORE_PARAM_INT_MAX_DOWNLOAD_SPEED_KBYTES_PER_SEC,
+								"0", RemoteConstants.PARAMETER_INT);
 						azureusDownload = "0";
 						refreshStatusBar();
 					}
@@ -1874,24 +1777,19 @@ public class DownloadManagerShell {
 					item.setSelection(true);
 				}
 				final SelectionListener speedChangeListener = new SelectionListener() {
-					public void widgetSelected(SelectionEvent e) {
+					public void widgetSelected (SelectionEvent e) {
 						if (((MenuItem) e.widget).getSelection()) {
-							String value = String.valueOf(((MenuItem) e.widget)
-									.getData("speed"));
-							RCMain
-									.getRCMain()
-									.getClient()
-									.sendSetAzParameter(
-											RemoteConstants.CORE_PARAM_INT_MAX_DOWNLOAD_SPEED_KBYTES_PER_SEC,
-											value,
-											RemoteConstants.PARAMETER_INT);
+							String value = String.valueOf(((MenuItem) e.widget).getData("speed"));
+							RCMain.getRCMain().getClient().sendSetAzParameter(
+									RemoteConstants.CORE_PARAM_INT_MAX_DOWNLOAD_SPEED_KBYTES_PER_SEC,
+									value, RemoteConstants.PARAMETER_INT);
 							azureusDownload = value;
 							refreshStatusBar();
 						}
 
 					}
 
-					public void widgetDefaultSelected(SelectionEvent arg0) {
+					public void widgetDefaultSelected (SelectionEvent arg0) {
 					}
 				};
 
@@ -1908,9 +1806,8 @@ public class DownloadManagerShell {
 						if (iAboveBelow[j] >= 5) {
 							item = new MenuItem(menuDownSpeed, SWT.RADIO,
 									(j == 0) ? 1 : menuDownSpeed.getItemCount());
-							item.setText(DisplayFormatters
-									.formatByteCountToKiBEtcPerSec(
-											iAboveBelow[j] * 1024, true));
+							item.setText(DisplayFormatters.formatByteCountToKiBEtcPerSec(
+									iAboveBelow[j] * 1024, true));
 							item.setData("speed", new Long(iAboveBelow[j]));
 							item.addSelectionListener(speedChangeListener);
 							item.setSelection(!unlim
@@ -1930,17 +1827,17 @@ public class DownloadManagerShell {
 
 		DOWNLOAD_MANAGER_SHELL.addShellListener(new ShellListener() {
 
-			public void shellActivated(ShellEvent arg0) {
+			public void shellActivated (ShellEvent arg0) {
 			}
 
-			public void shellClosed(ShellEvent event) {
+			public void shellClosed (ShellEvent event) {
 				logger.warn("Closing Shell!!!");
 
 				// Check to see the configs that we are coming in with
-				boolean sendMainWindowToTray = RCMain.getRCMain()
-						.getProperties().getPropertyAsBoolean("tray.exit");
-				boolean confirmExit = RCMain.getRCMain().getProperties()
-						.getPropertyAsBoolean("confirm.exit");
+				boolean sendMainWindowToTray = RCMain.getRCMain().getProperties().getPropertyAsBoolean(
+						"tray.exit");
+				boolean confirmExit = RCMain.getRCMain().getProperties().getPropertyAsBoolean(
+						"confirm.exit");
 
 				// -----First we need to save everything for the user---\\
 
@@ -1950,8 +1847,7 @@ public class DownloadManagerShell {
 
 				int position_x = DOWNLOAD_MANAGER_SHELL.getLocation().x;
 				int position_y = DOWNLOAD_MANAGER_SHELL.getLocation().y;
-				ExtendedProperties properties = RCMain.getRCMain()
-						.getProperties();
+				ExtendedProperties properties = RCMain.getRCMain().getProperties();
 
 				if (!sash.isDisposed()) {
 					int[] weights = sash.getWeights();
@@ -2023,8 +1919,7 @@ public class DownloadManagerShell {
 								DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION
 										| SWT.OK | SWT.CANCEL);
 						messageBox.setText("Confirm Exit");
-						messageBox
-								.setMessage("Are you sure you wish to exit AzSMRC entirely?");
+						messageBox.setMessage("Are you sure you wish to exit AzSMRC entirely?");
 						int response = messageBox.open();
 						switch (response) {
 						case SWT.OK:
@@ -2049,8 +1944,8 @@ public class DownloadManagerShell {
 					RCMain.getRCMain().getClient().removeGlobalStatsListener(
 							sul);
 					RCMain.getRCMain().getClient().removeConnectionListener(cl);
-					RCMain.getRCMain().getClient().getDownloadManager()
-							.removeListener(dml);
+					RCMain.getRCMain().getClient().getDownloadManager().removeListener(
+							dml);
 					RCMain.getRCMain().getClient().removeClientUpdateListener(
 							cul);
 					RCMain.getRCMain().getClient().removeParameterListener(pl);
@@ -2063,17 +1958,16 @@ public class DownloadManagerShell {
 				}
 			}
 
-			public void shellDeactivated(ShellEvent arg0) {
+			public void shellDeactivated (ShellEvent arg0) {
 
 			}
 
-			public void shellDeiconified(ShellEvent arg0) {
+			public void shellDeiconified (ShellEvent arg0) {
 				RCMain.getRCMain().updateTimer(true);
-				RCMain.getRCMain().getClient().getDownloadManager()
-						.update(true);
+				RCMain.getRCMain().getClient().getDownloadManager().update(true);
 			}
 
-			public void shellIconified(ShellEvent arg0) {
+			public void shellIconified (ShellEvent arg0) {
 				if (RCMain.getRCMain().getProperties().getPropertyAsBoolean(
 						"tray.minimize")) {
 					DOWNLOAD_MANAGER_SHELL.setVisible(false);
@@ -2114,8 +2008,8 @@ public class DownloadManagerShell {
 
 		if (RCMain.getRCMain().getRunTime()
 				- properties.getPropertyAsLong("lastDonationQuestion") > DONATION_INTERVAL) {
-			properties.setProperty("lastDonationQuestion", RCMain.getRCMain()
-					.getRunTime());
+			properties.setProperty("lastDonationQuestion",
+					RCMain.getRCMain().getRunTime());
 			// TODO MARC Popup donation tab
 		}
 
@@ -2147,7 +2041,7 @@ public class DownloadManagerShell {
 		// addView(ViewID.MAIN, "MyID", Eventlistener);
 	}
 
-	public void close_shell() {
+	public void close_shell () {
 		if (DOWNLOAD_MANAGER_SHELL != null
 				&& !DOWNLOAD_MANAGER_SHELL.isDisposed()) {
 			DOWNLOAD_MANAGER_SHELL.close();
@@ -2155,15 +2049,15 @@ public class DownloadManagerShell {
 
 	}
 
-	public Shell getShell() {
+	public Shell getShell () {
 		return DOWNLOAD_MANAGER_SHELL;
 	}
 
-	public boolean isCollapsed() {
+	public boolean isCollapsed () {
 		return COLLAPSED;
 	}
 
-	public void setCollapsed(boolean state) {
+	public void setCollapsed (boolean state) {
 		COLLAPSED = state;
 	}
 
@@ -2172,71 +2066,60 @@ public class DownloadManagerShell {
 	 * @param connection -- int -- 0 for no connection, 1 for connecting, 2 for
 	 *            connected
 	 */
-	public void setConnectionStatusBar(final int connection) {
+	public void setConnectionStatusBar (final int connection) {
 		Display display = RCMain.getRCMain().getDisplay();
 		if (display == null) {
 			return;
 		}
 		display.syncExec(new SWTSafeRunnable() {
 			@Override
-			public void runSafe() {
+			public void runSafe () {
 				if (connectionStatusIcon == null
 						|| connectionStatusIcon.isDisposed()) {
 					return;
 				}
 				if (connection == 0) {
-					connectionStatusIcon.setImage(ImageRepository
-							.getImage("connect_no"));
-					connectionStatusIcon
-							.setToolTipText("Not Connected to server");
+					connectionStatusIcon.setImage(ImageRepository.getImage("connect_no"));
+					connectionStatusIcon.setToolTipText("Not Connected to server");
 				} else if (connection == 1) {
 
-					connectionStatusIcon.setImage(ImageRepository
-							.getImage("connect_creating"));
-					connectionStatusIcon
-							.setToolTipText("Attempting to connect to server");
+					connectionStatusIcon.setImage(ImageRepository.getImage("connect_creating"));
+					connectionStatusIcon.setToolTipText("Attempting to connect to server");
 				} else if (connection == 2) {
-					connectionStatusIcon.setImage(ImageRepository
-							.getImage("connect_established"));
-					connectionStatusIcon
-							.setToolTipText("Connected to server\nDouble-Click for Server Details");
+					connectionStatusIcon.setImage(ImageRepository.getImage("connect_established"));
+					connectionStatusIcon.setToolTipText("Connected to server\nDouble-Click for Server Details");
 				}
 			}
 		});
 	}
 
-	public void setSSLStatusBar(final boolean benabled, final boolean buse_ssl) {
+	public void setSSLStatusBar (final boolean benabled, final boolean buse_ssl) {
 		Display display = RCMain.getRCMain().getDisplay();
 		if (display == null || display.isDisposed()) {
 			return;
 		}
 		display.asyncExec(new SWTSafeRunnable() {
 			@Override
-			public void runSafe() {
+			public void runSafe () {
 				if (benabled) {
 					if (buse_ssl) {
 						sslStatusIcon.setEnabled(true);
-						sslStatusIcon.setImage(ImageRepository
-								.getImage("ssl_enabled"));
-						sslStatusIcon
-								.setToolTipText("SSL Enabled\nDouble-Click for Server Details");
+						sslStatusIcon.setImage(ImageRepository.getImage("ssl_enabled"));
+						sslStatusIcon.setToolTipText("SSL Enabled\nDouble-Click for Server Details");
 					} else {
 						sslStatusIcon.setEnabled(true);
-						sslStatusIcon.setImage(ImageRepository
-								.getImage("ssl_disabled"));
-						sslStatusIcon
-								.setToolTipText("SSL Disabled\nDouble-Click for Server Details");
+						sslStatusIcon.setImage(ImageRepository.getImage("ssl_disabled"));
+						sslStatusIcon.setToolTipText("SSL Disabled\nDouble-Click for Server Details");
 					}
 				} else {
-					sslStatusIcon.setImage(ImageRepository
-							.getImage("ssl_disabled"));
+					sslStatusIcon.setImage(ImageRepository.getImage("ssl_disabled"));
 					sslStatusIcon.setEnabled(false);
 				}
 			}
 		});
 	}
 
-	public void setTorrentMoveButtons(final boolean bTop, final boolean bUp,
+	public void setTorrentMoveButtons (final boolean bTop, final boolean bUp,
 			final boolean bDown, final boolean bBottom) {
 		Display display = RCMain.getRCMain().getDisplay();
 		if (display == null || display.isDisposed()) {
@@ -2244,7 +2127,7 @@ public class DownloadManagerShell {
 		}
 		display.asyncExec(new SWTSafeRunnable() {
 			@Override
-			public void runSafe() {
+			public void runSafe () {
 				if (top.isEnabled() != bTop) {
 					top.setEnabled(bTop);
 				}
@@ -2261,16 +2144,15 @@ public class DownloadManagerShell {
 		});
 	}
 
-	public void setUserButton() {
+	public void setUserButton () {
 		Display display = RCMain.getRCMain().getDisplay();
 		if (display == null || display.isDisposed()) {
 			return;
 		}
 		display.asyncExec(new SWTSafeRunnable() {
 			@Override
-			public void runSafe() {
-				User user = RCMain.getRCMain().getClient().getUserManager()
-						.getActiveUser();
+			public void runSafe () {
+				User user = RCMain.getRCMain().getClient().getUserManager().getActiveUser();
 				if (user != null) {
 					manage_users.setEnabled(true);
 				}
@@ -2278,14 +2160,14 @@ public class DownloadManagerShell {
 		});
 	}
 
-	public void setLogInOutButtons(final boolean bLoggedIn) {
+	public void setLogInOutButtons (final boolean bLoggedIn) {
 		Display display = RCMain.getRCMain().getDisplay();
 		if (display == null || display.isDisposed()) {
 			return;
 		}
 		display.asyncExec(new SWTSafeRunnable() {
 			@Override
-			public void runSafe() {
+			public void runSafe () {
 				if (bLoggedIn) {
 					login.setEnabled(false);
 					menuLogin.setEnabled(false);
@@ -2337,7 +2219,7 @@ public class DownloadManagerShell {
 		});
 	}
 
-	public void redrawColumnsonTables() {
+	public void redrawColumnsonTables () {
 		// setRequestedItems();
 		TableColumn[] columns = downloadsTable.getColumns();
 		for (TableColumn column : columns) {
@@ -2369,14 +2251,14 @@ public class DownloadManagerShell {
 		redrawTables();
 	}
 
-	private void addDownloadManagerMenu(final Table table) {
+	private void addDownloadManagerMenu (final Table table) {
 		final Menu menu = new Menu(table);
 
 		final MenuItem queue = new MenuItem(menu, SWT.PUSH);
 		queue.setText("Queue");
 		queue.setImage(ImageRepository.getImage("menu_queue"));
 		queue.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event arg0) {
+			public void handleEvent (Event arg0) {
 				if (table != null || !table.isDisposed()) {
 					TableItem[] items = table.getSelection();
 					RCMain.getRCMain().getClient().transactionStart();
@@ -2392,7 +2274,7 @@ public class DownloadManagerShell {
 		final MenuItem forceStart = new MenuItem(menu, SWT.CHECK);
 		forceStart.setText("Force Start");
 		forceStart.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event arg0) {
+			public void handleEvent (Event arg0) {
 				if (table != null || !table.isDisposed()) {
 					TableItem[] items = table.getSelection();
 					RCMain.getRCMain().getClient().transactionStart();
@@ -2410,7 +2292,7 @@ public class DownloadManagerShell {
 		stop.setText("Stop");
 		stop.setImage(ImageRepository.getImage("menu_stop"));
 		stop.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event arg0) {
+			public void handleEvent (Event arg0) {
 				if (table != null || !table.isDisposed()) {
 					TableItem[] items = table.getSelection();
 					RCMain.getRCMain().getClient().transactionStart();
@@ -2427,7 +2309,7 @@ public class DownloadManagerShell {
 		remove.setText("Remove");
 		remove.setImage(ImageRepository.getImage("menu_remove"));
 		remove.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event arg0) {
+			public void handleEvent (Event arg0) {
 				if (table != null || !table.isDisposed()) {
 					TableItem[] items = table.getSelection();
 					RCMain.getRCMain().getClient().transactionStart();
@@ -2444,13 +2326,10 @@ public class DownloadManagerShell {
 						}
 
 						container.getDownload().remove();
-						if (seedsMap.containsKey(container.getDownload()
-								.getHash())) {
+						if (seedsMap.containsKey(container.getDownload().getHash())) {
 							seedsMap.remove(container.getDownload().getHash());
-						} else if (downloadsMap.containsKey(container
-								.getDownload().getHash())) {
-							downloadsMap.remove(container.getDownload()
-									.getHash());
+						} else if (downloadsMap.containsKey(container.getDownload().getHash())) {
+							downloadsMap.remove(container.getDownload().getHash());
 						}
 
 						redrawTables();
@@ -2470,7 +2349,7 @@ public class DownloadManagerShell {
 				SWT.PUSH);
 		downloadDeleteTorrent.setText("Delete Torrent File");
 		downloadDeleteTorrent.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event arg0) {
+			public void handleEvent (Event arg0) {
 				if (table != null || !table.isDisposed()) {
 					TableItem[] items = table.getSelection();
 					RCMain.getRCMain().getClient().transactionStart();
@@ -2488,13 +2367,10 @@ public class DownloadManagerShell {
 						}
 
 						container.getDownload().remove(true, false);
-						if (seedsMap.containsKey(container.getDownload()
-								.getHash())) {
+						if (seedsMap.containsKey(container.getDownload().getHash())) {
 							seedsMap.remove(container.getDownload().getHash());
-						} else if (downloadsMap.containsKey(container
-								.getDownload().getHash())) {
-							downloadsMap.remove(container.getDownload()
-									.getHash());
+						} else if (downloadsMap.containsKey(container.getDownload().getHash())) {
+							downloadsMap.remove(container.getDownload().getHash());
 						}
 						redrawTables();
 					}
@@ -2508,14 +2384,13 @@ public class DownloadManagerShell {
 				SWT.PUSH);
 		downloadDeleteData.setText("Delete Data");
 		downloadDeleteData.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event arg0) {
+			public void handleEvent (Event arg0) {
 				if (table != null || !table.isDisposed()) {
 					TableItem[] items = table.getSelection();
 					String names = "";
 					// Pull the names for the dialog
 					for (TableItem item : items) {
-						names += ((Container) item.getData()).getDownload()
-								.getName()
+						names += ((Container) item.getData()).getDownload().getName()
 								+ "\n";
 					}
 
@@ -2523,9 +2398,8 @@ public class DownloadManagerShell {
 							DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK
 									| SWT.CANCEL);
 					messageBox.setText("Confirm Delete");
-					messageBox
-							.setMessage("Remove the data associated with the following:\n\n"
-									+ names);
+					messageBox.setMessage("Remove the data associated with the following:\n\n"
+							+ names);
 					int response = messageBox.open();
 					switch (response) {
 					case SWT.OK:
@@ -2533,14 +2407,10 @@ public class DownloadManagerShell {
 						for (TableItem item : items) {
 							Container container = (Container) item.getData();
 							container.getDownload().remove(false, true);
-							if (seedsMap.containsKey(container.getDownload()
-									.getHash())) {
-								seedsMap.remove(container.getDownload()
-										.getHash());
-							} else if (downloadsMap.containsKey(container
-									.getDownload().getHash())) {
-								downloadsMap.remove(container.getDownload()
-										.getHash());
+							if (seedsMap.containsKey(container.getDownload().getHash())) {
+								seedsMap.remove(container.getDownload().getHash());
+							} else if (downloadsMap.containsKey(container.getDownload().getHash())) {
+								downloadsMap.remove(container.getDownload().getHash());
 							}
 							redrawTables();
 						}
@@ -2558,23 +2428,21 @@ public class DownloadManagerShell {
 				SWT.PUSH);
 		downloadDeleteBoth.setText("Delete Both");
 		downloadDeleteBoth.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event arg0) {
+			public void handleEvent (Event arg0) {
 				if (table != null || !table.isDisposed()) {
 					TableItem[] items = table.getSelection();
 					String names = "";
 					// Pull the names for the dialog
 					for (TableItem item : items) {
-						names += ((Container) item.getData()).getDownload()
-								.getName()
+						names += ((Container) item.getData()).getDownload().getName()
 								+ "\n";
 					}
 					MessageBox messageBox = new MessageBox(
 							DOWNLOAD_MANAGER_SHELL, SWT.ICON_QUESTION | SWT.OK
 									| SWT.CANCEL);
 					messageBox.setText("Confirm Delete");
-					messageBox
-							.setMessage("Remove both the data and the torrents for the following:\n\n"
-									+ names);
+					messageBox.setMessage("Remove both the data and the torrents for the following:\n\n"
+							+ names);
 					int response = messageBox.open();
 					switch (response) {
 					case SWT.OK:
@@ -2594,14 +2462,10 @@ public class DownloadManagerShell {
 							container.getDownload().remove(true, true);
 
 							// container.removeFromTable();
-							if (seedsMap.containsKey(container.getDownload()
-									.getHash())) {
-								seedsMap.remove(container.getDownload()
-										.getHash());
-							} else if (downloadsMap.containsKey(container
-									.getDownload().getHash())) {
-								downloadsMap.remove(container.getDownload()
-										.getHash());
+							if (seedsMap.containsKey(container.getDownload().getHash())) {
+								seedsMap.remove(container.getDownload().getHash());
+							} else if (downloadsMap.containsKey(container.getDownload().getHash())) {
+								downloadsMap.remove(container.getDownload().getHash());
 							}
 							redrawTables();
 						}
@@ -2618,7 +2482,7 @@ public class DownloadManagerShell {
 		forceRecheck.setText("Force Re-check");
 		forceRecheck.setImage(ImageRepository.getImage("menu_recheck"));
 		forceRecheck.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event arg0) {
+			public void handleEvent (Event arg0) {
 				if (table != null || !table.isDisposed()) {
 					TableItem[] items = table.getSelection();
 					if (items.length > 1) {
@@ -2656,7 +2520,7 @@ public class DownloadManagerShell {
 		new MenuItem(menuDownSpeed, SWT.SEPARATOR);
 
 		Listener itemsDownSpeedListener = new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				if (e.widget != null && e.widget instanceof MenuItem) {
 					MenuItem item = (MenuItem) e.widget;
 					int speed = item.getData("maxdl") == null ? 0
@@ -2677,6 +2541,12 @@ public class DownloadManagerShell {
 		itemsDownSpeed.setData("maxdl", new Integer(0));
 		itemsDownSpeed.addListener(SWT.Selection, itemsDownSpeedListener);
 
+		final MenuItem itemsDownSpeedDisable = new MenuItem(menuDownSpeed,
+				SWT.PUSH);
+		itemsDownSpeedDisable.setText("Disabled");
+		itemsDownSpeedDisable.setData("maxdl", new Integer(-1));
+		itemsDownSpeedDisable.addListener(SWT.Selection, itemsDownSpeedListener);
+
 		// --- Manual set
 		new MenuItem(menuDownSpeed, SWT.SEPARATOR);
 
@@ -2685,7 +2555,7 @@ public class DownloadManagerShell {
 		itemDownSpeedManual.setText("Manual");
 		itemDownSpeedManual.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected (SelectionEvent e) {
 				InputShell is = new InputShell("Set Download Speed",
 						"Enter a number in kb/s to change download to:");
 
@@ -2704,8 +2574,7 @@ public class DownloadManagerShell {
 					MessageBox mb = new MessageBox(DOWNLOAD_MANAGER_SHELL,
 							SWT.ICON_ERROR | SWT.OK);
 					mb.setText("Invalid or Unrecognized Number");
-					mb
-							.setMessage("The number you entered is invalid or unrecognized");
+					mb.setMessage("The number you entered is invalid or unrecognized");
 					mb.open();
 					return;
 				}
@@ -2735,7 +2604,7 @@ public class DownloadManagerShell {
 		new MenuItem(menuUpSpeed, SWT.SEPARATOR);
 
 		Listener itemsUpSpeedListener = new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				if (e.widget != null && e.widget instanceof MenuItem) {
 					MenuItem item = (MenuItem) e.widget;
 					int speed = item.getData("maxul") == null ? 0
@@ -2744,8 +2613,8 @@ public class DownloadManagerShell {
 					TableItem[] items = table.getSelection();
 					if (items.length == 1) {
 						Container container = (Container) items[0].getData();
-						container.getDownload()
-								.setUploadRateLimitBytesPerSecond(speed);
+						container.getDownload().setUploadRateLimitBytesPerSecond(
+								speed);
 					}
 				}
 			}
@@ -2762,7 +2631,7 @@ public class DownloadManagerShell {
 		itemUpSpeedManual.setText("Manual");
 		itemUpSpeedManual.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected (SelectionEvent e) {
 				InputShell is = new InputShell("Set Upload Speed",
 						"Enter a number in kb/s to change upload to:");
 
@@ -2778,8 +2647,7 @@ public class DownloadManagerShell {
 					MessageBox mb = new MessageBox(DOWNLOAD_MANAGER_SHELL,
 							SWT.ICON_ERROR | SWT.OK);
 					mb.setText("Invalid or Unrecognized Number");
-					mb
-							.setMessage("The number you entered is invalid or unrecognized");
+					mb.setMessage("The number you entered is invalid or unrecognized");
 					mb.open();
 					return;
 				}
@@ -2806,27 +2674,24 @@ public class DownloadManagerShell {
 		menuRenameDisplayedName.setText("Rename Displayed Name");
 		menuRenameDisplayedName.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected (SelectionEvent e) {
 				RCMain.getRCMain().getDisplay().asyncExec(
 						new SWTSafeRunnable() {
 							@Override
-							public void runSafe() {
+							public void runSafe () {
 								InputShell is = new InputShell(
 										"Rename Displayed Name",
 										"Enter a new name to display for this download"
 												+ "\nIf no text is entered, the original name will be used");
 								if (table != null && !table.isDisposed()) {
 									TableItem[] items = table.getSelection();
-									Container container = (Container) items[0]
-											.getData();
-									is.setTextValue(container.getDownload()
-											.getName());
+									Container container = (Container) items[0].getData();
+									is.setTextValue(container.getDownload().getName());
 									String displayName = is.open();
 									if (displayName != null
 											&& !displayName.equals("")) {
-										container.getDownload()
-												.changeDisplayedName(
-														displayName);
+										container.getDownload().changeDisplayedName(
+												displayName);
 									}
 								}
 							}
@@ -2837,21 +2702,19 @@ public class DownloadManagerShell {
 		menuRenameSavePath.setText("Rename Save Path");
 		menuRenameSavePath.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected (SelectionEvent e) {
 				RCMain.getRCMain().getDisplay().asyncExec(
 						new SWTSafeRunnable() {
 							@Override
-							public void runSafe() {
+							public void runSafe () {
 								InputShell is = new InputShell(
 										"Rename Save Path",
 										"Enter a new save path name for this download"
 												+ "\nIf no text is entered, the download's displayed name will be used");
 								if (table != null && !table.isDisposed()) {
 									TableItem[] items = table.getSelection();
-									Container container = (Container) items[0]
-											.getData();
-									is.setTextValue(container.getDownload()
-											.getSavePath());
+									Container container = (Container) items[0].getData();
+									is.setTextValue(container.getDownload().getSavePath());
 									String savepathName = is.open();
 									if (savepathName != null
 											&& !savepathName.equals("")) {
@@ -2867,25 +2730,23 @@ public class DownloadManagerShell {
 		menuRenameBoth.setText("Rename Both");
 		menuRenameBoth.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected (SelectionEvent e) {
 				RCMain.getRCMain().getDisplay().asyncExec(
 						new SWTSafeRunnable() {
 							@Override
-							public void runSafe() {
+							public void runSafe () {
 								InputShell is = new InputShell(
 										"Rename Download",
 										"Enter a new name for this download"
 												+ "\nIf no text is entered, the original values will be used");
 								if (table != null && !table.isDisposed()) {
 									TableItem[] items = table.getSelection();
-									Container container = (Container) items[0]
-											.getData();
-									is.setTextValue(container.getDownload()
-											.getName());
+									Container container = (Container) items[0].getData();
+									is.setTextValue(container.getDownload().getName());
 									String newName = is.open();
 									if (newName != null && !newName.equals("")) {
-										container.getDownload()
-												.changeDisplayedName(newName);
+										container.getDownload().changeDisplayedName(
+												newName);
 										container.getDownload().renameDownload(
 												newName);
 									}
@@ -2901,7 +2762,7 @@ public class DownloadManagerShell {
 			moveData.setText("Move Data");
 			moveData.addListener(SWT.Selection, new Listener() {
 
-				public void handleEvent(Event arg0) {
+				public void handleEvent (Event arg0) {
 					TableItem[] items = table.getSelection();
 					if (items.length > 1) {
 						return;
@@ -2923,18 +2784,17 @@ public class DownloadManagerShell {
 			/*
 			 * (non-Javadoc)
 			 * 
-			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)t)
 			 */
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected (SelectionEvent e) {
 				TableItem[] items = table.getSelection();
 				List<Container> downloads = new ArrayList<Container>();
 				for (TableItem item : items) {
 					Container container = (Container) item.getData();
 					downloads.add(container);
 				}
-				ChangeCategoryDialog.open(downloads
-						.toArray(new Container[downloads.size()]));
+				ChangeCategoryDialog.open(downloads.toArray(new Container[downloads.size()]));
 			}
 		});
 
@@ -2943,9 +2803,9 @@ public class DownloadManagerShell {
 		final MenuItem editColumns = new MenuItem(menu, SWT.PUSH);
 		editColumns.setText("Edit Columns");
 		editColumns.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event arg0) {
-				TableColumnEditorDialog
-						.open(table.equals(downloadsTable) ? true : false);
+			public void handleEvent (Event arg0) {
+				TableColumnEditorDialog.open(table.equals(downloadsTable) ? true
+						: false);
 			}
 		});
 
@@ -2954,12 +2814,12 @@ public class DownloadManagerShell {
 
 		menu.addMenuListener(new MenuListener() {
 
-			public void menuHidden(MenuEvent arg0) {
+			public void menuHidden (MenuEvent arg0) {
 				// Nothing to do here
 
 			}
 
-			public void menuShown(MenuEvent arg0) {
+			public void menuShown (MenuEvent arg0) {
 				TableItem[] items = table.getSelection();
 				if (items.length == 0) {
 					stop.setEnabled(false);
@@ -2986,26 +2846,22 @@ public class DownloadManagerShell {
 					itemUpSpeed.setEnabled(true);
 
 					Container container = (Container) items[0].getData();
-					int currentDownSpeed = container.getDownload()
-							.getMaximumDownloadKBPerSecond();
-					int currentUpSpeed = container.getDownload()
-							.getUploadRateLimitBytesPerSecond();
+					int currentDownSpeed = container.getDownload().getMaximumDownloadKBPerSecond();
+					int currentUpSpeed = container.getDownload().getUploadRateLimitBytesPerSecond();
 					if (currentUpSpeed <= 0) {
 						itemCurrentUpSpeed.setText("Current: " + "Unlimited");
 					} else {
-						itemCurrentUpSpeed
-								.setText("Current: "
-										+ DisplayFormatters
-												.formatByteCountToBase10KBEtcPerSec(currentUpSpeed));
+						itemCurrentUpSpeed.setText("Current: "
+								+ DisplayFormatters.formatByteCountToBase10KBEtcPerSec(currentUpSpeed));
 					}
 
-					if (currentDownSpeed <= 0) {
+					if (currentDownSpeed < 0) {
+						itemCurrentDownSpeed.setText("Current: " + "Disabled");
+					} else if (currentDownSpeed == 0) {
 						itemCurrentDownSpeed.setText("Current: " + "Unlimited");
 					} else {
-						itemCurrentDownSpeed
-								.setText("Current: "
-										+ DisplayFormatters
-												.formatByteCountToBase10KBEtcPerSec(currentDownSpeed));
+						itemCurrentDownSpeed.setText("Current: "
+								+ DisplayFormatters.formatByteCountToBase10KBEtcPerSec(currentDownSpeed));
 					}
 
 					itemDownSpeed.setEnabled(true);
@@ -3062,14 +2918,14 @@ public class DownloadManagerShell {
 	/**
 	 * Sets the GUI components to a completely logged out state
 	 */
-	public void setGUItoLoggedOut() {
+	public void setGUItoLoggedOut () {
 		final Display display = RCMain.getRCMain().getDisplay();
 		if (display == null || display.isDisposed()) {
 			return;
 		}
 		display.asyncExec(new SWTSafeRunnable() {
 			@Override
-			public void runSafe() {
+			public void runSafe () {
 				if (DOWNLOAD_MANAGER_SHELL != null) {
 					setLogInOutButtons(false);
 					setSSLStatusBar(false, false);
@@ -3106,14 +2962,14 @@ public class DownloadManagerShell {
 	 * @param text
 	 * @param color
 	 */
-	public void setStatusBarText(final String text, final int color) {
+	public void setStatusBarText (final String text, final int color) {
 		final Display display = RCMain.getRCMain().getDisplay();
 		if (display == null || display.isDisposed()) {
 			return;
 		}
 		display.asyncExec(new SWTSafeRunnable() {
 			@Override
-			public void runSafe() {
+			public void runSafe () {
 				try {
 					if (statusBarText == null || statusBarText.isDisposed()) {
 						return;
@@ -3139,7 +2995,7 @@ public class DownloadManagerShell {
 	 * 
 	 * @param text
 	 */
-	public void setStatusBarText(String text) {
+	public void setStatusBarText (String text) {
 		setStatusBarText(text, SWT.COLOR_BLACK);
 	}
 
@@ -3150,11 +3006,11 @@ public class DownloadManagerShell {
 	 * @param bStop true if Stop enabled
 	 * @param bRemove true if Remove enabled
 	 */
-	public void setToolBarTorrentIcons(final boolean bQueue,
+	public void setToolBarTorrentIcons (final boolean bQueue,
 			final boolean bStop, final boolean bRemove) {
 		RCMain.getRCMain().getDisplay().syncExec(new SWTSafeRunnable() {
 			@Override
-			public void runSafe() {
+			public void runSafe () {
 				if (queueTorrent != null || !queueTorrent.isDisposed()) {
 					queueTorrent.setEnabled(bQueue);
 				}
@@ -3171,12 +3027,13 @@ public class DownloadManagerShell {
 		});
 	}
 
-	public void createTableColumns(final Table table, final List<Integer> dlList) {
+	public void createTableColumns (final Table table,
+			final List<Integer> dlList) {
 		ControlListener resizeListener = new ControlListener() {
-			public void controlMoved(ControlEvent arg0) {
+			public void controlMoved (ControlEvent arg0) {
 			}
 
-			public void controlResized(ControlEvent arg0) {
+			public void controlResized (ControlEvent arg0) {
 				saveColumnWidthsToPreferencesFile();
 			}
 		};
@@ -3185,13 +3042,11 @@ public class DownloadManagerShell {
 		Properties properties = RCMain.getRCMain().getProperties();
 		if (table.equals(downloadsTable)) {
 			if (properties.containsKey("downloadsTable.columns.widths")) {
-				column_width_list = EncodingUtil.StringToIntegerList(properties
-						.getProperty("downloadsTable.columns.widths"));
+				column_width_list = EncodingUtil.StringToIntegerList(properties.getProperty("downloadsTable.columns.widths"));
 			}
 		} else {
 			if (properties.containsKey("seedsTable.columns.widths")) {
-				column_width_list = EncodingUtil.StringToIntegerList(properties
-						.getProperty("seedsTable.columns.widths"));
+				column_width_list = EncodingUtil.StringToIntegerList(properties.getProperty("seedsTable.columns.widths"));
 			}
 		}
 
@@ -3512,9 +3367,9 @@ public class DownloadManagerShell {
 	 * @param column (from RemoteConstants)
 	 * @return
 	 */
-	private Listener getSortListener(final Table table, final int column) {
+	private Listener getSortListener (final Table table, final int column) {
 		Listener sortListener = new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				table.setData("comparator", Container.getComparators().get(
 						column));
 				if (Boolean.parseBoolean((String) table.getData("sort"))) {
@@ -3544,7 +3399,7 @@ public class DownloadManagerShell {
 	 * This function sets the Items that are requested. It uses the columns as
 	 * datasource.
 	 */
-	public void setRequestedItems() {
+	public void setRequestedItems () {
 		int options = 0;
 		List<Integer> list = DownloadContainer.getColumns();
 		for (int i : list) {
@@ -3559,14 +3414,14 @@ public class DownloadManagerShell {
 				options);
 	}
 
-	public void clearMapsAndChildred() {
+	public void clearMapsAndChildred () {
 		downloadsMap.clear();
 		downloadsArray = downloadsMap.values().toArray(emptyArray);
 		seedsMap.clear();
 		seedsArray = seedsMap.values().toArray(emptyArray);
 		RCMain.getRCMain().getDisplay().syncExec(new SWTSafeRunnable() {
 			@Override
-			public void runSafe() {
+			public void runSafe () {
 				downloadsTable.removeAll();
 				seedsTable.removeAll();
 				Control[] children_downloads = downloadsTable.getChildren();
@@ -3581,7 +3436,7 @@ public class DownloadManagerShell {
 		});
 	}
 
-	public void redrawTables() {
+	public void redrawTables () {
 		downloadsArray = downloadsMap.values().toArray(emptyArray);
 		seedsArray = seedsMap.values().toArray(emptyArray);
 		Display display = RCMain.getRCMain().getDisplay();
@@ -3590,7 +3445,7 @@ public class DownloadManagerShell {
 		}
 		display.asyncExec(new SWTSafeRunnable() {
 			@Override
-			public void runSafe() {
+			public void runSafe () {
 				if (downloadsTable != null || !downloadsTable.isDisposed()) {
 					downloadsTable.clearAll();
 					downloadsTable.setItemCount(downloadsArray.length);
@@ -3697,47 +3552,37 @@ public class DownloadManagerShell {
 		});
 	}
 
-	public void refreshStatusBar() {
+	public void refreshStatusBar () {
 		RCMain.getRCMain().getDisplay().syncExec(new SWTSafeRunnable() {
 			@Override
-			public void runSafe() {
+			public void runSafe () {
 				if (statusDown != null || !statusDown.isDisposed()) {
 					if (azureusDownload.equalsIgnoreCase("0")) {
-						statusDown.setText(DisplayFormatters
-								.formatByteCountToBase10KBEtcPerSec(downSpeed));
+						statusDown.setText(DisplayFormatters.formatByteCountToBase10KBEtcPerSec(downSpeed));
 					} else if (azureusDownload.equalsIgnoreCase("N/S")) {
-						statusDown
-								.setText("["
-										+ azureusDownload
-										+ "] "
-										+ DisplayFormatters
-												.formatByteCountToBase10KBEtcPerSec(downSpeed));
+						statusDown.setText("["
+								+ azureusDownload
+								+ "] "
+								+ DisplayFormatters.formatByteCountToBase10KBEtcPerSec(downSpeed));
 					} else {
-						statusDown
-								.setText("["
-										+ azureusDownload
-										+ "K] "
-										+ DisplayFormatters
-												.formatByteCountToBase10KBEtcPerSec(downSpeed));
+						statusDown.setText("["
+								+ azureusDownload
+								+ "K] "
+								+ DisplayFormatters.formatByteCountToBase10KBEtcPerSec(downSpeed));
 					}
 
 					if (azureusUpload.equalsIgnoreCase("0")) {
-						statusUp.setText(DisplayFormatters
-								.formatByteCountToBase10KBEtcPerSec(upSpeed));
+						statusUp.setText(DisplayFormatters.formatByteCountToBase10KBEtcPerSec(upSpeed));
 					} else if (azureusUpload.equalsIgnoreCase("N/S")) {
-						statusUp
-								.setText("["
-										+ azureusUpload
-										+ "] "
-										+ DisplayFormatters
-												.formatByteCountToBase10KBEtcPerSec(upSpeed));
+						statusUp.setText("["
+								+ azureusUpload
+								+ "] "
+								+ DisplayFormatters.formatByteCountToBase10KBEtcPerSec(upSpeed));
 					} else {
-						statusUp
-								.setText("["
-										+ azureusUpload
-										+ "K] "
-										+ DisplayFormatters
-												.formatByteCountToBase10KBEtcPerSec(upSpeed));
+						statusUp.setText("["
+								+ azureusUpload
+								+ "K] "
+								+ DisplayFormatters.formatByteCountToBase10KBEtcPerSec(upSpeed));
 					}
 
 					statusbarComp.layout();
@@ -3750,7 +3595,7 @@ public class DownloadManagerShell {
 	 * Call when a successfull connection occurs
 	 * 
 	 */
-	public void initializeConnection() {
+	public void initializeConnection () {
 		if (RCMain.getRCMain().connected()) {
 			Client client = RCMain.getRCMain().getClient();
 			client.transactionStart();
@@ -3761,21 +3606,19 @@ public class DownloadManagerShell {
 			client.getRemoteInfo().load();
 
 			// pull the upload download settings
-			client
-					.sendGetAzParameter(
-							RemoteConstants.CORE_PARAM_INT_MAX_UPLOAD_SPEED_KBYTES_PER_SEC,
-							RemoteConstants.PARAMETER_INT);
-			client
-					.sendGetAzParameter(
-							RemoteConstants.CORE_PARAM_INT_MAX_DOWNLOAD_SPEED_KBYTES_PER_SEC,
-							RemoteConstants.PARAMETER_INT);
+			client.sendGetAzParameter(
+					RemoteConstants.CORE_PARAM_INT_MAX_UPLOAD_SPEED_KBYTES_PER_SEC,
+					RemoteConstants.PARAMETER_INT);
+			client.sendGetAzParameter(
+					RemoteConstants.CORE_PARAM_INT_MAX_DOWNLOAD_SPEED_KBYTES_PER_SEC,
+					RemoteConstants.PARAMETER_INT);
 			client.sendGetPluginParameter("singleUserMode",
 					RemoteConstants.PARAMETER_BOOLEAN);
 			client.transactionCommit();
 		}
 	}
 
-	private void createDragDrop(final Table parent) {
+	private void createDragDrop (final Table parent) {
 		try {
 
 			Transfer[] types = new Transfer[] { TextTransfer.getInstance() };
@@ -3784,11 +3627,10 @@ public class DownloadManagerShell {
 			dragSource.setTransfer(types);
 			dragSource.addDragListener(new DragSourceAdapter() {
 				@Override
-				public void dragStart(DragSourceEvent event) {
+				public void dragStart (DragSourceEvent event) {
 					Table table = parent;
 					if (table.getSelectionCount() != 0
-							&& table.getSelectionCount() != table
-									.getItemCount()) {
+							&& table.getSelectionCount() != table.getItemCount()) {
 						event.doit = true;
 						// System.out.println("DragStart");
 						drag_drop_line_start = table.getSelectionIndex();
@@ -3799,7 +3641,7 @@ public class DownloadManagerShell {
 				}
 
 				@Override
-				public void dragSetData(DragSourceEvent event) {
+				public void dragSetData (DragSourceEvent event) {
 					event.data = "moveRow";
 				}
 			});
@@ -3811,19 +3653,17 @@ public class DownloadManagerShell {
 			if (SWT.getVersion() >= 3107) {
 				dropTarget.setTransfer(new Transfer[] {
 						FileTransfer.getInstance(), /* HTMLTransfer.getInstance(), */
-						/* URLTransfer.getInstance(), */TextTransfer
-								.getInstance() });
+						/* URLTransfer.getInstance(), */TextTransfer.getInstance() });
 			} else {
 				dropTarget.setTransfer(new Transfer[] {
 						FileTransfer.getInstance(),
-						/* URLTransfer.getInstance(), */TextTransfer
-								.getInstance() });
+						/* URLTransfer.getInstance(), */TextTransfer.getInstance() });
 			}
 
 			dropTarget.addDropListener(new DropTargetAdapter() {
 
 				@Override
-				public void dragEnter(DropTargetEvent event) {
+				public void dragEnter (DropTargetEvent event) {
 					// no event.data on dragOver, use drag_drop_line_start to
 					// determine if
 					// ours
@@ -3851,7 +3691,7 @@ public class DownloadManagerShell {
 				}
 
 				@Override
-				public void drop(DropTargetEvent event) {
+				public void drop (DropTargetEvent event) {
 					if (!(event.data instanceof String)
 							|| !((String) event.data).equals("moveRow")) {
 						openDroppedTorrents(event);
@@ -3877,32 +3717,25 @@ public class DownloadManagerShell {
 						if (event.item == null) {
 							return;
 						}
-						int drag_drop_line_end = parent
-								.indexOf((TableItem) event.item);
+						int drag_drop_line_end = parent.indexOf((TableItem) event.item);
 
 						// moveSelectedTorrents(drag_drop_line_start,
 						// drag_drop_line_end);
 						if (parent.equals(downloadsTable)) {
-							Iterator<String> iter = downloadsMap.keySet()
-									.iterator();
+							Iterator<String> iter = downloadsMap.keySet().iterator();
 							while (iter.hasNext()) {
-								Container container = downloadsMap.get(iter
-										.next());
+								Container container = downloadsMap.get(iter.next());
 								if (container.getDownload().getPosition() == drag_drop_line_start + 1) {
-									System.out
-											.println("Moving "
-													+ container.getDownload()
-															.getName()
-													+ " From position "
-													+ (drag_drop_line_start + 1)
-													+ " to "
-													+ (drag_drop_line_end + 1));
+									System.out.println("Moving "
+											+ container.getDownload().getName()
+											+ " From position "
+											+ (drag_drop_line_start + 1)
+											+ " to " + (drag_drop_line_end + 1));
 									container.getDownload().moveTo(
 											drag_drop_line_end + 1);
 									if (RCMain.getRCMain().connected()) {
-										RCMain.getRCMain().getClient()
-												.getDownloadManager().update(
-														false);
+										RCMain.getRCMain().getClient().getDownloadManager().update(
+												false);
 									}
 
 									// make sure to redraw the table here so a
@@ -3911,25 +3744,20 @@ public class DownloadManagerShell {
 								}
 							}
 						} else {
-							Iterator<String> iter = seedsMap.keySet()
-									.iterator();
+							Iterator<String> iter = seedsMap.keySet().iterator();
 							while (iter.hasNext()) {
 								Container container = seedsMap.get(iter.next());
 								if (container.getDownload().getPosition() == drag_drop_line_start) {
-									System.out
-											.println("Moving "
-													+ container.getDownload()
-															.getName()
-													+ " From position "
-													+ (drag_drop_line_start + 1)
-													+ " to "
-													+ (drag_drop_line_end + 1));
+									System.out.println("Moving "
+											+ container.getDownload().getName()
+											+ " From position "
+											+ (drag_drop_line_start + 1)
+											+ " to " + (drag_drop_line_end + 1));
 									container.getDownload().moveTo(
 											drag_drop_line_end + 1);
 									if (RCMain.getRCMain().connected()) {
-										RCMain.getRCMain().getClient()
-												.getDownloadManager().update(
-														false);
+										RCMain.getRCMain().getClient().getDownloadManager().update(
+												false);
 									}
 
 									// make sure to redraw the table here so a
@@ -3948,7 +3776,7 @@ public class DownloadManagerShell {
 		}
 	}
 
-	public static String parseTextForURL(String text) {
+	public static String parseTextForURL (String text) {
 		// examples:
 		// <A HREF=http://abc.om/moo>test</a>
 		// <A style=cow HREF="http://abc.om/moo">test</a>
@@ -3964,7 +3792,7 @@ public class DownloadManagerShell {
 		return null;
 	}
 
-	public static void openDroppedTorrents(DropTargetEvent event) {
+	public static void openDroppedTorrents (DropTargetEvent event) {
 		if (event.data == null) {
 			return;
 		}
@@ -3994,15 +3822,13 @@ public class DownloadManagerShell {
 					String filename = source.getAbsolutePath();
 					try {
 						if (!isTorrentFile(filename)) {
-							logger
-									.info("openDroppedTorrents: file not a torrent file");
+							logger.info("openDroppedTorrents: file not a torrent file");
 
 							// Torrent creation if we ever support that in FF
 							// ShareUtils.shareFile(azureus_core, filename);
 						} else {
-							System.out
-									.println("Dropped file IS torrent -- to open: "
-											+ filename);
+							System.out.println("Dropped file IS torrent -- to open: "
+									+ filename);
 							files.add(filename);
 							/*
 							 * openTorrentWindow(null, new String[] { filename },
@@ -4042,7 +3868,7 @@ public class DownloadManagerShell {
 		}
 	}
 
-	public static boolean isTorrentFile(String filename)
+	public static boolean isTorrentFile (String filename)
 			throws FileNotFoundException, IOException {
 		File check = new File(filename);
 		if (!check.exists()) {
@@ -4064,9 +3890,7 @@ public class DownloadManagerShell {
 			}
 
 			if (check.length() == 0) {
-				logger
-						.info("Torrent is zero length('" + check.getName()
-								+ "')");
+				logger.info("Torrent is zero length('" + check.getName() + "')");
 			}
 
 			FileInputStream fis = null;
@@ -4101,7 +3925,7 @@ public class DownloadManagerShell {
 		}
 	}
 
-	public void saveColumnWidthsToPreferencesFile() {
+	public void saveColumnWidthsToPreferencesFile () {
 		Display display = RCMain.getRCMain().getDisplay();
 		if (display == null || display.isDisposed()) {
 			return;
@@ -4109,7 +3933,7 @@ public class DownloadManagerShell {
 		display.asyncExec(new SWTSafeRunnable() {
 
 			@Override
-			public void runSafe() {
+			public void runSafe () {
 				Properties properties = RCMain.getRCMain().getProperties();
 				// save the downloadsTable column widths
 				if (!downloadsTable.isDisposed()) {
@@ -4147,11 +3971,11 @@ public class DownloadManagerShell {
 	 * 
 	 * @return int count
 	 */
-	public CTabFolder getTabFolder() {
+	public CTabFolder getTabFolder () {
 		return tabFolder;
 	}
 
-	public int[] getSeedsDownloadsCount() {
+	public int[] getSeedsDownloadsCount () {
 		return new int[] { seedsMap.size(), downloadsMap.size() };
 	}
 
@@ -4160,7 +3984,7 @@ public class DownloadManagerShell {
 		private long		widthSetOn		= 0;
 		private final int	KEEPWIDTHFOR_MS	= 30 * 1000;
 
-		public CLabelPadding(Composite parent, int style) {
+		public CLabelPadding (Composite parent, int style) {
 			super(parent, style | SWT.CENTER);
 
 			GridData gridData = new GridData(GridData.HORIZONTAL_ALIGN_CENTER
@@ -4174,7 +3998,7 @@ public class DownloadManagerShell {
 		 * @see org.eclipse.swt.custom.CLabel#computeSize(int, int, boolean)
 		 */
 		@Override
-		public Point computeSize(int wHint, int hHint, boolean changed) {
+		public Point computeSize (int wHint, int hHint, boolean changed) {
 			if (!isVisible()) {
 				return (new Point(0, 0));
 			}
@@ -4201,7 +4025,7 @@ public class DownloadManagerShell {
 	 * @param pluginViewID string
 	 * @return Composite for the plugin
 	 */
-	public void openPluginView(final String pluginViewID) {
+	public void openPluginView (final String pluginViewID) {
 
 		// check if already open and return
 		if (!openPluginViews.add(pluginViewID)) {
@@ -4226,7 +4050,7 @@ public class DownloadManagerShell {
 
 		pluginTab.addDisposeListener(new DisposeListener() {
 
-			public void widgetDisposed(DisposeEvent arg0) {
+			public void widgetDisposed (DisposeEvent arg0) {
 				// remove from open views
 				openPluginViews.remove(pluginViewID);
 				vi.delete();
