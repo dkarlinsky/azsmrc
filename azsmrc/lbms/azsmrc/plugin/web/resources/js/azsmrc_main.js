@@ -355,6 +355,7 @@ function savePreferences() {
 	if (document.getElementById("cookie_tabposonthefly").checked)
 		value.push("tabposonthefly");
 	if (value.length) {
+		azsmrcOptions = value;
 		value = value.join(",");
 		setCookie("azsmrcOptions", value, now);
 	} 
