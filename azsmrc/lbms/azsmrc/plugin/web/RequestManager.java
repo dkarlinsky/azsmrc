@@ -272,7 +272,7 @@ public class RequestManager {
 
 	/**
 	 * This will convert all Parameters in Entries of FlexyConf
-	 * 
+	 *
 	 * @param pluginSection parent to containt the Elements
 	 * @param parameters Parameters to be converted
 	 */
@@ -634,6 +634,7 @@ public class RequestManager {
 						};
 					}).start();
 				} else if (location.equalsIgnoreCase("XML")) {
+					boolean returnResult = Boolean.parseBoolean(xmlRequest.getAttributeValue("returnResult"));
 					try {
 						Torrent newTorrent = getTorrentFromXML(xmlRequest.getChild("Torrent"));
 
@@ -690,11 +691,26 @@ public class RequestManager {
 								MultiUser.addUserToDownload(user, dl);
 							}
 						}
+						if (returnResult) {
+							response.setAttribute("name", dl.getName());
+							response.setAttribute("state","Successful");
+							return true;
+						}
 					} catch (TorrentException e) {
 						user.eventException(e);
 						e.printStackTrace();
+						if (returnResult) {
+							response.setAttribute("error", e.getMessage());
+							response.setAttribute("state","Error");
+							return true;
+						}
 					} catch (DownloadException e) {
 						user.eventException(e);
+						if (returnResult) {
+							response.setAttribute("error", e.getMessage());
+							response.setAttribute("state","Error");
+							return true;
+						}
 					}
 				}
 				return false;
