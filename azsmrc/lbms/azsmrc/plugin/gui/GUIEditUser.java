@@ -57,7 +57,7 @@ public class GUIEditUser {
 
 	/**
 	 * Private method for actually drawing the dialog
-	 * 
+	 *
 	 * @param User _user
 	 */
 	private void loadGUI(User _user) {
@@ -150,6 +150,11 @@ public class GUIEditUser {
 			public void handleEvent(Event arg0) {
 				shell.dispose();
 				instance = null;
+				try {
+					Plugin.getXMLConfig().saveConfigFile();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		});
 
@@ -205,7 +210,7 @@ public class GUIEditUser {
 		fci.setContentProvider(new ContentProvider() {
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see lbms.tools.flexyconf.ContentProvider#getDefaultValue(java.lang.String,
 			 *      int)
 			 */
@@ -215,7 +220,7 @@ public class GUIEditUser {
 
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see lbms.tools.flexyconf.ContentProvider#getValue(java.lang.String,
 			 *      int)
 			 */
@@ -226,7 +231,7 @@ public class GUIEditUser {
 
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see lbms.tools.flexyconf.ContentProvider#setValue(java.lang.String,
 			 *      java.lang.String, int)
 			 */
@@ -239,7 +244,7 @@ public class GUIEditUser {
 		fci.setI18NProvider(new I18NProvider() {
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see lbms.tools.flexyconf.I18NProvider#translate(java.lang.String)
 			 */
 			public String translate(String key) {
@@ -630,7 +635,7 @@ public class GUIEditUser {
 
 	/**
 	 * Public method to open the dialog
-	 * 
+	 *
 	 * @param User _user
 	 */
 	public void open(User _user) {

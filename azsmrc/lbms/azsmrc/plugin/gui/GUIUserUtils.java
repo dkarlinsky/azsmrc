@@ -16,7 +16,6 @@ import lbms.azsmrc.shared.DuplicatedUserException;
 import lbms.azsmrc.shared.RemoteConstants;
 import lbms.azsmrc.shared.UserNotFoundException;
 
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -40,8 +39,9 @@ public class GUIUserUtils {
 	 *
 	 */
 	public void addNewUser(){
-		if(Plugin.getDisplay()==null && Plugin.getDisplay().isDisposed())
+		if(Plugin.getDisplay()==null && Plugin.getDisplay().isDisposed()) {
 			return;
+		}
 		Plugin.getDisplay().asyncExec( new Runnable() {
 			public void run() {
 				//Shell Initialize
@@ -255,15 +255,6 @@ public class GUIUserUtils {
 							return;
 						}
 
-						if(outputDir.getText().equals("")){
-							MessageBox mb = new MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
-							mb.setText("Error");
-							mb.setMessage("Output directory cannot be empty.");
-							mb.open();
-							return;
-						}
-
-
 						if(password.getText().equalsIgnoreCase(verify.getText())){
 							//add the user to the XMLConfig file
 							try {
@@ -272,8 +263,9 @@ public class GUIUserUtils {
 								currentUser.setOutputDir(outputDir.getText());
 								currentUser.setAutoImportDir(importDir.getText());
 
-								if(combo.getSelectionIndex() != 0)
+								if(combo.getSelectionIndex() != 0) {
 									currentUser.setRight(RemoteConstants.RIGHTS_ADMIN);
+								}
 
 								Plugin.getXMLConfig().saveConfigFile();
 							} catch (IOException e1) {
@@ -388,9 +380,11 @@ public class GUIUserUtils {
 
 	public void changePassword(final String user){
 		final Thread addNew_thread = new Thread() {
+			@Override
 			public void run() {
-				if(Plugin.getDisplay()==null && Plugin.getDisplay().isDisposed())
+				if(Plugin.getDisplay()==null && Plugin.getDisplay().isDisposed()) {
 					return;
+				}
 				Plugin.getDisplay().asyncExec( new Runnable() {
 					public void run() {
 						//Shell Initialize
