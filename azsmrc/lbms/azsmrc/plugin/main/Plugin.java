@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -48,6 +50,7 @@ import org.gudy.azureus2.plugins.ui.UIManager;
 import org.gudy.azureus2.plugins.ui.UIManagerListener;
 import org.gudy.azureus2.plugins.ui.config.BooleanParameter;
 import org.gudy.azureus2.plugins.ui.config.DirectoryParameter;
+import org.gudy.azureus2.plugins.ui.config.StringParameter;
 import org.gudy.azureus2.plugins.ui.menus.MenuItem;
 import org.gudy.azureus2.plugins.ui.menus.MenuItemFillListener;
 import org.gudy.azureus2.plugins.ui.menus.MenuItemListener;
@@ -128,11 +131,17 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 				"restrictSaveDir", "azsmrc.restrictSaveDir", false);
 		DirectoryParameter restrictedDir = config_model.addDirectoryParameter2(
 				"restrictedSaveDir", "azsmrc.restrictedSaveDir", "");
+		BooleanParameter enablebindToIpParam = config_model.addBooleanParameter2(
+				"enable_bind_to_ip", "azsmrc.enableBindToIP", false);
+		StringParameter bindToIpParam =  config_model.addStringParameter2(
+				"bind_ip", "azsmrc.BindIP", "");
+
 		config_model.addLabelParameter2("azsmrc.statistics.label");
 		config_model.addBooleanParameter2("statistics.allow",
 				"azsmrc.statistics.allow", false);
 
 		restrictDir.addEnabledOnSelection(restrictedDir);
+		enablebindToIpParam.addEnabledOnSelection(bindToIpParam);
 
 		// Load the config file
 		config = XMLConfig.loadConfigFile(pluginInterface.getPluginDirectoryName()
@@ -335,25 +344,46 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 				config_model.addLabelParameter2("azsmrc.ssl.impossible");
 			}
 
-			if (sslSupported
-					&& pluginInterface.getPluginconfig().getPluginBooleanParameter(
-							"use_ssl", false)) {
-				config_model.addLabelParameter2("azsmrc.ssl.enabled");
-				context = pluginInterface.getTracker().createWebContext(
-						pluginInterface.getAzureusName() + " - "
-								+ pluginInterface.getPluginName(),
-						pluginInterface.getPluginconfig().getPluginIntParameter(
-								"remote_port", 49009), Tracker.PR_HTTPS);
-			} else {
+			{
 				if (sslSupported) {
 					config_model.addLabelParameter2("azsmrc.ssl.possible");
 				}
-				context = pluginInterface.getTracker().createWebContext(
-						pluginInterface.getAzureusName() + " - "
-								+ pluginInterface.getPluginName(),
-						pluginInterface.getPluginconfig().getPluginIntParameter(
-								"remote_port", 49009), Tracker.PR_HTTP);
+
+				boolean useSSL = pluginInterface.getPluginconfig().getPluginBooleanParameter(
+						"use_ssl", false);
+
+				int protocol = (sslSupported && useSSL) ? Tracker.PR_HTTPS : Tracker.PR_HTTP;
+
+				boolean bindToIP = pluginInterface.getPluginconfig().getPluginBooleanParameter(
+						"enable_bind_to_ip", false);
+
+				if (bindToIP) {
+					try {
+						InetAddress bindIP = InetAddress.getByName(pluginInterface.getPluginconfig().getPluginStringParameter(
+								"bind_ip", "127.0.0.1"));
+						context = pluginInterface.getTracker().createWebContext(
+								pluginInterface.getAzureusName() + " - "
+										+ pluginInterface.getPluginName(),
+								pluginInterface.getPluginconfig().getPluginIntParameter(
+										"remote_port", 49009), protocol, bindIP);
+					} catch (UnknownHostException e) {
+						context = pluginInterface.getTracker().createWebContext(
+								pluginInterface.getAzureusName() + " - "
+										+ pluginInterface.getPluginName(),
+								pluginInterface.getPluginconfig().getPluginIntParameter(
+										"remote_port", 49009), protocol);
+					}
+				} else {
+
+					context = pluginInterface.getTracker().createWebContext(
+							pluginInterface.getAzureusName() + " - "
+									+ pluginInterface.getPluginName(),
+							pluginInterface.getPluginconfig().getPluginIntParameter(
+									"remote_port", 49009), protocol);
+				}
+
 			}
+
 			context.addPageGenerator(new WebRequestHandler(pluginInterface));
 
 			context.addAuthenticationListener(new TrackerAuthenticationAdapter() {
