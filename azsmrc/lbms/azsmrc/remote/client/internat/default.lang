@@ -291,6 +291,7 @@ dialog.updateprogressdialog.status.2=Status:  Installing
 dialog.updateprogressdialog.status.3=Status:  Finished
 downloadmanagershell.menu.help=&Help
 downloadmanagershell.menu.help.about=&About
+downloadmanagershell.menu.help.ffPlugin=&Firefox Plugin
 downloadmanagershell.menu.main=&Main
 downloadmanagershell.menu.main.connect=&Connect to Server
 downloadmanagershell.menu.main.exit=E&xit

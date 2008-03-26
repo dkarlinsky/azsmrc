@@ -105,6 +105,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -541,6 +542,16 @@ public class DownloadManagerShell {
 		menuAbout.addListener(SWT.Selection, new Listener() {
 			public void handleEvent (Event e) {
 				ReadmeTab.open(tabFolder);
+			}
+		});
+
+		MenuItem ffPlugin = new MenuItem(helpSubmenu, SWT.PUSH);
+		ffPlugin.setText(I18N.translate(PFX + "menu.help.ffPlugin"));
+
+		ffPlugin.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected (SelectionEvent e) {
+				Program.launch("http://www.alexisbrunet.com");
 			}
 		});
 
@@ -2062,7 +2073,7 @@ public class DownloadManagerShell {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param connection -- int -- 0 for no connection, 1 for connecting, 2 for
 	 *            connected
 	 */
@@ -2783,7 +2794,7 @@ public class DownloadManagerShell {
 		changeCategory.addSelectionListener(new SelectionAdapter() {
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)t)
 			 */
 			@Override
@@ -2958,7 +2969,7 @@ public class DownloadManagerShell {
 
 	/**
 	 * sets the status bar text alert area given String text and SWT.COLOR_*
-	 * 
+	 *
 	 * @param text
 	 * @param color
 	 */
@@ -2992,7 +3003,7 @@ public class DownloadManagerShell {
 	/**
 	 * sets the status bar text alert area given String text and with the color
 	 * black
-	 * 
+	 *
 	 * @param text
 	 */
 	public void setStatusBarText (String text) {
@@ -3001,7 +3012,7 @@ public class DownloadManagerShell {
 
 	/**
 	 * Sets the Toolbar Icons for Queue Stop and Remove
-	 * 
+	 *
 	 * @param bQueue true if Queue enabled
 	 * @param bStop true if Stop enabled
 	 * @param bRemove true if Remove enabled
@@ -3362,7 +3373,7 @@ public class DownloadManagerShell {
 	/**
 	 * This listener will set the data to the "comparator" on Table for each
 	 * give int column from RemoteConstants
-	 * 
+	 *
 	 * @param table
 	 * @param column (from RemoteConstants)
 	 * @return
@@ -3593,7 +3604,7 @@ public class DownloadManagerShell {
 
 	/**
 	 * Call when a successfull connection occurs
-	 * 
+	 *
 	 */
 	public void initializeConnection () {
 		if (RCMain.getRCMain().connected()) {
@@ -3968,7 +3979,7 @@ public class DownloadManagerShell {
 
 	/**
 	 * Returns the number of tabs currently open in the tabFolder
-	 * 
+	 *
 	 * @return int count
 	 */
 	public CTabFolder getTabFolder () {
@@ -3994,7 +4005,7 @@ public class DownloadManagerShell {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.swt.custom.CLabel#computeSize(int, int, boolean)
 		 */
 		@Override
@@ -4021,7 +4032,7 @@ public class DownloadManagerShell {
 
 	/**
 	 * Open a plugin view
-	 * 
+	 *
 	 * @param pluginViewID string
 	 * @return Composite for the plugin
 	 */
