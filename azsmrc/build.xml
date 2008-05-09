@@ -165,7 +165,7 @@
 		</taskdef>
 		<!-- grab the NSIS Ant Tasks here http://sourceforge.net/projects/nsisant/ -->
 		<echo message="Creating Setup no SWT version" />
-		<nsis script="setup.nsi" path="C:/Programme/NSIS/">
+		<nsis script="setup.nsi" path="${nsis.dir}">
 			<define name="VERSION" value="${version}" />
 		</nsis>
 		<echo message="Creating Setup SWT version" />
@@ -191,23 +191,61 @@
 	<target name="cleanDist">
 		<delete dir="${root.dir}/${dist.dir}" />
 	</target>
-	
+
 	<target name="etc" depends="cleanDist, init">
 		<taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask" classpath="${launch4j.dir}/launch4j.jar:${launch4j.dir}/lib/xstream.jar" />
 		<!-- <launch4j configfile="${root.dir}/launch4j_ETC.xml" fileVersion="1.0" txtFileVersion="1.0" productVersion="1.0" txtProductVersion="1.0" outfile="${dist.dir}/ETC.exe" /> -->
-				
+
 		<jar destfile="${root.dir}/${dist.dir}/ETC.jar" basedir="${root.dir}/${build.dir}" excludes="${dist.jar.excludes}">
-			<include name="lbms/tools/i18n/*"/>
-			<include name="lbms/tools/i18n/**/*"/>
+			<include name="lbms/tools/i18n/*" />
+			<include name="lbms/tools/i18n/**/*" />
 			<manifest>
-				<attribute name="Main-Class" value="lbms.tools.i18n.swt.ETC"/>
+				<attribute name="Main-Class" value="lbms.tools.i18n.swt.ETC" />
 			</manifest>
 		</jar>
-		
+
 		<zip destfile="${root.dir}/${dist.dir}/ETC.zip">
-			<fileset file="${root.dir}/lbms/tools/i18n/swt/readme.txt"/>
-			<fileset file="${root.dir}/${dist.dir}/ETC.exe"/>
-			<fileset file="${root.dir}/${dist.dir}/ETC.jar"/>
+			<fileset file="${root.dir}/lbms/tools/i18n/swt/readme.txt" />
+			<fileset file="${root.dir}/${dist.dir}/ETC.exe" />
+			<fileset file="${root.dir}/${dist.dir}/ETC.jar" />
 		</zip>
+	</target>
+
+	<taskdef resource="flexTasks.tasks" classpath="${basedir}/flashui/lib/flexTasks.jar" />
+	<target name="flash_main" depends="flash_checkfiles,flash_images">
+		<mxmlc file="${basedir}/flashui/azsmrc.mxml" keep-generated-actionscript="true">
+			<load-config filename="${FLEX_HOME}/frameworks/flex-config.xml" />
+			<source-path path-element="${FLEX_HOME}/frameworks" />
+			<compiler.include-libraries dir="${basedir}/flashui" append="true">
+				<include name="images.swc" />
+			</compiler.include-libraries>
+		</mxmlc>
+		<copy todir="${build.dir}/lbms/azsmrc/plugin/web/resources" verbose="true">
+			<fileset file="${basedir}/flashui/azsmrc.swf"/>
+			<fileset file="${basedir}/flashui/flash.html"/>
+		</copy>
+	</target>
+
+	<target name="flash_images" depends="flash_checkfiles">
+		<compc output="${basedir}/flashui/images.swc">
+			<include-file name="open_by_file_new.png" path="${build.img}/open_by_file_new.png" />
+			<include-file name="refresh.png" path="${build.img}/refresh.png" />
+			<include-file name="open_by_url_new.png" path="${build.img}/open_by_url_new.png" />
+			<include-file name="delete.png" path="${build.img}/delete.png" />
+			<include-file name="Health_yellow.png" path="${build.img}/Health_yellow.png" />
+			<include-file name="Health_blue.png" path="${build.img}/Health_blue.png" />
+			<include-file name="Health_gray.png" path="${build.img}/Health_gray.png" />
+			<include-file name="Health_green.png" path="${build.img}/Health_green.png" />
+			<include-file name="Health_red.png" path="${build.img}/Health_red.png" />
+		</compc>
+	</target>
+
+
+	<target name="flash_checkfiles">
+		<available file="${FLEX_HOME}/bin/mxmlc" property="FlexOK" />
+		<fail unless="FlexOK" message="Flex SDK path not set. See the Readme.txt" />
+
+		<available file="${build.img}/Health_green.png" property="ImageOK" />
+		<fail unless="ImageOK" message="Cant find Images. Set the build.img variable in build.properties. See the Readme.txt" />
 	</target>
 </project>
