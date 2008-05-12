@@ -1,38 +1,24 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<title>AzSMRC Webinterface</title>
+	<title>AzSMRC Webinterface Selection</title>
 	<!-- Meta Tags -->
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 	<meta http-equiv="content-language" content="de" />
 	<meta name="author" content="Toni Uebernickel"/>
 	<meta name="description" content="Webinterface f&#252;r Azureus AzSMRC Plugin" />
 	<meta name="keywords" content="Azureus Webinterface AzSMRC Plugin remote control" />
-	<meta name="creation_date" content="04/09/2006" />
-	<!-- Scripts -->
-	<script type="text/javascript" src="js/debugLog.js" />
-	<script type="text/javascript" src="js/fileUpload.js" />
-	<script type="text/javascript" src="js/registeredRequests.js" />
-	<script type="text/javascript" src="js/handleRequests.js" />
-	<script type="text/javascript" src="js/tabControl.js" />
-	<script type="text/javascript" src="js/cookieControl.js" />
-	<script type="text/javascript" src="js/azsmrc_main.js" />
-	<script type="text/javascript" src="js/dragdrop.js" />
-	<script type="text/javascript" src="js/contextMenu.js" />
-	<script type="text/javascript" src="js/tableSort.js" />
-	<!-- Styles -->
-	<link rel="stylesheet" type="text/css" href="css/azsmrc_skin2.css" title="Standard AzSMRC Style" />
-	<link rel="alternate stylesheet" type="text/css" href="css/azsmrc_default.css" title="Old AzSMRC Style" />
+	<meta name="creation_date" content="04/09/2006" />	
+	
 </head>
-<body onload="initAzSMRCwebUI();"><div id="azsmrcintro"><h1>AzSMRC - webUserInterface</h1><img src="img/AzSMRC_Splash.png" id="splashscreen" class="invisible" alt="Splashscreen" title="AzSMRC Splashscreen" /><p>This application uses Javascript and requires a modern browser. If you can read this after the page have loaded completly, you may have been disabled Javascript or your browser is not up to date.</p><p>Please contact your system administrator.</p></div>
-	<div id="topbar">
-		<h2 class="invisible">Menu</h2>
-		<ul id="picmenu" class="menu"><li class="subbreak"><img src="img/refresh.png" alt="Refresh" title="Refresh" onclick="refreshView();" /></li><li class="subbreak"><img src="img/open_by_url_new.png" alt="Send Torrent to Server" title="Send Torrent to Server" onclick="addTab('torrentControl');" /></li><li><img src="img/top.png" alt="Move to Top" title="Move to Top" onclick="SendRequestToServer(14, 'top');" /></li><li><img src="img/up.png" alt="Move Up" title="Move Up" onclick="SendRequestToServer(15);" /></li><li><img src="img/down.png" alt="Move Down" title="Move Down" onclick="SendRequestToServer(16);" /></li><li class="subbreak"><img src="img/bottom.png" alt="Move to Bottom" title="Move to Bottom" onclick="SendRequestToServer(14, 'bottom');" /></li><li><img src="img/tool_delete.png" alt="Delete" title="Delete" onclick="SendRequestToServer(4);" /></li><li><img src="img/tool_pause.png" alt="Pause" title="Pause" onclick="SendRequestToServer(5);" /></li><li class="subbreak"><img src="img/tool_resume.png" alt="Resume" title="Resume" onclick="SendRequestToServer(7);" /></li><li><img src="img/preferences.png" alt="Open Preferences" title="Open Preferences" onclick="addTab('preferences');" /></li><li><img src="img/manage_users.png" alt="Manage Users" title="Manage Users" onclick="addTab('userManagement'); SendRequestToServer(29);" /></li><!--<li><img src="img/console.png" alt="Open Console" title="Open Console" /></li>--><li><img src="img/information.png" alt="Information" title="Information" onclick="addTab('about');" /></li></ul>	
-		<ul id="tabbar" class="menu"><li>This is a placeholder!</li></ul>
-		<div id="contextmenu">This menu will be filled by Javascript.</div>
-	</div>	
-	<div id="eventlist" class="tab"><p>No events since last request.</p></div>
-	<div id="tabcontents"></div>
-	<div id="statusbar"><a title="Open Debug Log" onclick="addTab('debug');">Open Debug Log</a><span id="azversion">unknown version</span><span id="azsmrcversion">unknown version</span><span id="eventstatus">no new events</span><span onclick="PingToServer();" id="ping">Ping: undefined</span><span id="requeststatus">no request sent</span><img id="connectionstatus" src="img/connect_no.png" alt="Connection not established" title="Not connected to Server" /></div>
+<body>
+	<div style="vertical-align: middle; text-align: center;">
+	<h1>Welcome to AzSMRC</h1>
+	<h2>Please Select the WebUI</h2>
+		<ul>
+			<li><a href="ajaxWebUI.htm">AJAX WebUI</a> (requires JavaScript)</li>
+			<li><a href="flash.htm">FlashUI</a> (requires Flash)</li>
+		</ul>
+	</div>
 </body>
 </html>
