@@ -78,6 +78,7 @@ public class ImageRepository {
 		registerImage("lbms/azsmrc/remote/client/swtgui/resources/menu/remove.png","menu_remove",255);
 		registerImage("lbms/azsmrc/remote/client/swtgui/resources/menu/recheck.png","menu_recheck",255);
 		registerImage("lbms/azsmrc/remote/client/swtgui/resources/menu/queue.png","menu_queue",255);
+		registerImage("lbms/azsmrc/remote/client/swtgui/resources/menu/force_start.png","menu_force_start",255);
 
 
 		//Toolbar icons

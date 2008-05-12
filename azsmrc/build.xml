@@ -68,7 +68,7 @@
 		</copy>
 	</target>
 
-	<target name="jar" depends="init, azLangFiles">
+	<target name="jar" depends="init, azLangFiles, flash_main">
 		<property name="beta" value="" />
 		<propertyfile file="${root.dir}/plugin.properties">
 			<entry key="plugin.class" value="lbms.azsmrc.plugin.main.Plugin" />
