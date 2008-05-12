@@ -21,14 +21,17 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
 
+import lbms.azsmrc.remote.client.callbacks.BrowseDirectoryCallback;
+import lbms.azsmrc.remote.client.callbacks.GenericCallback;
 import lbms.azsmrc.remote.client.events.ClientEventListener;
 import lbms.azsmrc.remote.client.events.ClientUpdateListener;
 import lbms.azsmrc.remote.client.events.ConnectionListener;
 import lbms.azsmrc.remote.client.events.ExceptionListener;
+import lbms.azsmrc.remote.client.events.GlobalStatsListener;
 import lbms.azsmrc.remote.client.events.HTTPErrorListener;
 import lbms.azsmrc.remote.client.events.IPCResponseListener;
 import lbms.azsmrc.remote.client.events.ParameterListener;
-import lbms.azsmrc.remote.client.events.GlobalStatsListener;
+import lbms.azsmrc.remote.client.impl.CallbackManagerImpl;
 import lbms.azsmrc.remote.client.impl.DownloadManagerImpl;
 import lbms.azsmrc.remote.client.impl.RemoteInfoImpl;
 import lbms.azsmrc.remote.client.impl.RemoteUpdateManagerImpl;
@@ -94,6 +97,7 @@ public class Client {
 	private RemoteInfoImpl				remoteInfo;
 	private RemoteUpdateManagerImpl		remoteUpdateManager;
 	private TrackerImpl					tracker;
+	private CallbackManger				callbackManager;
 
 	// use Vector of Collections.synchronizedList here
 	private List<ClientUpdateListener>	clientUpdateListeners	= new ArrayList<ClientUpdateListener>();
@@ -127,7 +131,7 @@ public class Client {
 		setLoginData(login);
 	}
 
-	public void setLoginData(LoginData login) {
+	public void setLoginData (LoginData login) {
 		setServer(login.getURL());
 		username = login.getUsername();
 		password = login.getPassword();
@@ -136,7 +140,7 @@ public class Client {
 	/**
 	 * Initialises Variables
 	 */
-	private void init() {
+	private void init () {
 		downloadManager = new DownloadManagerImpl(this);
 		responseManager = new ResponseManager(this);
 		reset();
@@ -151,11 +155,12 @@ public class Client {
 	 * 
 	 * Call this when you disconnect from a Server.
 	 */
-	private void reset() {
+	private void reset () {
 		userManager = new UserManagerImpl(this);
 		remoteInfo = new RemoteInfoImpl(this);
 		remoteUpdateManager = new RemoteUpdateManagerImpl(this);
 		tracker = new TrackerImpl(this);
+		callbackManager = new CallbackManagerImpl();
 		downloadManager.clear();
 		failedConnections = 0;
 		connect = false;
@@ -164,14 +169,14 @@ public class Client {
 	/**
 	 * If you want to use any send* methods you need to connect first.
 	 */
-	public void connect() {
+	public void connect () {
 		connect = true;
 	}
 
 	/**
 	 * Disconnect.
 	 */
-	public void disconnect() {
+	public void disconnect () {
 		connect = false;
 		if (connection != null) {
 			connection.disconnect();
@@ -182,7 +187,7 @@ public class Client {
 	/**
 	 * @return whether currently Connected to a Server
 	 */
-	public boolean isConnected() {
+	public boolean isConnected () {
 		return connect;
 	}
 
@@ -194,7 +199,7 @@ public class Client {
 	 * 
 	 * @return true if a transaction was active already
 	 */
-	public boolean transactionStart() {
+	public boolean transactionStart () {
 		boolean old = transaction;
 		transaction = true;
 		logger.debug("Transaction Started");
@@ -203,7 +208,7 @@ public class Client {
 		}
 		transactionTimeout = timer.addEvent(System.currentTimeMillis()
 				+ TRANSACTION_TIMEOUT, new TimerEventPerformer() {
-			public void perform(TimerEvent event) {
+			public void perform (TimerEvent event) {
 				logger.warn("Transaction Committed by Timeout.");
 				transactionCommit();
 			}
@@ -216,7 +221,7 @@ public class Client {
 	 * 
 	 * Commits the active transaction.
 	 */
-	public void transactionCommit() {
+	public void transactionCommit () {
 		if (transactionTimeout != null) {
 			transactionTimeout.cancel();
 		}
@@ -231,7 +236,7 @@ public class Client {
 	 * 
 	 * This is Threaded, if a transaction is active it will return immediately.
 	 */
-	private void send() {
+	private void send () {
 		if (transaction) {
 			return;
 		}
@@ -239,7 +244,7 @@ public class Client {
 			return;
 		}
 		new Thread(new Runnable() {
-			public void run() {
+			public void run () {
 				if (!semaphore.tryAcquire()) {
 					logger
 							.debug("Client connection already established, postponed transfer.");
@@ -290,7 +295,7 @@ public class Client {
 	 * 
 	 * @param req the Document to send
 	 */
-	private void sendHttpRequest(Document req) {
+	private void sendHttpRequest (Document req) {
 		if (!connect) {
 			return;
 		}
@@ -319,7 +324,7 @@ public class Client {
 						// dns names
 						ssl_connection
 								.setHostnameVerifier(new HostnameVerifier() {
-									public boolean verify(String arg0,
+									public boolean verify (String arg0,
 											SSLSession arg1) {
 										return true; // accept every hostname
 									}
@@ -431,9 +436,24 @@ public class Client {
 	 * @param id Switch
 	 * @return the Element
 	 */
-	public Element getSendElement(String id) {
+	public Element getSendElement (String id) {
+		return getSendElement(id, null);
+	}
+
+	/**
+	 * Creates a standard queue Element
+	 * 
+	 * @param id Switch
+	 * @param callback a callback instance
+	 * @return the Element
+	 */
+	public Element getSendElement (String id, GenericCallback callback) {
 		Element sendElement = new Element("Query");
 		sendElement.setAttribute("switch", id);
+		if (callback != null) {
+			sendElement.setAttribute("cbID", callbackManager
+					.addCallback(callback));
+		}
 		return sendElement;
 	}
 
@@ -445,14 +465,14 @@ public class Client {
 	 * 
 	 * @param e
 	 */
-	public void enqueue(Element e) {
+	public void enqueue (Element e) {
 		transactionQueue.offer(e);
 		send();
 	}
 
 	// --------------------------------------------------------//
 
-	public void sendPing() {
+	public void sendPing () {
 		final Document reqDoc = new Document();
 
 		Element request = new Element("Request");
@@ -464,13 +484,13 @@ public class Client {
 		Element statElement = getSendElement("Ping");
 		request.addContent(statElement);
 		new Thread(new Runnable() {
-			public void run() {
+			public void run () {
 				sendHttpRequest(reqDoc);
 			}
 		}).start();
 	}
 
-	public void sendUpdateDownloads(boolean fullUpdate) {
+	public void sendUpdateDownloads (boolean fullUpdate) {
 		updateDownloads = true;
 		if (fullUpdate) {
 			updateDownloadsFull = true;
@@ -478,7 +498,7 @@ public class Client {
 		send();
 	}
 
-	public void sendAddDownload(String url, String username, String password,
+	public void sendAddDownload (String url, String username, String password,
 			String fileLocation) {
 		Element sendElement = getSendElement("addDownload");
 		sendElement.setAttribute("location", "URL");
@@ -493,12 +513,12 @@ public class Client {
 		enqueue(sendElement);
 	}
 
-	public void sendAddDownload(File torrentFile, int[] fileOptions,
+	public void sendAddDownload (File torrentFile, int[] fileOptions,
 			String fileLocation) {
 		sendAddDownload(torrentFile, fileOptions, fileLocation, null);
 	}
 
-	public void sendAddDownload(File torrentFile, int[] fileOptions,
+	public void sendAddDownload (File torrentFile, int[] fileOptions,
 			String fileLocation, String encoding) {
 		Element sendElement = getSendElement("addDownload");
 		sendElement.setAttribute("location", "XML");
@@ -520,7 +540,7 @@ public class Client {
 		}
 	}
 
-	public void sendAddDownload(TOTorrent torrent, int[] fileOptions,
+	public void sendAddDownload (TOTorrent torrent, int[] fileOptions,
 			String fileLocation) {
 		Element sendElement = getSendElement("addDownload");
 		sendElement.setAttribute("location", "XML");
@@ -539,13 +559,13 @@ public class Client {
 		}
 	}
 
-	public void sendRemoveDownload(String hash) {
+	public void sendRemoveDownload (String hash) {
 		Element sendElement = getSendElement("removeDownload");
 		sendElement.setAttribute("hash", hash);
 		enqueue(sendElement);
 	}
 
-	public void sendRemoveDownload(String hash, boolean delete_torrent,
+	public void sendRemoveDownload (String hash, boolean delete_torrent,
 			boolean delete_data) {
 		Element sendElement = getSendElement("removeDownload");
 		sendElement.setAttribute("hash", hash);
@@ -555,47 +575,47 @@ public class Client {
 		enqueue(sendElement);
 	}
 
-	public void sendStartDownload(String hash) {
+	public void sendStartDownload (String hash) {
 		Element sendElement = getSendElement("startDownload");
 		sendElement.setAttribute("hash", hash);
 		enqueue(sendElement);
 	}
 
-	public void sendStopDownload(String hash) {
+	public void sendStopDownload (String hash) {
 		Element sendElement = getSendElement("stopDownload");
 		sendElement.setAttribute("hash", hash);
 		enqueue(sendElement);
 	}
 
-	public void sendRestartDownload(String hash) {
+	public void sendRestartDownload (String hash) {
 		Element sendElement = getSendElement("restartDownload");
 		sendElement.setAttribute("hash", hash);
 		enqueue(sendElement);
 	}
 
-	public void sendRecheckDataDownload(String hash) {
+	public void sendRecheckDataDownload (String hash) {
 		Element sendElement = getSendElement("recheckDataDownload");
 		sendElement.setAttribute("hash", hash);
 		enqueue(sendElement);
 	}
 
-	public void sendStopAndQueueDownloadDownload(String hash) {
+	public void sendStopAndQueueDownloadDownload (String hash) {
 		Element sendElement = getSendElement("stopAndQueueDownload");
 		sendElement.setAttribute("hash", hash);
 		enqueue(sendElement);
 	}
 
-	public void sendStartAll() {
+	public void sendStartAll () {
 		Element sendElement = getSendElement("startAllDownloads");
 		enqueue(sendElement);
 	}
 
-	public void sendStopAll() {
+	public void sendStopAll () {
 		Element sendElement = getSendElement("stopAllDownloads");
 		enqueue(sendElement);
 	}
 
-	public void sendPauseDownloads(int timeout) {
+	public void sendPauseDownloads (int timeout) {
 		Element sendElement = getSendElement("pauseDownloads");
 		if (timeout > 0) {
 			sendElement.setAttribute("timeout", Integer.toString(timeout));
@@ -603,78 +623,78 @@ public class Client {
 		enqueue(sendElement);
 	}
 
-	public void sendResumeDownloads() {
+	public void sendResumeDownloads () {
 		Element sendElement = getSendElement("resumeDownloads");
 		enqueue(sendElement);
 	}
 
-	public void sendSetForceStart(String hash, boolean start) {
+	public void sendSetForceStart (String hash, boolean start) {
 		Element sendElement = getSendElement("setForceStart");
 		sendElement.setAttribute("hash", hash);
 		sendElement.setAttribute("start", Boolean.toString(start));
 		enqueue(sendElement);
 	}
 
-	public void sendSetPosition(String hash, int pos) {
+	public void sendSetPosition (String hash, int pos) {
 		Element sendElement = getSendElement("setPosition");
 		sendElement.setAttribute("hash", hash);
 		sendElement.setAttribute("position", Integer.toString(pos));
 		enqueue(sendElement);
 	}
 
-	public void sendMoveToPosition(String hash, int pos) {
+	public void sendMoveToPosition (String hash, int pos) {
 		Element sendElement = getSendElement("moveToPosition");
 		sendElement.setAttribute("hash", hash);
 		sendElement.setAttribute("position", Integer.toString(pos));
 		enqueue(sendElement);
 	}
 
-	public void sendMoveUp(String hash) {
+	public void sendMoveUp (String hash) {
 		Element sendElement = getSendElement("moveUp");
 		sendElement.setAttribute("hash", hash);
 		enqueue(sendElement);
 	}
 
-	public void sendMoveDown(String hash) {
+	public void sendMoveDown (String hash) {
 		Element sendElement = getSendElement("moveDown");
 		sendElement.setAttribute("hash", hash);
 		enqueue(sendElement);
 	}
 
-	public void sendRequestDownloadScrape(String hash) {
+	public void sendRequestDownloadScrape (String hash) {
 		Element sendElement = getSendElement("requestDownloadScrape");
 		sendElement.setAttribute("hash", hash);
 		enqueue(sendElement);
 	}
 
-	public void sendRequestDownloadAnnounce(String hash) {
+	public void sendRequestDownloadAnnounce (String hash) {
 		Element sendElement = getSendElement("requestDownloadAnnounce");
 		sendElement.setAttribute("hash", hash);
 		enqueue(sendElement);
 	}
 
-	public void sendMoveDataFiles(String hash, String target) {
+	public void sendMoveDataFiles (String hash, String target) {
 		Element sendElement = getSendElement("moveDataFiles");
 		sendElement.setAttribute("hash", hash);
 		sendElement.setAttribute("target", target);
 		enqueue(sendElement);
 	}
 
-	public void sendMoveTorrentFile(String hash, String target) {
+	public void sendMoveTorrentFile (String hash, String target) {
 		Element sendElement = getSendElement("moveTorrentFile");
 		sendElement.setAttribute("hash", hash);
 		sendElement.setAttribute("target", target);
 		enqueue(sendElement);
 	}
 
-	public void sendRenameDownload(String hash, String target) {
+	public void sendRenameDownload (String hash, String target) {
 		Element sendElement = getSendElement("renameDownload");
 		sendElement.setAttribute("hash", hash);
 		sendElement.setAttribute("target", target);
 		enqueue(sendElement);
 	}
 
-	public void sendSetTorrentAttribute(String hash, String attribute,
+	public void sendSetTorrentAttribute (String hash, String attribute,
 			String value) {
 		Element sendElement = getSendElement("setTorrentAttribute");
 		sendElement.setAttribute("hash", hash);
@@ -683,63 +703,63 @@ public class Client {
 		enqueue(sendElement);
 	}
 
-	public void sendMaximumDownloadKBPerSecond(String hash, int limit) {
+	public void sendMaximumDownloadKBPerSecond (String hash, int limit) {
 		Element sendElement = getSendElement("setMaximumDownload");
 		sendElement.setAttribute("hash", hash);
 		sendElement.setAttribute("limit", Integer.toString(limit));
 		enqueue(sendElement);
 	}
 
-	public void sendUploadRateLimitBytesPerSecond(String hash, int limit) {
+	public void sendUploadRateLimitBytesPerSecond (String hash, int limit) {
 		Element sendElement = getSendElement("setMaximumUpload");
 		sendElement.setAttribute("hash", hash);
 		sendElement.setAttribute("limit", Integer.toString(limit));
 		enqueue(sendElement);
 	}
 
-	public void sendGetDownloadStats(String hash, int options) {
+	public void sendGetDownloadStats (String hash, int options) {
 		Element sendElement = getSendElement("getDownloadStats");
 		sendElement.setAttribute("hash", hash);
 		sendElement.setAttribute("options", Integer.toString(options));
 		enqueue(sendElement);
 	}
 
-	public void sendGetAdvancedStats(String hash) {
+	public void sendGetAdvancedStats (String hash) {
 		Element sendElement = getSendElement("getAdvancedStats");
 		sendElement.setAttribute("hash", hash);
 		enqueue(sendElement);
 	}
 
-	public void sendGetFiles(String hash) {
+	public void sendGetFiles (String hash) {
 		Element sendElement = getSendElement("getFiles");
 		sendElement.setAttribute("hash", hash);
 		enqueue(sendElement);
 	}
 
-	public void sendGetUsers() {
+	public void sendGetUsers () {
 		Element sendElement = getSendElement("getUsers");
 		enqueue(sendElement);
 	}
 
-	public void sendAddUser(Element user) {
+	public void sendAddUser (Element user) {
 		Element sendElement = getSendElement("addUser");
 		sendElement.addContent(user);
 		enqueue(sendElement);
 	}
 
-	public void sendRemoveUser(String username) {
+	public void sendRemoveUser (String username) {
 		Element sendElement = getSendElement("removeUser");
 		sendElement.setAttribute("username", username);
 		enqueue(sendElement);
 	}
 
-	public void sendUpdateUser(Element user) {
+	public void sendUpdateUser (Element user) {
 		Element sendElement = getSendElement("updateUser");
 		sendElement.addContent(user);
 		enqueue(sendElement);
 	}
 
-	public void sendSetFileOptions(String hash, int index, boolean priority,
+	public void sendSetFileOptions (String hash, int index, boolean priority,
 			boolean skipped, boolean deleted) {
 		Element sendElement = getSendElement("setFileOptions");
 		sendElement.setAttribute("hash", hash);
@@ -750,7 +770,7 @@ public class Client {
 		enqueue(sendElement);
 	}
 
-	public void sendSetAzParameter(String key, String value, int type) {
+	public void sendSetAzParameter (String key, String value, int type) {
 		Element sendElement = getSendElement("setAzParameter");
 		sendElement.setAttribute("key", key);
 		sendElement.setAttribute("value", value);
@@ -758,14 +778,14 @@ public class Client {
 		enqueue(sendElement);
 	}
 
-	public void sendGetAzParameter(String key, int type) {
+	public void sendGetAzParameter (String key, int type) {
 		Element sendElement = getSendElement("getAzParameter");
 		sendElement.setAttribute("key", key);
 		sendElement.setAttribute("type", Integer.toString(type));
 		enqueue(sendElement);
 	}
 
-	public void sendSetPluginParameter(String key, String value, int type) {
+	public void sendSetPluginParameter (String key, String value, int type) {
 		Element sendElement = getSendElement("setPluginParameter");
 		sendElement.setAttribute("key", key);
 		sendElement.setAttribute("value", value);
@@ -773,14 +793,14 @@ public class Client {
 		enqueue(sendElement);
 	}
 
-	public void sendGetPluginParameter(String key, int type) {
+	public void sendGetPluginParameter (String key, int type) {
 		Element sendElement = getSendElement("getPluginParameter");
 		sendElement.setAttribute("key", key);
 		sendElement.setAttribute("type", Integer.toString(type));
 		enqueue(sendElement);
 	}
 
-	public void sendSetCoreParameter(String key, String value, int type) {
+	public void sendSetCoreParameter (String key, String value, int type) {
 		Element sendElement = getSendElement("setCoreParameter");
 		sendElement.setAttribute("key", key);
 		sendElement.setAttribute("value", value);
@@ -788,46 +808,46 @@ public class Client {
 		enqueue(sendElement);
 	}
 
-	public void sendGetCoreParameter(String key, int type) {
+	public void sendGetCoreParameter (String key, int type) {
 		Element sendElement = getSendElement("getCoreParameter");
 		sendElement.setAttribute("key", key);
 		sendElement.setAttribute("type", Integer.toString(type));
 		enqueue(sendElement);
 	}
 
-	public void sendRestartAzureus() {
+	public void sendRestartAzureus () {
 		Element sendElement = getSendElement("restartAzureus");
 		enqueue(sendElement);
 	}
 
-	public void sendGetRemoteInfo() {
+	public void sendGetRemoteInfo () {
 		Element sendElement = getSendElement("getRemoteInfo");
 		enqueue(sendElement);
 	}
 
-	public void sendListPlugins() {
+	public void sendListPlugins () {
 		Element sendElement = getSendElement("listPlugins");
 		enqueue(sendElement);
 	}
 
-	public void sendSetPluginDisable(String id, boolean disable) {
+	public void sendSetPluginDisable (String id, boolean disable) {
 		Element sendElement = getSendElement("listPlugins");
 		sendElement.setAttribute("pluginID", id);
 		sendElement.setAttribute("disable", Boolean.toString(disable));
 		enqueue(sendElement);
 	}
 
-	public void sendGetPluginsFlexyConfig() {
+	public void sendGetPluginsFlexyConfig () {
 		Element sendElement = getSendElement("getPluginsFlexyConfig");
 		enqueue(sendElement);
 	}
 
-	public void sendGetDriveInfo() {
+	public void sendGetDriveInfo () {
 		Element sendElement = getSendElement("getDriveInfo");
 		enqueue(sendElement);
 	}
 
-	public void sendGetDownloadHistory(long start, long end) {
+	public void sendGetDownloadHistory (long start, long end) {
 		Element sendElement = getSendElement("getDownloadHistory");
 		sendElement.setAttribute("startDate", Long.toString(start));
 		sendElement.setAttribute("endDate", Long.toString(end));
@@ -840,12 +860,12 @@ public class Client {
 	 * "getPluginsFlexyConfig"); enqueue(sendElement); }
 	 */
 
-	public void sendGetUpdateInfo() {
+	public void sendGetUpdateInfo () {
 		Element sendElement = getSendElement("getUpdateInfo");
 		enqueue(sendElement);
 	}
 
-	public void sendApplyUpdates(String[] names) {
+	public void sendApplyUpdates (String[] names) {
 		Element sendElement = getSendElement("applyUpdates");
 		for (String n : names) {
 			Element a = new Element("Apply");
@@ -855,7 +875,7 @@ public class Client {
 		enqueue(sendElement);
 	}
 
-	public void sendCreateSLLCertificate(String alias, String dn, int strength) {
+	public void sendCreateSLLCertificate (String alias, String dn, int strength) {
 		Element sendElement = getSendElement("createSSLCertificate");
 		sendElement.setAttribute("alias", alias);
 		sendElement.setAttribute("dn", dn);
@@ -863,18 +883,30 @@ public class Client {
 		enqueue(sendElement);
 	}
 
-	public void sendGetGlobalStats() {
+	public void sendBrowseDirectory (String directory,
+			BrowseDirectoryCallback callback) {
+		if (callback == null) {
+			return;
+		}
+		Element sendElement = getSendElement("browseDirectory", callback);
+		if (directory != null) {
+			sendElement.setAttribute("dir", directory);
+		}
+		enqueue(sendElement);
+	}
+
+	public void sendGetGlobalStats () {
 		send(); // globalStats are allways requested so just send here
 	}
 
 	// ********************************************************//
 
-	public void sendGetTrackerTorrents() {
+	public void sendGetTrackerTorrents () {
 		Element sendElement = getSendElement("getTrackerTorrents");
 		enqueue(sendElement);
 	}
 
-	public void sendHostTorrent(File torrentFile, boolean persistent,
+	public void sendHostTorrent (File torrentFile, boolean persistent,
 			boolean passive) {
 		Element sendElement = getSendElement("hostTorrent");
 		sendElement.setAttribute("location", "XML");
@@ -888,7 +920,8 @@ public class Client {
 		}
 	}
 
-	public void sendHostTorrent(Download dl, boolean persistent, boolean passive) {
+	public void sendHostTorrent (Download dl, boolean persistent,
+			boolean passive) {
 		Element sendElement = getSendElement("hostTorrent");
 		sendElement.setAttribute("location", "Download");
 		sendElement.setAttribute("hash", dl.getHash());
@@ -897,7 +930,7 @@ public class Client {
 		enqueue(sendElement);
 	}
 
-	public void sendPublishTorrent(File torrentFile) {
+	public void sendPublishTorrent (File torrentFile) {
 		Element sendElement = getSendElement("publishTorrent");
 		sendElement.setAttribute("location", "XML");
 		try {
@@ -908,26 +941,26 @@ public class Client {
 		}
 	}
 
-	public void sendPublishTorrent(Download dl) {
+	public void sendPublishTorrent (Download dl) {
 		Element sendElement = getSendElement("publishTorrent");
 		sendElement.setAttribute("location", "Download");
 		sendElement.setAttribute("hash", dl.getHash());
 		enqueue(sendElement);
 	}
 
-	public void sendTrackerTorrentRemove(TrackerTorrentImpl t) {
+	public void sendTrackerTorrentRemove (TrackerTorrentImpl t) {
 		Element sendElement = getSendElement("trackerTorrentRemove");
 		sendElement.setAttribute("hash", t.getHash());
 		enqueue(sendElement);
 	}
 
-	public void sendTrackerTorrentStop(TrackerTorrentImpl t) {
+	public void sendTrackerTorrentStop (TrackerTorrentImpl t) {
 		Element sendElement = getSendElement("trackerTorrentStop");
 		sendElement.setAttribute("hash", t.getHash());
 		enqueue(sendElement);
 	}
 
-	public void sendTrackerTorrentStart(TrackerTorrentImpl t) {
+	public void sendTrackerTorrentStart (TrackerTorrentImpl t) {
 		Element sendElement = getSendElement("trackerTorrentStart");
 		sendElement.setAttribute("hash", t.getHash());
 		enqueue(sendElement);
@@ -942,7 +975,7 @@ public class Client {
 	 * @param params array of Parameters supported are: boolean, int, long,
 	 *            float, double, String
 	 */
-	public void sendIPCCall(String pluginID, String senderID, String method,
+	public void sendIPCCall (String pluginID, String senderID, String method,
 			Object[] params) {
 		Element sendElement = getSendElement("ipcCall");
 		sendElement.setAttribute("pluginID", pluginID);
@@ -1003,7 +1036,7 @@ public class Client {
 	 * @return the Element containing the Torrent data
 	 * @throws IOException
 	 */
-	public Element loadTorrentToXML(File torrentFile) throws IOException {
+	public Element loadTorrentToXML (File torrentFile) throws IOException {
 		Element torrent = new Element("Torrent");
 		FileInputStream fis = null;
 		try {
@@ -1041,7 +1074,7 @@ public class Client {
 	 * @return the Element containing the Torrent data
 	 * @throws TOTorrentException
 	 */
-	public Element loadTorrentToXML(TOTorrent torrent)
+	public Element loadTorrentToXML (TOTorrent torrent)
 			throws TOTorrentException {
 		Element torrentElement = new Element("Torrent");
 		torrentElement.setText(EncodingUtil.encode(torrent
@@ -1051,103 +1084,103 @@ public class Client {
 
 	// --------------------------------------------------------//
 
-	public void addClientUpdateListener(ClientUpdateListener listener) {
+	public void addClientUpdateListener (ClientUpdateListener listener) {
 		clientUpdateListeners.add(listener);
 	}
 
-	public void removeClientUpdateListener(ClientUpdateListener listener) {
+	public void removeClientUpdateListener (ClientUpdateListener listener) {
 		clientUpdateListeners.remove(listener);
 	}
 
-	protected void callClientUpdateListeners(long updateSwitches) {
+	protected void callClientUpdateListeners (long updateSwitches) {
 		for (int i = 0; i < clientUpdateListeners.size(); i++) {
 			clientUpdateListeners.get(i).update(updateSwitches);
 		}
 
 	}
 
-	public void addGlobalStatsListener(GlobalStatsListener listener) {
+	public void addGlobalStatsListener (GlobalStatsListener listener) {
 		globalStatsListners.add(listener);
 	}
 
-	public void removeGlobalStatsListener(GlobalStatsListener listener) {
+	public void removeGlobalStatsListener (GlobalStatsListener listener) {
 		globalStatsListners.remove(listener);
 	}
 
-	protected void callGlobalStatsListener(int d, int u, int s, int sq, int dl,
-			int dlq) {
+	protected void callGlobalStatsListener (int d, int u, int s, int sq,
+			int dl, int dlq) {
 		for (int i = 0; i < globalStatsListners.size(); i++) {
 			globalStatsListners.get(i).updateStats(d, u, s, sq, dl, dlq);
 		}
 	}
 
-	public void addExceptionListener(ExceptionListener listener) {
+	public void addExceptionListener (ExceptionListener listener) {
 		exceptionListeners.add(listener);
 	}
 
-	public void removeExceptionListener(ExceptionListener listener) {
+	public void removeExceptionListener (ExceptionListener listener) {
 		exceptionListeners.remove(listener);
 	}
 
-	protected void callExceptionListener(Exception e, boolean serious) {
+	protected void callExceptionListener (Exception e, boolean serious) {
 		for (int i = 0; i < exceptionListeners.size(); i++) {
 			exceptionListeners.get(i).exceptionOccured(e, serious);
 		}
 	}
 
-	public void addConnectionListener(ConnectionListener listener) {
+	public void addConnectionListener (ConnectionListener listener) {
 		connectionListeners.add(listener);
 	}
 
-	public void removeConnectionListener(ConnectionListener listener) {
+	public void removeConnectionListener (ConnectionListener listener) {
 		connectionListeners.remove(listener);
 	}
 
-	protected void callConnectionListener(int state) {
+	protected void callConnectionListener (int state) {
 		for (int i = 0; i < connectionListeners.size(); i++) {
 			connectionListeners.get(i).connectionState(state);
 		}
 	}
 
-	public void addClientEventListener(ClientEventListener listener) {
+	public void addClientEventListener (ClientEventListener listener) {
 		eventListeners.add(listener);
 	}
 
-	public void removeClientEventListener(ClientEventListener listener) {
+	public void removeClientEventListener (ClientEventListener listener) {
 		eventListeners.remove(listener);
 	}
 
-	protected void callClientEventListener(int type, long time, Element event) {
+	protected void callClientEventListener (int type, long time, Element event) {
 		for (int i = 0; i < eventListeners.size(); i++) {
 			eventListeners.get(i).handleEvent(type, time, event);
 		}
 
 	}
 
-	public void addHTTPErrorListener(HTTPErrorListener listener) {
+	public void addHTTPErrorListener (HTTPErrorListener listener) {
 		httpErrorListeners.add(listener);
 	}
 
-	public void removeHTTPErrorListener(HTTPErrorListener listener) {
+	public void removeHTTPErrorListener (HTTPErrorListener listener) {
 		httpErrorListeners.remove(listener);
 	}
 
-	protected void callHTTPErrorListener(int statusCode) {
+	protected void callHTTPErrorListener (int statusCode) {
 		for (int i = 0; i < httpErrorListeners.size(); i++) {
 			httpErrorListeners.get(i).httpError(statusCode);
 		}
 
 	}
 
-	public void addParameterListener(ParameterListener listener) {
+	public void addParameterListener (ParameterListener listener) {
 		parameterListeners.add(listener);
 	}
 
-	public void removeParameterListener(ParameterListener listener) {
+	public void removeParameterListener (ParameterListener listener) {
 		parameterListeners.remove(listener);
 	}
 
-	protected void callAzParameterListener(String key, String value, int type) {
+	protected void callAzParameterListener (String key, String value, int type) {
 		if (!verifyParameter(key, value, type)) {
 			return;
 		}
@@ -1157,7 +1190,7 @@ public class Client {
 
 	}
 
-	protected void callPluginParameterListener(String key, String value,
+	protected void callPluginParameterListener (String key, String value,
 			int type) {
 		if (!verifyParameter(key, value, type)) {
 			return;
@@ -1167,7 +1200,7 @@ public class Client {
 		}
 	}
 
-	protected void callCoreParameterListener(String key, String value, int type) {
+	protected void callCoreParameterListener (String key, String value, int type) {
 		if (!verifyParameter(key, value, type)) {
 			return;
 		}
@@ -1184,7 +1217,7 @@ public class Client {
 	 * @param type
 	 * @return true or false
 	 */
-	protected boolean verifyParameter(String key, String value, int type) {
+	protected boolean verifyParameter (String key, String value, int type) {
 		if (key == null || value == null) {
 			return false;
 		}
@@ -1194,15 +1227,15 @@ public class Client {
 		return true;
 	}
 
-	public void addIPCResponseListener(IPCResponseListener listener) {
+	public void addIPCResponseListener (IPCResponseListener listener) {
 		ipcResponseListeners.add(listener);
 	}
 
-	public void removeIPCResponseListener(IPCResponseListener listener) {
+	public void removeIPCResponseListener (IPCResponseListener listener) {
 		ipcResponseListeners.remove(listener);
 	}
 
-	protected void callIPCResponseListeners(int status, String senderID,
+	protected void callIPCResponseListeners (int status, String senderID,
 			String pluginID, String method, Element response) {
 		for (int i = 0; i < ipcResponseListeners.size(); i++) {
 			ipcResponseListeners.get(i).handleIPCResponse(status, senderID,
@@ -1215,98 +1248,102 @@ public class Client {
 	/**
 	 * @return Returns the server.
 	 */
-	public URL getServer() {
+	public URL getServer () {
 		return server;
 	}
 
 	/**
 	 * @return Returns the username.
 	 */
-	public String getUsername() {
+	public String getUsername () {
 		return username;
 	}
 
 	/**
 	 * @return Returns the downloadManager.
 	 */
-	public DownloadManager getDownloadManager() {
+	public DownloadManager getDownloadManager () {
 		return downloadManager;
 	}
 
 	/**
 	 * @return Returns the DownloadManagerImpl
 	 */
-	protected DownloadManagerImpl getDownloadManagerImpl() {
+	protected DownloadManagerImpl getDownloadManagerImpl () {
 		return downloadManager;
 	}
 
 	/**
 	 * @return Returns the userManager.
 	 */
-	public UserManager getUserManager() {
+	public UserManager getUserManager () {
 		return userManager;
 	}
 
 	/**
 	 * @return Returns the userManagerImpl.
 	 */
-	protected UserManagerImpl getUserManagerImpl() {
+	protected UserManagerImpl getUserManagerImpl () {
 		return userManager;
 	}
 
 	/**
 	 * @return Returns the remoteInfo.
 	 */
-	public RemoteInfo getRemoteInfo() {
+	public RemoteInfo getRemoteInfo () {
 		return remoteInfo;
 	}
 
 	/**
 	 * @return Returns the remoteInfo.
 	 */
-	protected RemoteInfoImpl getRemoteInfoImpl() {
+	protected RemoteInfoImpl getRemoteInfoImpl () {
 		return remoteInfo;
 	}
 
 	/**
 	 * @return Returns the remoteUpdateManager.
 	 */
-	public RemoteUpdateManager getRemoteUpdateManager() {
+	public RemoteUpdateManager getRemoteUpdateManager () {
 		return remoteUpdateManager;
 	}
 
 	/**
 	 * @return Returns the remoteUpdateManager.
 	 */
-	protected RemoteUpdateManagerImpl getRemoteUpdateManagerImpl() {
+	protected RemoteUpdateManagerImpl getRemoteUpdateManagerImpl () {
 		return remoteUpdateManager;
 	}
 
 	/**
 	 * @return returns the Tracker
 	 */
-	public Tracker getTracker() {
+	public Tracker getTracker () {
 		return tracker;
 	}
 
 	/**
 	 * @return returns the TrackerImpl
 	 */
-	protected TrackerImpl getTrackerImpl() {
+	protected TrackerImpl getTrackerImpl () {
 		return tracker;
+	}
+
+	public CallbackManger getCallbackManger () {
+		return callbackManager;
 	}
 
 	/**
 	 * @param password The password to set.
 	 */
-	public void setPassword(String password) {
+	public void setPassword (String password) {
 		this.password = password;
 	}
 
 	/**
 	 * @param username The username to set.
 	 */
-	public void setUsername(String username) {
+	public void setUsername (String username) {
 		if (this.username != null && !this.username.equalsIgnoreCase(username)) {
 			// remove info if user changes
 			downloadManager.clear();
@@ -1318,11 +1355,11 @@ public class Client {
 	/**
 	 * @param server The server to set.
 	 */
-	public void setServer(URL server) {
+	public void setServer (URL server) {
 		setServer(server.toExternalForm());
 	}
 
-	public void setServer(String server) {
+	public void setServer (String server) {
 		reset();
 		if (server == null) {
 			this.server = null;
@@ -1343,7 +1380,7 @@ public class Client {
 	 * 
 	 * @param proxy the proxy to set
 	 */
-	public void setProxy(Proxy proxy) {
+	public void setProxy (Proxy proxy) {
 		if (proxy == null) {
 			useProxy = false;
 		} else {
@@ -1355,28 +1392,28 @@ public class Client {
 	/**
 	 * @return Returns the failedConnections.
 	 */
-	public int getFailedConnections() {
+	public int getFailedConnections () {
 		return failedConnections;
 	}
 
 	/**
 	 * @return Returns the ssl.
 	 */
-	public boolean isSSLEncrypted() {
+	public boolean isSSLEncrypted () {
 		return ssl;
 	}
 
 	/**
 	 * @return the fastMode
 	 */
-	public boolean isFastMode() {
+	public boolean isFastMode () {
 		return fastMode;
 	}
 
 	/**
 	 * @param fastMode the fastMode to set
 	 */
-	public void setFastMode(boolean fastMode) {
+	public void setFastMode (boolean fastMode) {
 		this.fastMode = fastMode;
 	}
 }

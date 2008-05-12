@@ -1,7 +1,6 @@
 /*
- * Created on Jan 27, 2006
- * Created by omschaub
- *
+ * Created on Jan 27, 2006 Created by omschaub
+ * 
  */
 package lbms.azsmrc.remote.client.swtgui.dialogs;
 
@@ -23,6 +22,7 @@ import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.remote.client.swtgui.URLTransfer;
 import lbms.azsmrc.remote.client.swtgui.container.AddTorrentContainer;
+import lbms.azsmrc.remote.client.swtgui.dialogs.BrowseDirectoryDialog.DirectorySelectedCallback;
 import lbms.azsmrc.remote.client.torrent.TOTorrentAnnounceURLGroup;
 import lbms.azsmrc.remote.client.torrent.TOTorrentAnnounceURLSet;
 import lbms.azsmrc.remote.client.torrent.TOTorrentException;
@@ -53,6 +53,7 @@ import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellEvent;
@@ -104,14 +105,15 @@ public class OpenByFileDialog {
 
 	private static OpenByFileDialog				instance;
 
-	private static Logger						logger		= Logger.getLogger(OpenByFileDialog.class);
+	private static Logger						logger		= Logger
+																	.getLogger(OpenByFileDialog.class);
 
 	// private int drag_drop_line_start = -1;
 
 	// I18N prefix
 	public static final String					PFX			= "dialog.openbyfiledialog.";
 
-	private OpenByFileDialog (Display display) {
+	private OpenByFileDialog(Display display) {
 		// set the static instance
 		instance = this;
 
@@ -161,14 +163,17 @@ public class OpenByFileDialog {
 		buttonComp.setLayoutData(gridData);
 
 		Button open_file_button = new Button(buttonComp, SWT.PUSH);
-		open_file_button.setToolTipText(I18N.translate(PFX + "openfile.tooltip"));
+		open_file_button.setToolTipText(I18N
+				.translate(PFX + "openfile.tooltip"));
 		open_file_button.setText(I18N.translate(PFX + "openfile.text"));
 		open_file_button.setImage(ImageRepository.getImage("open_by_file"));
 		open_file_button.addListener(SWT.Selection, new Listener() {
 			public void handleEvent (Event e) {
 				FileDialog dialog = new FileDialog(shell, SWT.OPEN);
 				dialog.setFilterExtensions(new String[] { "*.torrent", "*.*" });
-				dialog.setText(I18N.translate(PFX + "openfile.filedialog.text"));
+				dialog
+						.setText(I18N.translate(PFX
+								+ "openfile.filedialog.text"));
 				if (lastDir != null) {
 					dialog.setFilterPath(lastDir);
 				}
@@ -184,9 +189,8 @@ public class OpenByFileDialog {
 							// check the encoding of the file
 							if (container.getTorrent().getAdditionalProperty(
 									"encoding") == null) {
-								EncodingDialog.open(
-										RCMain.getRCMain().getDisplay(),
-										container);
+								EncodingDialog.open(RCMain.getRCMain()
+										.getDisplay(), container);
 
 							}
 
@@ -195,10 +199,14 @@ public class OpenByFileDialog {
 							if (tMap.containsKey(container.getName())) {
 								MessageBox messageBox = new MessageBox(shell,
 										SWT.ICON_INFORMATION | SWT.OK);
-								messageBox.setText(I18N.translate(PFX
-										+ "openfile.filedialog.duplicate.title"));
-								messageBox.setMessage(I18N.translate(PFX
-										+ "openfile.filedialog.duplicate.message"));
+								messageBox
+										.setText(I18N
+												.translate(PFX
+														+ "openfile.filedialog.duplicate.title"));
+								messageBox
+										.setMessage(I18N
+												.translate(PFX
+														+ "openfile.filedialog.duplicate.message"));
 								messageBox.open();
 								return;
 							}
@@ -219,7 +227,8 @@ public class OpenByFileDialog {
 
 							// select the item in the table
 							try {
-								filesTable.setSelection(filesTable.indexOf(item));
+								filesTable.setSelection(filesTable
+										.indexOf(item));
 							} catch (Exception e1) {
 								e1.printStackTrace();
 								filesTable.setSelection(0);
@@ -334,7 +343,8 @@ public class OpenByFileDialog {
 
 		// save.dir is the default save dir
 		Label saveDirL = new Label(details3, SWT.NULL);
-		saveDirL.setText(I18N.translate(PFX + "serverdrive.defaultsavedir.text"));
+		saveDirL.setText(I18N
+				.translate(PFX + "serverdrive.defaultsavedir.text"));
 
 		saveDir = new Label(details3, SWT.NULL);
 		saveDir.setText(I18N.translate(PFX + "serverdrive.notreceivedyet"));
@@ -344,7 +354,8 @@ public class OpenByFileDialog {
 
 		// destination.dir is the user dir
 		Label destDirL = new Label(details3, SWT.NULL);
-		destDirL.setText(I18N.translate(PFX + "serverdrive.destinationdir.text"));
+		destDirL.setText(I18N
+				.translate(PFX + "serverdrive.destinationdir.text"));
 
 		destDir = new Label(details3, SWT.NULL);
 		destDir.setText(I18N.translate(PFX + "serverdrive.notreceivedyet"));
@@ -362,20 +373,36 @@ public class OpenByFileDialog {
 								@Override
 								public void runSafe () {
 									try {
-										driveMap = RCMain.getRCMain().getClient().getRemoteInfo().getDriveInfo();
+										driveMap = RCMain.getRCMain()
+												.getClient().getRemoteInfo()
+												.getDriveInfo();
 
 										if (driveMap.containsKey("save.dir")
-												&& driveMap.containsKey("save.dir.path")) {
-											saveDir.setText(driveMap.get("save.dir.path"));
-											saveDirSize.setText(DisplayFormatters.formatKBCountToBase10KBEtc(Long.parseLong(driveMap.get("save.dir")))
-													+ " Free");
+												&& driveMap
+														.containsKey("save.dir.path")) {
+											saveDir.setText(driveMap
+													.get("save.dir.path"));
+											saveDirSize
+													.setText(DisplayFormatters
+															.formatKBCountToBase10KBEtc(Long
+																	.parseLong(driveMap
+																			.get("save.dir")))
+															+ " Free");
 										}
 
-										if (driveMap.containsKey("destination.dir")
-												&& driveMap.containsKey("destination.dir.path")) {
-											destDir.setText(driveMap.get("destination.dir.path"));
-											destDirSize.setText(DisplayFormatters.formatKBCountToBase10KBEtc(Long.parseLong(driveMap.get("destination.dir")))
-													+ " Free");
+										if (driveMap
+												.containsKey("destination.dir")
+												&& driveMap
+														.containsKey("destination.dir.path")) {
+											destDir
+													.setText(driveMap
+															.get("destination.dir.path"));
+											destDirSize
+													.setText(DisplayFormatters
+															.formatKBCountToBase10KBEtc(Long
+																	.parseLong(driveMap
+																			.get("destination.dir")))
+															+ " Free");
 										}
 
 										// redraw the group
@@ -502,7 +529,7 @@ public class OpenByFileDialog {
 		Group detailsGroup = new Group(sash, SWT.NULL);
 		detailsGroup.setText(I18N.translate(PFX + "torrentdetail.group.text"));
 		gl = new GridLayout();
-		gl.numColumns = 1;
+		gl.numColumns = 2;
 		gl.marginHeight = 0;
 		gl.marginWidth = 0;
 		detailsGroup.setLayout(gl);
@@ -515,6 +542,9 @@ public class OpenByFileDialog {
 		Label saveToLabel = new Label(detailsGroup, SWT.NULL);
 		saveToLabel.setText(I18N.translate(PFX
 				+ "torrentdetail.saveToLabel.text"));
+		gridData = new GridData(GridData.FILL_BOTH);
+		gridData.horizontalSpan = 2;
+		saveToLabel.setLayoutData(gridData);
 
 		saveTo = new Text(detailsGroup, SWT.BORDER | SWT.SINGLE);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
@@ -527,11 +557,35 @@ public class OpenByFileDialog {
 			}
 		});
 
+		Button browseButton = new Button(detailsGroup, SWT.PUSH);
+		browseButton.setText(I18N.translate("global.browse"));
+		browseButton.addSelectionListener(new SelectionAdapter() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
+			@Override
+			public void widgetSelected (SelectionEvent e) {
+				BrowseDirectoryDialog.open(new DirectorySelectedCallback() {
+					@Override
+					public void directorySelected (final String directory) {
+						shell.getDisplay().asyncExec(new SWTSafeRunnable() {
+							@Override
+							public void runSafe () {
+								saveTo.setText(directory);
+							}
+						});
+					}
+				}, shell);
+			}
+		});
+
 		// detailsTAble for each torrent
 		detailsTable = new Table(detailsGroup, SWT.BORDER | SWT.V_SCROLL
 				| SWT.H_SCROLL | SWT.CHECK | SWT.MULTI);
 		gridData = new GridData(GridData.FILL_BOTH);
-		gridData.horizontalSpan = 3;
+		gridData.horizontalSpan = 2;
 		gridData.verticalSpan = 20;
 		gridData.grabExcessVerticalSpace = true;
 		detailsTable.setLayoutData(gridData);
@@ -553,7 +607,8 @@ public class OpenByFileDialog {
 				if (event.detail == SWT.CHECK) {
 					TableItem item = (TableItem) event.item;
 					int place = detailsTable.indexOf(item);
-					AddTorrentContainer container = (AddTorrentContainer) filesTable.getSelection()[0].getData();
+					AddTorrentContainer container = (AddTorrentContainer) filesTable
+							.getSelection()[0].getData();
 					if (item.getChecked()) {
 						container.setFileProperty(place, 1);
 					} else {
@@ -670,8 +725,8 @@ public class OpenByFileDialog {
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 2;
 		deleteOnSend.setLayoutData(gridData);
-		deleteOnSend.setSelection(Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty(
-				"delete.on.send", "false")));
+		deleteOnSend.setSelection(Boolean.parseBoolean(RCMain.getRCMain()
+				.getProperties().getProperty("delete.on.send", "false")));
 		deleteOnSend.addListener(SWT.Selection, new Listener() {
 
 			public void handleEvent (Event arg0) {
@@ -708,35 +763,41 @@ public class OpenByFileDialog {
 						// just add it normally
 						// else send it with the properties int[]
 						if (container.isWholeFileSent()) {
-							if (container.getSaveToDirectory().equalsIgnoreCase(
-									"")) {
-								RCMain.getRCMain().getClient().getDownloadManager().addDownload(
-										container.getTorrent());
+							if (container.getSaveToDirectory()
+									.equalsIgnoreCase("")) {
+								RCMain.getRCMain().getClient()
+										.getDownloadManager().addDownload(
+												container.getTorrent());
 							} else {
-								RCMain.getRCMain().getClient().getDownloadManager().addDownload(
-										container.getTorrent(),
-										container.getSaveToDirectory());
+								RCMain.getRCMain().getClient()
+										.getDownloadManager().addDownload(
+												container.getTorrent(),
+												container.getSaveToDirectory());
 							}
 						} else {
 							int[] props = container.getFileProperties();
 							// Main add to Azureus
-							if (container.getSaveToDirectory().equalsIgnoreCase(
-									"")) {
-								RCMain.getRCMain().getClient().getDownloadManager().addDownload(
-										container.getTorrent(), props);
+							if (container.getSaveToDirectory()
+									.equalsIgnoreCase("")) {
+								RCMain.getRCMain().getClient()
+										.getDownloadManager().addDownload(
+												container.getTorrent(), props);
 							} else {
-								RCMain.getRCMain().getClient().getDownloadManager().addDownload(
-										container.getTorrent(), props,
-										container.getSaveToDirectory());
+								RCMain.getRCMain().getClient()
+										.getDownloadManager().addDownload(
+												container.getTorrent(), props,
+												container.getSaveToDirectory());
 							}
 						}
 
-						if (Boolean.parseBoolean(RCMain.getRCMain().getProperties().getProperty(
-								"delete.on.send", "false"))) {
+						if (Boolean.parseBoolean(RCMain.getRCMain()
+								.getProperties().getProperty("delete.on.send",
+										"false"))) {
 							if (!container.deleteFile()) {
 								MessageBox messageBox = new MessageBox(shell,
 										SWT.ICON_ERROR | SWT.OK);
-								messageBox.setText(I18N.translate("global.error"));
+								messageBox.setText(I18N
+										.translate("global.error"));
 								messageBox.setMessage(I18N.translate(PFX
 										+ "sendfiles.error2")
 										+ " "
@@ -768,7 +829,7 @@ public class OpenByFileDialog {
 
 	/**
 	 * public open method without a string
-	 *
+	 * 
 	 */
 	public static void open () {
 		final Display display = RCMain.getRCMain().getDisplay();
@@ -785,7 +846,7 @@ public class OpenByFileDialog {
 
 	/**
 	 * Static open with fileNames
-	 *
+	 * 
 	 * @param display
 	 * @param fileNames
 	 */
@@ -797,7 +858,7 @@ public class OpenByFileDialog {
 		display.syncExec(new SWTSafeRunnable() {
 			/*
 			 * (non-Javadoc)
-			 *
+			 * 
 			 * @see lbms.azsmrc.shared.SWTSafeRunnable#runSafe()
 			 */
 			@Override
@@ -947,7 +1008,8 @@ public class OpenByFileDialog {
 					String filename = source.getAbsolutePath();
 					try {
 						if (!DownloadManagerShell.isTorrentFile(filename)) {
-							logger.info("openDroppedTorrents: file not a torrent file");
+							logger
+									.info("openDroppedTorrents: file not a torrent file");
 
 						} else {
 							// System.out.println("Dropped file IS torrent -- to
@@ -981,9 +1043,9 @@ public class OpenByFileDialog {
 								+ "'\n" + e.toString());
 					}
 				} else if (source.isDirectory()) {
-					MessageBox messageBox = new MessageBox(
-							RCMain.getRCMain().getMainWindow().getShell(),
-							SWT.ICON_ERROR | SWT.OK);
+					MessageBox messageBox = new MessageBox(RCMain.getRCMain()
+							.getMainWindow().getShell(), SWT.ICON_ERROR
+							| SWT.OK);
 					messageBox.setText(I18N.translate("global.error"));
 					messageBox.setMessage(I18N.translate(PFX
 							+ "clipboard.error1"));
@@ -1014,12 +1076,12 @@ public class OpenByFileDialog {
 					detailItem.setChecked(true);
 				}
 				detailItem.setText(1, name);
-				detailItem.setText(
-						2,
-						DisplayFormatters.formatByteCountToBase10KBEtc(files[i].getLength()));
+				detailItem.setText(2, DisplayFormatters
+						.formatByteCountToBase10KBEtc(files[i].getLength()));
 				// Shade every other one
 				if (filesTable.indexOf(detailItem) % 2 != 0) {
-					detailItem.setBackground(ColorUtilities.getBackgroundColor());
+					detailItem.setBackground(ColorUtilities
+							.getBackgroundColor());
 				}
 			}
 
@@ -1053,14 +1115,14 @@ public class OpenByFileDialog {
 			// System.out.println(saveDirFree + " | " + (1024l*1024l*2l) + " | "
 			// + totalSizeAdj + " | " + (saveDirFree - totalSizeAdj));
 			if ((saveDirFree - totalSizeAdj) > (1024l * 1024l * 2l/* 2 GB */)) {
-				totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(
-						SWT.COLOR_DARK_GREEN));
+				totalS.setForeground(RCMain.getRCMain().getDisplay()
+						.getSystemColor(SWT.COLOR_DARK_GREEN));
 			} else if ((saveDirFree - totalSizeAdj) > (1024l * 20l /* 20 MB */)) {
-				totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(
-						SWT.COLOR_DARK_YELLOW));
+				totalS.setForeground(RCMain.getRCMain().getDisplay()
+						.getSystemColor(SWT.COLOR_DARK_YELLOW));
 			} else {
-				totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(
-						SWT.COLOR_DARK_RED));
+				totalS.setForeground(RCMain.getRCMain().getDisplay()
+						.getSystemColor(SWT.COLOR_DARK_RED));
 			}
 			saveDirSize.setToolTipText(I18N.translate(PFX
 					+ "serverdrive.defaultsavedir.tooltip")
@@ -1068,42 +1130,43 @@ public class OpenByFileDialog {
 							- totalSizeAdj));
 
 		} else {
-			totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(
-					SWT.COLOR_WIDGET_FOREGROUND));
+			totalS.setForeground(RCMain.getRCMain().getDisplay()
+					.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
 		}
 
 		if (driveMap.containsKey("destination.dir")
 				&& driveMap.containsKey("destination.dir.path")) {
 			long destDirFree = Long.parseLong(driveMap.get("destination.dir"));
 			if ((destDirFree - totalSizeAdj) > (1024l * 1024l * 2l/* 2 GB */)) {
-				totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(
-						SWT.COLOR_DARK_GREEN));
+				totalS.setForeground(RCMain.getRCMain().getDisplay()
+						.getSystemColor(SWT.COLOR_DARK_GREEN));
 			} else if ((destDirFree - totalSizeAdj) > (1024l * 20l /* 20 MB */)) {
-				totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(
-						SWT.COLOR_DARK_YELLOW));
+				totalS.setForeground(RCMain.getRCMain().getDisplay()
+						.getSystemColor(SWT.COLOR_DARK_YELLOW));
 			} else {
-				totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(
-						SWT.COLOR_DARK_RED));
+				totalS.setForeground(RCMain.getRCMain().getDisplay()
+						.getSystemColor(SWT.COLOR_DARK_RED));
 			}
 			destDirSize.setToolTipText(I18N.translate(PFX
 					+ "serverdrive.destinationdir.tooltip")
 					+ DisplayFormatters.formatKBCountToBase10KBEtc(destDirFree
 							- totalSizeAdj));
 		} else {
-			totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(
-					SWT.COLOR_WIDGET_FOREGROUND));
+			totalS.setForeground(RCMain.getRCMain().getDisplay()
+					.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
 		}
 		if (totalSizeAdj == 0) {
-			totalS.setForeground(RCMain.getRCMain().getDisplay().getSystemColor(
-					SWT.COLOR_WIDGET_FOREGROUND));
+			totalS.setForeground(RCMain.getRCMain().getDisplay()
+					.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
 		}
 		totalSLabel.setText(I18N.translate(PFX + "totalsize.text") + " ");
-		totalS.setText(DisplayFormatters.formatByteCountToBase10KBEtc(totalSize));
+		totalS.setText(DisplayFormatters
+				.formatByteCountToBase10KBEtc(totalSize));
 	}
 
 	/**
 	 * The main torrent details tab
-	 *
+	 * 
 	 * @param tabFolder
 	 * @param atc
 	 */
@@ -1151,12 +1214,14 @@ public class OpenByFileDialog {
 		combo.setLayoutData(gd);
 
 		// Pull the group from the torrent
-		TOTorrentAnnounceURLGroup torrentGroup = atc.getTorrent().getAnnounceURLGroup();
+		TOTorrentAnnounceURLGroup torrentGroup = atc.getTorrent()
+				.getAnnounceURLGroup();
 
 		// Check the length to see if a group is actually present
 		if (torrentGroup.getAnnounceURLSets().length > 0) {
 			// group is present, now pull the set
-			TOTorrentAnnounceURLSet[] urlSets = torrentGroup.getAnnounceURLSets();
+			TOTorrentAnnounceURLSet[] urlSets = torrentGroup
+					.getAnnounceURLSets();
 			// crawl through them and pull the titles for the table
 			for (TOTorrentAnnounceURLSet urlSet : urlSets) {
 				URL[] urls = urlSet.getAnnounceURLs();
@@ -1286,7 +1351,8 @@ public class OpenByFileDialog {
 		sizeL.setText(I18N.translate(PFX + "detailstab.files.size.text") + " ");
 
 		Label size = new Label(cLeft, SWT.NULL);
-		size.setText(DisplayFormatters.formatByteCountToBase10KBEtc(atc.getTorrent().getSize()));
+		size.setText(DisplayFormatters.formatByteCountToBase10KBEtc(atc
+				.getTorrent().getSize()));
 
 		// Number of Pieces
 		Label numPiecesL = new Label(cLeft, SWT.NULL);
@@ -1302,7 +1368,8 @@ public class OpenByFileDialog {
 				+ "detailstab.files.pieceSize.text")
 				+ " ");
 		Label pieceSize = new Label(cLeft, SWT.NULL);
-		pieceSize.setText(DisplayFormatters.formatByteCountToBase10KBEtc(atc.getTorrent().getPieceLength()));
+		pieceSize.setText(DisplayFormatters.formatByteCountToBase10KBEtc(atc
+				.getTorrent().getPieceLength()));
 
 		Composite cRight = new Composite(gFiles, SWT.NULL);
 		cRight.setLayout(new GridLayout(2, false));
@@ -1317,7 +1384,8 @@ public class OpenByFileDialog {
 				+ " ");
 
 		Label date = new Label(cRight, SWT.NULL);
-		date.setText(DisplayFormatters.formatDate(atc.getTorrent().getCreationDate()));
+		date.setText(DisplayFormatters.formatDate(atc.getTorrent()
+				.getCreationDate()));
 
 		// Created by
 		Label byL = new Label(cRight, SWT.NULL);
@@ -1325,7 +1393,8 @@ public class OpenByFileDialog {
 				+ " ");
 
 		Label by = new Label(cRight, SWT.NULL);
-		by.setText(EncodingUtil.nicePrint(atc.getTorrent().getCreatedBy(), true));
+		by.setText(EncodingUtil
+				.nicePrint(atc.getTorrent().getCreatedBy(), true));
 
 		// Is Private
 		Label privL = new Label(cRight, SWT.NULL);
@@ -1355,9 +1424,11 @@ public class OpenByFileDialog {
 		Label hash = new Label(cBottom, SWT.NULL);
 		hash.setLayoutData(gd);
 		try {
-			hash.setText(I18N.translate(PFX + "detailstab.files.hash.text")
-					+ " "
-					+ EncodingUtil.nicePrint(atc.getTorrent().getHash(), false));
+			hash
+					.setText(I18N.translate(PFX + "detailstab.files.hash.text")
+							+ " "
+							+ EncodingUtil.nicePrint(
+									atc.getTorrent().getHash(), false));
 		} catch (TOTorrentException e) {
 			hash.setText(I18N.translate(PFX + "detailstab.files.hash.error"));
 		}
@@ -1405,9 +1476,8 @@ public class OpenByFileDialog {
 			}
 
 			detailItem.setText(0, name);
-			detailItem.setText(
-					1,
-					DisplayFormatters.formatByteCountToBase10KBEtc(files[i].getLength()));
+			detailItem.setText(1, DisplayFormatters
+					.formatByteCountToBase10KBEtc(files[i].getLength()));
 
 			// Shade every other one
 			if (filesTable.indexOf(detailItem) % 2 != 0) {
@@ -1419,7 +1489,8 @@ public class OpenByFileDialog {
 		scrape.addListener(SWT.Selection, new Listener() {
 			public void handleEvent (Event arg0) {
 				pb.setVisible(true);
-				final String urlToScrape = combo.getItem(combo.getSelectionIndex());
+				final String urlToScrape = combo.getItem(combo
+						.getSelectionIndex());
 				scraper.addListener(new ScrapeListener() {
 
 					public void scrapeFailed (final String reason) {
@@ -1429,9 +1500,11 @@ public class OpenByFileDialog {
 									@Override
 									public void runSafe () {
 										pb.setVisible(false);
-										status.setText(I18N.translate(PFX
-												+ "detailstab.status.text.failed")
-												+ " - " + reason);
+										status
+												.setText(I18N
+														.translate(PFX
+																+ "detailstab.status.text.failed")
+														+ " - " + reason);
 										parent.layout();
 									}
 								});
@@ -1444,15 +1517,24 @@ public class OpenByFileDialog {
 									@Override
 									public void runSafe () {
 										pb.setVisible(false);
-										status.setText(I18N.translate(PFX
-												+ "detailstab.status.text.success"));
-										gStats.setText(I18N.translate(PFX
-												+ "detailstab.stats.group.text.received")
-												+ " "
-												+ combo.getItem(combo.getSelectionIndex()));
-										seeds.setText(String.valueOf(sr.getSeeds()));
-										leechers.setText(String.valueOf(sr.getLeechers()));
-										downloaded.setText(String.valueOf(sr.getDownloaded()));
+										status
+												.setText(I18N
+														.translate(PFX
+																+ "detailstab.status.text.success"));
+										gStats
+												.setText(I18N
+														.translate(PFX
+																+ "detailstab.stats.group.text.received")
+														+ " "
+														+ combo
+																.getItem(combo
+																		.getSelectionIndex()));
+										seeds.setText(String.valueOf(sr
+												.getSeeds()));
+										leechers.setText(String.valueOf(sr
+												.getLeechers()));
+										downloaded.setText(String.valueOf(sr
+												.getDownloaded()));
 										srURL.setText(sr.getScrapeUrl());
 										srURL.setToolTipText(sr.getScrapeUrl());
 										atc.setScrapeResults(sr);
@@ -1482,7 +1564,7 @@ public class OpenByFileDialog {
 
 	/**
 	 * Opens the scrape dialog with an array of files already in place
-	 *
+	 * 
 	 * @param File[] torrents
 	 */
 	public static void openFilesAndScrape (final File[] torrents) {
@@ -1494,7 +1576,7 @@ public class OpenByFileDialog {
 		display.syncExec(new SWTSafeRunnable() {
 			/*
 			 * (non-Javadoc)
-			 *
+			 * 
 			 * @see lbms.azsmrc.shared.SWTSafeRunnable#runSafe()
 			 */
 			@Override
@@ -1522,9 +1604,9 @@ public class OpenByFileDialog {
 
 	/**
 	 * Opens the scrape dialog with a Torrent that needs to be downloaded first.
-	 *
+	 * 
 	 * It may fail to download the torrent and to display the scrapeDialog.
-	 *
+	 * 
 	 * @param urlStr torrent URL
 	 */
 	public static void openURLandScrape (String urlStr) {
@@ -1533,7 +1615,8 @@ public class OpenByFileDialog {
 			Thread t = new Thread(new Runnable() {
 				public void run () {
 					try {
-						File torTemp = File.createTempFile("azsmrc", ".torrent");
+						File torTemp = File
+								.createTempFile("azsmrc", ".torrent");
 						torTemp.deleteOnExit();
 						TorrentDownload tdl = new TorrentDownload(url, torTemp);
 						if (RCMain.getRCMain().getProxy() != null) {

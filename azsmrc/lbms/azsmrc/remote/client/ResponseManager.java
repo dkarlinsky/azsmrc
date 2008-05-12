@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import lbms.azsmrc.remote.client.callbacks.BrowseDirectoryCallback;
+import lbms.azsmrc.remote.client.callbacks.GenericCallback;
 import lbms.azsmrc.remote.client.history.DownloadHistory;
 import lbms.azsmrc.remote.client.impl.DownloadAdvancedStatsImpl;
 import lbms.azsmrc.remote.client.impl.DownloadFileImpl;
@@ -29,21 +31,22 @@ import org.jdom.DataConversionException;
 import org.jdom.Document;
 import org.jdom.Element;
 
+@SuppressWarnings("unchecked")
 public class ResponseManager {
 	private Map<String, ResponseHandler>	handlerList	= new HashMap<String, ResponseHandler>();
 	private Client							client;
 	private DownloadManagerImpl				dm;
 	private Logger							debug;
 
-	public void addHandler(String request, ResponseHandler handler) {
+	public void addHandler (String request, ResponseHandler handler) {
 		handlerList.put(request, handler);
 	}
 
-	public void removeHandler(String request) {
+	public void removeHandler (String request) {
 		handlerList.remove(request);
 	}
 
-	public void handleResponse(Document xmlResponse) throws IOException {
+	public void handleResponse (Document xmlResponse) throws IOException {
 		Element requestRoot = xmlResponse.getRootElement();
 		List<Element> queries = requestRoot.getChildren("Result");
 		double protocolVersion = 1;
@@ -74,7 +77,7 @@ public class ResponseManager {
 		client.callClientUpdateListeners(updates);
 	}
 
-	private void updateDownload(Element dle) {
+	private void updateDownload (Element dle) {
 		String hash = dle.getAttributeValue("hash");
 		if (hash == null) {
 			return;
@@ -237,12 +240,12 @@ public class ResponseManager {
 		this.dm = caller.getDownloadManagerImpl();
 		debug = Logger.getLogger("lbms.azsmrc.client");
 		addHandler("_InvalidProtocolVersion_", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException {
+			public long handleRequest (Element xmlResponse) throws IOException {
 				return 0;
 			}
 		});
 		addHandler("_UnhandledRequest_", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException {
+			public long handleRequest (Element xmlResponse) throws IOException {
 				try {
 					debug.warning("Unhandled Request: "
 							+ xmlResponse.getChild("Error").getChild("Query")
@@ -256,13 +259,13 @@ public class ResponseManager {
 			}
 		});
 		addHandler("Ping", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException {
+			public long handleRequest (Element xmlResponse) throws IOException {
 				System.out.println("Received Pong.");
 				return 0;
 			}
 		});
 		addHandler("listTransfers", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException {
+			public long handleRequest (Element xmlResponse) throws IOException {
 				Element root = xmlResponse.getChild("Transfers");
 				List<Element> transfers = root.getChildren("Transfer");
 				for (Element t : transfers) {
@@ -272,7 +275,7 @@ public class ResponseManager {
 			}
 		});
 		addHandler("updateDownloads", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException {
+			public long handleRequest (Element xmlResponse) throws IOException {
 				Element root = xmlResponse.getChild("Transfers");
 				List<Element> transfers = root.getChildren("Transfer");
 				List<String> dls = new ArrayList<String>();
@@ -285,7 +288,7 @@ public class ResponseManager {
 			}
 		});
 		addHandler("getAdvancedStats", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException {
+			public long handleRequest (Element xmlResponse) throws IOException {
 				Element advStats = xmlResponse.getChild("AdvancedStats");
 				DownloadImpl dl = dm.manGetDownload(xmlResponse
 						.getAttributeValue("hash"));
@@ -307,7 +310,7 @@ public class ResponseManager {
 			}
 		});
 		addHandler("getFiles", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException {
+			public long handleRequest (Element xmlResponse) throws IOException {
 				Element fileList = xmlResponse.getChild("Files");
 				String hash = xmlResponse.getAttributeValue("hash");
 				DownloadImpl dl = dm.manGetDownload(hash);
@@ -348,7 +351,7 @@ public class ResponseManager {
 			}
 		});
 		addHandler("globalStats", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException {
+			public long handleRequest (Element xmlResponse) throws IOException {
 				int receiveRate = 0, sendRate = 0;
 				int s = 0, sq = 0, d = 0, dq = 0;
 				try {
@@ -380,7 +383,7 @@ public class ResponseManager {
 			}
 		});
 		addHandler("getUsers", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException {
+			public long handleRequest (Element xmlResponse) throws IOException {
 				UserManagerImpl um = client.getUserManagerImpl();
 				List<Element> userList = xmlResponse.getChild("Users")
 						.getChildren("User");
@@ -402,7 +405,7 @@ public class ResponseManager {
 			}
 		});
 		addHandler("Events", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException {
+			public long handleRequest (Element xmlResponse) throws IOException {
 				List<Element> events = xmlResponse.getChildren("Event");
 				for (Element event : events) {
 					try {
@@ -424,7 +427,7 @@ public class ResponseManager {
 			}
 		});
 		addHandler("getAzParameter", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException {
+			public long handleRequest (Element xmlResponse) throws IOException {
 				try {
 					client.callAzParameterListener(xmlResponse
 							.getAttributeValue("key"), xmlResponse
@@ -438,7 +441,7 @@ public class ResponseManager {
 			}
 		});
 		addHandler("getPluginParameter", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException {
+			public long handleRequest (Element xmlResponse) throws IOException {
 				try {
 					client.callPluginParameterListener(xmlResponse
 							.getAttributeValue("key"), xmlResponse
@@ -452,7 +455,7 @@ public class ResponseManager {
 			}
 		});
 		addHandler("getCoreParameter", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException {
+			public long handleRequest (Element xmlResponse) throws IOException {
 				try {
 					client.callCoreParameterListener(xmlResponse
 							.getAttributeValue("key"), xmlResponse
@@ -466,7 +469,7 @@ public class ResponseManager {
 			}
 		});
 		addHandler("getRemoteInfo", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException {
+			public long handleRequest (Element xmlResponse) throws IOException {
 				RemoteInfoImpl ri = client.getRemoteInfoImpl();
 				ri.setAzureusVersion(xmlResponse
 						.getAttributeValue("azureusVersion"));
@@ -479,7 +482,7 @@ public class ResponseManager {
 			}
 		});
 		addHandler("getPluginsFlexyConfig", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException {
+			public long handleRequest (Element xmlResponse) throws IOException {
 				RemoteInfoImpl ri = client.getRemoteInfoImpl();
 				ri.setPluginFlexyConf(xmlResponse
 						.getChild("FlexyConfiguration"));
@@ -487,7 +490,7 @@ public class ResponseManager {
 			}
 		});
 		addHandler("listPlugins", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException {
+			public long handleRequest (Element xmlResponse) throws IOException {
 				RemoteInfoImpl ri = client.getRemoteInfoImpl();
 				List<RemotePluginImpl> rPlugins = new ArrayList<RemotePluginImpl>();
 				List<Element> plugsE = xmlResponse.getChildren("Plugin");
@@ -515,7 +518,7 @@ public class ResponseManager {
 			}
 		});
 		addHandler("getDriveInfo", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException {
+			public long handleRequest (Element xmlResponse) throws IOException {
 				RemoteInfoImpl ri = client.getRemoteInfoImpl();
 				Map<String, String> map = new HashMap<String, String>();
 				List<Element> eList = xmlResponse.getChildren("Directory");
@@ -531,7 +534,7 @@ public class ResponseManager {
 			}
 		});
 		addHandler("getUpdateInfo", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException {
+			public long handleRequest (Element xmlResponse) throws IOException {
 				RemoteUpdateManagerImpl rum = client
 						.getRemoteUpdateManagerImpl();
 				boolean avail = Boolean.parseBoolean(xmlResponse
@@ -550,7 +553,7 @@ public class ResponseManager {
 			}
 		});
 		addHandler("getTrackerTorrents", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException {
+			public long handleRequest (Element xmlResponse) throws IOException {
 				TrackerImpl tracker = client.getTrackerImpl();
 				List<Element> trackerTorrents = xmlResponse.getChild(
 						"TrackerTorrents").getChildren("TrackerTorrent");
@@ -621,7 +624,7 @@ public class ResponseManager {
 			}
 		});
 		addHandler("ipcCall", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException {
+			public long handleRequest (Element xmlResponse) throws IOException {
 				client.callIPCResponseListeners(Integer.parseInt(xmlResponse
 						.getAttributeValue("status")), xmlResponse
 						.getAttributeValue("senderID"), xmlResponse
@@ -632,9 +635,33 @@ public class ResponseManager {
 			}
 		});
 		addHandler("getDownloadHistory", new ResponseHandler() {
-			public long handleRequest(Element xmlResponse) throws IOException {
+			public long handleRequest (Element xmlResponse) throws IOException {
 				DownloadHistory.getInstance().addEntries(
 						xmlResponse.getChildren("Entry"));
+				return 0;
+			}
+		});
+		addHandler("browseDirectory", new ResponseHandler() {
+			public long handleRequest (Element xmlResponse) throws IOException {
+				GenericCallback cb = client.getCallbackManger().removeCallback(
+						xmlResponse.getAttributeValue("cbID"));
+				if (cb == null || !(cb instanceof BrowseDirectoryCallback)) {
+					return 0;
+				}
+				BrowseDirectoryCallback bdcb = (BrowseDirectoryCallback) cb;
+				if (xmlResponse.getAttribute("error") != null) {
+					bdcb.errorOccured(xmlResponse.getAttributeValue("error"));
+					return 0;
+				}
+
+				List<Element> directories = xmlResponse.getChildren("Dir");
+				String[] directoryArray = new String[directories.size()];
+				for (int i = 0; i < directoryArray.length; i++) {
+					directoryArray[i] = directories.get(i).getAttributeValue(
+							"name");
+				}
+				bdcb.subdirList(xmlResponse.getAttributeValue("parentPath"),
+						directoryArray);
 				return 0;
 			}
 		});
