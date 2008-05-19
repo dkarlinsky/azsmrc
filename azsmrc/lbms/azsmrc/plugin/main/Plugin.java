@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lbms.azsmrc.plugin.gui.SWTUtil;
 import lbms.azsmrc.plugin.gui.View;
 import lbms.azsmrc.plugin.pluginsupport.PSupportAzJabber;
 import lbms.azsmrc.plugin.pluginsupport.PSupportStatusMailer;
@@ -30,7 +31,6 @@ import lbms.tools.CryptoTools;
 import lbms.tools.flexyconf.FlexyConfiguration;
 import lbms.tools.flexyconf.Section;
 
-import org.eclipse.swt.widgets.Display;
 import org.gudy.azureus2.core3.util.AEMonitor;
 import org.gudy.azureus2.plugins.PluginConfig;
 import org.gudy.azureus2.plugins.PluginConfigListener;
@@ -78,7 +78,6 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 	PluginInterface								pluginInterface;
 	private static PluginInterface				pi;
-	private static Display						display;
 
 	// the XMLConfig file to be used
 	private static XMLConfig					config;
@@ -103,14 +102,15 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 		this.pluginInterface = pluginInterface;
 		locale_utils = pluginInterface.getUtilities().getLocaleUtilities();
-		locale_utils.integrateLocalisedMessageBundle("lbms.azsmrc.plugin.internat.Messages");
+		locale_utils
+				.integrateLocalisedMessageBundle("lbms.azsmrc.plugin.internat.Messages");
 		pi = pluginInterface;
 
 		firstRun = generateUID();
 
 		UIManager ui_manager = pluginInterface.getUIManager();
-		BasicPluginConfigModel config_model = ui_manager.createBasicPluginConfigModel(
-				"plugins", "plugin.azsmrc");
+		BasicPluginConfigModel config_model = ui_manager
+				.createBasicPluginConfigModel("plugins", "plugin.azsmrc");
 
 		// settings on main options panel
 		config_model.addBooleanParameter2("azsmrc_military_time",
@@ -131,9 +131,10 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 				"restrictSaveDir", "azsmrc.restrictSaveDir", false);
 		DirectoryParameter restrictedDir = config_model.addDirectoryParameter2(
 				"restrictedSaveDir", "azsmrc.restrictedSaveDir", "");
-		BooleanParameter enablebindToIpParam = config_model.addBooleanParameter2(
-				"enable_bind_to_ip", "azsmrc.enableBindToIP", false);
-		StringParameter bindToIpParam =  config_model.addStringParameter2(
+		BooleanParameter enablebindToIpParam = config_model
+				.addBooleanParameter2("enable_bind_to_ip",
+						"azsmrc.enableBindToIP", false);
+		StringParameter bindToIpParam = config_model.addStringParameter2(
 				"bind_ip", "azsmrc.BindIP", "");
 
 		config_model.addLabelParameter2("azsmrc.statistics.label");
@@ -144,12 +145,14 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		enablebindToIpParam.addEnabledOnSelection(bindToIpParam);
 
 		// Load the config file
-		config = XMLConfig.loadConfigFile(pluginInterface.getPluginDirectoryName()
+		config = XMLConfig.loadConfigFile(pluginInterface
+				.getPluginDirectoryName()
 				+ System.getProperty("file.separator") + "MultiUserConfig.xml");
 
 		// initialize the logger
 		logger = pluginInterface.getLogger().getTimeStampedChannel("AzSMRC");
-		final BasicPluginViewModel view_model = ui_manager.createBasicPluginViewModel("AzSMRC Log");
+		final BasicPluginViewModel view_model = ui_manager
+				.createBasicPluginViewModel("AzSMRC Log");
 		view_model.getActivity().setVisible(false);
 		view_model.getProgress().setVisible(false);
 		view_model.getStatus().setVisible(false);
@@ -239,8 +242,9 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		pluginInterface.getPluginconfig().addListener(
 				new PluginConfigListener() {
 					public void configSaved () {
-						if (pluginInterface.getPluginconfig().getPluginBooleanParameter(
-								"disableAutoImport", false)) {
+						if (pluginInterface.getPluginconfig()
+								.getPluginBooleanParameter("disableAutoImport",
+										false)) {
 							Timers.stopCheckDirsTimer();
 						} else {
 							Timers.startCheckDirsTimer();
@@ -265,8 +269,9 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 			}
 
 			public void downloadRemoved (Download dl) {
-				boolean singleUser = Plugin.getPluginInterface().getPluginconfig().getPluginBooleanParameter(
-						"singleUserMode", false);
+				boolean singleUser = Plugin.getPluginInterface()
+						.getPluginconfig().getPluginBooleanParameter(
+								"singleUserMode", false);
 				User[] users;
 				if (singleUser) {
 					users = getXMLConfig().getUsers();
@@ -283,7 +288,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 			public void UIAttached (UIInstance instance) {
 				if (instance instanceof UISWTInstance) {
 					swtInstance = (UISWTInstance) instance;
-					display = swtInstance.getDisplay();
+					SWTUtil.setDisplay(swtInstance);
 					myView = new View(pluginInterface);
 					swtInstance.addView(UISWTInstance.VIEW_MAIN, View.VIEWID,
 							myView);
@@ -328,7 +333,8 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 			boolean sslSupported = false;
 
 			try {
-				KeyStore key = pluginInterface.getUtilities().getSecurityManager().getKeyStore();
+				KeyStore key = pluginInterface.getUtilities()
+						.getSecurityManager().getKeyStore();
 				if (key.size() > 0) {
 					sslSupported = true;
 				}
@@ -349,69 +355,88 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 					config_model.addLabelParameter2("azsmrc.ssl.possible");
 				}
 
-				boolean useSSL = pluginInterface.getPluginconfig().getPluginBooleanParameter(
-						"use_ssl", false);
+				boolean useSSL = pluginInterface.getPluginconfig()
+						.getPluginBooleanParameter("use_ssl", false);
 
-				int protocol = (sslSupported && useSSL) ? Tracker.PR_HTTPS : Tracker.PR_HTTP;
+				int protocol = (sslSupported && useSSL) ? Tracker.PR_HTTPS
+						: Tracker.PR_HTTP;
 
-				boolean bindToIP = pluginInterface.getPluginconfig().getPluginBooleanParameter(
-						"enable_bind_to_ip", false);
+				boolean bindToIP = pluginInterface.getPluginconfig()
+						.getPluginBooleanParameter("enable_bind_to_ip", false);
 
 				if (bindToIP) {
 					try {
-						InetAddress bindIP = InetAddress.getByName(pluginInterface.getPluginconfig().getPluginStringParameter(
-								"bind_ip", "127.0.0.1"));
-						context = pluginInterface.getTracker().createWebContext(
-								pluginInterface.getAzureusName() + " - "
-										+ pluginInterface.getPluginName(),
-								pluginInterface.getPluginconfig().getPluginIntParameter(
-										"remote_port", 49009), protocol, bindIP);
+						InetAddress bindIP = InetAddress
+								.getByName(pluginInterface.getPluginconfig()
+										.getPluginStringParameter("bind_ip",
+												"127.0.0.1"));
+						context = pluginInterface.getTracker()
+								.createWebContext(
+										pluginInterface.getAzureusName()
+												+ " - "
+												+ pluginInterface
+														.getPluginName(),
+										pluginInterface.getPluginconfig()
+												.getPluginIntParameter(
+														"remote_port", 49009),
+										protocol, bindIP);
 					} catch (UnknownHostException e) {
-						context = pluginInterface.getTracker().createWebContext(
-								pluginInterface.getAzureusName() + " - "
-										+ pluginInterface.getPluginName(),
-								pluginInterface.getPluginconfig().getPluginIntParameter(
-										"remote_port", 49009), protocol);
+						context = pluginInterface.getTracker()
+								.createWebContext(
+										pluginInterface.getAzureusName()
+												+ " - "
+												+ pluginInterface
+														.getPluginName(),
+										pluginInterface.getPluginconfig()
+												.getPluginIntParameter(
+														"remote_port", 49009),
+										protocol);
 					}
 				} else {
 
-					context = pluginInterface.getTracker().createWebContext(
-							pluginInterface.getAzureusName() + " - "
-									+ pluginInterface.getPluginName(),
-							pluginInterface.getPluginconfig().getPluginIntParameter(
-									"remote_port", 49009), protocol);
+					context = pluginInterface.getTracker()
+							.createWebContext(
+									pluginInterface.getAzureusName() + " - "
+											+ pluginInterface.getPluginName(),
+									pluginInterface.getPluginconfig()
+											.getPluginIntParameter(
+													"remote_port", 49009),
+									protocol);
 				}
 
 			}
 
 			context.addPageGenerator(new WebRequestHandler(pluginInterface));
 
-			context.addAuthenticationListener(new TrackerAuthenticationAdapter() {
-				AEMonitor	this_mon	= new AEMonitor("AZMultiUser:auth");
+			context
+					.addAuthenticationListener(new TrackerAuthenticationAdapter() {
+						AEMonitor	this_mon	= new AEMonitor(
+														"AZMultiUser:auth");
 
-				@Override
-				public boolean authenticate (URL resource, String user,
-						String pw) {
-					try {
-						this_mon.enter();
-						if (user == null || pw == null) {
-							return false;
-						}
-						User userObj = config.getUser(user);
-						if (userObj.verifyPassword(pw)) {
-							addToLog("User: " + userObj + " has logged in.");
-							return true;
-						} else {
-							return false;
-						}
+						@Override
+						public boolean authenticate (URL resource, String user,
+								String pw) {
+							try {
+								this_mon.enter();
+								if (user == null || pw == null) {
+									return false;
+								}
+								User userObj = config.getUser(user);
+								if (userObj.verifyPassword(pw)) {
+									addToLog("User: " + userObj
+											+ " has logged in.");
+									return true;
+								} else {
+									return false;
+								}
 
-					} catch (UserNotFoundException e) {
-						return false;
-					} finally {
-						this_mon.exit();
-					}
-				}
-			});
+							} catch (UserNotFoundException e) {
+								return false;
+							} finally {
+								this_mon.exit();
+							}
+						}
+					});
 
 		} catch (TrackerException e) {
 
@@ -426,7 +451,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		pluginInterface.addListener(new PluginListener() {
 			/*
 			 * (non-Javadoc)
-			 *
+			 * 
 			 * @see org.gudy.azureus2.plugins.PluginListener#closedownComplete()
 			 */
 			public void closedownComplete () {
@@ -436,7 +461,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 			/*
 			 * (non-Javadoc)
-			 *
+			 * 
 			 * @see org.gudy.azureus2.plugins.PluginListener#closedownInitiated()
 			 */
 			public void closedownInitiated () {
@@ -450,12 +475,12 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 			/*
 			 * (non-Javadoc)
-			 *
+			 * 
 			 * @see org.gudy.azureus2.plugins.PluginListener#initializationComplete()
 			 */
 			public void initializationComplete () {
-				registerUPnPMapping(pluginInterface.getPluginconfig().getPluginIntParameter(
-						"remote_port", 49009));
+				registerUPnPMapping(pluginInterface.getPluginconfig()
+						.getPluginIntParameter("remote_port", 49009));
 				addToLog("Initializing Plugin Support...");
 				for (PluginSupport ps : pluginSupport.values()) {
 					try {
@@ -473,12 +498,14 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 			}
 		});
 
-		TableContextMenuItem incompleteMenuItem = pluginInterface.getUIManager().getTableManager().addContextMenuItem(
-				TableManager.TABLE_MYTORRENTS_INCOMPLETE,
-				"azsmrc.tablemenu.useritem");
-		TableContextMenuItem completeMenuItem = pluginInterface.getUIManager().getTableManager().addContextMenuItem(
-				TableManager.TABLE_MYTORRENTS_COMPLETE,
-				"azsmrc.tablemenu.useritem");
+		TableContextMenuItem incompleteMenuItem = pluginInterface
+				.getUIManager().getTableManager().addContextMenuItem(
+						TableManager.TABLE_MYTORRENTS_INCOMPLETE,
+						"azsmrc.tablemenu.useritem");
+		TableContextMenuItem completeMenuItem = pluginInterface.getUIManager()
+				.getTableManager().addContextMenuItem(
+						TableManager.TABLE_MYTORRENTS_COMPLETE,
+						"azsmrc.tablemenu.useritem");
 
 		incompleteMenuItem.setStyle(MenuItem.STYLE_MENU);
 		completeMenuItem.setStyle(MenuItem.STYLE_MENU);
@@ -486,13 +513,14 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		MenuItemFillListener fillListener = new MenuItemFillListener() {
 			/*
 			 * (non-Javadoc)
-			 *
+			 * 
 			 * @see org.gudy.azureus2.plugins.ui.menus.MenuItemFillListener#menuWillBeShown(org.gudy.azureus2.plugins.ui.menus.MenuItem,
 			 *      java.lang.Object)
 			 */
 			public void menuWillBeShown (MenuItem menu, Object data) {
 				menu.removeAllChildItems();
-				TableManager tm = pluginInterface.getUIManager().getTableManager();
+				TableManager tm = pluginInterface.getUIManager()
+						.getTableManager();
 				if (getCurrentUser() != null
 						&& getCurrentUser().checkAccess(
 								RemoteConstants.RIGHTS_ADMIN)) {
@@ -511,28 +539,32 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 							// displayState.setEnabled(false);
 							owner.setText("PUBLIC");
 
-							TableContextMenuItem separator = tm.addContextMenuItem(
-									(TableContextMenuItem) menu, "");
+							TableContextMenuItem separator = tm
+									.addContextMenuItem(
+											(TableContextMenuItem) menu, "");
 							separator.setStyle(MenuItem.STYLE_SEPARATOR);
 
 						} else {
 
 							if (MultiUser.isSharedDownload(dl)) {
 								for (final User o : ownerList) {
-									TableContextMenuItem owner = tm.addContextMenuItem(
-											(TableContextMenuItem) menu, "");
+									TableContextMenuItem owner = tm
+											.addContextMenuItem(
+													(TableContextMenuItem) menu,
+													"");
 									owner.setText(o.getUsername());
 									owner.addListener(new MenuItemListener() {
 										/*
 										 * (non-Javadoc)
-										 *
+										 * 
 										 * @see org.gudy.azureus2.plugins.ui.menus.MenuItemListener#selected(org.gudy.azureus2.plugins.ui.menus.MenuItem,
 										 *      java.lang.Object)
 										 */
 										public void selected (MenuItem menu,
 												Object target) {
 											TableRow row = (TableRow) target;
-											Download dl = (Download) row.getDataSource();
+											Download dl = (Download) row
+													.getDataSource();
 											MultiUser.removeUserFromDownload(o,
 													dl);
 											System.out.println("Removing User "
@@ -543,22 +575,24 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 								}
 
 							} else {
-								TableContextMenuItem owner = tm.addContextMenuItem(
-										(TableContextMenuItem) menu, "");
+								TableContextMenuItem owner = tm
+										.addContextMenuItem(
+												(TableContextMenuItem) menu, "");
 								// displayState.setEnabled(false);
 								owner.setText(ownerList[0].getUsername());
 								final User o = ownerList[0];
 								owner.addListener(new MenuItemListener() {
 									/*
 									 * (non-Javadoc)
-									 *
+									 * 
 									 * @see org.gudy.azureus2.plugins.ui.menus.MenuItemListener#selected(org.gudy.azureus2.plugins.ui.menus.MenuItem,
 									 *      java.lang.Object)
 									 */
 									public void selected (MenuItem menu,
 											Object target) {
 										TableRow row = (TableRow) target;
-										Download dl = (Download) row.getDataSource();
+										Download dl = (Download) row
+												.getDataSource();
 										MultiUser.removeUserFromDownload(o, dl);
 										System.out.println("Removing User "
 												+ o.getUsername() + " from "
@@ -567,35 +601,41 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 								});
 							}
 
-							TableContextMenuItem separator = tm.addContextMenuItem(
-									(TableContextMenuItem) menu, "");
+							TableContextMenuItem separator = tm
+									.addContextMenuItem(
+											(TableContextMenuItem) menu, "");
 							separator.setStyle(MenuItem.STYLE_SEPARATOR);
 
-							TableContextMenuItem removeAllUsers = tm.addContextMenuItem(
-									(TableContextMenuItem) menu,
-									"azsmrc.tablemenu.removeallusers");
-							removeAllUsers.addMultiListener(new MenuItemListener() {
-								/*
-								 * (non-Javadoc)
-								 *
-								 * @see org.gudy.azureus2.plugins.ui.menus.MenuItemListener#selected(org.gudy.azureus2.plugins.ui.menus.MenuItem,
-								 *      java.lang.Object)
-								 */
-								public void selected (MenuItem menu,
-										Object target) {
-									TableRow[] rows = (TableRow[]) target;
-									for (int i = 0; i < rows.length; i++) {
-										Download dl = (Download) rows[i].getDataSource();
-										MultiUser.removeUsersFromDownload(dl);
-										System.out.println("Removing Users from "
-												+ dl.getName());
-									}
-								}
-							});
+							TableContextMenuItem removeAllUsers = tm
+									.addContextMenuItem(
+											(TableContextMenuItem) menu,
+											"azsmrc.tablemenu.removeallusers");
+							removeAllUsers
+									.addMultiListener(new MenuItemListener() {
+										/*
+										 * (non-Javadoc)
+										 * 
+										 * @see org.gudy.azureus2.plugins.ui.menus.MenuItemListener#selected(org.gudy.azureus2.plugins.ui.menus.MenuItem,
+										 *      java.lang.Object)
+										 */
+										public void selected (MenuItem menu,
+												Object target) {
+											TableRow[] rows = (TableRow[]) target;
+											for (int i = 0; i < rows.length; i++) {
+												Download dl = (Download) rows[i]
+														.getDataSource();
+												MultiUser
+														.removeUsersFromDownload(dl);
+												System.out
+														.println("Removing Users from "
+																+ dl.getName());
+											}
+										}
+									});
 						}
 
-						List<User> users = new ArrayList<User>(
-								Arrays.asList(config.getUsers()));
+						List<User> users = new ArrayList<User>(Arrays
+								.asList(config.getUsers()));
 						users.removeAll(Arrays.asList(ownerList));
 						if (users.size() > 10) {
 							menu = tm.addContextMenuItem(
@@ -603,15 +643,17 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 									"azsmrc.tablemenu.adduser");
 						}
 						for (final User u : users) {
-							TableContextMenuItem addToUser = tm.addContextMenuItem(
-									(TableContextMenuItem) menu, "");
+							TableContextMenuItem addToUser = tm
+									.addContextMenuItem(
+											(TableContextMenuItem) menu, "");
 							addToUser.setText("Add to: " + u.getUsername());
 							addToUser.addMultiListener(new MenuItemListener() {
 								public void selected (MenuItem menu,
 										Object target) {
 									TableRow[] rows = (TableRow[]) target;
 									for (int i = 0; i < rows.length; i++) {
-										Download dl = (Download) rows[i].getDataSource();
+										Download dl = (Download) rows[i]
+												.getDataSource();
 										MultiUser.addUserToDownload(u, dl);
 										System.out.println("Adding "
 												+ dl.getName() + " to "
@@ -622,20 +664,22 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 						}
 
 					} else {
-						TableContextMenuItem removeAllUsers = tm.addContextMenuItem(
-								(TableContextMenuItem) menu,
-								"azsmrc.tablemenu.removeallusers");
+						TableContextMenuItem removeAllUsers = tm
+								.addContextMenuItem(
+										(TableContextMenuItem) menu,
+										"azsmrc.tablemenu.removeallusers");
 						removeAllUsers.addMultiListener(new MenuItemListener() {
 							/*
 							 * (non-Javadoc)
-							 *
+							 * 
 							 * @see org.gudy.azureus2.plugins.ui.menus.MenuItemListener#selected(org.gudy.azureus2.plugins.ui.menus.MenuItem,
 							 *      java.lang.Object)
 							 */
 							public void selected (MenuItem menu, Object target) {
 								TableRow[] rows = (TableRow[]) target;
 								for (int i = 0; i < rows.length; i++) {
-									Download dl = (Download) rows[i].getDataSource();
+									Download dl = (Download) rows[i]
+											.getDataSource();
 									MultiUser.removeUsersFromDownload(dl);
 									System.out.println("Removing Users from "
 											+ dl.getName());
@@ -645,15 +689,17 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 						User[] users = config.getUsers();
 						for (final User u : users) {
-							TableContextMenuItem addToUser = tm.addContextMenuItem(
-									(TableContextMenuItem) menu, "");
+							TableContextMenuItem addToUser = tm
+									.addContextMenuItem(
+											(TableContextMenuItem) menu, "");
 							addToUser.setText("Add to: " + u.getUsername());
 							addToUser.addMultiListener(new MenuItemListener() {
 								public void selected (MenuItem menu,
 										Object target) {
 									TableRow[] rows = (TableRow[]) target;
 									for (int i = 0; i < rows.length; i++) {
-										Download dl = (Download) rows[i].getDataSource();
+										Download dl = (Download) rows[i]
+												.getDataSource();
 										MultiUser.addUserToDownload(u, dl);
 										System.out.println("Adding "
 												+ dl.getName() + " to "
@@ -667,7 +713,8 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 					TableContextMenuItem displayState = tm.addContextMenuItem(
 							(TableContextMenuItem) menu, "");
 					displayState.setEnabled(false);
-					displayState.setText("You are not logged in or don't have Admin access.");
+					displayState
+							.setText("You are not logged in or don't have Admin access.");
 				}
 			}
 		};
@@ -678,12 +725,12 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 	/**
 	 * Generates a Random UID
-	 *
+	 * 
 	 * @return true if UID was generated, false if UID already present
 	 */
 	private boolean generateUID () {
-		if (!pi.getPluginconfig().getPluginStringParameter("azsmrc.uid").equals(
-				"")) {
+		if (!pi.getPluginconfig().getPluginStringParameter("azsmrc.uid")
+				.equals("")) {
 			return false;
 		}
 
@@ -717,23 +764,24 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 	private void logStat () {
 		if (pi.getPluginconfig().getPluginBooleanParameter("statistics.allow")) {
-			long lastcheck = Long.parseLong(pi.getPluginconfig().getPluginStringParameter(
-					"stats.lastcheck", "0"));
+			long lastcheck = Long.parseLong(pi.getPluginconfig()
+					.getPluginStringParameter("stats.lastcheck", "0"));
 			if (System.currentTimeMillis() - lastcheck > 1000 * 60 * 60 * 24) {
 				Thread t = new Thread() {
 					@Override
 					public void run () {
 						try {
-							URL url = new URL(
-									RemoteConstants.INFO_URL
-											+ "?app=AzSMRC_server&version="
-											+ pi.getPluginVersion()
-											+ "&uid="
-											+ pi.getPluginconfig().getPluginStringParameter(
+							URL url = new URL(RemoteConstants.INFO_URL
+									+ "?app=AzSMRC_server&version="
+									+ pi.getPluginVersion()
+									+ "&uid="
+									+ pi.getPluginconfig()
+											.getPluginStringParameter(
 													"azsmrc.uid"));
 
 							System.out.println(url.toExternalForm());
-							HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+							HttpURLConnection conn = (HttpURLConnection) url
+									.openConnection();
 							conn.connect();
 							conn.getResponseCode();
 							conn.disconnect();
@@ -754,7 +802,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 	/**
 	 * Gets the pluginInterface from Plugin.java
-	 *
+	 * 
 	 * @return pluginInterface
 	 */
 	public static PluginInterface getPluginInterface () {
@@ -763,36 +811,28 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 	private void registerUPnPMapping (int port) {
 		addToLog("Trying to register with UPnP...");
-		PluginInterface pi_upnp = pluginInterface.getPluginManager().getPluginInterfaceByClass(
-				UPnPPlugin.class);
+		PluginInterface pi_upnp = pluginInterface.getPluginManager()
+				.getPluginInterfaceByClass(UPnPPlugin.class);
 		if (pi_upnp != null) {
-			((UPnPPlugin) pi_upnp.getPlugin()).addMapping(
-					pluginInterface.getPluginName(), true, port, true);
+			((UPnPPlugin) pi_upnp.getPlugin()).addMapping(pluginInterface
+					.getPluginName(), true, port, true);
 		}
 	}
 
 	/**
-	 * Gets the Display from Plugin.java from the UISWTInstance
-	 *
-	 * @return display
-	 */
-	public static Display getDisplay () {
-		return display;
-	}
-
-	/**
 	 * Returns the user set status of whether or not the plugin should autoOpen
-	 *
+	 * 
 	 * @return boolean autoOpen
 	 */
 	public static boolean isPluginAutoOpen () {
 		PluginConfig config_getter = getPluginInterface().getPluginconfig();
-		return config_getter.getPluginBooleanParameter("azsmrc_auto_open", true);
+		return config_getter
+				.getPluginBooleanParameter("azsmrc_auto_open", true);
 	}
 
 	/**
 	 * Returns the initialized XMLConfig file
-	 *
+	 * 
 	 * @return config -- initialized XMLConfig file
 	 */
 	public static XMLConfig getXMLConfig () {
@@ -801,7 +841,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 	/**
 	 * Adds given String to the Azureus log as well as dumping it to the console
-	 *
+	 * 
 	 * @param textToAdd
 	 */
 	public static void addToLog (String textToAdd) {
@@ -817,7 +857,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 	/**
 	 * Adds given String to the Azureus log as well as dumping it to the console
 	 * It will log the Exception ass well.
-	 *
+	 * 
 	 * @param textToAdd
 	 * @param e
 	 */
@@ -852,7 +892,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 	/**
 	 * Returns the localeUtilities as defined by the pluginInterface
-	 *
+	 * 
 	 * @return LocaleUtilities from pluginInterface
 	 */
 	public static LocaleUtilities getLocaleUtilities () {
@@ -901,9 +941,9 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 	/**
 	 * Returns an Array of users.
-	 *
+	 * 
 	 * This Method is intended to be used via IPC.
-	 *
+	 * 
 	 * @return array of User
 	 */
 	public String[] ipcGetUsers () {
@@ -912,9 +952,9 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 	/**
 	 * Adds a Download to a User if he exists.
-	 *
+	 * 
 	 * This Method is intended to be used via IPC.
-	 *
+	 * 
 	 * @param uName username to add Download to
 	 * @param dl Download to add
 	 * @return true on success, false on fail

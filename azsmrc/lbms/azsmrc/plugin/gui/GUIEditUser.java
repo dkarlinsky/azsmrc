@@ -57,10 +57,10 @@ public class GUIEditUser {
 
 	/**
 	 * Private method for actually drawing the dialog
-	 *
+	 * 
 	 * @param User _user
 	 */
-	private void loadGUI(User _user) {
+	private void loadGUI (User _user) {
 
 		instance = this;
 		user = _user;
@@ -119,7 +119,7 @@ public class GUIEditUser {
 		sc.setExpandHorizontal(true);
 		sc.addControlListener(new ControlAdapter() {
 			@Override
-			public void controlResized(ControlEvent e) {
+			public void controlResized (ControlEvent e) {
 				sc.setMinSize(cOptions.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 			}
 		});
@@ -147,7 +147,7 @@ public class GUIEditUser {
 		close.setLayoutData(gridData);
 
 		close.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event arg0) {
+			public void handleEvent (Event arg0) {
 				shell.dispose();
 				instance = null;
 				try {
@@ -160,7 +160,7 @@ public class GUIEditUser {
 
 		shell.addDisposeListener(new DisposeListener() {
 
-			public void widgetDisposed(DisposeEvent arg0) {
+			public void widgetDisposed (DisposeEvent arg0) {
 				GUIMain.redrawTable();
 			}
 
@@ -178,10 +178,10 @@ public class GUIEditUser {
 
 		tree.addSelectionListener(new SelectionListener() {
 
-			public void widgetDefaultSelected(SelectionEvent arg0) {
+			public void widgetDefaultSelected (SelectionEvent arg0) {
 			}
 
-			public void widgetSelected(SelectionEvent arg0) {
+			public void widgetSelected (SelectionEvent arg0) {
 				TreeItem[] selections = tree.getSelection();
 				if (selections.length != 1) {
 					return;
@@ -210,32 +210,32 @@ public class GUIEditUser {
 		fci.setContentProvider(new ContentProvider() {
 			/*
 			 * (non-Javadoc)
-			 *
+			 * 
 			 * @see lbms.tools.flexyconf.ContentProvider#getDefaultValue(java.lang.String,
 			 *      int)
 			 */
-			public String getDefaultValue(String key, int type) {
+			public String getDefaultValue (String key, int type) {
 				return user.getProperty(key);
 			}
 
 			/*
 			 * (non-Javadoc)
-			 *
+			 * 
 			 * @see lbms.tools.flexyconf.ContentProvider#getValue(java.lang.String,
 			 *      int)
 			 */
-			public String getValue(String key, int type) {
+			public String getValue (String key, int type) {
 				String v = user.getProperty(key);
 				return (v == null) ? "" : v;
 			}
 
 			/*
 			 * (non-Javadoc)
-			 *
+			 * 
 			 * @see lbms.tools.flexyconf.ContentProvider#setValue(java.lang.String,
 			 *      java.lang.String, int)
 			 */
-			public void setValue(String key, String value, int type) {
+			public void setValue (String key, String value, int type) {
 				System.out.println("Set Property for user [" + user + "]: "
 						+ key + " -> " + value);
 				user.setProperty(key, value);
@@ -244,10 +244,10 @@ public class GUIEditUser {
 		fci.setI18NProvider(new I18NProvider() {
 			/*
 			 * (non-Javadoc)
-			 *
+			 * 
 			 * @see lbms.tools.flexyconf.I18NProvider#translate(java.lang.String)
 			 */
-			public String translate(String key) {
+			public String translate (String key) {
 				return Plugin.getLocaleUtilities().getLocalisedMessageText(key);
 			}
 		});
@@ -256,7 +256,7 @@ public class GUIEditUser {
 		fcm.addAsRoot();
 	}
 
-	private void addGeneralItems(Composite composite) {
+	private void addGeneralItems (Composite composite) {
 		// User Name Label
 		Label nameLabel = new Label(composite, SWT.NONE);
 		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
@@ -274,10 +274,10 @@ public class GUIEditUser {
 
 		userName.addFocusListener(new FocusListener() {
 
-			public void focusGained(FocusEvent arg0) {
+			public void focusGained (FocusEvent arg0) {
 			}
 
-			public void focusLost(FocusEvent arg0) {
+			public void focusLost (FocusEvent arg0) {
 				if (userName == null || userName.isDisposed()) {
 					return;
 				}
@@ -292,9 +292,8 @@ public class GUIEditUser {
 						Plugin.getXMLConfig().saveConfigFile();
 					} catch (DuplicatedUserException e) {
 						userName.setText(user.getUsername());
-						MessageBox mb = new MessageBox(
-								Plugin.getDisplay().getActiveShell(),
-								SWT.ICON_ERROR);
+						MessageBox mb = new MessageBox(SWTUtil.getDisplay()
+								.getActiveShell(), SWT.ICON_ERROR);
 						mb.setText("Error");
 						mb.setMessage("User name already exists.");
 						mb.open();
@@ -328,7 +327,7 @@ public class GUIEditUser {
 		gd.horizontalSpan = 2;
 		rights1.setLayoutData(gd);
 		rights1.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event arg0) {
+			public void handleEvent (Event arg0) {
 				if (!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
 					if (rights1.getSelection()) {
 						user.setRight(RemoteConstants.RIGHTS_FORCESTART);
@@ -345,7 +344,7 @@ public class GUIEditUser {
 		gd.horizontalSpan = 2;
 		rights2.setLayoutData(gd);
 		rights2.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event arg0) {
+			public void handleEvent (Event arg0) {
 				if (!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
 					if (rights2.getSelection()) {
 						user.setRight(RemoteConstants.RIGHTS_SEE_PUBLICDL);
@@ -362,7 +361,7 @@ public class GUIEditUser {
 		gd.horizontalSpan = 2;
 		rights3.setLayoutData(gd);
 		rights3.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event arg0) {
+			public void handleEvent (Event arg0) {
 				if (!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
 					if (rights3.getSelection()) {
 						user.setRight(RemoteConstants.RIGHTS_SET_DL_DIR);
@@ -379,7 +378,7 @@ public class GUIEditUser {
 		gd.horizontalSpan = 2;
 		rights4.setLayoutData(gd);
 		rights4.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event arg0) {
+			public void handleEvent (Event arg0) {
 				if (!user.checkAccess(RemoteConstants.RIGHTS_ADMIN)) {
 					if (rights4.getSelection()) {
 						user.setRight(RemoteConstants.RIGHTS_ADD_PUBLICDL);
@@ -404,10 +403,16 @@ public class GUIEditUser {
 			rights4.setEnabled(false);
 		}
 
-		rights1.setSelection(user.checkRight(RemoteConstants.RIGHTS_FORCESTART));
-		rights2.setSelection(user.checkRight(RemoteConstants.RIGHTS_SEE_PUBLICDL));
-		rights3.setSelection(user.checkRight(RemoteConstants.RIGHTS_SET_DL_DIR));
-		rights4.setSelection(user.checkRight(RemoteConstants.RIGHTS_ADD_PUBLICDL));
+		rights1
+				.setSelection(user
+						.checkRight(RemoteConstants.RIGHTS_FORCESTART));
+		rights2.setSelection(user
+				.checkRight(RemoteConstants.RIGHTS_SEE_PUBLICDL));
+		rights3
+				.setSelection(user
+						.checkRight(RemoteConstants.RIGHTS_SET_DL_DIR));
+		rights4.setSelection(user
+				.checkRight(RemoteConstants.RIGHTS_ADD_PUBLICDL));
 
 		if (!Plugin.getCurrentUser().checkRight(RemoteConstants.RIGHTS_ADMIN)) {
 			combo.setEnabled(false);
@@ -415,7 +420,7 @@ public class GUIEditUser {
 
 		// Combo Listener to save changes to user
 		combo.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event arg0) {
+			public void handleEvent (Event arg0) {
 				if (combo.getSelectionIndex() == 1) {
 					user.setRight(RemoteConstants.RIGHTS_ADMIN);
 					rights1.setEnabled(false);
@@ -439,13 +444,14 @@ public class GUIEditUser {
 		gd.horizontalSpan = 2;
 		downloadHistory.setLayoutData(gd);
 		downloadHistory.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event arg0) {
-				user.setProperty("DownloadHistory",
-						Boolean.toString(downloadHistory.getSelection()));
+			public void handleEvent (Event arg0) {
+				user.setProperty("DownloadHistory", Boolean
+						.toString(downloadHistory.getSelection()));
 			}
 		});
 
-		downloadHistory.setSelection(Boolean.parseBoolean(user.getProperty("DownloadHistory")));
+		downloadHistory.setSelection(Boolean.parseBoolean(user
+				.getProperty("DownloadHistory")));
 
 		// ---------Directory stuff ------------\\
 
@@ -476,10 +482,10 @@ public class GUIEditUser {
 		// Listener for manual input of outputDir
 		outputDir.addFocusListener(new FocusListener() {
 
-			public void focusGained(FocusEvent arg0) {
+			public void focusGained (FocusEvent arg0) {
 			}
 
-			public void focusLost(FocusEvent arg0) {
+			public void focusLost (FocusEvent arg0) {
 				if (outputDir == null || outputDir.isDisposed()) {
 					return;
 				}
@@ -498,10 +504,11 @@ public class GUIEditUser {
 		outputDir_icon.setToolTipText("Click to choose directory");
 		outputDir_icon.setImage(ImageRepository.getImage("folder"));
 		outputDir_icon.addListener(SWT.MouseDown, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				DirectoryDialog dirDialog = new DirectoryDialog(shell);
 				dirDialog.setText("Please Choose Output Directory");
-				dirDialog.setFilterPath(Plugin.getPluginInterface().getPluginDirectoryName());
+				dirDialog.setFilterPath(Plugin.getPluginInterface()
+						.getPluginDirectoryName());
 				String selectedDir = dirDialog.open();
 
 				// need to check if selected dir has files and if so, does it
@@ -543,10 +550,10 @@ public class GUIEditUser {
 		// Listener for manual input of outputDir
 		importDir.addFocusListener(new FocusListener() {
 
-			public void focusGained(FocusEvent arg0) {
+			public void focusGained (FocusEvent arg0) {
 			}
 
-			public void focusLost(FocusEvent arg0) {
+			public void focusLost (FocusEvent arg0) {
 				if (importDir == null || importDir.isDisposed()) {
 					return;
 				}
@@ -568,10 +575,11 @@ public class GUIEditUser {
 		importDir_icon.setToolTipText("Click to choose directory");
 		importDir_icon.setImage(ImageRepository.getImage("folder"));
 		importDir_icon.addListener(SWT.MouseDown, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent (Event e) {
 				DirectoryDialog dirDialog = new DirectoryDialog(shell);
 				dirDialog.setText("Please Choose Automatic Import Directory");
-				dirDialog.setFilterPath(Plugin.getPluginInterface().getPluginDirectoryName());
+				dirDialog.setFilterPath(Plugin.getPluginInterface()
+						.getPluginDirectoryName());
 				String selectedDir = dirDialog.open();
 				File selectedDir_file = new File(selectedDir);
 				// need to check if selected dir has files and if so, does it
@@ -580,11 +588,11 @@ public class GUIEditUser {
 					return;
 				} else if (!selectedDir_file.exists()
 						|| !selectedDir_file.isDirectory()) {
-					MessageBox mb = new MessageBox(
-							Plugin.getDisplay().getActiveShell(),
-							SWT.ICON_ERROR);
+					MessageBox mb = new MessageBox(SWTUtil.getDisplay()
+							.getActiveShell(), SWT.ICON_ERROR);
 					mb.setText("Error");
-					mb.setMessage("Selected Directory does not exist, please choose a valid directory.");
+					mb
+							.setMessage("Selected Directory does not exist, please choose a valid directory.");
 					mb.open();
 				} else {
 					importDir.setText(selectedDir);
@@ -602,7 +610,7 @@ public class GUIEditUser {
 		 * handleEvent(Event e) { if(userName.getText().equalsIgnoreCase("") ||
 		 * outputDir.getText().equalsIgnoreCase("")||
 		 * importDir.getText().equalsIgnoreCase("")){ MessageBox mb = new
-		 * MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
+		 * MessageBox(SWTUtil.getDisplay().getActiveShell(),SWT.ICON_ERROR);
 		 * mb.setText("Error"); mb.setMessage("Please fill out all of the
 		 * information."); mb.open(); return; } //add the user to the XMLConfig
 		 * file try {
@@ -617,13 +625,13 @@ public class GUIEditUser {
 		 * Plugin.getXMLConfig().saveConfigFile(); } catch (IOException e1) {
 		 * Plugin.addToLog(e1.toString()); } catch (UserNotFoundException e2) {
 		 * MessageBox mb = new
-		 * MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
+		 * MessageBox(SWTUtil.getDisplay().getActiveShell(),SWT.ICON_ERROR);
 		 * mb.setText("Error"); mb.setMessage("Plugin is reporting a 'User Not
 		 * Found' error. \n Possible error in your plugin config file. \nPlease
 		 * Check your settings and try again."); mb.open();
 		 * Plugin.addToLog(e2.getMessage()); e2.printStackTrace(); }catch
 		 * (DuplicatedUserException e2) { MessageBox mb = new
-		 * MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
+		 * MessageBox(SWTUtil.getDisplay().getActiveShell(),SWT.ICON_ERROR);
 		 * mb.setText("Error"); mb.setMessage("User name already exists.");
 		 * mb.open(); return; } } });
 		 */
@@ -635,10 +643,10 @@ public class GUIEditUser {
 
 	/**
 	 * Public method to open the dialog
-	 *
+	 * 
 	 * @param User _user
 	 */
-	public void open(User _user) {
+	public void open (User _user) {
 		if (instance == null) {
 			loadGUI(_user);
 		} else {

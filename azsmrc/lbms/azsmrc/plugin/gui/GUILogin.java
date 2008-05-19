@@ -1,7 +1,6 @@
 /*
- * Created on Nov 28, 2005
- * Created by omschaub
- *
+ * Created on Nov 28, 2005 Created by omschaub
+ * 
  */
 package lbms.azsmrc.plugin.gui;
 
@@ -25,59 +24,56 @@ import org.eclipse.swt.widgets.Text;
 
 public class GUILogin {
 
-
-
-	private static Label status;
-
-
+	private static Label	status;
 
 	/**
 	 * Make the main composite show the login screen
-	 *
+	 * 
 	 * @param composite
 	 */
-	public static void openLogin(Composite composite){
-
+	public static void openLogin (Composite composite) {
 
 		// Main Composite for the login layout
 		Composite loginComp = new Composite(composite, SWT.BORDER);
 
 		// Set the comp on its parent
-		GridData gridData = new GridData(GridData.VERTICAL_ALIGN_CENTER | GridData.HORIZONTAL_ALIGN_CENTER);
+		GridData gridData = new GridData(GridData.VERTICAL_ALIGN_CENTER
+				| GridData.HORIZONTAL_ALIGN_CENTER);
 		gridData.grabExcessVerticalSpace = true;
 		gridData.grabExcessHorizontalSpace = true;
 		//gridData.widthHint = 200;
 		gridData.verticalSpan = 5;
 		loginComp.setLayoutData(gridData);
 
-
-
 		// Set the layout of the comp
-		loginComp.setLayout(new GridLayout(2,false));
-
+		loginComp.setLayout(new GridLayout(2, false));
 
 		//Label and Text for the User Name
-		Label userNameLabel = new Label(loginComp,SWT.NULL);
-		userNameLabel.setText(Plugin.getLocaleUtilities().getLocalisedMessageText("GUILogin.openLogin.userNameLabel"));
+		Label userNameLabel = new Label(loginComp, SWT.NULL);
+		userNameLabel.setText(Plugin.getLocaleUtilities()
+				.getLocalisedMessageText("GUILogin.openLogin.userNameLabel"));
 
-		final Text userName = new Text(loginComp,SWT.BORDER | SWT.LEFT | SWT.SINGLE);
+		final Text userName = new Text(loginComp, SWT.BORDER | SWT.LEFT
+				| SWT.SINGLE);
 		userName.setEditable(true);
 		gridData = new GridData(GridData.BEGINNING);
 		gridData.widthHint = 200;
 		userName.setLayoutData(gridData);
 
 		//Label and Text for the Password
-		Label passwordLabel = new Label(loginComp,SWT.NULL);
-		passwordLabel.setText(Plugin.getLocaleUtilities().getLocalisedMessageText("GUILogin.openLogin.passwordLabel"));
+		Label passwordLabel = new Label(loginComp, SWT.NULL);
+		passwordLabel.setText(Plugin.getLocaleUtilities()
+				.getLocalisedMessageText("GUILogin.openLogin.passwordLabel"));
 
-		final Text password = new Text(loginComp,SWT.BORDER | SWT.LEFT | SWT.SINGLE | SWT.PASSWORD);
+		final Text password = new Text(loginComp, SWT.BORDER | SWT.LEFT
+				| SWT.SINGLE | SWT.PASSWORD);
 		password.setEditable(true);
 		gridData = new GridData(GridData.BEGINNING);
 		gridData.widthHint = 200;
 		password.setLayoutData(gridData);
 
 		//Listener on the password to remove error message
-		password.addListener (SWT.Verify, new Listener () {
+		password.addListener(SWT.Verify, new Listener() {
 			public void handleEvent (Event e) {
 				status.setVisible(false);
 			}
@@ -88,12 +84,15 @@ public class GUILogin {
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		gridData.horizontalSpan = 1;
 		loginButton.setLayoutData(gridData);
-		loginButton.setText(Plugin.getLocaleUtilities().getLocalisedMessageText("GUILogin.openLogin.loginButton"));
+		loginButton.setText(Plugin.getLocaleUtilities()
+				.getLocalisedMessageText("GUILogin.openLogin.loginButton"));
 
 		// Text for failure
 		status = new Label(loginComp, SWT.NULL);
-		status.setText(Plugin.getLocaleUtilities().getLocalisedMessageText("GUILogin.openLogin.status"));
-		status.setForeground(Plugin.getDisplay().getSystemColor(SWT.COLOR_DARK_RED));
+		status.setText(Plugin.getLocaleUtilities().getLocalisedMessageText(
+				"GUILogin.openLogin.status"));
+		status.setForeground(SWTUtil.getDisplay().getSystemColor(
+				SWT.COLOR_DARK_RED));
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		gridData.horizontalSpan = 1;
 		gridData.verticalSpan = 1;
@@ -102,17 +101,19 @@ public class GUILogin {
 
 		//Listener for Login Button
 		loginButton.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
-				if(userName.getText().length() != 0 || password.getText().length() != 0){
+			public void handleEvent (Event e) {
+				if (userName.getText().length() != 0
+						|| password.getText().length() != 0) {
 
 					try {
 						//Verify User and Password
-						User tempUser = Plugin.getXMLConfig().getUser(userName.getText());
-						if(tempUser.verifyPassword(password.getText())){
+						User tempUser = Plugin.getXMLConfig().getUser(
+								userName.getText());
+						if (tempUser.verifyPassword(password.getText())) {
 							// Verify is true, so proceed and login
 							Plugin.setCurrentUser(tempUser);
 							login(tempUser);
-						}else{
+						} else {
 							// Verify is false, so reject login
 
 							password.setText("");
@@ -125,39 +126,34 @@ public class GUILogin {
 						status.setVisible(true);
 					}
 
-
-
-				}else{
+				} else {
 					//Something is empty, so show error
 					status.setVisible(true);
 				}
 
-
-
-
-
 			}
 		});
 
-
 		password.addKeyListener(new KeyListener() {
-			public void keyPressed(KeyEvent e) {
+			public void keyPressed (KeyEvent e) {
 				//Empty
 			}
 
 			public void keyReleased (KeyEvent e) {
-				switch (e.character){
+				switch (e.character) {
 				case SWT.CR:
-					if(userName.getText().length() != 0 || password.getText().length() != 0){
+					if (userName.getText().length() != 0
+							|| password.getText().length() != 0) {
 
 						try {
 							//Verify User and Password
-							User tempUser = Plugin.getXMLConfig().getUser(userName.getText());
-							if(tempUser.verifyPassword(password.getText())){
+							User tempUser = Plugin.getXMLConfig().getUser(
+									userName.getText());
+							if (tempUser.verifyPassword(password.getText())) {
 								// Verify is true, so proceed and login
 								Plugin.setCurrentUser(tempUser);
 								login(tempUser);
-							}else{
+							} else {
 								// Verify is false, so reject login
 								status.setVisible(true);
 								password.setText("");
@@ -167,13 +163,22 @@ public class GUILogin {
 							e1.printStackTrace();
 							Plugin.addToLog(e1.toString());
 
-							MessageBox mb = new MessageBox(Plugin.getDisplay().getActiveShell(),SWT.ICON_ERROR);
-							mb.setText(Plugin.getLocaleUtilities().getLocalisedMessageText("General.UserNotFoundError.MessageBox.title"));
-							mb.setMessage(Plugin.getLocaleUtilities().getLocalisedMessageText("General.UserNotFoundError.MessageBox.message"));
+							MessageBox mb = new MessageBox(SWTUtil.getDisplay()
+									.getActiveShell(), SWT.ICON_ERROR);
+							mb
+									.setText(Plugin
+											.getLocaleUtilities()
+											.getLocalisedMessageText(
+													"General.UserNotFoundError.MessageBox.title"));
+							mb
+									.setMessage(Plugin
+											.getLocaleUtilities()
+											.getLocalisedMessageText(
+													"General.UserNotFoundError.MessageBox.message"));
 							mb.open();
 							//Destroy the login on the main composite
 							Control[] controls = View.composite.getChildren();
-							for(int i = 0; i < controls.length; i++){
+							for (int i = 0; i < controls.length; i++) {
 								controls[i].dispose();
 							}
 
@@ -182,14 +187,10 @@ public class GUILogin {
 
 						}
 
-
-
-					}else{
+					} else {
 						//  Something is empty, so show error
 						status.setVisible(true);
 					}
-
-
 
 					break;
 
@@ -201,14 +202,15 @@ public class GUILogin {
 		View.composite.layout();
 	}
 
-	private static void login(final User user){
-		Plugin.getDisplay().asyncExec(new Runnable (){
+	private static void login (final User user) {
+		SWTUtil.getDisplay().asyncExec(new Runnable() {
 			public void run () {
-				if(status != null || !status.isDisposed())
+				if (status != null || !status.isDisposed()) {
 					status.setText("");
+				}
 				//Destroy the login on the main composite
 				Control[] controls = View.composite.getChildren();
-				for(int i = 0; i < controls.length; i++){
+				for (int i = 0; i < controls.length; i++) {
 					controls[i].dispose();
 				}
 
