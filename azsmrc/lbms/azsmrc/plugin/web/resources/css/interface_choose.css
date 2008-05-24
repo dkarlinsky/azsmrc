@@ -31,7 +31,6 @@ h2 {
 	top: 225px;
 }
 #tabbar li {
-	background: transparent url(../img/skin2/inactive_tab.png);
 	color: #888;
 	display: block;
 	font-size: 8px;
@@ -46,10 +45,10 @@ h2 {
 	font-size: 12px;
 	font-weight: bold;
 }
+#tabbar li:hover a,
 #tabbar li a:hover {
 	color: #000;
 }
 #tabbar li:hover {
 	cursor: pointer;
-	background-image: url(../img/skin2/active_tab.png);
 }
