@@ -21,6 +21,12 @@ h2 {
 	font-size: 14px;
 	margin: 70px 0px 10px 0px;
 }
+.javascriptavailable {
+	color: #0A0 !important;
+}
+.nojavascript {
+	color: #F00 !important;
+}
 #tabbar {
 	color: #000;
 	display: block;

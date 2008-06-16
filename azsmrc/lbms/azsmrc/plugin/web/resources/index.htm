@@ -11,13 +11,18 @@
 	<meta name="creation_date" content="04/09/2006" />
 	<!-- Styles -->
 	<link rel="stylesheet" type="text/css" href="css/interface_choose.css" title="AzSMRC Style" />
+	<script type="text/javascript">
+		function loadJS() {
+			document.getElementById('ajaxwebuichoose').className = 'javascriptavailable';
+		}
+	</script>
 </head>
-<body>
+<body onload="loadJS()">
 <h1>Welcome to AzSMRC</h1>
 <h2>Please select the WebUI</h2>
 <p>You can choose between two different types of user interfaces here.</p>
 <ul id="tabbar">
-	<li><a href="ajaxWebUI.htm">AJAX WebUI</a> (requires JavaScript)</li>
+	<li class="nojavascript" id="ajaxwebuichoose"><a href="ajaxWebUI.htm">AJAX WebUI</a> (requires JavaScript)</li>
 	<li><a href="flash.html">FlashUI</a> (requires Flash)</li>
 </ul>
 </body>
