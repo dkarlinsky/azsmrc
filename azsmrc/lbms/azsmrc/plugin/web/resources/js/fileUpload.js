@@ -3,36 +3,39 @@ function addTorrentContent() {
 	var head = document.createElement("h2");
 	head.appendChild(document.createTextNode("Torrent Control"));
 	div.appendChild(head);
-	head = document.createElement("h3");
+	var fieldset = document.createElement("fieldset");
+	head = document.createElement("legend");
 	head.appendChild(document.createTextNode("Add Torrent by File Upload"));
-	div.appendChild(head);
+	fieldset.appendChild(head);
 	var form = document.createElement("form");
 	form.setAttribute("enctype", "multipart/form-data");
 	var label = document.createElement("label");
 	label.appendChild(document.createTextNode("TorrentFile"));
 	label.setAttribute("for", "torrentfile");
-	form.appendChild(label);
+	fieldset.appendChild(label);
 	var input = document.createElement("input");
 	input.setAttribute("type", "file");
 	input.setAttribute("id", "torrentfile");
 	input.setAttribute("name", "torrentfile");
-	form.appendChild(input);
+	fieldset.appendChild(input);
 	input = document.createElement("input");
 	input.setAttribute("type", "button");
 	input.setAttribute("name", "uplsubmit");
 	input.setAttribute("value", "Send file");
 	input.onclick = function () { uploadFile(); };
-	form.appendChild(input);
+	fieldset.appendChild(input);
+	form.appendChild(fieldset);
 	div.appendChild(form);
-	
-	head = document.createElement("h3");
+
+	fieldset = document.createElement("fieldset");
+	head = document.createElement("legend");
 	head.appendChild(document.createTextNode("Add Torrent by URL"));
-	div.appendChild(head);
+	fieldset.appendChild(head);
 	form = document.createElement("form");
 	p = document.createElement("p");
 	p.appendChild(document.createTextNode("http, ftp and magnet works"));
 	p.className = "hint";
-	form.appendChild(p);
+	fieldset.appendChild(p);
 	label = document.createElement("label");
 	label.setAttribute("for", "torrentURL");
 	label.appendChild(document.createTextNode("Torrent URL"));
@@ -40,39 +43,40 @@ function addTorrentContent() {
 	input.setAttribute("type", "text");
 	input.setAttribute("id", "torrentURL");
 	input.value = "http://";
-	form.appendChild(label);
-	form.appendChild(input);
+	fieldset.appendChild(label);
+	fieldset.appendChild(input);
 	p = document.createElement("p");
 	p.appendChild(document.createTextNode("Leave information below empty if torrent is public"));
 	p.className = "hint";
-	form.appendChild(p);
-	
+	fieldset.appendChild(p);
+
 	label = document.createElement("label");
 	label.setAttribute("for", "torrentUser");
 	label.appendChild(document.createTextNode("Torrent user"));
 	input = document.createElement("input");
 	input.setAttribute("type", "text");
 	input.setAttribute("id", "torrentUser");
-	form.appendChild(label);
-	form.appendChild(input);
-	
+	fieldset.appendChild(label);
+	fieldset.appendChild(input);
+
 	label = document.createElement("label");
 	label.setAttribute("for", "torrentPasswd");
 	label.appendChild(document.createTextNode("Torrent password"));
 	input = document.createElement("input");
 	input.setAttribute("type", "password");
 	input.setAttribute("id", "torrentPasswd");
-	form.appendChild(label);
-	form.appendChild(input);
-	
+	fieldset.appendChild(label);
+	fieldset.appendChild(input);
+
 	input = document.createElement("input");
 	input.setAttribute("type", "button");
 	input.value = "Send to Server";
 	input.onclick = function () {
 		SendRequestToServer(3);
 	}
-	form.appendChild(input);
-	div.appendChild(form);	
+	fieldset.appendChild(input);
+	form.appendChild(fieldset);
+	div.appendChild(form);
 	return div;
 }
 function encode64(input) {
@@ -107,7 +111,7 @@ function uploadFile() {
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	} catch (e) {
 		alert("Permission to read file was denied.\nPlease check your security settings.");
-	}	
+	}
 	// open the local file
 	var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
 	file.initWithPath(filename);
@@ -119,11 +123,10 @@ function uploadFile() {
 	bstream.QueryInterface(Components.interfaces.nsIInputStream);
 	binary = Components.classes["@mozilla.org/binaryinputstream;1"].createInstance(Components.interfaces.nsIBinaryInputStream);
 	binary.setInputStream(stream);
-	
+
 	var requestURL = Server+"process.cgi";
-	var xmlhttp = createXMLHTTP();	
+	var xmlhttp = createXMLHTTP();
 	if (xmlhttp) {
-		var statusbarentry = document.getElementById("requeststatus").firstChild;		
 		var filecontent = encode64(binary.readBytes(binary.available()));
 		var xmlrequest = '<?xml version="1.0" encoding="UTF-8"?><Request version="1.0">'
 			+ '<Query switch="addDownload" location="xml">'
@@ -134,23 +137,23 @@ function uploadFile() {
 		xmlhttp.onreadystatechange = function () {
 			switch (xmlhttp.readyState) {
 				case 0:
-					statusbarentry.data = "uninitialized";
+					changeStatus("uninitialized");
 				break;
 				case 1:
-					statusbarentry.data = "open request";
+					changeStatus("open request");
 				break;
 				case 2:
-					statusbarentry.data = "request sent";
+					changeStatus("request sent");
 				break;
 				case 3:
-					statusbarentry.data = "receiving response";
+					changeStatus("receiving response");
 				break;
 				case 4:
-					statusbarentry.data = "response loaded";	
+					changeStatus("response loaded");
 					addDebugEntry("XML Response: "+xmlhttp.responseText);
 				break;
 				default:
-					statusbarentry.data = "unknown state";
+					changeStatus("unknown state");
 				break;
 			}
 		}

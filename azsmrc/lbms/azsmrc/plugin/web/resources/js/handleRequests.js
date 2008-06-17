@@ -10,9 +10,9 @@ var formalAttributes = ["Health", "#", "Name", "", "Status", "Downloaded", "Uplo
 var eventTypes = ["unknown", "Download Completed", "Download Torrent Removed", "Download Exception", "System Exception", "Update Available", "Message", "Error Message", "Plugin Message"];
 // additional interactions listed in interaction menu
 // with selected torrents
-var interactions = [["request download scrape",17], ["request download announce", 18]];
+var interactions = [["request download scrape", 17], ["request download announce", 18]];
 // with all torrents at once
-var globalinteractions = [["start all downloads", 21], ["resume all downloads", 24], ["stop all downloads",22]];
+var globalinteractions = [["start all downloads", 21], ["resume all downloads", 24], ["stop all downloads", 22]];
 // system (admin) interactions
 var systeminteractions = [["restart Azureus", 39]];
 function addAdvInteraction() {
@@ -587,6 +587,7 @@ function handlelistTransfers(xmldoc) {
 		ulbody = document.createElement("tbody");
 		// filling tbody
 		var transferCtrl = null;
+		var dli, uli = 0;
 		for (j in transferDataField)		
 			if (j > 0) {
 				// check dl or ul
@@ -620,8 +621,17 @@ function handlelistTransfers(xmldoc) {
 							tr.appendChild(td);
 						}
 				}
-				if (activeTable == 0) dlbody.appendChild(tr);
-				else ulbody.appendChild(tr);
+				if (activeTable == 0) {
+					dli++;
+					if (dli % 2) tr.className = "odd";
+					else  tr.className = "even";
+					dlbody.appendChild(tr);
+				} else {
+					uli++;
+					if (uli % 2) tr.className = "odd";
+					else  tr.className = "even";
+					ulbody.appendChild(tr);
+				}
 				positions[activeTable]++;
 			}
 		if (dlbody.hasChildNodes()) {

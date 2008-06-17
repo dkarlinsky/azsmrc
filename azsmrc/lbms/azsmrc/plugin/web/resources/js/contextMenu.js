@@ -3,7 +3,7 @@ var contextDraw = false;
 var contextCallObj = null;
 function checkContextMenu(event) {
 	contextDraw = (event.button == 2) ? true : false;
-	contextCallObj = event.target;	
+	contextCallObj = event.target;
 	if ((event.shiftKey) && (event.button == 0)) {
 		contextDraw = true;
 		addDebugEntry("valid");
@@ -25,6 +25,7 @@ function renderContextMenuContent(event) {
 	addDebugEntry("contextCallObj: "+contextCallObj.tagName.toLowerCase());
 	var menulist, menuitem, link;
 	var head = document.createElement("h2");
+	var img;
 	switch (contextCallObj.tagName.toLowerCase()) {
 		case "td":
 			// is TC
@@ -34,30 +35,51 @@ function renderContextMenuContent(event) {
 				head.appendChild(document.createTextNode("Torrent Control"));
 				contextMenu.appendChild(head);
 				menulist = document.createElement("ul");
-				menuitem = document.createElement("li");
-				link = document.createElement("a");
-				link.onclick = function () { SendRequestToServer(7, hash); }
-				link.appendChild(document.createTextNode("start torrent"));
-				menuitem.appendChild(link);
-				menulist.appendChild(menuitem);
-				menuitem = document.createElement("li");
-				link = document.createElement("a");
-				link.onclick = function () { SendRequestToServer(13, hash); }
-				link.appendChild(document.createTextNode("force start torrent"));
-				menuitem.appendChild(link);
-				menulist.appendChild(menuitem);
-				menuitem = document.createElement("li");
-				link = document.createElement("a");
-				link.onclick = function() { SendRequestToServer(5, hash); }
-				link.appendChild(document.createTextNode("stop torrent"));
-				menuitem.appendChild(link);
-				menulist.appendChild(menuitem);
+
 				menuitem = document.createElement("li");
 				link = document.createElement("a");
 				link.onclick = function () { SendRequestToServer(4, hash); }
-				link.appendChild(document.createTextNode("delete torrent"));
+				img = document.createElement("img");
+				img.src = "img/crystalClear/torrentControl/delete.png";
+				img.setAttribute("alt", "Delete Torrent");
+				img.setAttribute("title", "Delete Torrent");
+				link.appendChild(img);
 				menuitem.appendChild(link);
 				menulist.appendChild(menuitem);
+
+				menuitem = document.createElement("li");
+				link = document.createElement("a");
+				link.onclick = function() { SendRequestToServer(5, hash); }
+				img = document.createElement("img");
+				img.src = "img/crystalClear/torrentControl/stop.png";
+				img.setAttribute("alt", "Stop Torrent");
+				img.setAttribute("title", "Stop Torrent");
+				link.appendChild(img);
+				menuitem.appendChild(link);
+				menulist.appendChild(menuitem);
+
+				menuitem = document.createElement("li");
+				link = document.createElement("a");
+				link.onclick = function () { SendRequestToServer(7, hash); }
+				img = document.createElement("img");
+				img.src = "img/crystalClear/torrentControl/start.png";
+				img.setAttribute("alt", "Start Torrent");
+				img.setAttribute("title", "Start Torrent");
+				link.appendChild(img);
+				menuitem.appendChild(link);
+				menulist.appendChild(menuitem);
+
+				menuitem = document.createElement("li");
+				link = document.createElement("a");
+				link.onclick = function () { SendRequestToServer(13, hash); }
+				img = document.createElement("img");
+				img.src = "img/crystalClear/torrentControl/force_start.png";
+				img.setAttribute("alt", "Force Start Torrent");
+				img.setAttribute("title", "Force Start Torrent");
+				link.appendChild(img);
+				menuitem.appendChild(link);
+				menulist.appendChild(menuitem);
+
 				contextMenu.appendChild(menulist);
 			}
 		break;

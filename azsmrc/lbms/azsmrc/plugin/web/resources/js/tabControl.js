@@ -17,14 +17,16 @@ var tabs = [];
 var startupTabs = [false, true, false, false, false, false, false];
 // current tab positions and layer (zIndex) in viewport
 var tabPositions = [];
+// tabs which are able to maximize
+var tabMax = [1, 0, 1, 1, 0, 0, 0];
 // an example tab (tabbar is list of tabs)
 // <li><span onclick="SendRequestToServer(1);">ALL Torrents</span><img src="img/delete.png" alt="Close Tab" title="Close Tab" onclick="closeTab(this);" /></li>
 function addTab(contentElement, isStartup) {
 	// only create new tab, if no tab with contentElement exists
 	var tabExists = getTabByContent(contentElement);
 	var setTabPos = optionSet("tabposonthefly");
-	var i = 0;		
-	if (tabExists == null) {		
+	var i = 0;
+	if (tabExists == null) {
 		var label, labelID = null;
 		label = document.createTextNode("Empty Tab");
 		for (i in registeredTabs)
@@ -39,7 +41,7 @@ function addTab(contentElement, isStartup) {
 		var img = document.createElement("img");
 		tabCount++;
 		if (contentElement != "listTransfers") {
-			img.src = "img/delete.png";
+			img.src = "img/crystalClear/close.png";
 			img.setAttribute("alt", "Close Tab");
 			img.setAttribute("title", "Close Tab");
 			img.setAttribute("tab", tabCount);
@@ -54,7 +56,7 @@ function addTab(contentElement, isStartup) {
 		if (contentElement != "listTransfers")
 			tab.appendChild(img);
 		tab.setAttribute("tab_control", tabCount);
-		tabbar.appendChild(tab);		
+		tabbar.appendChild(tab);
 		// tabcontent
 		var contentList = document.getElementById("tabcontents");
 		var tabContent = document.createElement("div");
@@ -76,7 +78,7 @@ function addTab(contentElement, isStartup) {
 				var head = document.createElement("h2");
 				head.appendChild(document.createTextNode("Debug Log"));
 				var ul = document.createElement("ul");
-				ul.className = "debuglist";				
+				ul.className = "debuglist";
 				tabContent.appendChild(head);
 				tabContent.appendChild(ul);
 			break;
@@ -107,9 +109,9 @@ function addTab(contentElement, isStartup) {
 		window.setTimeout("ShowTab(tabCount)", 200);
 		refreshView();
 		configAutoRefresh();
+		set_dragbar(tabContent);
+		var dragbar = tabContent.firstChild;
 		if (contentElement != "listTransfers") {
-			set_dragbar(tabContent);
-			var dragbar = tabContent.firstChild;
 			var frameLabel = document.createElement("h2");
 			frameLabel.appendChild(document.createTextNode(tabLabels[labelID]));
 			dragbar.appendChild(frameLabel);
@@ -124,11 +126,28 @@ function addTab(contentElement, isStartup) {
 				var tab = 0;
 				for (i = 0; i < list.childNodes.length; i++) {
 					tab = list.childNodes[i];
-					if (tab.getAttribute("tab_control") == tabID) {
+					if (tab.getAttribute("tab_control") == tabID)
 						tab.lastChild.onclick();
-					}
 				}
 			}
+		}
+		/*
+		if (tabMax[labelID]) {
+			var maximize = document.createElement("img");
+			maximize.src = "img/icon-max.png";
+			maximize.setAttribute("title", "to 'Fullscreen'");
+			maximize.setAttribute("alt", "Max");
+			maximize.setAttribute("tab", tabCount);
+			maximize.onclick = function () {
+				var tabID = this.getAttribute("tab");
+				var list = document.getElementById("tabbar");
+				var tab = 0;
+				alert("would do if function exists");
+			}
+			dragbar.appendChild(maximize);
+		}
+		*/
+		if (contentElement != "listTransfers") {
 			dragbar.appendChild(close);
 		}
 		if (isStartup || setTabPos) {
@@ -140,7 +159,7 @@ function addTab(contentElement, isStartup) {
 				tabContent.style.zIndex = tabPos[2];
 			}
 		}
-	} else { 
+	} else {
 		window.setTimeout("ShowTab(getTabIdByContent('"+contentElement+"'))", 200);
 	}
 }
@@ -172,13 +191,13 @@ function getRegTabById(tabID) {
 			tab = i;
 			break;
 		}
-	return i;
+	return tab;
 }
 function getTabByContent(contentElement) {
 	var list = null;
 	for (var i in tabs)
 		if (tabs[i] == contentElement) {
-			list = document.getElementById("tab_"+i);				
+			list = document.getElementById("tab_"+i);
 			break; // exit for ()
 		}
 	return list;
@@ -228,7 +247,12 @@ function loadTabPos() {
 			pos = value[i].split(",");
 			tabPositions[pos[0]] = [pos[1], pos[2], pos[3]];
 		}
-	}	
+	}
+}
+function maximizeTab(tabObj) {
+	// make tab "fullscreen"
+
+
 }
 function refreshTabbar() {
 	var tabbar = document.getElementById("tabbar");
@@ -246,18 +270,18 @@ function refreshTabbar() {
 				tab.className = "active";
 			else
 				tab.className = "";
-		}		
+		}
 	}
 }
 function reindexStatusbar() {
 	zIndex++;
 	document.getElementById("statusbar").style.zIndex = zIndex;
 }
-function saveTabPosCookie() {		
+function saveTabPosCookie() {
 	var tabPos = [];
 	for (var i in registeredTabs) {
 		tab = getTabByContent(registeredTabs[i]);
-		if (tab && tab.style.left) {			
+		if (tab && tab.style.left) {
 			tabPos.push([i, tab.style.left, tab.style.top, tab.style.zIndex]);
 		}
 	}
@@ -266,7 +290,7 @@ function saveTabPosCookie() {
 	// expires after one year
 	now.setTime(now.getTime() + 365 * 24 * 60 * 60 * 1000);
 	var value = tabPos.join(";");
-	setCookie("tabPositions", value, now); 
+	setCookie("tabPositions", value, now);
 }
 function ShowTab(tab) {
 	var toActivate = document.getElementById("tab_"+tab);

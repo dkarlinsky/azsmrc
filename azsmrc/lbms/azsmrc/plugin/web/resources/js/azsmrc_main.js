@@ -1,4 +1,4 @@
-var Server = window.location.href;
+var Server = window.location.protocol+'//'+window.location.hostname+':'+window.location.port;
 /* example request XML sent to Server
 <?xml version="1.0" encoding="UTF-8"?>
 <Request version="1.0">
@@ -29,12 +29,17 @@ function adjustMaxTabWidth() {
 				document.styleSheets[s]["cssRules"][r].style["max-width"] = maxwidth+"px";
 			}
 }
+function changeStatus(status) {
+	// write status to statusbar
+	var statusbarentry = document.getElementById("requeststatus").firstChild;
+	statusbarentry.data = status;
+}
 function configAutoRefresh() {
 	var regTabID, i;
 	for (i in autoRefreshObjs)
 		if (autoRefreshObjs[i] != null)
 			window.clearInterval(autoRefreshObjs[i]);
-	for (i in tabs) 
+	for (i in tabs)
 		if (tabs[i]) {
 			regTabID = getRegTabById(i);
 			if (autoRefresh[regTabID] > 0) {
@@ -56,7 +61,7 @@ function createXMLHTTP() {
 	return xmlhttp;
 }
 function doAutoRefresh(regTabID) {
-	if (refreshRequests[regTabID] > -1) 
+	if (refreshRequests[regTabID] > -1)
 		SendRequestToServer(refreshRequests[regTabID]);
 }
 function doNothing() {
@@ -89,13 +94,17 @@ function fetchData(xmlhttp) {
 							img.src = "img/connect_established.png";
 							img.setAttribute("alt","Connection established");
 							img.setAttribute("title","Connected to Server");
-						}					
+						}
 					break;
 					case "listTransfers":
 						handlelistTransfers(doc);
 					break;
 					case "getRemoteInfo":
-						document.getElementById("azversion").firstChild.data = "Azureus "+results[i].getAttribute("azureusVersion");
+						if (results[i].getAttribute("azureusVersion")[0] == 3)
+							version = "Vuze "+results[i].getAttribute("azureusVersion");
+						else
+							version = "Azureus "+results[i].getAttribute("azureusVersion");
+						document.getElementById("azversion").firstChild.data = version;
 						document.getElementById("azsmrcversion").firstChild.data = "AzSMRC "+results[i].getAttribute("pluginVersion");
 					break;
 					case "getUsers":
@@ -106,7 +115,7 @@ function fetchData(xmlhttp) {
 							var users = doc.getElementsByTagName("User");
 							while (userTable.firstChild) userTable.removeChild(userTable.firstChild);
 							var tr, td;
-							for (var j in users) 
+							for (var j in users)
 								if (j < users.length) {
 									tr = document.createElement("tr");
 									td = document.createElement("td");
@@ -159,7 +168,7 @@ function getRequestOptions(request) {
 					options += Math.pow(2, i);
 				}
 			options = ' options="'+options+'"';
-			return options;			
+			return options;
 		break;
 		case "addDownload":
 			var torrentURL = document.getElementById("torrentURL").value;
@@ -188,10 +197,10 @@ function getRequestQuery(req, par) {
 			request += '<Query switch="'+req+'" location="url"'+getRequestOptions(req)+' />';
 			if (request == '<Query switch="'+req+'" location="url" />')
 				request = '';
-		break;	
-		case "removeDownload":			
+		break;
+		case "removeDownload":
 			if (!window.confirm("Are you sure to delete all selected downloads and uploads?"))
-				break;			
+				break;
 			if (par) {
 				request += '<Query switch="'+req+'" hash="'+par+'" />';
 			} else
@@ -220,7 +229,7 @@ function getRequestQuery(req, par) {
 				for (var i in selectedTransfers)
 					if (selectedTransfers[i] != null)
 						request += '<Query switch="'+req+'" hash="'+selectedTransfers[i]+'" />';
-			
+
 		break;
 		case "moveToPosition":
 			for (var i in selectedTransfers)
@@ -229,14 +238,14 @@ function getRequestQuery(req, par) {
 						position = 1;
 					else if (par == "bottom")
 						position = positions[getLoadType(selectedTransfers[i])];
-					else 
+					else
 						position = par;
 					request += '<Query switch="'+req+'" position="'+position+'" hash="'+selectedTransfers[i]+'" />';
 				}
 		break;
 		default:
 			request += '<Query switch="'+req+'" />';
-		break;	
+		break;
 	}
 	return request;
 }
@@ -254,7 +263,7 @@ function initAzSMRCwebUI() {
 	addTab("listTransfers", true);
 	initTabControl();
 	adjustMaxTabWidth();
-	setJSHint(); 
+	setJSHint();
 	//showSplashScreen();
 	configAutoRefresh();
 	PingToServer();
@@ -289,7 +298,6 @@ function PingToServer() {
 function refreshView() {
 	switch (tabs[activeTab]) {
 		case "listTransfers":
-			selectedTransfers = [];
 			// listTransfers
 			SendRequestToServer(1);
 		break;
@@ -300,7 +308,7 @@ function refreshView() {
 			// getRemoteInfo
 			SendRequestToServer(40);
 		break;
-		default: 
+		default:
 			PingToServer();
 		break;
 	}
@@ -322,12 +330,12 @@ function savePreferences() {
 			value = Math.floor(document.getElementById("cookie_autorefresh_"+i).value);
 			if (!Math.floor(value))
 				document.getElementById("cookie_autorefresh_"+i).value = 0;
-			autoRefresh[i] = value > 0 ? value : 0;			
+			autoRefresh[i] = value > 0 ? value : 0;
 		}
 		if (i > 0)
 			startupTabs[i] = document.getElementById("startup_"+i).checked;
 		tab = getTabByContent(registeredTabs[i]);
-		if (tab && tab.style.left) {			
+		if (tab && tab.style.left) {
 			tabPos[pos] = [i, tab.style.left, tab.style.top, tab.style.zIndex];
 			pos++;
 		}
@@ -341,8 +349,8 @@ function savePreferences() {
 	// startup tabs
 	value = startupTabs.join(",");
 	setCookie("startupTabs", value, now);
-	// auto refresh	
-	var saveCookie = document.getElementById("cookie_autorefresh").checked;	
+	// auto refresh
+	var saveCookie = document.getElementById("cookie_autorefresh").checked;
 	if (saveCookie) {
 		// set autorefresh cookie
 		value = autoRefresh.join(",");
@@ -358,7 +366,7 @@ function savePreferences() {
 		azsmrcOptions = value;
 		value = value.join(",");
 		setCookie("azsmrcOptions", value, now);
-	} 
+	}
 	addDebugEntry("saved Cookies: "+document.cookie);
 }
 function selectDetails(id) {
@@ -378,7 +386,7 @@ function selectTC(obj) {
 				selectedTransfers[i] = hash;
 				inserted = true;
 				break;
-			}				
+			}
 		}
 		if (!inserted) {
 			selectedTransfers[selectedTransfers.length] = hash;
@@ -391,44 +399,44 @@ function selectTC(obj) {
 			}
 		}
 	}
-	obj.className = (input.checked == true)? "activeTC" : "";
-	// addDebugEntry("selected Transfers: "+selectedTransfers);
+	obj.className = (input.checked == true) ? "activeTC" : "";
+	addDebugEntry("selected Transfers: "+selectedTransfers);
 }
 function SendRequestToServer(request, par) {
 	request = registeredRequests[request];
 	// respondig file fo server: process.cgi
 	// edit line below if changes
-	var requestURL = Server+"process.cgi";
+	var requestURL = Server+"/process.cgi";
 	var xmlhttp = createXMLHTTP();
 	if (xmlhttp) {
-		var statusbarentry = document.getElementById("requeststatus").firstChild;
 		var xmlrequest = '<?xml version="1.0" encoding="UTF-8"?><Request version="1.0">'+getRequestQuery(request, par)+'</Request>';
 		// no empty requests
 		if (xmlrequest != '<?xml version="1.0" encoding="UTF-8"?><Request version="1.0"></Request>') {
 			addDebugEntry("XML Request: "+xmlrequest);
 			xmlhttp.open("POST", requestURL, true);
-			xmlhttp.setRequestHeader("Content-type","application/xml"); 
-			xmlhttp.setRequestHeader("Connection","close"); 
+			xmlhttp.setRequestHeader("Content-type","application/xml");
+			xmlhttp.setRequestHeader("Connection","close");
 			xmlhttp.onreadystatechange = function () {
 				switch (xmlhttp.readyState) {
 					case 0:
-						statusbarentry.data = "uninitialized";
+						changeStatus("uninitialized");
 					break;
 					case 1:
-						statusbarentry.data = "open request";
+						changeStatus("open request");
 					break;
 					case 2:
-						statusbarentry.data = "request sent";
+						changeStatus("request sent");
 					break;
 					case 3:
-						statusbarentry.data = "receiving response";
+						changeStatus("receiving response");
 					break;
 					case 4:
-						statusbarentry.data = "response loaded";	
-						fetchData(xmlhttp);		
+						changeStatus("response loaded");
+						fetchData(xmlhttp);
+						changeStatus("data fetched");
 					break;
 					default:
-						statusbarentry.data = "unknown state";
+						changeStatus("unknown state");
 					break;
 				}
 			}
