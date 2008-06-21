@@ -19,6 +19,9 @@ var startupTabs = [false, true, false, false, false, false, false];
 var tabPositions = [];
 // tabs which are able to maximize
 var tabMax = [1, 0, 1, 1, 0, 0, 0];
+// currently maximized tab
+var maxTab = null;
+var maxzIndex = null;
 // an example tab (tabbar is list of tabs)
 // <li><span onclick="SendRequestToServer(1);">ALL Torrents</span><img src="img/delete.png" alt="Close Tab" title="Close Tab" onclick="closeTab(this);" /></li>
 function addTab(contentElement, isStartup) {
@@ -131,7 +134,6 @@ function addTab(contentElement, isStartup) {
 				}
 			}
 		}
-		/*
 		if (tabMax[labelID]) {
 			var maximize = document.createElement("img");
 			maximize.src = "img/icon-max.png";
@@ -139,14 +141,10 @@ function addTab(contentElement, isStartup) {
 			maximize.setAttribute("alt", "Max");
 			maximize.setAttribute("tab", tabCount);
 			maximize.onclick = function () {
-				var tabID = this.getAttribute("tab");
-				var list = document.getElementById("tabbar");
-				var tab = 0;
-				alert("would do if function exists");
+				maximizeTab(this.parentNode.parentNode);
 			}
 			dragbar.appendChild(maximize);
 		}
-		*/
 		if (contentElement != "listTransfers") {
 			dragbar.appendChild(close);
 		}
@@ -251,8 +249,26 @@ function loadTabPos() {
 }
 function maximizeTab(tabObj) {
 	// make tab "fullscreen"
+	var tabID = tabObj.getAttribute("tab");
 
+	if (maxTab != null) {
+		var oldTab = document.getElementById('tab_'+maxTab);
+		// revoke old max tab
+		$('#tab_'+maxTab).removeClass('maximizedTab');
+		changeFixState(oldTab.firstChild);
+		oldTab.style.zIndex = maxzIndex;
+		oldTab.style.height = 'auto';
+		oldTab.style.width = 'auto';
+	}
 
+	// set new max tab
+	maxTab = tabID;
+	maxzIndex = tabObj.style.zIndex;
+	$(tabObj).addClass('maximizedTab');
+	changeFixState(tabObj.firstChild);
+	tabObj.style.zIndex = 5000;
+	tabObj.style.height = maxHeight+'px';
+	tabObj.style.width = maxWidth+'px';
 }
 function refreshTabbar() {
 	var tabbar = document.getElementById("tabbar");

@@ -27,6 +27,7 @@ body {
 	background: transparent url(../img/skin2/azsmrc_typer.png) no-repeat fixed right 32px;
 	color: #FFF;
 	font-size: 12px;
+	overflow: hidden;
 	padding: 120px 0px 25px 0px;
 }
 body > * {
@@ -155,7 +156,6 @@ tbody > tr:hover {
 .debuglist {
 	list-style: none outside none;
 	margin: -10px 0px 10px 0px;
-	max-height: 400px;
 	overflow-x: auto;
 	padding: 0px 0px 0px 25px;
 }
@@ -234,6 +234,54 @@ ul.eventDetails {
 .form_checks {
 	width: 220px;
 }
+.growlBottom {
+	background-image: url(../img/growl/normalBottom.png);
+	float: right;
+	height: 16px;
+	margin-bottom: 10px;
+	position: relative;
+	width: 259px;
+}
+.growlContainer {
+	position: absolute;
+	top: 100px;
+}
+.growlContent {
+	background-image: url(../img/growl/normalBackground.png);
+	color: #FFF;
+	display: block;
+	float: right;
+	font-family: Arial;
+	font-size: 12px;
+	line-height: 14px;
+	margin: 0pt;
+	position: relative;
+	width: 259px;
+}
+.growlHeader {
+	background-image: url(../img/growl/normalTop.png);
+	float: right;
+	height: 16px;
+	margin: 0pt;
+	position: relative;
+	width: 259px;
+}
+.growlImage {
+ 	float: left;
+	margin: 14px;
+	margin-top: 0px;
+}
+.growlMessage {
+	font-size: 12px;
+	margin: 0pt 14px;
+	margin-left: 77px;
+}
+.growlTitle {
+	font-size: 13px;
+	margin: 0pt;
+	margin-left: 77px;
+	padding-bottom: 10px;
+}
 p.hint {
 	font-size: 0.8em;
 	font-style: italic;
@@ -245,6 +293,17 @@ input.interact {
 }
 .invisible {
 	display: none;
+}
+.maximizedTab {
+	border-left: none !important;
+	border-right: none !important;
+	left: 0px !important;
+	max-height: 100% !important;
+	max-width: 100% !important;
+	padding-left: 2px !important;
+	padding-right: 2px !important;
+	position: fixed !important;
+	top: 110px !important;
 }
 ul.menu {
 	display: block;

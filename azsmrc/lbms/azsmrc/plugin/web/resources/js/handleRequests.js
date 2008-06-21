@@ -1,7 +1,7 @@
 // attributes that are allowed to be shown
 var attributes = ["health", "position", "name", "state", "status", "downloaded", "uploaded", "forceStart", "downloadAVG", "uploadAVG", "totalAVG", "elapsedTime", "eta", "availability", "completition", "shareRatio", "tracker", "downloadLimit", "uploadLimit", "total_seeds", "total_leechers", "size", "last_scrape", "next_scrape", "hash"];
 // enable attributefiltering for tables
-var onlyDLAtt = [0,0,0,0,0,0,0,1,1,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0]; 
+var onlyDLAtt = [0,0,0,0,0,0,0,1,1,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0];
 var onlyULAtt = [0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 // output strings for attributes
 // empty string defines no output
@@ -25,17 +25,17 @@ function addAdvInteraction() {
 	form.appendChild(p);
 	form.appendChild(createTorrentInteractions());
 	div.appendChild(form);
-	return div;	
+	return div;
 }
 function addlistTransfersInteraction() {
 	var div, form, label, selector, p, link, button, i, ul, li;
 	// details selection for interaction
 	div = document.getElementById("interaction_container");
-	if (!div) { 
+	if (!div) {
 		div = document.createElement("div");
 		div.setAttribute("id", "interaction_container");
 	} else
-		while (div.firstChild) div.removeChild(div.firstChild);	
+		while (div.firstChild) div.removeChild(div.firstChild);
 	ul = document.createElement("ul");
 	ul.setAttribute("title", "Submenu");
 	// label selection
@@ -48,7 +48,7 @@ function addlistTransfersInteraction() {
 	for (i in selectableDetails) {
 		label = document.createElement("label");
 		label.appendChild(document.createTextNode(selectableDetails[i]));
-		label.setAttribute("for", "selDetails_"+i);				
+		label.setAttribute("for", "selDetails_"+i);
 		selector = document.createElement("input");
 		selector.setAttribute("type", "checkbox");
 		selector.setAttribute("id", "selDetails_"+i);
@@ -87,11 +87,11 @@ function addlistTransfersInteraction() {
 	form.className = "tab";
 	set_dragbar(form);
 	div.appendChild(form);
-	
+
 	link = document.createElement("a");
 	link.setAttribute("title", "Open Labelselection");
 	link.onclick = function () { document.getElementById("labelselectionform").style.display = "block"; };
-	link.appendChild(document.createTextNode("Open Labelselection"));	
+	link.appendChild(document.createTextNode("Open Labelselection"));
 	li = document.createElement("li");
 	li.appendChild(link);
 	ul.appendChild(li);
@@ -101,7 +101,7 @@ function addlistTransfersInteraction() {
 	link.appendChild(document.createTextNode("Open Advanced Interactionmenu"));
 	li = document.createElement("li");
 	li.appendChild(link);
-	ul.appendChild(li);	
+	ul.appendChild(li);
 	div.appendChild(ul);
 	div.style.display = "block";
 	return div;
@@ -171,8 +171,8 @@ function addPreferences() {
 			container.appendChild(input);
 		}
 	fieldset.appendChild(container);
-	form.appendChild(fieldset);	
-	
+	form.appendChild(fieldset);
+
 	fieldset = document.createElement("fieldset");
 	legend = document.createElement("legend");
 	legend.appendChild(document.createTextNode("Tab Positions"));
@@ -202,7 +202,7 @@ function addPreferences() {
 	p.appendChild(document.createTextNode("This option allows AzSMRC to remember where you placed your tabs. If you enable this option, tabs that come with startup will be places on their old positions! 'On The Fly' means your data will be saved as soon as you change a position and will be loaded everytime you (re)open a certain tab - not only on startup."));
 	fieldset.appendChild(p);
 	form.appendChild(fieldset);
-	
+
 	input = document.createElement("input");
 	input.setAttribute("type", "button");
 	input.setAttribute("value", "Save settings");
@@ -232,12 +232,12 @@ function addUserManagement() {
 	var heading = document.createElement("h2");
 	heading.appendChild(document.createTextNode("User Management"));
 	div.appendChild(heading);
-	
+
 	var userTable, tr, td, tbody;
 	userTable = document.createElement("table");
 	userTable.setAttribute("id", "userTable");
 	userTable.setAttribute("summary", "List of users for AzSMRC");
-	userTable.setAttribute("rules", "groups");		
+	userTable.setAttribute("rules", "groups");
 	tr = document.createElement("caption");
 	tr.appendChild(document.createTextNode("List of users"));
 	userTable.appendChild(tr);
@@ -258,12 +258,12 @@ function addUserManagement() {
 	td = document.createElement("th");
 	td.appendChild(document.createTextNode("has Adminrights"));
 	tr.appendChild(td);
-	tbody.appendChild(tr);	
+	tbody.appendChild(tr);
 	userTable.appendChild(tbody);
 	tbody = document.createElement("tbody");
 	tbody.setAttribute("id", "userTableBody");
-	userTable.appendChild(tbody);	
-	div.appendChild(userTable);	
+	userTable.appendChild(tbody);
+	div.appendChild(userTable);
 	return div;
 }
 // creates torrent interaction buttons and menues
@@ -322,8 +322,8 @@ function getAttributeFormat(attributeID, value) {
 			while ((value > 1000) && (i < SI_byte.length-1)) {
 				value = value/1000;
 				i++;
-			}		
-			value = round(value, 2);		
+			}
+			value = round(value, 2);
 			return document.createTextNode(value+" "+SI_byte[i]+"/s");
 		break;
 		case "size":
@@ -333,8 +333,8 @@ function getAttributeFormat(attributeID, value) {
 			while ((value > 1000) && (i < SI_byte.length-1)) {
 				value = value/1000;
 				i++;
-			}		
-			value = round(value, 2);		
+			}
+			value = round(value, 2);
 			return document.createTextNode(value+" "+SI_byte[i]);
 		break;
 		case "health":
@@ -356,7 +356,18 @@ function getEventType(evType) {
 	return eventTypes[evType] ? eventTypes[evType] : eventTypes[0];
 }
 function handleEvents(Events) {
-	//addDebugEntry("Handling Events..");
+	var Event = Events.firstChild;
+	if (Event) {
+		showEvent(Event);
+
+		while (Event.nextSibling) {
+			Event = Event.nextSibling;
+			showEvent(Event);
+		}
+	}
+}
+function handleEvents_old(Events) {
+	// addDebugEntry("Handling Events..");
 	// childnodes: <Event ...>
 	var evType = null;
 	var Event, time;
@@ -377,11 +388,11 @@ function handleEvents(Events) {
 			while (evList.lastChild.className != "dragbar") evList.removeChild(evList.lastChild);
 		var evTable = document.createElement("table");
 		evTable.setAttribute("summary", "Events since last request");
-		evTable.setAttribute("rules", "groups");		
+		evTable.setAttribute("rules", "groups");
 		tbody = document.createElement("caption");
 		tbody.appendChild(document.createTextNode("new Events"));
 		evTable.appendChild(tbody);
-	
+
 		tbody = document.createElement("thead");
 		tr = document.createElement("tr");
 		td = document.createElement("th");
@@ -395,8 +406,8 @@ function handleEvents(Events) {
 		tr.appendChild(td);
 		tbody.appendChild(tr);
 		evTable.appendChild(tbody);
-	
-		tbody = document.createElement("tbody");	
+
+		tbody = document.createElement("tbody");
 	}
 	//addDebugEntry("Events: "+Events.nodeType+" - "+Events.nodeName);
 	Event = Events.firstChild;
@@ -414,17 +425,17 @@ function handleEvents(Events) {
 	if (Event.attributes.length > 2) {
 		evDetails = document.createElement("ul");
 		evDetails.className = "eventDetails";
-		for (i in Event.attributes) 
+		for (i in Event.attributes)
 			if (Event.attributes[i].nodeName && (Event.attributes[i].nodeName != "time") && (Event.attributes[i].nodeName != "type")) {
 				li = document.createElement("li");
 				li.appendChild(document.createTextNode(Event.attributes[i].nodeName+": "+Event.attributes[i].nodeValue));
 				evDetails.appendChild(li);
-			}		
+			}
 		td.appendChild(evDetails);
 	} else td.appendChild(document.createTextNode("no details given"));
 	tr.appendChild(td);
 	tbody.appendChild(tr);
-	
+
 	while (Event.nextSibling) {
 		Event = Event.nextSibling;
 		time = Math.floor(Event.getAttribute("time"));
@@ -440,18 +451,18 @@ function handleEvents(Events) {
 		if (Event.attributes.length > 2) {
 			evDetails = document.createElement("ul");
 			evDetails.className = "eventDetails";
-			for (i in Event.attributes) 
+			for (i in Event.attributes)
 				if (Event.attributes[i].nodeName && (Event.attributes[i].nodeName != "time") && (Event.attributes[i].nodeName != "type")) {
 					li = document.createElement("li");
 					li.appendChild(document.createTextNode(Event.attributes[i].nodeName+": "+Event.attributes[i].nodeValue));
 					evDetails.appendChild(li);
-				}		
+				}
 				td.appendChild(evDetails);
 		} else td.appendChild(document.createTextNode("no details given"));
 		tr.appendChild(td);
 		tbody.appendChild(tr);
 	}
-	
+
 	if (wasClear) {
 		evTable.appendChild(tbody);
 		evList.appendChild(evTable);
@@ -471,7 +482,7 @@ function handleEvents(Events) {
 		if (evList.firstChild.className != "dragbar")
 			set_dragbar(evList);
 	}
-	
+
 	evList.style.display = "block";
 	document.getElementById("eventstatus").firstChild.data = "new events";
 }
@@ -483,7 +494,7 @@ function handlelistTransfers(xmldoc) {
 	var hash = -1;
 	positions = [0, 0];
 	//addDebugEntry("Transfers: "+transfers);
-	for (var t in transfers) 
+	for (var t in transfers)
 		if (transfers[t].nodeType == 1) {
 			//addDebugEntry("ChildNodes "+t+": "+transfers[t].hasChildNodes());
 			//addDebugEntry("FirstChild "+t+" (nodeType): "+transfers[t].firstChild.nodeType);
@@ -506,7 +517,7 @@ function handlelistTransfers(xmldoc) {
 					i++;
 					transferDataField[i] = [];
 					for (j in transferDataField[0])
-						transferDataField[i][j] = transfer.getAttribute(attributes[transferDataField[0][j]]);					
+						transferDataField[i][j] = transfer.getAttribute(attributes[transferDataField[0][j]]);
 					//addDebugEntry("DataField: "+transferDataField);
 					//addDebugEntry("Transfer "+i+": "+transferDataField[i]);
 				}
@@ -514,11 +525,11 @@ function handlelistTransfers(xmldoc) {
 					i++;
 					transferDataField[i] = [];
 					transfer = transfer.nextSibling;
-					for (j in transferDataField[0]) 
-						transferDataField[i][j] = transfer.getAttribute(attributes[transferDataField[0][j]]);					
-					//addDebugEntry("Transfer "+i+": "+transferDataField[i]);					
+					for (j in transferDataField[0])
+						transferDataField[i][j] = transfer.getAttribute(attributes[transferDataField[0][j]]);
+					//addDebugEntry("Transfer "+i+": "+transferDataField[i]);
 				}
-			}	
+			}
 		}
 	// fetch data to viewport
 	if (transfer != null) {
@@ -551,7 +562,7 @@ function handlelistTransfers(xmldoc) {
 		caption = document.createElement("caption");
 		caption.appendChild(document.createTextNode("Uploads"));
 		uploads.appendChild(caption);
-		// fetch to tables		
+		// fetch to tables
 		var activeTable = 0;
 		// creating thead
 		for (j = 0; j < 2; j++) {
@@ -588,7 +599,7 @@ function handlelistTransfers(xmldoc) {
 		// filling tbody
 		var transferCtrl = null;
 		var dli, uli = 0;
-		for (j in transferDataField)		
+		for (j in transferDataField)
 			if (j > 0) {
 				// check dl or ul
 				activeTable = 0;
@@ -614,7 +625,7 @@ function handlelistTransfers(xmldoc) {
 					if (formalAttributes[transferDataField[0][i]] != "")
 						if (((activeTable == 0) && (onlyULAtt[transferDataField[0][i]] == 0)) || ((activeTable == 1) && (onlyDLAtt[transferDataField[0][i]] == 0))) {
 							td = document.createElement("td");
-							if ((i == isStatusCol) && (transferDataField[j][isForceCol] == "true")) 
+							if ((i == isStatusCol) && (transferDataField[j][isForceCol] == "true"))
 									td.appendChild(document.createTextNode("Forced "));
 							content = getAttributeFormat(transferDataField[0][i], transferDataField[j][i]);
 							td.appendChild(content);
@@ -644,21 +655,35 @@ function handlelistTransfers(xmldoc) {
 			uploads.appendChild(ulbody);
 			container.appendChild(uploads);
 			noul = 0;
-			//addTableToSort(uploads);	
+			//addTableToSort(uploads);
 		} else noul = 1;
 		if (nodl) {
 			var p = document.createElement("p");
 			p.appendChild(document.createTextNode("No downloads present!"));
 			p.className = "hint";
-			list.appendChild(p); 
+			list.appendChild(p);
 		}
 		if (noul) {
 			var p = document.createElement("p");
 			p.appendChild(document.createTextNode("No uploads present!"));
 			p.className = "hint";
-			list.appendChild(p); 
+			list.appendChild(p);
 		}
 		list.appendChild(container);
 		//addDebugEntry("Positions: "+positions);
 	}
+}
+function showEvent(Event) {
+	var message = '';
+	var time = Math.floor(Event.getAttribute("time"));
+	time = new Date(time);
+
+	if (Event.attributes.length > 2) {
+		for (i in Event.attributes)
+			if (Event.attributes[i].nodeName && (Event.attributes[i].nodeName != "time") && (Event.attributes[i].nodeName != "type")) {
+				message = Event.attributes[i].nodeName+': '+Event.attributes[i].nodeValue+'<br />';
+			}
+	}
+
+	message('new Event at '+time, message, 'event');
 }

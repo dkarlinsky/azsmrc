@@ -19,14 +19,19 @@ var positions = [0, 0];
 var forceStates = [];
 // several options within this webinterface
 var azsmrcOptions = [];
+// message types for message function
+var messageTypes = ["info", "error"];
+// max height of tab is view - position - statusbar
+var maxHeight = window.innerHeight - 110 - 22;
+// max width of tab is view - padding
+var maxWidth = window.innerWidth - 4;
 function adjustMaxTabWidth() {
-	var maxwidth = Math.floor(window.innerWidth*0.98);
 	for (var s = 0; s < document.styleSheets.length; s++)
 		for (var r = 0; r < document.styleSheets[s]["cssRules"].length; r++)
 			if ((document.styleSheets[s]["cssRules"][r].selectorText == "div.tab") ||
 				(document.styleSheets[s]["cssRules"][r].selectorText == "div.moveTab")) {
-				document.styleSheets[s]["cssRules"][r].style["maxWidth"] = maxwidth+"px";
-				document.styleSheets[s]["cssRules"][r].style["max-width"] = maxwidth+"px";
+				document.styleSheets[s]["cssRules"][r].style["maxWidth"] = maxWidth+"px";
+				document.styleSheets[s]["cssRules"][r].style["max-width"] = maxWidth+"px";
 			}
 }
 function changeStatus(status) {
@@ -142,7 +147,7 @@ function fetchData(xmlhttp) {
 					break;
 				}
 			}
-	} else PingToServer();
+	} // infinite loop else PingToServer();
 }
 function getLoadType(hash) {
 	var tab = document.getElementById("tab_"+getTabIdByContent("listTransfers"));
@@ -279,6 +284,23 @@ function killPlaceholders() {
 	tabbar = document.getElementById("tabbar");
 	tabbar.removeChild(tabbar.firstChild);
 }
+// function abstracted
+// if another system should be applied instead of growl, simply change this one
+function message(title, message, type, priority) {
+	// message, no handling
+	if (!message) return;
+	// default title
+	if (!title) title = "AzSMRC Message";
+	// default priority
+	if (!priority) priority = 1;
+	// default type
+	if (!type) type = 'info';
+	// check for existing message type
+	if (!messageTypes[type])
+		type = 'info';
+	// growl message :)
+	$.growl(title, message, type+'.png', priority);
+}
 function optionSet(option) {
 	for (var i in azsmrcOptions)
 		if (azsmrcOptions[i] == option) {
@@ -289,10 +311,12 @@ function optionSet(option) {
 }
 function PingToServer() {
 	var img = document.getElementById("connectionstatus");
+	var ping = document.getElementById("ping").firstChild.data;
+	var pingMsg = "Ping: no response";
 	img.src = "img/connect_no.png";
 	img.setAttribute("alt","Connection not established");
 	img.setAttribute("title","Not connected to Server");
-	document.getElementById("ping").firstChild.data = "Ping: no response";
+	ping = pingMsg;
 	SendRequestToServer(0);
 }
 function refreshView() {
