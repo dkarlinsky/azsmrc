@@ -20,11 +20,15 @@ var forceStates = [];
 // several options within this webinterface
 var azsmrcOptions = [];
 // message types for message function
-var messageTypes = ["info", "error"];
+var messageTypes = [];
+messageTypes["info"] = 1;
+messageTypes["error"] = 1;
 // max height of tab is view - position - statusbar
 var maxHeight = window.innerHeight - 110 - 22;
 // max width of tab is view - padding
 var maxWidth = window.innerWidth - 4;
+// server online
+var serverOnline = 'first';
 function adjustMaxTabWidth() {
 	for (var s = 0; s < document.styleSheets.length; s++)
 		for (var r = 0; r < document.styleSheets[s]["cssRules"].length; r++)
@@ -33,6 +37,23 @@ function adjustMaxTabWidth() {
 				document.styleSheets[s]["cssRules"][r].style["maxWidth"] = maxWidth+"px";
 				document.styleSheets[s]["cssRules"][r].style["max-width"] = maxWidth+"px";
 			}
+}
+function changeServerStatus(status) {
+	if (status) {
+		// state changed
+		if (!serverOnline) {
+			message('Server up!', 'The AzSMRC server is up again!', 'info');
+			serverOnline = true;
+		} else if (serverOnline == 'first') {
+			message('AzSMRC startup', 'AzSMRC is now ready for use!', 'info');
+			serverOnline = true;
+		}
+	} else {
+		if (serverOnline) {
+			message('Server down!', 'The AzSMRC server is <strong>down</strong>!', 'error');
+			serverOnline = false;
+		}
+	}
 }
 function changeStatus(status) {
 	// write status to statusbar
@@ -79,6 +100,7 @@ function fetchData(xmlhttp) {
 	var doc = xmlhttp.responseXML; // allows to use DOM methods on XML document
 	addDebugEntry("XML Response: "+xmlhttp.responseText);
 	if (xmlhttp.responseText != "") {
+		changeServerStatus(true);
 		var results = doc.getElementsByTagName("Result");
 		var result;
 		// setting defaults
@@ -147,7 +169,7 @@ function fetchData(xmlhttp) {
 					break;
 				}
 			}
-	} // infinite loop else PingToServer();
+	} else changeServerStatus(false);
 }
 function getLoadType(hash) {
 	var tab = document.getElementById("tab_"+getTabIdByContent("listTransfers"));
@@ -261,6 +283,7 @@ function getTCState(hash) {
 	return false;
 }
 function initAzSMRCwebUI() {
+	showSplashScreen();
 	killPlaceholders();
 	initDebugLog();
 	initCookies();
@@ -269,7 +292,6 @@ function initAzSMRCwebUI() {
 	initTabControl();
 	adjustMaxTabWidth();
 	setJSHint();
-	//showSplashScreen();
 	configAutoRefresh();
 	PingToServer();
 	SendRequestToServer(40);

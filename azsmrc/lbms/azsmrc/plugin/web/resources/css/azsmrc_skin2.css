@@ -374,6 +374,11 @@ input.transferCtrl {
 	margin: 3px 0px 0px 0px;
 }
 /* IDs */
+#aboutimg {
+	display: block;
+	float: left;
+	margin: 0px 5px 2px 0px;
+}
 #advinteractform input[type="button"] {
 	display: block;
 	width: 200px;
@@ -422,6 +427,9 @@ input.transferCtrl {
 }
 #eventlist table {
 	margin: 0px 0px 2px 0px;
+}
+#eventstatus {
+	display: none;
 }
 #labelselectionform {
 	background: #010E94 url(../img/skin2/background.png) repeat-x fixed top left;

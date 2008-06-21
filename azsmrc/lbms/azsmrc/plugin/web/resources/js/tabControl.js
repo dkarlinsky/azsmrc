@@ -73,8 +73,16 @@ function addTab(contentElement, isStartup) {
 				var head = document.createElement("h2");
 				head.appendChild(document.createTextNode("AzSMRC Webinterface"));
 				var p = document.createElement("p");
+				var img = document.getElementById('splashscreen');
+				img.setAttribute('id', 'aboutimg');
+				img.style.display = '';
+				p.appendChild(img);
 				p.appendChild(document.createTextNode("AzSMRC is a remotecontrol for Azureus Bittorrent Client. This webinterface needs activated Javascript."));
 				tabContent.appendChild(head);
+				tabContent.appendChild(p);
+				var html = 'You can find the <a href="http://azsmrc.sourceforge.net">project homepage on sourceforge.net</a>. More details about the developers and what AzSMRC is about can be found there!';
+				var p = document.createElement("p");
+				p.innerHTML = html;
 				tabContent.appendChild(p);
 			break;
 			case "debug":
