@@ -360,7 +360,8 @@ function refreshView() {
 	}
 }
 function removeSplashScreen() {
-	document.getElementById("splashscreen").style.display = "none";
+	if (document.getElementById("splashscreen"))
+		document.getElementById("splashscreen").style.display = "none";
 }
 function round(val,dig) {
 	var fac = Math.pow(10,dig);
