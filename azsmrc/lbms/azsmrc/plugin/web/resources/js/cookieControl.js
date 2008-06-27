@@ -1,4 +1,4 @@
-var registeredCookies = ["autoRefresh", "startupTabs", "selectedDetails", "tabPositions", "azsmrcOptions"];
+var registeredCookies = ["autoRefresh", "startupTabs", "selectedDetails", "tabPositions", "azsmrcOptions", "maxTab"];
 function clearCookies() {
 	for (var i in registeredCookies)
 		deleteCookie(registeredCookies[i]);
@@ -50,7 +50,10 @@ function initCookies() {
 	value = getCookie("selectedDetails");
 	if (value)
 		selectedDetails = value.split(",");
+
 	loadTabPos();
+	loadMaxTab();
+
 	value = getCookie("azsmrcOptions");
 	if (value)
 		azsmrcOptions = value.split(",");

@@ -369,6 +369,7 @@ function round(val,dig) {
 }
 function savePreferences() {
 	var value = null;
+
 	// read data
 	var pos = 0;
 	var tabPos = [];
@@ -388,14 +389,17 @@ function savePreferences() {
 		}
 	}
 	configAutoRefresh();
+
 	// cookies
 	var now = new Date();
 	fixDate(now);
 	// expires after one year
 	now.setTime(now.getTime() + 365 * 24 * 60 * 60 * 1000);
+
 	// startup tabs
 	value = startupTabs.join(",");
 	setCookie("startupTabs", value, now);
+
 	// auto refresh
 	var saveCookie = document.getElementById("cookie_autorefresh").checked;
 	if (saveCookie) {
@@ -403,17 +407,29 @@ function savePreferences() {
 		value = autoRefresh.join(",");
 		setCookie("autoRefresh", value, now);
 	}
-	if (document.getElementById("cookie_tabpositions").checked)
-		saveTabPosCookie();
+
 	// misc options for azsmrc
 	value = [];
+
+	if (document.getElementById("cookie_tabpositions").checked) {
+		saveTabPosCookie();
+		value.push("tabpositions");
+	}
+
 	if (document.getElementById("cookie_tabposonthefly").checked)
 		value.push("tabposonthefly");
+
+	if (document.getElementById("cookie_maxtab").checked) {
+		saveMaxTabCookie();
+		value.push("maxtab");
+	}
+
 	if (value.length) {
 		azsmrcOptions = value;
 		value = value.join(",");
 		setCookie("azsmrcOptions", value, now);
 	}
+
 	addDebugEntry("saved Cookies: "+document.cookie);
 }
 function selectDetails(id) {

@@ -22,6 +22,7 @@ var tabMax = [1, 0, 1, 1, 0, 0, 0];
 // currently maximized tab
 var maxTab = null;
 var maxzIndex = null;
+var savedMaxTab = null;
 // an example tab (tabbar is list of tabs)
 // <li><span onclick="SendRequestToServer(1);">ALL Torrents</span><img src="img/delete.png" alt="Close Tab" title="Close Tab" onclick="closeTab(this);" /></li>
 function addTab(contentElement, isStartup) {
@@ -165,6 +166,11 @@ function addTab(contentElement, isStartup) {
 				tabContent.style.zIndex = tabPos[2];
 			}
 		}
+		// if current tab is savedMaxTab, max this tab!
+		if (labelID == savedMaxTab) {
+			maximizeTab(tabContent);
+			savedMaxTab = null;
+		}
 	} else {
 		window.setTimeout("ShowTab(getTabIdByContent('"+contentElement+"'))", 200);
 	}
@@ -247,6 +253,9 @@ function initTabControl() {
 			addTab(registeredTabs[i], true);
 	ShowTab(0);
 }
+function loadMaxTab() {
+	savedMaxTab = getCookie("maxTab");
+}
 function loadTabPos() {
 	var value = getCookie("tabPositions");
 	var pos;
@@ -282,9 +291,13 @@ function maximizeTab(tabObj) {
 		tabObj.style.zIndex = 5000;
 		tabObj.style.height = maxHeight+'px';
 		tabObj.style.width = maxWidth+'px';
+
 	// on same tab, return to normal state (done above)
 	// and reset default values
 	} else resetMaxTab();
+
+	if (optionSet('maxtab'))
+		saveMaxTabCookie();
 }
 function refreshTabbar() {
 	var tabbar = document.getElementById("tabbar");
@@ -310,8 +323,25 @@ function reindexStatusbar() {
 	document.getElementById("statusbar").style.zIndex = zIndex;
 }
 function resetMaxTab() {
+	// if maxTab is the saved max tab, delete its flag
+	if (maxTab == savedMaxTab) {
+		savedMaxTab = null;
+		saveMaxTabCookie();
+	}
+
 	maxTab = null;
 	maxzIndex = null;
+}
+function saveMaxTabCookie() {
+	if (maxTab) {
+		var now = new Date();
+		fixDate(now);
+		// expires after one year
+		now.setTime(now.getTime() + 365 * 24 * 60 * 60 * 1000);
+		var value = getRegTabById(maxTab);
+		setCookie("maxTab", value, now);
+	// if no max tab given, clear cookie
+	} else deleteCookie("maxTab");
 }
 function saveTabPosCookie() {
 	var tabPos = [];

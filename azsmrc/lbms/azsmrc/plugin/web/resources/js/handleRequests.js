@@ -179,6 +179,7 @@ function addPreferences() {
 	fieldset.appendChild(legend);
 	container = document.createElement("div");
 	container.className = "form_checks";
+
 	label = document.createElement("label");
 	label.appendChild(document.createTextNode("Save Tabpositions in cookie"));
 	label.setAttribute("for", "cookie_tabpositions");
@@ -186,7 +187,9 @@ function addPreferences() {
 	input = document.createElement("input");
 	input.setAttribute("id", "cookie_tabpositions");
 	input.setAttribute("type", "checkbox");
+	input.checked = optionSet("tabpositions");
 	container.appendChild(input);
+
 	label = document.createElement("label");
 	label.appendChild(document.createTextNode("Save 'On The Fly'"));
 	label.setAttribute("for", "cookie_tabposonthefly");
@@ -196,6 +199,17 @@ function addPreferences() {
 	input.setAttribute("type", "checkbox");
 	input.checked = optionSet("tabposonthefly");
 	container.appendChild(input);
+
+	label = document.createElement("label");
+	label.appendChild(document.createTextNode("Save maximized tab"));
+	label.setAttribute("for", "cookie_maxtab");
+	container.appendChild(label);
+	input = document.createElement("input");
+	input.setAttribute("id", "cookie_maxtab");
+	input.setAttribute("type", "checkbox");
+	input.checked = optionSet("maxtab");
+	container.appendChild(input);
+
 	fieldset.appendChild(container);
 	p = document.createElement("p");
 	p.className = "description";
