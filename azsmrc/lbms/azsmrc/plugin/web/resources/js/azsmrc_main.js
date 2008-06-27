@@ -360,8 +360,7 @@ function refreshView() {
 	}
 }
 function removeSplashScreen() {
-	if (document.getElementById("splashscreen"))
-		document.getElementById("splashscreen").style.display = "none";
+	$('#lightbox-secNav-btnClose').click();
 }
 function round(val,dig) {
 	var fac = Math.pow(10,dig);
@@ -513,6 +512,6 @@ function setJSHint() {
 }
 function showSplashScreen() {
 	// just a funny splashscreen function
-	document.getElementById("splashscreen").style.display = "block";
+	$('#splashscreenlink').click();
 	setTimeout("removeSplashScreen()", 5000);
 }

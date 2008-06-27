@@ -38,3 +38,18 @@ $.growl.settings.noticeTemplate = ''
 $.growl.settings.noticeCss = {
 	position: 'relative'
 };
+
+// lightbox settings
+$(function() {
+	$('a#splashscreenlink').lightBox({
+		overlayBgColor: '#000',
+		overlayOpacity: 0.8,
+		imageLoading: '/img/loading.gif',
+		imageBtnClose: '/img/lightbox/close.gif',
+		imageBtnPrev: '',
+		imageBtnNext: '',
+		containerResizeSpeed: 350,
+		txtImage: 'AzSMRC Splashscreen',
+		txtOf: 'AzSMRC AJAX webUI'
+	});
+});

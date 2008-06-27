@@ -551,6 +551,7 @@ input.transferCtrl {
 	opacity: 0.4;
 }
 #splashscreen {
+	display: none;
 	left: 50%;
 	margin: -127px 0px 0px -200px;
 	position: absolute;
