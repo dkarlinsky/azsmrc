@@ -172,6 +172,9 @@ function addTab(contentElement, isStartup) {
 function closeTab(tabObj) {
 	tabID = tabObj.getAttribute("tab");
 	if (getTabIdByContent("listTransfers") != tabID) {
+		// reset maximize tab, if maxTab gets closed
+		if (tabID == maxTab)
+			resetMaxTab();
 		//addDebugEntry("tabID: "+tabID);
 		var tabControl = tabObj.parentNode;
 		tabControl.parentNode.removeChild(tabControl);
@@ -281,10 +284,7 @@ function maximizeTab(tabObj) {
 		tabObj.style.width = maxWidth+'px';
 	// on same tab, return to normal state (done above)
 	// and reset default values
-	} else {
-		maxTab = null;
-		maxzIndex
-	}
+	} else resetMaxTab();
 }
 function refreshTabbar() {
 	var tabbar = document.getElementById("tabbar");
@@ -308,6 +308,10 @@ function refreshTabbar() {
 function reindexStatusbar() {
 	zIndex++;
 	document.getElementById("statusbar").style.zIndex = zIndex;
+}
+function resetMaxTab() {
+	maxTab = null;
+	maxzIndex = null;
 }
 function saveTabPosCookie() {
 	var tabPos = [];
