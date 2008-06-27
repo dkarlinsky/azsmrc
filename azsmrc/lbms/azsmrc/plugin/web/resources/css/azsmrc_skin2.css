@@ -4,7 +4,17 @@
  */
 /* Elements and Pseudo-Classes */
 a {
+	color: #FFF;
 	font-size: 0.8em;
+}
+p a {
+	color: #D9D9D9;
+	font-size: 1em;
+	text-decoration: underline;
+}
+a:visited {
+	color: #FFF !important;
+	text-decoration: none;
 }
 a:hover {
 	color: #CCC;
