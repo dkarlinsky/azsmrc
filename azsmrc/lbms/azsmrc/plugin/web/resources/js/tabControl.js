@@ -269,14 +269,22 @@ function maximizeTab(tabObj) {
 		oldTab.style.width = 'auto';
 	}
 
-	// set new max tab
-	maxTab = tabID;
-	maxzIndex = tabObj.style.zIndex;
-	$(tabObj).addClass('maximizedTab');
-	changeFixState(tabObj.firstChild);
-	tabObj.style.zIndex = 5000;
-	tabObj.style.height = maxHeight+'px';
-	tabObj.style.width = maxWidth+'px';
+	// only set new if an other tab was chosen
+	if (tabObj != oldTab) {
+		// set new max tab
+		maxTab = tabID;
+		maxzIndex = tabObj.style.zIndex;
+		$(tabObj).addClass('maximizedTab');
+		changeFixState(tabObj.firstChild);
+		tabObj.style.zIndex = 5000;
+		tabObj.style.height = maxHeight+'px';
+		tabObj.style.width = maxWidth+'px';
+	// on same tab, return to normal state (done above)
+	// and reset default values
+	} else {
+		maxTab = null;
+		maxzIndex
+	}
 }
 function refreshTabbar() {
 	var tabbar = document.getElementById("tabbar");
