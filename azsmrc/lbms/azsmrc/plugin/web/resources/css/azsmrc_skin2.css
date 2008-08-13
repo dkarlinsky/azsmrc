@@ -371,6 +371,9 @@ div.moveTab {
 .moveTab .dragbar:hover {
 	cursor: move;
 }
+tr.odd {
+	background-color: #0053AF;
+}
 li.subbreak a {
 	border-bottom: #FFF 1px solid;
 }

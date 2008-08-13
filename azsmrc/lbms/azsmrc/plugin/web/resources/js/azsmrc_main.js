@@ -39,7 +39,7 @@ function adjustMaxTabWidth() {
 			}
 }
 function afterInit() {
-	$("table").tablesorter();
+	$("table").tablesorter({widgets: ['zebra']});
 }
 function changeServerStatus(status) {
 	if (status) {
