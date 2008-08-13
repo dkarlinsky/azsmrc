@@ -38,6 +38,9 @@ function adjustMaxTabWidth() {
 				document.styleSheets[s]["cssRules"][r].style["max-width"] = maxWidth+"px";
 			}
 }
+function afterInit() {
+	$("table").tablesorter();
+}
 function changeServerStatus(status) {
 	if (status) {
 		// state changed
@@ -297,9 +300,9 @@ function initAzSMRCwebUI() {
 	SendRequestToServer(40);
 	refreshView();
 	init_dragdrop('tab', true);
-	//initTableSort();
-	//alert(window.innerWidth);
 	reindexStatusbar();
+	// for all things, that need document to be _really_ ready
+	window.setInterval('afterInit()', 500);
 }
 function killPlaceholders() {
 	// kill tabbar placeholder

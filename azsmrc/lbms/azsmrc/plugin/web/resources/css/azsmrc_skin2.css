@@ -292,6 +292,16 @@ ul.eventDetails {
 	margin-left: 77px;
 	padding-bottom: 10px;
 }
+th.header {
+	background: #0053BF url(../img/tablesorter/sort.gif) no-repeat right center;
+	padding-right: 20px;
+}
+th.headerSortUp {
+	background: #0053BF url(../img/tablesorter/asc.gif) no-repeat right center;
+}
+th.headerSortDown {
+	background: #0053BF url(../img/tablesorter/desc.gif) no-repeat right center;
+}
 p.hint {
 	font-size: 0.8em;
 	font-style: italic;

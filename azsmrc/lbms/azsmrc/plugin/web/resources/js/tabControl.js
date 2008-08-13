@@ -75,9 +75,11 @@ function addTab(contentElement, isStartup) {
 				head.appendChild(document.createTextNode("AzSMRC Webinterface"));
 				var p = document.createElement("p");
 				var img = document.getElementById('splashscreen');
-				img.setAttribute('id', 'aboutimg');
-				img.style.display = '';
-				p.appendChild(img);
+				if (img) {
+					img.setAttribute('id', 'aboutimg');
+					img.style.display = '';
+					p.appendChild(img);
+				}
 				p.appendChild(document.createTextNode("AzSMRC is a remotecontrol for Azureus Bittorrent Client. This webinterface needs activated Javascript."));
 				tabContent.appendChild(head);
 				tabContent.appendChild(p);
