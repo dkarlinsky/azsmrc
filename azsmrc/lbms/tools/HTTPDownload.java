@@ -15,25 +15,25 @@ import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
-
 import lbms.tools.stats.StatsInputStream;
 
-public class HTTPDownload extends Download  {
+public class HTTPDownload extends Download {
 
-	private static final int BUFFER_SIZE = 1024;
+	private static final int				BUFFER_SIZE					= 1024;
 
-	private ByteArrayOutputStream buffer;
+	private static HttpURLConnectionFactory	defaultConnectionFactory	= new DefaultHttpURLConnectionFactory();
 
-	private Map<String, List<String>> headerFields = null;
+	private ByteArrayOutputStream			buffer;
 
-	private int responeCode = 0;
+	private Map<String, List<String>>		headerFields				= null;
 
-	private Method method = Method.GET;
+	private int								responeCode					= 0;
 
-	private String postData = "";
+	private Method							method						= Method.GET;
+
+	private String							postData					= "";
+
+	private HttpURLConnectionFactory		connectionFactory			= defaultConnectionFactory;
 
 	public HTTPDownload(URL source, File target) {
 		super(source, target);
@@ -47,7 +47,7 @@ public class HTTPDownload extends Download  {
 		super(d);
 	}
 
-	public void run() {
+	public void run () {
 		try {
 			call();
 		} catch (Exception e) {
@@ -55,41 +55,14 @@ public class HTTPDownload extends Download  {
 		}
 	}
 
-	public Download call() throws Exception {
+	public Download call () throws Exception {
 		InputStream is = null;
 		OutputStream os = null;
 		try {
 			HttpURLConnection conn = null;
 
-			if ( source.getProtocol().equalsIgnoreCase("https")){
+			conn = connectionFactory.getConnection(source, proxy);
 
-				// see ConfigurationChecker for SSL client defaults
-				HttpsURLConnection ssl_con;
-				if (proxy != null)
-					ssl_con = (HttpsURLConnection)source.openConnection(proxy);
-				else
-					ssl_con = (HttpsURLConnection)source.openConnection();
-				// allow for certs that contain IP addresses rather than dns names
-
-				ssl_con.setHostnameVerifier(
-						new HostnameVerifier()
-						{
-							public boolean
-							verify(
-									String		host,
-									SSLSession	session )
-							{
-								return( true );
-							}
-						});
-
-				conn = ssl_con;
-			} else {
-				if (proxy != null)
-					conn = (HttpURLConnection)source.openConnection(proxy);
-				else
-					conn = (HttpURLConnection)source.openConnection();
-			}
 			conn.setConnectTimeout(TIMEOUT);
 			conn.setReadTimeout(TIMEOUT);
 			conn.setDoInput(true);
@@ -98,16 +71,20 @@ public class HTTPDownload extends Download  {
 				conn.setDoOutput(true);
 			}
 
-			conn.addRequestProperty("Accept-Encoding","gzip, x-gzip, deflate, x-deflate");
+			conn.addRequestProperty("Accept-Encoding",
+					"gzip, x-gzip, deflate, x-deflate");
 			conn.addRequestProperty("User-Agent", userAgent);
-			if (referer != null)
+			if (referer != null) {
 				conn.addRequestProperty("Referer", referer);
+			}
 
-			if (cookie != null)
+			if (cookie != null) {
 				conn.addRequestProperty("Cookie", cookie);
+			}
 
-			if (login != null)
-				conn.setRequestProperty("Authorization", "Basic: "+login);
+			if (login != null) {
+				conn.setRequestProperty("Authorization", "Basic: " + login);
+			}
 
 			callStateChanged(STATE_CONNECTING);
 
@@ -123,26 +100,31 @@ public class HTTPDownload extends Download  {
 			headerFields = conn.getHeaderFields();
 
 			//connection failed
-			if ((responeCode != HttpURLConnection.HTTP_ACCEPTED) && (responeCode != HttpURLConnection.HTTP_OK)) {
+			if ((responeCode != HttpURLConnection.HTTP_ACCEPTED)
+					&& (responeCode != HttpURLConnection.HTTP_OK)) {
 				callStateChanged(STATE_FAILURE);
 				failed = true;
 				failureReason = conn.getResponseMessage();
 				return this;
 			}
 
-			StatsInputStream sis = new StatsInputStream (conn.getInputStream());
+			StatsInputStream sis = new StatsInputStream(conn.getInputStream());
 			is = sis;
-			String encoding = conn.getHeaderField( "content-encoding");
+			String encoding = conn.getHeaderField("content-encoding");
 			int contentLength = conn.getContentLength();
-			if (conn.getHeaderField("cookie") != null ) {
+			if (conn.getHeaderField("cookie") != null) {
 				this.cookie = conn.getHeaderField("cookie");
 			}
 
-			boolean	gzip = encoding != null && (encoding.equalsIgnoreCase("gzip") || encoding.equalsIgnoreCase("x-gzip"));
-			boolean	deflate = encoding != null && (encoding.equalsIgnoreCase("deflate") || encoding.equalsIgnoreCase("x-deflate"));
+			boolean gzip = encoding != null
+					&& (encoding.equalsIgnoreCase("gzip") || encoding
+							.equalsIgnoreCase("x-gzip"));
+			boolean deflate = encoding != null
+					&& (encoding.equalsIgnoreCase("deflate") || encoding
+							.equalsIgnoreCase("x-deflate"));
 
-			if ( gzip ){
-				is = new GZIPInputStream( is );
+			if (gzip) {
+				is = new GZIPInputStream(is);
 			} else if (deflate) {
 				is = new InflaterInputStream(is);
 			}
@@ -156,7 +138,7 @@ public class HTTPDownload extends Download  {
 				FileOutputStream fos = null;
 				try {
 					fos = new FileOutputStream(target);
-					for (int read=is.read(buf);read>0;read=is.read(buf)) {
+					for (int read = is.read(buf); read > 0; read = is.read(buf)) {
 						if (abort) {
 							fos.close();
 							is.close();
@@ -165,21 +147,24 @@ public class HTTPDownload extends Download  {
 							failureReason = "Aborted by User";
 							return this;
 						}
-						fos.write(buf,0,read);
+						fos.write(buf, 0, read);
 						now = System.currentTimeMillis();
-						if (now-last>=500) {
+						if (now - last >= 500) {
 							callProgress(sis.getBytesRead(), contentLength);
 							last = now;
 						}
 					}
 				} finally {
-					if (fos != null)
+					if (fos != null) {
 						fos.close();
+					}
 				}
 			} else {
 
-				buffer = (contentLength > 0 && contentLength < 5242880) ? new ByteArrayOutputStream(contentLength):new ByteArrayOutputStream();
-				for (int read=is.read(buf);read>0;read=is.read(buf)) {
+				buffer = (contentLength > 0 && contentLength < 5242880) ? new ByteArrayOutputStream(
+						contentLength)
+						: new ByteArrayOutputStream();
+				for (int read = is.read(buf); read > 0; read = is.read(buf)) {
 					if (abort) {
 						is.close();
 						callStateChanged(STATE_ABORTED);
@@ -189,7 +174,7 @@ public class HTTPDownload extends Download  {
 					}
 					buffer.write(buf, 0, read);
 					now = System.currentTimeMillis();
-					if (now-last>=500) {
+					if (now - last >= 500) {
 						callProgress(sis.getBytesRead(), contentLength);
 						last = now;
 					}
@@ -197,11 +182,11 @@ public class HTTPDownload extends Download  {
 			}
 			//finally call again
 			callProgress(sis.getBytesRead(), contentLength);
-			if (contentLength>0 &&  !(gzip || deflate) && (buffer != null && buffer.size() != contentLength)) {
+			if (contentLength > 0 && !(gzip || deflate)
+					&& (buffer != null && buffer.size() != contentLength)) {
 				failed = true;
 				callStateChanged(STATE_FAILURE);
-			}
-			else {
+			} else {
 				finished = true;
 				callStateChanged(STATE_FINISHED);
 			}
@@ -212,15 +197,17 @@ public class HTTPDownload extends Download  {
 			e.printStackTrace();
 			throw e;
 		} finally {
-			if (is!= null) {
+			if (is != null) {
 				try {
 					is.close();
-				} catch (IOException e) {}
+				} catch (IOException e) {
+				}
 			}
-			if (os!= null) {
+			if (os != null) {
 				try {
 					os.close();
-				} catch (IOException e) {}
+				} catch (IOException e) {
+				}
 			}
 		}
 		return this;
@@ -229,22 +216,23 @@ public class HTTPDownload extends Download  {
 	/**
 	 * @return Returns the buffer.
 	 */
-	public ByteArrayOutputStream getBuffer() {
+	public ByteArrayOutputStream getBuffer () {
 		return buffer;
 	}
 
 	/**
 	 * @return the headerFields may be null
 	 */
-	public Map<String, List<String>> getHeaderFields() {
+	public Map<String, List<String>> getHeaderFields () {
 		return headerFields;
 	}
 
 	/**
 	 * Returns HTTP response code
+	 * 
 	 * @return the responseCode (0 if not connected)
 	 */
-	public int getResponeCode() {
+	public int getResponeCode () {
 		return responeCode;
 	}
 
@@ -252,15 +240,31 @@ public class HTTPDownload extends Download  {
 		postData = data;
 	}
 
-	public void setPostData (Map<String,String> data) {
+	public void setPostData (Map<String, String> data) {
 		postData = "";
-		for (String key:data.keySet()) {
+		for (String key : data.keySet()) {
 			try {
-				postData+=URLEncoder.encode(key, "UTF8")+"="+URLEncoder.encode(data.get(key), "UTF8")+"&";
+				postData += URLEncoder.encode(key, "UTF8") + "="
+						+ URLEncoder.encode(data.get(key), "UTF8") + "&";
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	/**
+	 * @param connectionFactory the connectionFactory to set
+	 */
+	public void setConnectionFactory (HttpURLConnectionFactory connectionFactory) {
+		this.connectionFactory = connectionFactory;
+	}
+
+	/**
+	 * @param defaultConnectionFactory the defaultConnectionFactory to set
+	 */
+	public static void setDefaultConnectionFactory (
+			HttpURLConnectionFactory defaultConnectionFactory) {
+		HTTPDownload.defaultConnectionFactory = defaultConnectionFactory;
 	}
 
 	public void setMethod (Method m) {
