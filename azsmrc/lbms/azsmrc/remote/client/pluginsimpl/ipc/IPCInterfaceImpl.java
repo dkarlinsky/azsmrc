@@ -19,7 +19,7 @@ public class IPCInterfaceImpl implements IPCInterface {
 		reference = new WeakReference<Object>(_target);
 	}
 
-	public Object invoke(String methodName, Object[] params)
+	public Object invoke (String methodName, Object[] params)
 			throws IPCException {
 
 		Object target = reference.get();
@@ -33,7 +33,7 @@ public class IPCInterfaceImpl implements IPCInterface {
 				params = new Object[0];
 			}
 
-			Class[] paramTypes = new Class[params.length];
+			Class<?>[] paramTypes = new Class[params.length];
 			for (int i = 0; i < params.length; i++) {
 				if (params[i] instanceof Boolean) {
 					paramTypes[i] = boolean.class;
@@ -69,7 +69,7 @@ public class IPCInterfaceImpl implements IPCInterface {
 
 					Method method = methods[i];
 
-					Class[] method_params = method.getParameterTypes();
+					Class<?>[] method_params = method.getParameterTypes();
 
 					if (method.getName().equals(methodName)
 							&& method_params.length == paramTypes.length) {
@@ -78,8 +78,8 @@ public class IPCInterfaceImpl implements IPCInterface {
 
 						for (int j = 0; j < method_params.length; j++) {
 
-							Class declared = method_params[j];
-							Class supplied = paramTypes[j];
+							Class<?> declared = method_params[j];
+							Class<?> supplied = paramTypes[j];
 
 							if (!declared.isAssignableFrom(supplied)) {
 

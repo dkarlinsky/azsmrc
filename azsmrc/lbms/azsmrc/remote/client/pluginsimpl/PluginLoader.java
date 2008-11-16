@@ -19,49 +19,50 @@ import lbms.tools.launcher.SystemProperties;
 
 /**
  * @author Damokles
- *
+ * 
  */
 public class PluginLoader {
 
-	public static void	findAndLoadPlugins(PluginManagerImpl manager, ExtendedProperties azsmrcProps) {
+	public static void findAndLoadPlugins (PluginManagerImpl manager,
+			ExtendedProperties azsmrcProps) {
 
-		File	app_dir	 = getApplicationFile("plugins");
+		File app_dir = getApplicationFile("plugins");
 
-		if ( !( app_dir.exists()) && app_dir.isDirectory()){
+		if (!(app_dir.exists()) && app_dir.isDirectory()) {
 
-			System.out.println(  "Plugin dir '" + app_dir + "' not found" );
+			System.out.println("Plugin dir '" + app_dir + "' not found");
 
 			return;
 		} else {
-			System.out.println(  "Checking " + app_dir );
+			System.out.println("Checking " + app_dir);
 		}
 
 		File[] plugins = app_dir.listFiles();
 
-		if ( plugins == null || plugins.length == 0 ){
+		if (plugins == null || plugins.length == 0) {
 
-			System.out.println(  "Plugin dir '" + app_dir + "' empty" );
+			System.out.println("Plugin dir '" + app_dir + "' empty");
 
 			return;
 		}
-		for ( int i=0;i<plugins.length;i++ ) {
+		for (int i = 0; i < plugins.length; i++) {
 
-			File	plugin_dir = plugins[i];
+			File plugin_dir = plugins[i];
 
-			if( !plugin_dir.isDirectory()){
+			if (!plugin_dir.isDirectory()) {
 
 				continue;
 			}
 
 			File[] pluginContents = plugin_dir.listFiles();
 
-			boolean	looks_like_plugin	= false;
+			boolean looks_like_plugin = false;
 
-			for (int j=0;j<pluginContents.length;j++){
+			for (int j = 0; j < pluginContents.length; j++) {
 
-				String	name = pluginContents[j].getName().toLowerCase();
+				String name = pluginContents[j].getName().toLowerCase();
 
-				if ( name.endsWith( ".jar") || name.equals( "plugin.properties" )){
+				if (name.endsWith(".jar") || name.equals("plugin.properties")) {
 
 					looks_like_plugin = true;
 
@@ -69,112 +70,120 @@ public class PluginLoader {
 				}
 			}
 
-			if (!looks_like_plugin) continue;
+			if (!looks_like_plugin) {
+				continue;
+			}
 
 			try {
 
-				System.out.println("Checking dir for Plugins: "+plugin_dir.getCanonicalPath());
+				System.out.println("Checking dir for Plugins: "
+						+ plugin_dir.getCanonicalPath());
 
-				ClassLoader	root_cl = getRootClassLoader(new File("."));
+				ClassLoader root_cl = getRootClassLoader(new File("."));
 
 				ClassLoader classLoader = root_cl;
 
-				File[] pluginjars	= getHighestJarVersions( plugins[i].listFiles());
+				File[] pluginjars = getHighestJarVersions(plugins[i]
+						.listFiles());
 
-				for( int j = 0 ; j < pluginjars.length ; j++){
-					classLoader = addFileToClassPath(root_cl,classLoader, pluginjars[j]);
+				for (int j = 0; j < pluginjars.length; j++) {
+					classLoader = addFileToClassPath(root_cl, classLoader,
+							pluginjars[j]);
 				}
 
 				Properties props = new Properties();
 
-				File properties_file = new File( plugin_dir, "plugin.properties");
+				File properties_file = new File(plugin_dir, "plugin.properties");
 
 				// if properties file exists on its own then override any properties file
 				// potentially held within a jar
 
-				if ( properties_file.exists()) {
+				if (properties_file.exists()) {
 
-					FileInputStream	fis = null;
+					FileInputStream fis = null;
 
-					try{
-						fis = new FileInputStream( properties_file );
+					try {
+						fis = new FileInputStream(properties_file);
 
-						props.load( fis );
+						props.load(fis);
 
 					} finally {
 
-						if ( fis != null ){
+						if (fis != null) {
 
 							fis.close();
 						}
 					}
 				} else {
-					if ( classLoader instanceof URLClassLoader ){
+					if (classLoader instanceof URLClassLoader) {
 
-						URLClassLoader	current = (URLClassLoader)classLoader;
+						URLClassLoader current = (URLClassLoader) classLoader;
 
 						URL url = current.findResource("plugin.properties");
 
-						if ( url != null ){
+						if (url != null) {
 
 							props.load(url.openStream());
 						} else {
-							System.out.println("Failed to load Properties from jar.");
+							System.out
+									.println("Failed to load Properties from jar.");
 						}
 					}
 				}
 
 				String pluginID = props.getProperty("plugin.id");
 
-				if (azsmrcProps.propertyExists("plugins."+pluginID+".load")) {
+				if (azsmrcProps.propertyExists("plugins." + pluginID + ".load")) {
 					//if we don't want to load this plugin continue
-					if (!azsmrcProps.getPropertyAsBoolean("plugins."+pluginID+".load")) {
-						System.out.println( "Skipping load of "+pluginID);
-						manager.addDisabledPlugin(props, plugin_dir.getCanonicalPath());
+					if (!azsmrcProps.getPropertyAsBoolean("plugins." + pluginID
+							+ ".load")) {
+						System.out.println("Skipping load of " + pluginID);
+						manager.addDisabledPlugin(props, plugin_dir
+								.getCanonicalPath());
 						continue;
 					}
 				} else {
 					//add the plugin to the load list
-					azsmrcProps.setProperty("plugins."+pluginID+".load", true);
+					azsmrcProps.setProperty("plugins." + pluginID + ".load",
+							true);
 				}
 
-				String plugin_class = props.getProperty( "azsmrc.plugin.class");
+				String plugin_class = props.getProperty("azsmrc.plugin.class");
 
-//				if (plugin_class == null) continue;
+				//				if (plugin_class == null) continue;
 				// don't support multiple Launchables
 
-				Class c = classLoader.loadClass(plugin_class);
+				Class<?> c = classLoader.loadClass(plugin_class);
 
-				Plugin	    plugin	= (Plugin) c.newInstance();
+				Plugin plugin = (Plugin) c.newInstance();
 
-				if ( plugin instanceof Plugin ) {
+				if (plugin instanceof Plugin) {
 
-					manager.addPlugin(plugin, props, plugin_dir.getCanonicalPath());
+					manager.addPlugin(plugin, props, plugin_dir
+							.getCanonicalPath());
 				}
-			}catch( Throwable e ) {
+			} catch (Throwable e) {
 
-				System.out.println( "Load of Plugin in '" + plugin_dir + "' fails");
+				System.out.println("Load of Plugin in '" + plugin_dir
+						+ "' fails");
 				e.printStackTrace();
 			}
 		}
 	}
 
-	private static ClassLoader
-	getRootClassLoader(
-			File		dir )
-	{
+	private static ClassLoader getRootClassLoader (File dir) {
 		ClassLoader root_class_loader = PluginLoader.class.getClassLoader();
-		dir = new File( dir, "shared" );
-		if ( dir.exists() && dir.isDirectory()){
+		dir = new File(dir, "shared");
+		if (dir.exists() && dir.isDirectory()) {
 
-			File[]	files = dir.listFiles();
+			File[] files = dir.listFiles();
 
-			if ( files != null ) {
+			if (files != null) {
 				files = getHighestJarVersions(files);
 
-				for (int i=0;i<files.length;i++) {
+				for (int i = 0; i < files.length; i++) {
 					root_class_loader = addFileToClassPath(root_class_loader,
-							root_class_loader, files[i] );
+							root_class_loader, files[i]);
 				}
 
 			}
@@ -182,174 +191,165 @@ public class PluginLoader {
 		return root_class_loader;
 	}
 
-	private static File
-	getApplicationFile(
-			String filename)
-	{
+	private static File getApplicationFile (String filename) {
 		String path = SystemProperties.getApplicationPath();
 
-		if (Constants.isOSX ) {
+		if (Constants.isOSX) {
 
-			path = path + "/" + SystemProperties.getApplicationName() + ".app/Contents/";
+			path = path + "/" + SystemProperties.getApplicationName()
+					+ ".app/Contents/";
 		}
 
 		return new File(path, filename);
 	}
 
-	public static File[] getHighestJarVersions (File[] files)	// currently the version of last versioned jar found...
+	public static File[] getHighestJarVersions (File[] files) // currently the version of last versioned jar found...
 	{
 
-		List	res 		= new ArrayList();
-		Map		version_map	= new HashMap();
+		List<File> res = new ArrayList<File>();
+		Map<String, String> version_map = new HashMap<String, String>();
 
-		for (int i=0;i<files.length;i++){
+		for (int i = 0; i < files.length; i++) {
 
-			File	f = files[i];
+			File f = files[i];
 
-			String	name = f.getName().toLowerCase();
+			String name = f.getName().toLowerCase();
 
-			if ( name.endsWith(".jar") ) {
-				System.out.println("Checking: "+name);
+			if (name.endsWith(".jar")) {
+				System.out.println("Checking: " + name);
 
 				int cvs_pos = name.lastIndexOf("_cvs");
 
 				int sep_pos;
 
-				if (cvs_pos <= 0)
+				if (cvs_pos <= 0) {
 					sep_pos = name.lastIndexOf("_");
-				else
+				} else {
 					sep_pos = name.lastIndexOf("_", cvs_pos - 1);
+				}
 
-				String	prefix;
+				String prefix;
 
-				String	version;;
+				String version;
+				;
 
-
-				if ( 	sep_pos == -1 ||
-						sep_pos == name.length()-1 ||
-						!Character.isDigit(name.charAt(sep_pos+1))){
+				if (sep_pos == -1 || sep_pos == name.length() - 1
+						|| !Character.isDigit(name.charAt(sep_pos + 1))) {
 
 					prefix = name.substring(0, name.indexOf('.'));
 					version = "-1.0";
 
 				} else {
-					prefix = name.substring(0,sep_pos);
+					prefix = name.substring(0, sep_pos);
 
-					version = name.substring(sep_pos+1, (cvs_pos <= 0) ? name.length()-4 : cvs_pos);
+					version = name.substring(sep_pos + 1, (cvs_pos <= 0) ? name
+							.length() - 4 : cvs_pos);
 				}
-				String	prev_version = (String)version_map.get(prefix);
+				String prev_version = version_map.get(prefix);
 
-				if ( prev_version == null ){
+				if (prev_version == null) {
 
-					version_map.put( prefix, version );
+					version_map.put(prefix, version);
 
 				} else {
 
-					if ( compareVersions( prev_version, version ) < 0 ){
+					if (compareVersions(prev_version, version) < 0) {
 
-						version_map.put( prefix, version );
+						version_map.put(prefix, version);
 					}
 				}
 			}
 		}
 
-		Iterator it = version_map.keySet().iterator();
+		Iterator<String> it = version_map.keySet().iterator();
 
-		while(it.hasNext()){
+		while (it.hasNext()) {
 
-			String	prefix 	= (String)it.next();
-			String	version	= (String)version_map.get(prefix);
-			String	target;
-			if (version.equalsIgnoreCase("-1.0"))
+			String prefix = it.next();
+			String version = version_map.get(prefix);
+			String target;
+			if (version.equalsIgnoreCase("-1.0")) {
 				target = prefix;
-			else
+			} else {
 				target = prefix + "_" + version;
+			}
 
-			for (int i=0;i<files.length;i++){
+			for (int i = 0; i < files.length; i++) {
 
-				File	f = files[i];
+				File f = files[i];
 
-				String	lc_name = f.getName().toLowerCase();
+				String lc_name = f.getName().toLowerCase();
 
-				if ( lc_name.equals( target + ".jar" ) ||
-						lc_name.equals( target + "_cvs.jar" )){
-					System.out.println("Adding "+target+" to PluginClasspath.");
-					res.add( f );
+				if (lc_name.equals(target + ".jar")
+						|| lc_name.equals(target + "_cvs.jar")) {
+					System.out.println("Adding " + target
+							+ " to PluginClasspath.");
+					res.add(f);
 					break;
 				}
 			}
 		}
 
-		File[]	res_array = new File[res.size()];
+		File[] res_array = new File[res.size()];
 
-		res.toArray( res_array );
+		res.toArray(res_array);
 
-		return( res_array );
+		return (res_array);
 	}
 
-	public static int
-	compareVersions(
-			String		version_1,
-			String		version_2 )
-	{
-		try{
-			if ( version_1.startsWith("." )){
+	public static int compareVersions (String version_1, String version_2) {
+		try {
+			if (version_1.startsWith(".")) {
 				version_1 = "0" + version_1;
 			}
-			if ( version_2.startsWith("." )){
+			if (version_2.startsWith(".")) {
 				version_2 = "0" + version_2;
 			}
 
-			StringTokenizer	tok1 = new StringTokenizer(version_1,".");
-			StringTokenizer	tok2 = new StringTokenizer(version_2,".");
+			StringTokenizer tok1 = new StringTokenizer(version_1, ".");
+			StringTokenizer tok2 = new StringTokenizer(version_2, ".");
 
-			while( true ){
-				if ( tok1.hasMoreTokens() && tok2.hasMoreTokens()){
+			while (true) {
+				if (tok1.hasMoreTokens() && tok2.hasMoreTokens()) {
 
-					int	i1 = Integer.parseInt(tok1.nextToken());
-					int	i2 = Integer.parseInt(tok2.nextToken());
+					int i1 = Integer.parseInt(tok1.nextToken());
+					int i2 = Integer.parseInt(tok2.nextToken());
 
-					if ( i1 != i2 ){
+					if (i1 != i2) {
 
-						return( i1 - i2 );
+						return (i1 - i2);
 					}
-				}else if ( tok1.hasMoreTokens()){
+				} else if (tok1.hasMoreTokens()) {
 
-					int	i1 = Integer.parseInt(tok1.nextToken());
+					int i1 = Integer.parseInt(tok1.nextToken());
 
-					if ( i1 != 0 ){
+					if (i1 != 0) {
 
-						return( 1 );
+						return (1);
 					}
-				}else if ( tok2.hasMoreTokens()){
+				} else if (tok2.hasMoreTokens()) {
 
-					int	i2 = Integer.parseInt(tok2.nextToken());
+					int i2 = Integer.parseInt(tok2.nextToken());
 
-					if ( i2 != 0 ){
+					if (i2 != 0) {
 
-						return( -1 );
+						return (-1);
 					}
-				}else{
-					return( 0 );
+				} else {
+					return (0);
 				}
 			}
-		}catch( Throwable e ){
+		} catch (Throwable e) {
 
 			e.printStackTrace();
 
-			return( 0 );
+			return (0);
 		}
 	}
 
-	public static ClassLoader
-	addFileToClassPath(
-			ClassLoader		root,
-			ClassLoader		classLoader,
-			File 			f)
-	{
-		if ( 	f.exists() &&
-				(!f.isDirectory())&&
-				f.getName().endsWith(".jar")){
+	public static ClassLoader addFileToClassPath (ClassLoader root,
+			ClassLoader classLoader, File f) {
+		if (f.exists() && (!f.isDirectory()) && f.getName().endsWith(".jar")) {
 
 			try {
 
@@ -358,26 +358,25 @@ public class PluginLoader {
 				// make sure that all of our added URLs end up within a single URLClassloader
 				// with its parent being the one that loaded this class itself
 
-				if ( classLoader instanceof URLClassLoader ){
+				if (classLoader instanceof URLClassLoader) {
 
-					URL[]	old = ((URLClassLoader)classLoader).getURLs();
+					URL[] old = ((URLClassLoader) classLoader).getURLs();
 
-					URL[]	new_urls = new URL[old.length+1];
+					URL[] new_urls = new URL[old.length + 1];
 
-					System.arraycopy( old, 0, new_urls, 0, old.length );
+					System.arraycopy(old, 0, new_urls, 0, old.length);
 
-					new_urls[new_urls.length-1]= f.toURL();
+					new_urls[new_urls.length - 1] = f.toURL();
 
-					classLoader = new URLClassLoader(
-							new_urls,
-							classLoader==root?
-									classLoader:
-										classLoader.getParent());
-				}else{
+					classLoader = new URLClassLoader(new_urls,
+							classLoader == root ? classLoader : classLoader
+									.getParent());
+				} else {
 
-					classLoader = new URLClassLoader(new URL[]{f.toURL()},classLoader);
+					classLoader = new URLClassLoader(new URL[] { f.toURL() },
+							classLoader);
 				}
-			}catch( Exception e){
+			} catch (Exception e) {
 
 				// don't use Debug/lglogger here as we can be called before AZ has been initialised
 
@@ -385,6 +384,6 @@ public class PluginLoader {
 			}
 		}
 
-		return( classLoader );
+		return (classLoader);
 	}
 }

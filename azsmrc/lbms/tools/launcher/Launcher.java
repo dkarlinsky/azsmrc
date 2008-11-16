@@ -1,23 +1,19 @@
 /*
- * Created on 25-Jul-2005
- * Created by Paul Gardner
- * Copyright (C) 2005, 2006 Aelitis, All Rights Reserved.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * AELITIS, SAS au capital de 46,603.30 euros
- * 8 Allee Lenotre, La Grille Royale, 78600 Le Mesnil le Roi, France.
- *
+ * Created on 25-Jul-2005 Created by Paul Gardner Copyright (C) 2005, 2006
+ * Aelitis, All Rights Reserved.
+ * 
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or (at your option) any later
+ * version. This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details. You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * 
+ * AELITIS, SAS au capital de 46,603.30 euros 8 Allee Lenotre, La Grille Royale,
+ * 78600 Le Mesnil le Roi, France.
  */
 
 package lbms.tools.launcher;
@@ -38,9 +34,9 @@ import java.util.StringTokenizer;
 
 public class Launcher {
 
-	private static URLClassLoader classLoader;
+	private static URLClassLoader	classLoader;
 
-	public static void main(final String[] args) {
+	public static void main (final String[] args) {
 		boolean restart = false;
 		do {
 
@@ -63,7 +59,6 @@ public class Launcher {
 			}
 			final Launchable launch = launchables[0];
 
-
 			System.out.println("Starting Launchable");
 			restart = launch.launch(args);
 
@@ -72,7 +67,7 @@ public class Launcher {
 
 	}
 
-	private static Launchable[] findLaunchables() {
+	private static Launchable[] findLaunchables () {
 		// CAREFUL - this is called BEFORE any AZ initialisation has been
 		// performed and must
 		// therefore NOT use anything that relies on this (such as logging,
@@ -161,7 +156,7 @@ public class Launcher {
 
 			if (launch_class != null && launch_class.indexOf(';') == -1) {
 				System.out.println("Trying to load: " + launch_class);
-				Class c = classLoader.loadClass(launch_class);
+				Class<?> c = classLoader.loadClass(launch_class);
 
 				Launchable launchable = (Launchable) c.newInstance();
 
@@ -182,13 +177,13 @@ public class Launcher {
 		return (x);
 	}
 
-	private static File getApplicationFile(String filename) {
+	private static File getApplicationFile (String filename) {
 		String path = SystemProperties.getApplicationPath();
 
 		return new File(path, filename);
 	}
 
-	public static File[] getHighestJarVersions(File[] files,
+	public static File[] getHighestJarVersions (File[] files,
 			String[] version_out, String[] id_out) // currently the version of
 	// last versioned jar
 	// found...
@@ -302,16 +297,16 @@ public class Launcher {
 	 * classLoader).getURLs(); URL[] new_urls = new URL[old.length + 1];
 	 * System.arraycopy(old, 0, new_urls, 0, old.length);
 	 * new_urls[new_urls.length - 1] = f.toURL(); classLoader = new
-	 * URLClassLoader( new_urls, classLoader == Launcher.class.getClassLoader() ?
-	 * classLoader : classLoader.getParent()); } else { classLoader = new
+	 * URLClassLoader( new_urls, classLoader == Launcher.class.getClassLoader()
+	 * ? classLoader : classLoader.getParent()); } else { classLoader = new
 	 * URLClassLoader(new URL[] { f.toURL() }, classLoader); } } catch
 	 * (Exception e) { // don't use Debug/lglogger here as we can be called
 	 * before AZ // has been initialised e.printStackTrace(); } } return
 	 * (classLoader); }
 	 */
 
-	public static URLClassLoader addFilesToClassPath(URLClassLoader classLoader,
-			File[] files) {
+	public static URLClassLoader addFilesToClassPath (
+			URLClassLoader classLoader, File[] files) {
 		List<URL> urls = new ArrayList<URL>();
 		URL[] old = (classLoader).getURLs();
 		urls.addAll(Arrays.asList(old));
@@ -336,7 +331,7 @@ public class Launcher {
 		return (classLoader);
 	}
 
-	public static int compareVersions(String version_1, String version_2) {
+	public static int compareVersions (String version_1, String version_2) {
 		try {
 			if (version_1.startsWith(".")) {
 				version_1 = "0" + version_1;
@@ -386,19 +381,16 @@ public class Launcher {
 		}
 	}
 
-	private static void killAllThreads() {
-		// Find the root thread group
-		ThreadGroup root = Thread.currentThread().getThreadGroup().getParent();
-		while (root.getParent() != null) {
-			root = root.getParent();
-		}
-
-		// Visit each thread group
-		visit(root, 0);
-	}
+	/*
+	 * private static void killAllThreads () { // Find the root thread group
+	 * ThreadGroup root = Thread.currentThread().getThreadGroup().getParent();
+	 * while (root.getParent() != null) { root = root.getParent(); }
+	 * 
+	 * // Visit each thread group visit(root, 0); }
+	 */
 
 	// This method recursively visits all thread groups under `group'.
-	public static void visit(ThreadGroup group, int level) {
+	public static void visit (ThreadGroup group, int level) {
 		System.out.println("Visiting TG: " + group.getName());
 		// Get threads in `group'
 		int numThreads = group.activeCount();

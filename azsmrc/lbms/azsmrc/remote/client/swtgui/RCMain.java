@@ -98,59 +98,66 @@ import org.jdom.Element;
 
 public class RCMain {
 
-	public static final String LOGGER_ROOT = "lbms.azsmrc";
-	public static final String USER_DIR = System.getProperty("user.dir");
-	public static final String FSEP = System.getProperty("file.separator");
+	public static final String		LOGGER_ROOT		= "lbms.azsmrc";
+	public static final String		USER_DIR		= System
+															.getProperty("user.dir");
+	public static final String		FSEP			= System
+															.getProperty("file.separator");
 
-	protected Shell shell;
-	protected Display display;
-	private static RCMain rcMain;
-	private Client client;
-	private ExtendedProperties properties;
-	private Properties  azsmrcProperties;
-	private File confFile;
-	private Timer timer;
-	private TimerEventPeriodic updateTimer;
-	private boolean connect;
-	private Logger logger;
-	private Updater updater;
-	private Proxy proxy;
-	private PluginManagerImpl pluginManager;
+	protected Shell					shell;
+	protected Display				display;
+	private static RCMain			rcMain;
+	private Client					client;
+	private ExtendedProperties		properties;
+	private Properties				azsmrcProperties;
+	private File					confFile;
+	private Timer					timer;
+	private TimerEventPeriodic		updateTimer;
+	private boolean					connect;
+	private Logger					logger;
+	private Updater					updater;
+	private Proxy					proxy;
+	private PluginManagerImpl		pluginManager;
 
-	private TrayItem systrayItem;
-	private DownloadManagerShell mainWindow;
-	private long runTime;
-	private boolean manifestInUse;
-	private StartServer startServer;
+	private TrayItem				systrayItem;
+	private DownloadManagerShell	mainWindow;
+	private long					runTime;
+	private boolean					manifestInUse;
+	private StartServer				startServer;
 
-	private boolean firstRun;
-
+	private boolean					firstRun;
 
 	//  I18N prefix
-	public static final String PFX = "rcmain.";
+	public static final String		PFX				= "rcmain.";
 
-	private Transferable emptyTransfer = new Transferable() {
-		private DataFlavor[] emptyArray = new DataFlavor[0];
-		public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-			throw new UnsupportedFlavorException(flavor);
-		}
+	private Transferable			emptyTransfer	= new Transferable() {
+														private DataFlavor[]	emptyArray	= new DataFlavor[0];
 
-		public DataFlavor[] getTransferDataFlavors() {
-			return emptyArray;
-		}
+														public Object getTransferData (
+																DataFlavor flavor)
+																throws UnsupportedFlavorException,
+																IOException {
+															throw new UnsupportedFlavorException(
+																	flavor);
+														}
 
-		public boolean isDataFlavorSupported(DataFlavor flavor) {
-			return false;
-		}
-	};
+														public DataFlavor[] getTransferDataFlavors () {
+															return emptyArray;
+														}
 
-	protected boolean terminated, failedConnection;
+														public boolean isDataFlavorSupported (
+																DataFlavor flavor) {
+															return false;
+														}
+													};
 
-	public static void main(String[] args) {
+	protected boolean				terminated, failedConnection;
+
+	public static void main (String[] args) {
 		start(args);
 	}
 
-	public static boolean start(String[] args) {
+	public static boolean start (String[] args) {
 		if (rcMain == null) { //if it is launched by launchable then rcMain should already exist
 			new RCMain();
 		}
@@ -168,22 +175,23 @@ public class RCMain {
 
 		startServer = new StartServer();
 
-		if  (args.length > 0 && args[0].equalsIgnoreCase( "--closedown" )){
-			closedown	= true;
+		if (args.length > 0 && args[0].equalsIgnoreCase("--closedown")) {
+			closedown = true;
 		}
 
 		boolean another_instance = startServer.getState() != StartServer.STATE_LISTENING;
 
-		if( another_instance && !properties.getPropertyAsBoolean("multiInstance") ) {
+		if (another_instance
+				&& !properties.getPropertyAsBoolean("multiInstance")) {
 			StartSocket ss = new StartSocket(args);
 			closedown = true;
-			if( !ss.sendArgs() ) {  //arg passing attempt failed, so start core anyway
+			if (!ss.sendArgs()) { //arg passing attempt failed, so start core anyway
 				closedown = false;
 				String msg = "There appears to be another program process already listening on socket [127.0.0.1: 6880].\nLoading of torrents via command line parameter will fail until this is fixed.";
-				System.out.println( msg );
+				System.out.println(msg);
 			}
 		} else {
-			String[] args2 = new String[args.length+1];
+			String[] args2 = new String[args.length + 1];
 			args2[0] = "args";
 			System.arraycopy(args, 0, args2, 1, args.length);
 			startServer.processArgs(args2);
@@ -198,14 +206,14 @@ public class RCMain {
 		return true;
 	}
 
-	public void open() {
+	public void open () {
 		DownloadContainer.loadColumns();
 		SeedContainer.loadColumns();
 		terminated = false;
 
 		display.asyncExec(new SWTSafeRunnable() {
 			@Override
-			public void runSafe() {
+			public void runSafe () {
 				createContents();
 			}
 		});
@@ -213,7 +221,8 @@ public class RCMain {
 		connect = properties.getPropertyAsBoolean("auto_connect");
 		if (connect) {
 			try {
-				LoginData login = new LoginData(properties.getProperty("lastConnection",""));
+				LoginData login = new LoginData(properties.getProperty(
+						"lastConnection", ""));
 				if (login.isComplete()) {
 					connect(false);
 					updateTimer(properties.getPropertyAsBoolean("auto_open"));
@@ -225,7 +234,8 @@ public class RCMain {
 				connect = false;
 			}
 		}
-		File error = new File(System.getProperty("user.dir")+System.getProperty("file.separator")+"error.log");
+		File error = new File(System.getProperty("user.dir")
+				+ System.getProperty("file.separator") + "error.log");
 		if (error.exists()) {
 			System.out.println("Crash Detected");
 			ErrorDialog.createAndOpen();
@@ -235,8 +245,8 @@ public class RCMain {
 		System.out.println("openQueuedTorrents");
 		startServer.openQueuedTorrents();
 		while (!terminated) { //runnig
-			if (!display.readAndDispatch ()) {
-				display.sleep ();
+			if (!display.readAndDispatch()) {
+				display.sleep();
 			}
 		}
 		if (mainWindow != null) { //cleanup
@@ -245,52 +255,52 @@ public class RCMain {
 		shutdown();
 		display.dispose();
 		/*
-		 * Have yet to trace the reason why, but OSX will not
-		 * kill the whole application on SWT disposal- call exit to force end.
+		 * Have yet to trace the reason why, but OSX will not kill the whole
+		 * application on SWT disposal- call exit to force end.
 		 */
-		if(Utilities.isOSX) {
+		if (Utilities.isOSX) {
 			System.exit(0);
 		}
 	}
 
-	protected void createContents() {
+	protected void createContents () {
 		shell = new Shell();
 		SplashScreen.setProgressAndText("Loading Images", 80);
 		ImageRepository.preloadImages(display);
 		SplashScreen.setProgressAndText("Creating GUI", 90);
 
-/*		//Show Splash
-		if(properties.getPropertyAsBoolean("show_splash",true)){
-			SplashScreen.open(getDisplay(), 20);
-		}*/
+		/*
+		 * //Show Splash
+		 * if(properties.getPropertyAsBoolean("show_splash",true)){
+		 * SplashScreen.open(getDisplay(), 20); }
+		 */
 
-		final Tray systray = display.getSystemTray ();
+		final Tray systray = display.getSystemTray();
 		if (systray != null) {
-			systrayItem = new TrayItem (systray, SWT.NONE);
+			systrayItem = new TrayItem(systray, SWT.NONE);
 
 			//Listener for the system tray
 
-			systrayItem.addSelectionListener(new SelectionListener()
-			{
-				public void widgetDefaultSelected(SelectionEvent arg0) {
+			systrayItem.addSelectionListener(new SelectionListener() {
+				public void widgetDefaultSelected (SelectionEvent arg0) {
 					// this is a double click .. if we ever want to do something with this
 					// do it here
 
 				}
 
-				public void widgetSelected(SelectionEvent arg0) {
+				public void widgetSelected (SelectionEvent arg0) {
 					//normal selection is a single click
-					try{
+					try {
 						Shell dms_shell = getMainWindow().getShell();
-						if(dms_shell.getMinimized()){
+						if (dms_shell.getMinimized()) {
 							dms_shell.setMinimized(false);
 							dms_shell.setVisible(true);
 
-						} else{
+						} else {
 							dms_shell.setMinimized(true);
 							dms_shell.setVisible(false);
 						}
-					}catch(Exception e1){
+					} catch (Exception e1) {
 						if (mainWindow == null) {
 							mainWindow = new DownloadManagerShell();
 						}
@@ -309,21 +319,22 @@ public class RCMain {
 		setTrayIcon(0);
 		//Open mainWindow if AutoOpen is true
 
-		if(properties.getPropertyAsBoolean("auto_open")){
+		if (properties.getPropertyAsBoolean("auto_open")) {
 			if (mainWindow == null) {
 				mainWindow = new DownloadManagerShell();
 			}
 			mainWindow.open();
 		}
 
-
 		final Menu menu = new Menu(shell, SWT.POP_UP);
 
 		final MenuItem openMainWindowMenuItem = new MenuItem(menu, SWT.PUSH);
-		openMainWindowMenuItem.setText(I18N.translate(PFX + "traymenu.openMainWindow"));
+		openMainWindowMenuItem.setText(I18N.translate(PFX
+				+ "traymenu.openMainWindow"));
 
 		final MenuItem openStatusShellMenuItem = new MenuItem(menu, SWT.PUSH);
-		openStatusShellMenuItem.setText(I18N.translate(PFX + "traymenu.openStatusShell"));
+		openStatusShellMenuItem.setText(I18N.translate(PFX
+				+ "traymenu.openStatusShell"));
 
 		final MenuItem addMenuItem = new MenuItem(menu, SWT.CASCADE);
 		addMenuItem.setText(I18N.translate(PFX + "traymenu.add"));
@@ -331,10 +342,10 @@ public class RCMain {
 		final Menu addMenu = new Menu(addMenuItem);
 		addMenuItem.setMenu(addMenu);
 
-		final MenuItem addByFile = new MenuItem(addMenu,SWT.PUSH);
+		final MenuItem addByFile = new MenuItem(addMenu, SWT.PUSH);
 		addByFile.setText(I18N.translate(PFX + "traymenu.add.byFile"));
 
-		final MenuItem addByUrl = new MenuItem(addMenu,SWT.PUSH);
+		final MenuItem addByUrl = new MenuItem(addMenu, SWT.PUSH);
 		addByUrl.setText(I18N.translate(PFX + "traymenu.add.byURL"));
 
 		final MenuItem quickMenuItem = new MenuItem(menu, SWT.CASCADE);
@@ -343,29 +354,36 @@ public class RCMain {
 		final Menu quickMenu = new Menu(quickMenuItem);
 		quickMenuItem.setMenu(quickMenu);
 
-		final MenuItem pauseDownloads_1min = new MenuItem(quickMenu,SWT.PUSH);
-		pauseDownloads_1min.setText(I18N.translate(PFX + "traymenu.quickmenu.pause1min"));
+		final MenuItem pauseDownloads_1min = new MenuItem(quickMenu, SWT.PUSH);
+		pauseDownloads_1min.setText(I18N.translate(PFX
+				+ "traymenu.quickmenu.pause1min"));
 
-		final MenuItem pauseDownloads_5min = new MenuItem(quickMenu,SWT.PUSH);
-		pauseDownloads_5min.setText(I18N.translate(PFX + "traymenu.quickmenu.pause5min"));
+		final MenuItem pauseDownloads_5min = new MenuItem(quickMenu, SWT.PUSH);
+		pauseDownloads_5min.setText(I18N.translate(PFX
+				+ "traymenu.quickmenu.pause5min"));
 
-		final MenuItem pauseDownloads_UserSpecified = new MenuItem(quickMenu, SWT.PUSH);
-		pauseDownloads_UserSpecified.setText(I18N.translate(PFX + "traymenu.quickmenu.pauseUserSpecified"));
+		final MenuItem pauseDownloads_UserSpecified = new MenuItem(quickMenu,
+				SWT.PUSH);
+		pauseDownloads_UserSpecified.setText(I18N.translate(PFX
+				+ "traymenu.quickmenu.pauseUserSpecified"));
 
-		new MenuItem (menu, SWT.SEPARATOR);
+		new MenuItem(menu, SWT.SEPARATOR);
 
 		final MenuItem connectDisconnectMenuItem = new MenuItem(menu, SWT.PUSH);
 		if (!connect) {
-			connectDisconnectMenuItem.setText(I18N.translate(PFX + "traymenu.connect"));
+			connectDisconnectMenuItem.setText(I18N.translate(PFX
+					+ "traymenu.connect"));
 		} else {
-			connectDisconnectMenuItem.setText(I18N.translate(PFX + "traymenu.disconnect"));
+			connectDisconnectMenuItem.setText(I18N.translate(PFX
+					+ "traymenu.disconnect"));
 		}
 
 		final MenuItem silentItem = new MenuItem(menu, SWT.CHECK);
 		silentItem.setText(I18N.translate(PFX + "traymenu.silentMode"));
 
 		final MenuItem disablePopupItem = new MenuItem(menu, SWT.CHECK);
-		disablePopupItem.setText(I18N.translate(PFX + "traymenu.disablePopups"));
+		disablePopupItem
+				.setText(I18N.translate(PFX + "traymenu.disablePopups"));
 
 		final MenuItem closeMenuItem = new MenuItem(menu, SWT.PUSH);
 		closeMenuItem.setText(I18N.translate(PFX + "traymenu.close"));
@@ -374,7 +392,7 @@ public class RCMain {
 
 		openMainWindowMenuItem.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected (SelectionEvent e) {
 				if (mainWindow == null) {
 					mainWindow = new DownloadManagerShell();
 					mainWindow.open();
@@ -382,35 +400,36 @@ public class RCMain {
 			}
 		});
 
-
 		openStatusShellMenuItem.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected (SelectionEvent e) {
 				StatusShell.open();
 			}
 		});
 
 		closeMenuItem.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected (SelectionEvent e) {
 				terminated = true;
 			}
 		});
 
 		connectDisconnectMenuItem.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected (SelectionEvent e) {
 				if (connect) {
-					connectDisconnectMenuItem.setText(I18N.translate(PFX + "traymenu.connect"));
+					connectDisconnectMenuItem.setText(I18N.translate(PFX
+							+ "traymenu.connect"));
 					disconnect();
 					setTrayIcon(0);
-					if(mainWindow != null){
+					if (mainWindow != null) {
 						mainWindow.setConnectionStatusBar(0);
 						mainWindow.setLogInOutButtons(false);
 						mainWindow.clearMapsAndChildred();
 					}
 				} else {
-					connectDisconnectMenuItem.setText(I18N.translate(PFX + "traymenu.disconnect"));
+					connectDisconnectMenuItem.setText(I18N.translate(PFX
+							+ "traymenu.disconnect"));
 					client.sendGetGlobalStats();
 					if (mainWindow != null) {
 						connect(true);
@@ -423,89 +442,102 @@ public class RCMain {
 		});
 
 		//----------listener for the menu before it opens------\\
-		menu.addMenuListener(new MenuListener(){
+		menu.addMenuListener(new MenuListener() {
 
-			public void menuHidden(MenuEvent arg0) {
+			public void menuHidden (MenuEvent arg0) {
 			}
 
-			public void menuShown(MenuEvent arg0) {
-				if (!connect){
-					connectDisconnectMenuItem.setText(I18N.translate(PFX + "traymenu.connect"));
+			public void menuShown (MenuEvent arg0) {
+				if (!connect) {
+					connectDisconnectMenuItem.setText(I18N.translate(PFX
+							+ "traymenu.connect"));
 					addMenuItem.setEnabled(false);
 					quickMenuItem.setEnabled(false);
-				}else{
-					connectDisconnectMenuItem.setText(I18N.translate(PFX + "traymenu.disconnect"));
+				} else {
+					connectDisconnectMenuItem.setText(I18N.translate(PFX
+							+ "traymenu.disconnect"));
 					addMenuItem.setEnabled(true);
 					quickMenuItem.setEnabled(true);
 				}
 				silentItem.setSelection(SoundManager.isSilent());
-				disablePopupItem.setSelection(!properties.getPropertyAsBoolean("popups_enabled"));
+				disablePopupItem.setSelection(!properties
+						.getPropertyAsBoolean("popups_enabled"));
 			}
 		});
 
 		addByUrl.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected (SelectionEvent e) {
 				OpenByURLDialog.open();
 			}
 		});
 
 		addByFile.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected (SelectionEvent e) {
 				OpenByFileDialog.open();
 			}
 		});
 
 		pauseDownloads_1min.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected (SelectionEvent e) {
 				client.getDownloadManager().pauseDownloads(60);
 			}
 		});
 
 		pauseDownloads_5min.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected (SelectionEvent e) {
 				client.getDownloadManager().pauseDownloads(300);
 			}
 		});
 
-		pauseDownloads_UserSpecified.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				try{
-					InputShell is = new InputShell(I18N.translate(PFX + "traymenu.quickmenu.pauseUserSpecified.inputShell.title"),
-							I18N.translate(PFX + "traymenu.quickmenu.pauseUserSpecified.inputShell.message"));
-					String str_minutes = is.open();
-					int mins = Integer.parseInt(str_minutes);
-					client.getDownloadManager().pauseDownloads(mins*60);
-					logger.info("Pausing all downloads for " + mins*60  + " seconds (" + mins + " minutes)");
-				}catch(Exception ex) {}
+		pauseDownloads_UserSpecified
+				.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected (SelectionEvent e) {
+						try {
+							InputShell is = new InputShell(
+									I18N
+											.translate(PFX
+													+ "traymenu.quickmenu.pauseUserSpecified.inputShell.title"),
+									I18N
+											.translate(PFX
+													+ "traymenu.quickmenu.pauseUserSpecified.inputShell.message"));
+							String str_minutes = is.open();
+							int mins = Integer.parseInt(str_minutes);
+							client.getDownloadManager().pauseDownloads(
+									mins * 60);
+							logger.info("Pausing all downloads for " + mins
+									* 60 + " seconds (" + mins + " minutes)");
+						} catch (Exception ex) {
+						}
 
-
-			}
-		});
+					}
+				});
 
 		silentItem.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected (SelectionEvent e) {
 				SoundManager.setSilentMode(silentItem.getSelection());
 			}
 		});
 
 		disablePopupItem.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
-				properties.setProperty("popups_enabled", silentItem.getSelection());
+			public void widgetSelected (SelectionEvent e) {
+				properties.setProperty("popups_enabled", !disablePopupItem
+						.getSelection());
 			}
 		});
 		if (systrayItem != null) {
-			systrayItem.addListener (SWT.MenuDetect, new Listener () {
+			systrayItem.addListener(SWT.MenuDetect, new Listener() {
 				public void handleEvent (Event event) {
-					try{
-						menu.setVisible (true);
-					}catch (Exception e){}
+					try {
+						menu.setVisible(true);
+					} catch (Exception e) {
+					}
 				}
 			});
 		}
@@ -519,14 +551,15 @@ public class RCMain {
 		}
 	}
 
-	private void initConfig() {
-		confFile = new File(USER_DIR+FSEP+"config.cfg");
+	private void initConfig () {
+		confFile = new File(USER_DIR + FSEP + "config.cfg");
 		properties = null;
 		{
 			Properties defaultProps = new Properties();
 			InputStream is = null;
 			try {
-				is = RCMain.class.getClassLoader().getResourceAsStream("default.cfg");
+				is = RCMain.class.getClassLoader().getResourceAsStream(
+						"default.cfg");
 				defaultProps.loadFromXML(is);
 				is.close();
 				properties = new ExtendedProperties(defaultProps); //read in default values
@@ -534,8 +567,11 @@ public class RCMain {
 				properties = new ExtendedProperties(); //if something happens create empty properties
 				e1.printStackTrace();
 			} finally {
-				if (is!=null) {
-					try { is.close(); } catch (IOException e) {}
+				if (is != null) {
+					try {
+						is.close();
+					} catch (IOException e) {
+					}
 				}
 			}
 		}
@@ -548,9 +584,12 @@ public class RCMain {
 				properties.loadFromXML(fin);
 			} catch (IOException e) {
 				e.printStackTrace();
-			}  finally {
-				if (fin!=null) {
-					try { fin.close(); } catch (IOException e) {}
+			} finally {
+				if (fin != null) {
+					try {
+						fin.close();
+					} catch (IOException e) {
+					}
 				}
 			}
 		}
@@ -558,14 +597,18 @@ public class RCMain {
 		{
 			InputStream is = null;
 			try {
-				is = RCMain.class.getClassLoader().getResourceAsStream("azsmrc.properties");
+				is = RCMain.class.getClassLoader().getResourceAsStream(
+						"azsmrc.properties");
 				azsmrcProperties.load(is);
 				is.close();
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			} finally {
-				if (is!=null) {
-					try { is.close(); } catch (IOException e) {}
+				if (is != null) {
+					try {
+						is.close();
+					} catch (IOException e) {
+					}
 				}
 			}
 		}
@@ -579,17 +622,18 @@ public class RCMain {
 		System.out.println("Checking javaw.exe.manifest");
 		javawExeManifest();
 
-		if(properties.getPropertyAsBoolean("show_splash")){
+		if (properties.getPropertyAsBoolean("show_splash")) {
 			SplashScreen.open(display, 20);
 		}
-		SplashScreen.setProgressAndText("Creating Logger.",10);
+		SplashScreen.setProgressAndText("Creating Logger.", 10);
 		PropertyConfigurator.configure(Loader.getResource("log4j.properties"));
 		logger = Logger.getLogger(LOGGER_ROOT);
 
-		SplashScreen.setProgressAndText("Loading I18N.",15);
+		SplashScreen.setProgressAndText("Loading I18N.", 15);
 		try {
 			if (properties.getProperty("language") != null) {
-				I18N.setLocalized("lbms/azsmrc/remote/client/internat/"+properties.getProperty("language")+".lang");
+				I18N.setLocalized("lbms/azsmrc/remote/client/internat/"
+						+ properties.getProperty("language") + ".lang");
 			}
 			I18N.reload();
 			if (I18N.isInitialized()) {
@@ -602,35 +646,48 @@ public class RCMain {
 			e1.printStackTrace();
 		}
 
-		SplashScreen.setProgressAndText("Loading Plugins.",20);
+		SplashScreen.setProgressAndText("Loading Plugins.", 20);
 		pluginManager = new PluginManagerImpl();
 
 		PluginLoader.findAndLoadPlugins(pluginManager, getProperties());
 
-		SESecurityManager.getSingleton().addSecurityListner(new SESecurityManagerListener() {
-			public boolean trustCertificate(String ressource, X509Certificate x509_cert) {
-				// TODO Change it
-				logger.debug("Trusting Certificate: "+ressource);
-				return true;
-			}
-		});
-		SplashScreen.setProgressAndText("Creating Client.",25);
+		SESecurityManager.getSingleton().addSecurityListner(
+				new SESecurityManagerListener() {
+					public boolean trustCertificate (String ressource,
+							X509Certificate x509_cert) {
+						// TODO Change it
+						logger.debug("Trusting Certificate: " + ressource);
+						return true;
+					}
+				});
+		SplashScreen.setProgressAndText("Creating Client.", 25);
 		try {
-			LoginData login = new LoginData(properties.getProperty("lastConnection",""));
+			LoginData login = new LoginData(properties.getProperty(
+					"lastConnection", ""));
 			client = new Client(login);
 		} catch (MalformedURLException e1) {
 			client = new Client();
 		}
 		if (properties.getPropertyAsBoolean("connection.proxy.use")) {
-			Proxy.Type type = Proxy.Type.valueOf(properties.getProperty("connection.proxy.type"));
-			InetSocketAddress inetAddress = new InetSocketAddress(properties.getProperty("connection.proxy.url"),properties.getPropertyAsInt("connection.proxy.port"));
-			proxy = new Proxy(type,inetAddress);
-			if (properties.getProperty("connection.proxy.username") != null && properties.getProperty("connection.proxy.password") != null) {
+			Proxy.Type type = Proxy.Type.valueOf(properties
+					.getProperty("connection.proxy.type"));
+			InetSocketAddress inetAddress = new InetSocketAddress(properties
+					.getProperty("connection.proxy.url"), properties
+					.getPropertyAsInt("connection.proxy.port"));
+			proxy = new Proxy(type, inetAddress);
+			if (properties.getProperty("connection.proxy.username") != null
+					&& properties.getProperty("connection.proxy.password") != null) {
 				Authenticator.setDefault(new Authenticator() {
-					PasswordAuthentication pw = new PasswordAuthentication(properties.getProperty("connection.proxy.username"),properties.getProperty("connection.proxy.password").toCharArray());
+					PasswordAuthentication	pw	= new PasswordAuthentication(
+														properties
+																.getProperty("connection.proxy.username"),
+														properties
+																.getProperty(
+																		"connection.proxy.password")
+																.toCharArray());
 
 					@Override
-					protected PasswordAuthentication getPasswordAuthentication() {
+					protected PasswordAuthentication getPasswordAuthentication () {
 						return pw;
 					}
 				});
@@ -639,21 +696,43 @@ public class RCMain {
 		}
 		client.setFastMode(properties.getPropertyAsBoolean("client.fastmode"));
 		client.addGlobalStatsListener(new GlobalStatsListener() {
-			public void updateStats(final int d, final int u, final int seeding, final int seedqueue, final int downloading, final int downloadqueue) {
-				if(display != null) {
+			public void updateStats (final int d, final int u,
+					final int seeding, final int seedqueue,
+					final int downloading, final int downloadqueue) {
+				if (display != null) {
 					display.syncExec(new SWTSafeRunnable() {
 						@Override
-						public void runSafe() {
+						public void runSafe () {
 							//setTrayToolTip("AzSMRC: D:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d)+" - U:"+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u));
 
-							setTrayToolTip(seeding + " ("+ seedqueue+") "
-									+ I18N.translate(PFX + "tray.tooltip.part1") + " "
-									+ downloading + " ("+ downloadqueue+") "
-									+ I18N.translate(PFX + "tray.tooltip.part2") + "\n"
-									+ I18N.translate(PFX + "tray.tooltip.part3")
-									+ " "+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(d)
-									+ I18N.translate(PFX + "tray.tooltip.part4")
-									+ " "+DisplayFormatters.formatByteCountToBase10KBEtcPerSec(u));
+							setTrayToolTip(seeding
+									+ " ("
+									+ seedqueue
+									+ ") "
+									+ I18N
+											.translate(PFX
+													+ "tray.tooltip.part1")
+									+ " "
+									+ downloading
+									+ " ("
+									+ downloadqueue
+									+ ") "
+									+ I18N
+											.translate(PFX
+													+ "tray.tooltip.part2")
+									+ "\n"
+									+ I18N
+											.translate(PFX
+													+ "tray.tooltip.part3")
+									+ " "
+									+ DisplayFormatters
+											.formatByteCountToBase10KBEtcPerSec(d)
+									+ I18N
+											.translate(PFX
+													+ "tray.tooltip.part4")
+									+ " "
+									+ DisplayFormatters
+											.formatByteCountToBase10KBEtcPerSec(u));
 						}
 					});
 				}
@@ -661,184 +740,284 @@ public class RCMain {
 		});
 
 		client.addHTTPErrorListener(new HTTPErrorListener() {
-			public void httpError(int statusCode) {
+			public void httpError (int statusCode) {
 				if (statusCode == UNAUTHORIZED) {
 					if (mainWindow != null) {
-						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.failed") + " " + statusCode
-								+ I18N.translate(PFX + "mainwindow.statusbar.badUsername_badPassword"), SWT.COLOR_RED);
+						mainWindow
+								.setStatusBarText(
+										I18N
+												.translate(PFX
+														+ "mainwindow.statusbar.failed")
+												+ " "
+												+ statusCode
+												+ I18N
+														.translate(PFX
+																+ "mainwindow.statusbar.badUsername_badPassword"),
+										SWT.COLOR_RED);
 					}
-					logger.warn("Connection failed: " + statusCode + " Bad Username or Password");
-					new MessageSlideShell(display,SWT.ICON_ERROR,I18N.translate(PFX + "mainwindow.statusbar.failed"),statusCode + " " + I18N.translate(PFX + "mainwindow.statusbar.badUsername_badPassword"),(String)null);
-					/*MessageDialog.error(display,I18N.translate(PFX + "mainwindow.statusbar.failed")
-							,statusCode + " " + I18N.translate(PFX + "mainwindow.statusbar.badUsername_badPassword"));*/
+					logger.warn("Connection failed: " + statusCode
+							+ " Bad Username or Password");
+					new MessageSlideShell(
+							display,
+							SWT.ICON_ERROR,
+							I18N.translate(PFX + "mainwindow.statusbar.failed"),
+							statusCode
+									+ " "
+									+ I18N
+											.translate(PFX
+													+ "mainwindow.statusbar.badUsername_badPassword"),
+							(String) null);
+					/*
+					 * MessageDialog.error(display,I18N.translate(PFX +
+					 * "mainwindow.statusbar.failed") ,statusCode + " " +
+					 * I18N.translate(PFX +
+					 * "mainwindow.statusbar.badUsername_badPassword"));
+					 */
 					disconnect();
 				} else {
 					if (mainWindow != null) {
-						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.failed") + " "+statusCode, SWT.COLOR_RED);
+						mainWindow.setStatusBarText(I18N.translate(PFX
+								+ "mainwindow.statusbar.failed")
+								+ " " + statusCode, SWT.COLOR_RED);
 					}
-					logger.warn("Connection failed: "+statusCode);
+					logger.warn("Connection failed: " + statusCode);
 				}
 			}
 		});
 		client.addConnectionListener(new ConnectionListener() {
-			public void connectionState(final int state) {
-				logger.debug("Connection State: "+state);
-				if(display != null) {
+			public void connectionState (final int state) {
+				logger.debug("Connection State: " + state);
+				if (display != null) {
 					display.syncExec(new SWTSafeRunnable() {
 						@Override
-						public void runSafe() {
+						public void runSafe () {
 							setTrayIcon(state);
 						}
 					});
 				}
 				if (state == ST_CONNECTION_ERROR) {
-					int delay = client.getFailedConnections()*30000;
-					delay = (delay>120000)?120000:delay;
-					logger.warn("Connection failed "+client.getFailedConnections()+" times, delay: "+(delay/1000)+"sec");
+					int delay = client.getFailedConnections() * 30000;
+					delay = (delay > 120000) ? 120000 : delay;
+					logger.warn("Connection failed "
+							+ client.getFailedConnections() + " times, delay: "
+							+ (delay / 1000) + "sec");
 					if (mainWindow != null) {
-						updateTimer(true,delay);
+						updateTimer(true, delay);
 					} else {
-						updateTimer(false,delay);
+						updateTimer(false, delay);
 					}
 					if (mainWindow != null) {
-						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.failed") + " "
+						mainWindow.setStatusBarText(I18N.translate(PFX
+								+ "mainwindow.statusbar.failed")
+								+ " "
 								+ client.getFailedConnections()
-								+ " " + I18N.translate(PFX + "mainwindow.statusbar.numTimes"), SWT.COLOR_RED);
+								+ " "
+								+ I18N.translate(PFX
+										+ "mainwindow.statusbar.numTimes"),
+								SWT.COLOR_RED);
 					}
 					failedConnection = true;
-					 if(client.getFailedConnections() > 0 && client.getFailedConnections()%3 == 0){
-						 new MessageSlideShell(RCMain.getRCMain().getDisplay(),SWT.ICON_ERROR,
-								 I18N.translate(PFX + "mainwindow.statusbar.connectionError")
-								 ,I18N.translate(PFX + "mainwindow.statusbar.connectionError.failed")
-									+ " " + RCMain.getRCMain().getClient().getFailedConnections() + " "
-									+ I18N.translate(PFX + "mainwindow.statusbar.connectionError.failed_part2"),
-									(String)null);
+					if (client.getFailedConnections() > 0
+							&& client.getFailedConnections() % 3 == 0) {
+						new MessageSlideShell(
+								RCMain.getRCMain().getDisplay(),
+								SWT.ICON_ERROR,
+								I18N
+										.translate(PFX
+												+ "mainwindow.statusbar.connectionError"),
+								I18N
+										.translate(PFX
+												+ "mainwindow.statusbar.connectionError.failed")
+										+ " "
+										+ RCMain.getRCMain().getClient()
+												.getFailedConnections()
+										+ " "
+										+ I18N
+												.translate(PFX
+														+ "mainwindow.statusbar.connectionError.failed_part2"),
+								(String) null);
 
-						 /*MessageDialog.error(RCMain.getRCMain().getDisplay(),
-									I18N.translate(PFX + "mainwindow.statusbar.connectionError")
-									, I18N.translate(PFX + "mainwindow.statusbar.connectionError.failed")
-									+ " " + RCMain.getRCMain().getClient().getFailedConnections() + " "
-									+ I18N.translate(PFX + "mainwindow.statusbar.connectionError.failed_part2"));*/
-							return;
-						}
+						/*
+						 * MessageDialog.error(RCMain.getRCMain().getDisplay(),
+						 * I18N.translate(PFX +
+						 * "mainwindow.statusbar.connectionError") ,
+						 * I18N.translate(PFX +
+						 * "mainwindow.statusbar.connectionError.failed") + " "
+						 * +
+						 * RCMain.getRCMain().getClient().getFailedConnections()
+						 * + " " + I18N.translate(PFX +
+						 * "mainwindow.statusbar.connectionError.failed_part2"
+						 * ));
+						 */
+						return;
+					}
 				} else if (failedConnection && (state == ST_CONNECTED)) {
 					if (mainWindow != null) {
-						updateTimer(true,0);
-						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.connectionSuccessful")
-								, SWT.COLOR_DARK_GREEN);
+						updateTimer(true, 0);
+						mainWindow.setStatusBarText(I18N.translate(PFX
+								+ "mainwindow.statusbar.connectionSuccessful"),
+								SWT.COLOR_DARK_GREEN);
 					} else {
-						updateTimer(false,0);
+						updateTimer(false, 0);
 					}
 				}
 
 			}
 		});
 		client.getDownloadManager().addListener(new DownloadManagerListener() {
-			public void downloadAdded(Download download) {
-				 logger.info("Download Added: "+download.getName());
+			public void downloadAdded (Download download) {
+				logger.info("Download Added: " + download.getName());
 
 			}
-			public void downloadRemoved(Download download) {
-				logger.info("Download Removed: "+download.getName());
+
+			public void downloadRemoved (Download download) {
+				logger.info("Download Removed: " + download.getName());
 			};
 		});
 		client.addClientEventListener(new ClientEventListener() {
-			public void handleEvent(int type, long time, Element event) {
+			public void handleEvent (int type, long time, Element event) {
 				String msg = event.getAttributeValue("message");
 				switch (type) {
 				case RemoteConstants.EV_DL_FINISHED:
 					if (mainWindow != null) {
-						mainWindow.setStatusBarText(I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")
-								+ " " + event.getAttributeValue("name"), SWT.COLOR_DARK_GREEN);
+						mainWindow.setStatusBarText(I18N.translate(PFX
+								+ "mainwindow.statusbar.downloadFinished")
+								+ " " + event.getAttributeValue("name"),
+								SWT.COLOR_DARK_GREEN);
 					}
 					SoundManager.playSound(Sound.DOWNLOADING_FINISHED);
 
 					if (event.getAttributeValue("duration") != null) {
-						long duration = Long.parseLong(event.getAttributeValue("duration"));
-						String avgDl = (event.getAttributeValue("avgDownload") != null)?event.getAttributeValue("avgDownload") : "";
-						logger.info(I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+" "+event.getAttributeValue("name")
-											+" "+I18N.translate(PFX  + "mainwindow.statusbar.downloadFinishedIn")+DisplayFormatters.formatTime(duration*1000)+" "+avgDl);
+						long duration = Long.parseLong(event
+								.getAttributeValue("duration"));
+						String avgDl = (event.getAttributeValue("avgDownload") != null) ? event
+								.getAttributeValue("avgDownload")
+								: "";
+						logger
+								.info(I18N
+										.translate(PFX
+												+ "mainwindow.statusbar.downloadFinished")
+										+ " "
+										+ event.getAttributeValue("name")
+										+ " "
+										+ I18N
+												.translate(PFX
+														+ "mainwindow.statusbar.downloadFinishedIn")
+										+ DisplayFormatters
+												.formatTime(duration * 1000)
+										+ " " + avgDl);
 						new MessageSlideShell(
 								display,
 								SWT.ICON_INFORMATION,
-								I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished"),
-								event.getAttributeValue("name")+"\n"+I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+DisplayFormatters.formatTime(duration*1000)+" "+avgDl,
-								(String)null);
-						/*MessageDialog.message(display,I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished"),
-								event.getAttributeValue("name")+"\n"+I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+DisplayFormatters.formatTime(duration*1000)+" "+avgDl);*/
-					}
-					else {
-						logger.info(I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished")+" "+event.getAttributeValue("name"));
-						MessageDialog.message(display,I18N.translate(PFX  + "mainwindow.statusbar.downloadFinished"),event.getAttributeValue("name"));
+								I18N
+										.translate(PFX
+												+ "mainwindow.statusbar.downloadFinished"),
+								event.getAttributeValue("name")
+										+ "\n"
+										+ I18N
+												.translate(PFX
+														+ "mainwindow.statusbar.downloadFinished")
+										+ DisplayFormatters
+												.formatTime(duration * 1000)
+										+ " " + avgDl, (String) null);
+						/*
+						 * MessageDialog.message(display,I18N.translate(PFX +
+						 * "mainwindow.statusbar.downloadFinished"),
+						 * event.getAttributeValue
+						 * ("name")+"\n"+I18N.translate(PFX +
+						 * "mainwindow.statusbar.downloadFinished"
+						 * )+DisplayFormatters
+						 * .formatTime(duration1000)+" "+avgDl);
+						 */
+					} else {
+						logger.info(I18N.translate(PFX
+								+ "mainwindow.statusbar.downloadFinished")
+								+ " " + event.getAttributeValue("name"));
+						MessageDialog.message(display, I18N.translate(PFX
+								+ "mainwindow.statusbar.downloadFinished"),
+								event.getAttributeValue("name"));
 					}
 					break;
 
 				case RemoteConstants.EV_DL_EXCEPTION:
 					if (mainWindow != null) {
-						mainWindow.setStatusBarText("Download Exception: "+msg, SWT.COLOR_RED);
+						mainWindow.setStatusBarText("Download Exception: "
+								+ msg, SWT.COLOR_RED);
 					}
-					logger.error("Download Exception: "+msg);
+					logger.error("Download Exception: " + msg);
 					break;
 
 				case RemoteConstants.EV_EXCEPTION:
 					if (mainWindow != null) {
-						mainWindow.setStatusBarText("Remote Exception: "+msg, SWT.COLOR_RED);
+						mainWindow.setStatusBarText("Remote Exception: " + msg,
+								SWT.COLOR_RED);
 					}
-					logger.error(I18N.translate(PFX + "mainwindow.statusbar.remoteException") + " " + msg);
+					logger.error(I18N.translate(PFX
+							+ "mainwindow.statusbar.remoteException")
+							+ " " + msg);
 					break;
 				case RemoteConstants.EV_UPDATE_AVAILABLE:
 					if (mainWindow != null) {
-						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.remoteUpdateAvailable"), SWT.COLOR_DARK_GREEN);
+						mainWindow
+								.setStatusBarText(
+										I18N
+												.translate(PFX
+														+ "mainwindow.statusbar.remoteUpdateAvailable"),
+										SWT.COLOR_DARK_GREEN);
 					}
 					logger.info("Remote Update Available");
 					client.getRemoteUpdateManager().load();
 					break;
 				case RemoteConstants.EV_MESSAGE:
 					if (mainWindow != null) {
-						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.serverMessage") + ": " + msg);
+						mainWindow.setStatusBarText(I18N.translate(PFX
+								+ "mainwindow.statusbar.serverMessage")
+								+ ": " + msg);
 					}
-					new MessageSlideShell(
-							display,
-							SWT.ICON_INFORMATION,
-							I18N.translate(PFX + "mainwindow.statusbar.serverMessage"),
-							msg,
-							(String)null);
-					/*MessageDialog.message(getDisplay(), I18N.translate(PFX + "mainwindow.statusbar.serverMessage"), msg);*/
-					logger.debug("Server Message: "+msg);
+					new MessageSlideShell(display, SWT.ICON_INFORMATION, I18N
+							.translate(PFX
+									+ "mainwindow.statusbar.serverMessage"),
+							msg, (String) null);
+					/*
+					 * MessageDialog.message(getDisplay(), I18N.translate(PFX +
+					 * "mainwindow.statusbar.serverMessage"), msg);
+					 */
+					logger.debug("Server Message: " + msg);
 					break;
 				case RemoteConstants.EV_ERROR_MESSAGE:
 					if (mainWindow != null) {
-						mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.serverErrorMessage") + ": " + msg, SWT.COLOR_RED);
+						mainWindow.setStatusBarText(I18N.translate(PFX
+								+ "mainwindow.statusbar.serverErrorMessage")
+								+ ": " + msg, SWT.COLOR_RED);
 					}
-					logger.error("Server ErrorMessage: "+msg);
+					logger.error("Server ErrorMessage: " + msg);
 					new MessageSlideShell(
 							display,
 							SWT.ICON_ERROR,
-							I18N.translate(PFX + "mainwindow.statusbar.serverErrorMessage"),
-							msg,
-							(String)null);
+							I18N
+									.translate(PFX
+											+ "mainwindow.statusbar.serverErrorMessage"),
+							msg, (String) null);
 					//MessageDialog.error(getDisplay(), I18N.translate(PFX + "mainwindow.statusbar.serverErrorMessage"), msg);
 					break;
 				}
 			}
 		});
 		client.addExceptionListener(new ExceptionListener() {
-			public void exceptionOccured(Exception e, boolean serious) {
+			public void exceptionOccured (Exception e, boolean serious) {
 				if (e instanceof SSLHandshakeException) {
-					new MessageSlideShell(
-							display,
-							SWT.ICON_ERROR,
-							"Connection Error",
-							"Server doesn't support SSL.",
-							(String)null);
+					new MessageSlideShell(display, SWT.ICON_ERROR,
+							"Connection Error", "Server doesn't support SSL.",
+							(String) null);
 					//MessageDialog.message(display,true,5000,"Connection Error","Server doesn't support SSL.");
 					disconnect();
-					logger.error("Connection Error: Server doesn't support SSL.");
+					logger
+							.error("Connection Error: Server doesn't support SSL.");
 				}
 			}
 		});
 		client.addClientUpdateListener(new ClientUpdateListener() {
-			public void update(long updateSwitches) {
+			public void update (long updateSwitches) {
 				if ((updateSwitches & Constants.UPDATE_UPDATE_INFO) != 0) {
 					if (client.getRemoteUpdateManager().updatesAvailable()) {
 						ServerUpdateDialog.open();
@@ -847,89 +1026,102 @@ public class RCMain {
 			}
 		});
 
-
-		SplashScreen.setProgressAndText("Creating Updater.",40);
+		SplashScreen.setProgressAndText("Creating Updater.", 40);
 		try {
-			updater = new Updater(new URL(RemoteConstants.UPDATE_URL),new File("AzSMRCupdate.xml.gz"),new File(USER_DIR));
+			updater = new Updater(new URL(RemoteConstants.UPDATE_URL),
+					new File("AzSMRCupdate.xml.gz"), new File(USER_DIR));
 			updater.setProxy(getProxy());
 		} catch (MalformedURLException e2) {
 		}
 		updater.addListener(new UpdateListener() {
-			public void exception(Exception e) {
-				System.out.println("Update Exception: "+e.getLocalizedMessage());
-				System.out.println("Update Exception: "+e.getMessage());
+			public void exception (Exception e) {
+				System.out.println("Update Exception: "
+						+ e.getLocalizedMessage());
+				System.out.println("Update Exception: " + e.getMessage());
 				if (mainWindow != null) {
-					mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.updateException") + ": "+e.getLocalizedMessage(),SWT.COLOR_RED);
+					mainWindow.setStatusBarText(I18N.translate(PFX
+							+ "mainwindow.statusbar.updateException")
+							+ ": " + e.getLocalizedMessage(), SWT.COLOR_RED);
 				}
-				logger.error("Update Exception: "+e.getLocalizedMessage());
+				logger.error("Update Exception: " + e.getLocalizedMessage());
 
 			}
-			public void noUpdate() {
+
+			public void noUpdate () {
 				if (mainWindow != null) {
-					mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.noUpdateAvailable"));
+					mainWindow.setStatusBarText(I18N.translate(PFX
+							+ "mainwindow.statusbar.noUpdateAvailable"));
 				}
 				logger.info("No Update Available");
 			}
-			public void updateAvailable(final Update update) {
+
+			public void updateAvailable (final Update update) {
 				if (mainWindow != null) {
-					mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.updateAvailable")
+					mainWindow.setStatusBarText(I18N.translate(PFX
+							+ "mainwindow.statusbar.updateAvailable")
 							+ " " + update.getVersion());
 				}
-				logger.info("Update Available: Version "+update.getVersion());
+				logger.info("Update Available: Version " + update.getVersion());
 				if (properties.getPropertyAsBoolean("update.autoupdate")) {
 					updater.doUpdate();
-				}else{
+				} else {
 					display.asyncExec(new SWTSafeRunnable() {
 						@Override
-						public void runSafe() {
-							UpdateDialog.open(display,update,updater);
+						public void runSafe () {
+							UpdateDialog.open(display, update, updater);
 						}
 					});
 
 				}
 			}
-			public void updateFailed(String reason) {
+
+			public void updateFailed (String reason) {
 				if (mainWindow != null) {
-					mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.updateFailed")
-							+ ": " + reason,SWT.COLOR_RED);
+					mainWindow.setStatusBarText(I18N.translate(PFX
+							+ "mainwindow.statusbar.updateFailed")
+							+ ": " + reason, SWT.COLOR_RED);
 				}
-				logger.info("Update Failed: "+reason);
+				logger.info("Update Failed: " + reason);
 			}
-			public void updateFinished() {
+
+			public void updateFinished () {
 				if (mainWindow != null) {
-					mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.updateFinished"));
+					mainWindow.setStatusBarText(I18N.translate(PFX
+							+ "mainwindow.statusbar.updateFinished"));
 				}
 				logger.info("Update Finished");
 			}
 
-			public void updateError(String error) {
+			public void updateError (String error) {
 				if (mainWindow != null) {
-					mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.updateError")
-							+ ": " + error,SWT.COLOR_RED);
+					mainWindow.setStatusBarText(I18N.translate(PFX
+							+ "mainwindow.statusbar.updateError")
+							+ ": " + error, SWT.COLOR_RED);
 				}
-				logger.info("Update Error: "+error);
+				logger.info("Update Error: " + error);
 			}
-			public void initializeUpdate(lbms.tools.Download[] dls) {
+
+			public void initializeUpdate (lbms.tools.Download[] dls) {
 				UpdateProgressDialog.initialize(dls);
 			}
 		});
 
-		SplashScreen.setProgressAndText("Loading Sounds.",50);
+		SplashScreen.setProgressAndText("Loading Sounds.", 50);
 		loadSounds();
-		SplashScreen.setProgressAndText("Creating Timer.",55);
-		timer = new Timer("Main Timer",5);
-		SplashScreen.setProgressAndText("Initializing Plugins.",60);
+		SplashScreen.setProgressAndText("Creating Timer.", 55);
+		timer = new Timer("Main Timer", 5);
+		SplashScreen.setProgressAndText("Initializing Plugins.", 60);
 		pluginManager.initialize(this);
-		SplashScreen.setProgressAndText("Finished Startup.",70);
+		SplashScreen.setProgressAndText("Finished Startup.", 70);
 	}
 
-	public RCMain () {
+	public RCMain() {
 		rcMain = this;
 		//set the langfile in case something needs it from the start
 		I18N.setDefault("lbms/azsmrc/remote/client/internat/default.lang");
 	}
 
-	private void shutdown() {
+	private void shutdown () {
 		System.out.println("Shutting down");
 		timer.destroy();
 		DownloadContainer.saveColumns();
@@ -942,40 +1134,69 @@ public class RCMain {
 	}
 
 	public void checkUpadteAndMotd () {
-		Thread t = new Thread () {
+		Thread t = new Thread() {
 			@Override
-			public void run() {
-				long lastcheck = properties.getPropertyAsLong("update.lastcheck");
-				if (System.currentTimeMillis()-lastcheck > 1000*60*60*24) {
-					if (properties.getPropertyAsBoolean("update.autocheck") || !properties.getPropertyAsBoolean("motd.disable")) {
+			public void run () {
+				long lastcheck = properties
+						.getPropertyAsLong("update.lastcheck");
+				if (System.currentTimeMillis() - lastcheck > 1000 * 60 * 60 * 24) {
+					if (properties.getPropertyAsBoolean("update.autocheck")
+							|| !properties.getPropertyAsBoolean("motd.disable")) {
 						if (mainWindow != null) {
-							mainWindow.setStatusBarText(I18N.translate(PFX + "mainwindow.statusbar.checking"));
+							mainWindow.setStatusBarText(I18N.translate(PFX
+									+ "mainwindow.statusbar.checking"));
 						}
 						URL url = null;
 						try {
-							if (properties.getPropertyAsBoolean("statistics.allow")) {
-								url = new URL (RemoteConstants.INFO_URL+"?app=AzSMRC_client&version="+azsmrcProperties.getProperty("version","0")+"&uid="+properties.getProperty("azsmrc.uid"));
-							} else	{
-								url = new URL (RemoteConstants.INFO_URL+"?app=AzSMRC_client&version="+azsmrcProperties.getProperty("version","0"));
+							if (properties
+									.getPropertyAsBoolean("statistics.allow")) {
+								url = new URL(RemoteConstants.INFO_URL
+										+ "?app=AzSMRC_client&version="
+										+ azsmrcProperties.getProperty(
+												"version", "0") + "&uid="
+										+ properties.getProperty("azsmrc.uid"));
+							} else {
+								url = new URL(RemoteConstants.INFO_URL
+										+ "?app=AzSMRC_client&version="
+										+ azsmrcProperties.getProperty(
+												"version", "0"));
 							}
-							HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+							HttpURLConnection conn = (HttpURLConnection) url
+									.openConnection();
 							conn.connect();
 							if (conn.getResponseCode() == 200) { //won't work unless something is requested
-								BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+								BufferedReader br = new BufferedReader(
+										new InputStreamReader(conn
+												.getInputStream()));
 								String info = br.readLine();
-								if (properties.getPropertyAsBoolean("update.autocheck") && !info.equalsIgnoreCase(properties.getProperty("update.Last-Modified", ""))) {
-									properties.setProperty("update.Last-Modified", info);
-									updater.checkForUpdates(properties.getPropertyAsBoolean("update.beta"));
+								if (properties
+										.getPropertyAsBoolean("update.autocheck")
+										&& !info.equalsIgnoreCase(properties
+												.getProperty(
+														"update.Last-Modified",
+														""))) {
+									properties.setProperty(
+											"update.Last-Modified", info);
+									updater
+											.checkForUpdates(properties
+													.getPropertyAsBoolean("update.beta"));
 								}
 								info = br.readLine();
-								if (!properties.getPropertyAsBoolean("motd.disable") && !info.equalsIgnoreCase(properties.getProperty("motd.Last-Modified", ""))) {
-									properties.setProperty("motd.Last-Modified", info);
+								if (!properties
+										.getPropertyAsBoolean("motd.disable")
+										&& !info.equalsIgnoreCase(properties
+												.getProperty(
+														"motd.Last-Modified",
+														""))) {
+									properties.setProperty(
+											"motd.Last-Modified", info);
 									MotdDialog.open();
 								}
 								br.close();
 							}
 							conn.disconnect();
-							properties.setProperty("update.lastcheck", System.currentTimeMillis());
+							properties.setProperty("update.lastcheck", System
+									.currentTimeMillis());
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -988,23 +1209,22 @@ public class RCMain {
 		t.start();
 	}
 
-	public long getRunTime() {
+	public long getRunTime () {
 		long now = System.currentTimeMillis();
-		long rTime = (now-runTime)
-			+properties.getPropertyAsLong("runTime");
+		long rTime = (now - runTime) + properties.getPropertyAsLong("runTime");
 		runTime = now;
 		properties.setProperty("runTime", rTime);
 		return rTime;
 	}
 
-	public void close() {
+	public void close () {
 		terminated = true;
 	}
 
 	/**
 	 * @return the terminated
 	 */
-	public boolean isTerminated() {
+	public boolean isTerminated () {
 		return terminated;
 	}
 
@@ -1018,16 +1238,16 @@ public class RCMain {
 		return connect;
 	}
 
-	public void connect(boolean open) {
+	public void connect (boolean open) {
 		logger.debug("Connect!");
 		connect = true;
 		client.connect();
-		/*client.sendGetPluginsFlexyConf();*/
+		/* client.sendGetPluginsFlexyConf(); */
 		client.getDownloadManager().update(true);
 		updateTimer(open);
 	}
 
-	public void disconnect() {
+	public void disconnect () {
 		logger.debug("Disconnect!");
 		connect = false;
 		client.disconnect();
@@ -1040,13 +1260,13 @@ public class RCMain {
 		}
 	}
 
-	public void updateTimer(boolean open) {
+	public void updateTimer (boolean open) {
 		if (connect) {
-			updateTimer(open,0);
+			updateTimer(open, 0);
 		}
 	}
 
-	public void updateTimer(boolean open,final int delay) {
+	public void updateTimer (boolean open, final int delay) {
 		if (!connect) {
 			return;
 		}
@@ -1054,20 +1274,21 @@ public class RCMain {
 		if (updateTimer != null) {
 			updateTimer.cancel();
 		}
-		logger.debug("Changing Timer: "+(open?"GUI mode":"Tray mode"));
+		logger.debug("Changing Timer: " + (open ? "GUI mode" : "Tray mode"));
 		if (open) {
-			updateTimer = timer.addPeriodicEvent(properties.getPropertyAsLong("connection_interval_open")+delay,
-				new TimerEventPerformer() {
-				public void perform(TimerEvent event) {
+			updateTimer = timer.addPeriodicEvent(properties
+					.getPropertyAsLong("connection_interval_open")
+					+ delay, new TimerEventPerformer() {
+				public void perform (TimerEvent event) {
 					logger.debug("Timer: GUI mode");
 					client.getDownloadManager().update(false);
 				}
 			});
-		}
-		else {
-			updateTimer = timer.addPeriodicEvent(properties.getPropertyAsLong("connection_interval_closed")+delay,
-				new TimerEventPerformer() {
-				public void perform(TimerEvent event) {
+		} else {
+			updateTimer = timer.addPeriodicEvent(properties
+					.getPropertyAsLong("connection_interval_closed")
+					+ delay, new TimerEventPerformer() {
+				public void perform (TimerEvent event) {
 					logger.debug("Timer: Tray mode");
 					client.sendGetGlobalStats();
 				}
@@ -1075,47 +1296,47 @@ public class RCMain {
 		}
 	}
 
-	public static RCMain getRCMain() {
+	public static RCMain getRCMain () {
 		return rcMain;
 	}
 
-	public Client getClient() {
+	public Client getClient () {
 		return client;
 	}
 
-	public Display getDisplay(){
+	public Display getDisplay () {
 		return display;
 	}
 
-	public DownloadManagerShell getMainWindow(){
+	public DownloadManagerShell getMainWindow () {
 		return mainWindow;
 	}
 
-	public void closeMainWindow(){
+	public void closeMainWindow () {
 		if (mainWindow != null) {
 			mainWindow.close_shell();
 			mainWindow = null;
 		}
 	}
 
-	public void nullMainWindow(){
-		if(mainWindow != null) {
+	public void nullMainWindow () {
+		if (mainWindow != null) {
 			mainWindow = null;
 		}
 	}
 
-	public void openMainWindow(){
-		try{
+	public void openMainWindow () {
+		try {
 			Shell dms_shell = getMainWindow().getShell();
-			if(dms_shell.getMinimized()){
+			if (dms_shell.getMinimized()) {
 				dms_shell.setMinimized(false);
 				dms_shell.setVisible(true);
 
-			} else{
+			} else {
 				dms_shell.setMinimized(true);
 				dms_shell.setVisible(false);
 			}
-		}catch(Exception e1){
+		} catch (Exception e1) {
 			if (mainWindow == null) {
 				mainWindow = new DownloadManagerShell();
 			}
@@ -1123,57 +1344,60 @@ public class RCMain {
 			return;
 		}
 
-		/*mainWindow = new DownloadManagerShell();
-			mainWindow.open();*/
+		/*
+		 * mainWindow = new DownloadManagerShell(); mainWindow.open();
+		 */
 	}
 
 	public Timer getMainTimer () {
 		return timer;
 	}
 
-	public ExtendedProperties getProperties() {
+	public ExtendedProperties getProperties () {
 		return properties;
 	}
-
 
 	/**
 	 * @return Returns the azsmrcProperties.
 	 */
-	public Properties getAzsmrcProperties() {
+	public Properties getAzsmrcProperties () {
 		return azsmrcProperties;
 	}
-
 
 	/**
 	 * @return Returns the updater.
 	 */
-	public Updater getUpdater() {
+	public Updater getUpdater () {
 		return updater;
 	}
 
 	/**
 	 * Sets the tray Icon
-	 *
+	 * 
 	 * @param connection -- int -- @see ConnectionListener.ST_*
 	 */
 	public void setTrayIcon (int connection) {
-		if(systrayItem == null || systrayItem.isDisposed()) {
+		if (systrayItem == null || systrayItem.isDisposed()) {
 			return;
 		}
 		switch (connection) {
 		case ConnectionListener.ST_CONNECTION_ERROR:
-			systrayItem.setToolTipText(I18N.translate(PFX + "tray.tooltip.connectionError"));
+			systrayItem.setToolTipText(I18N.translate(PFX
+					+ "tray.tooltip.connectionError"));
 			systrayItem.setImage(ImageRepository.getImage("TrayIcon_Red"));
-		break;
+			break;
 
 		case ConnectionListener.ST_DISCONNECTED:
-			systrayItem.setToolTipText(I18N.translate(PFX + "tray.tooltip.notConnected"));
-			systrayItem.setImage(ImageRepository.getImage("TrayIcon_Disconnected"));
-		break;
+			systrayItem.setToolTipText(I18N.translate(PFX
+					+ "tray.tooltip.notConnected"));
+			systrayItem.setImage(ImageRepository
+					.getImage("TrayIcon_Disconnected"));
+			break;
 
 		case ConnectionListener.ST_CONNECTING:
-			systrayItem.setImage(ImageRepository.getImage("TrayIcon_Connecting"));
-		break;
+			systrayItem.setImage(ImageRepository
+					.getImage("TrayIcon_Connecting"));
+			break;
 
 		case ConnectionListener.ST_CONNECTED:
 			//systrayItem.setToolTipText("AzMultiUser RC");  //Let the listener do this!
@@ -1181,8 +1405,8 @@ public class RCMain {
 		}
 	}
 
-	public void javawExeManifest() {
-		if (!(RemoteConstants.isWindowsXP || RemoteConstants.isWindows2003) ) {
+	public void javawExeManifest () {
+		if (!(RemoteConstants.isWindowsXP || RemoteConstants.isWindows2003)) {
 			manifestInUse = false;
 		} else {
 			//due to the new exe we don't need the check anymore
@@ -1193,12 +1417,12 @@ public class RCMain {
 	/**
 	 * @return Returns the manifestInUse.
 	 */
-	public boolean isManifestInUse() {
+	public boolean isManifestInUse () {
 		return manifestInUse;
 	}
 
-	public void saveConfig() {
-		if (properties!=null) {
+	public void saveConfig () {
+		if (properties != null) {
 			FileOutputStream fos = null;
 			try {
 				if (!confFile.exists()) {
@@ -1208,28 +1432,32 @@ public class RCMain {
 				properties.storeToXML(fos, null);
 			} catch (IOException e) {
 				e.printStackTrace();
-			} finally {if (fos != null) {
-				try {
-					fos.close();
-				} catch (IOException e) {
-					e.printStackTrace();
+			} finally {
+				if (fos != null) {
+					try {
+						fos.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
-			}
 			}
 		}
 	}
 
-	public void loadSounds() {
+	public void loadSounds () {
 		if (!properties.getPropertyAsBoolean("soundManager.active", true)) {
 			return;
 		}
-		loadSound(Sound.ERROR, 					properties.getProperty("sound.Error"));
-		loadSound(Sound.DOWNLOAD_ADDED, 		properties.getProperty("sound.DownloadAdded"));
-		loadSound(Sound.DOWNLOADING_FINISHED,	properties.getProperty("sound.DownloadingFinished"));
-		loadSound(Sound.SEEDING_FINISHED,		properties.getProperty("sound.SeedingFinished"));
+		loadSound(Sound.ERROR, properties.getProperty("sound.Error"));
+		loadSound(Sound.DOWNLOAD_ADDED, properties
+				.getProperty("sound.DownloadAdded"));
+		loadSound(Sound.DOWNLOADING_FINISHED, properties
+				.getProperty("sound.DownloadingFinished"));
+		loadSound(Sound.SEEDING_FINISHED, properties
+				.getProperty("sound.SeedingFinished"));
 	}
 
-	public void unLoadSounds() {
+	public void unLoadSounds () {
 		SoundManager.unLoad(Sound.ERROR);
 		SoundManager.unLoad(Sound.DOWNLOAD_ADDED);
 		SoundManager.unLoad(Sound.DOWNLOADING_FINISHED);
@@ -1238,24 +1466,26 @@ public class RCMain {
 
 	/**
 	 * Sets the Proxy for the current session.
-	 *
+	 * 
 	 * The data will not be saved.
-	 *
-	 * @param stype Proxy Type {@link http://java.sun.com/j2se/1.5.0/docs/api/java/net/Proxy.Type.html}
+	 * 
+	 * @param stype Proxy Type {@link http 
+	 *            ://java.sun.com/j2se/1.5.0/docs/api/java/net/Proxy.Type.html}
 	 * @param url the Proxy url
 	 * @param port the Proxy port
 	 */
 	public void setProxy (String stype, String url, int port) {
 		Proxy.Type type = Proxy.Type.valueOf(stype);
 		InetSocketAddress inetAddress = new InetSocketAddress(url, port);
-		proxy = new Proxy(type,inetAddress);
+		proxy = new Proxy(type, inetAddress);
 		client.setProxy(proxy);
 	}
 
 	/**
 	 * Sets the Proxy for the current session.
-	 *
+	 * 
 	 * The data will not be saved.
+	 * 
 	 * @param proxy the Proxy to use
 	 */
 	public void setProxy (Proxy proxy) {
@@ -1266,16 +1496,18 @@ public class RCMain {
 	/**
 	 * @return the proxy
 	 */
-	public Proxy getProxy() {
+	public Proxy getProxy () {
 		return proxy;
 	}
 
 	private void loadSound (Sound key, String snd) {
 		if (snd == null || snd.equals("")) {
-			logger.warn("Couldn't Load "+key+" because location was empty.");
+			logger
+					.warn("Couldn't Load " + key
+							+ " because location was empty.");
 			return;
 		}
-		File sndFile = new File (snd);
+		File sndFile = new File(snd);
 		if (sndFile.exists() && sndFile.canRead()) {
 			SoundManager.unLoad(key);
 			try {
@@ -1284,16 +1516,16 @@ public class RCMain {
 				e.printStackTrace();
 			}
 		} else {
-			logger.warn("Couldn't Load "+key+" from "+snd);
+			logger.warn("Couldn't Load " + key + " from " + snd);
 		}
 	}
 
 	/**
 	 * Generates a Random UID
-	 *
+	 * 
 	 * @return true if UID was generated, false if UID already present
 	 */
-	private boolean generateUID() {
+	private boolean generateUID () {
 		if (properties.containsKey("azsmrc.uid")) {
 			return false;
 		}
@@ -1316,7 +1548,8 @@ public class RCMain {
 		n >>>= 8;
 		b[0] = (byte) (n);
 		try {
-			String uid = CryptoTools.formatByte(CryptoTools.messageDigest(b, "SHA-1"),true);
+			String uid = CryptoTools.formatByte(CryptoTools.messageDigest(b,
+					"SHA-1"), true);
 			properties.setProperty("azsmrc.uid", uid);
 			saveConfig();
 			return true;
@@ -1328,15 +1561,14 @@ public class RCMain {
 
 	public String getAWTClipboardString () {
 		try {
-			Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-			Transferable transferData = systemClipboard.getContents( null );
-			for ( DataFlavor dataFlavor : transferData.getTransferDataFlavors() )
-			{
-			  Object content = transferData.getTransferData( dataFlavor );
-			  if ( content instanceof String )
-			  {
-			   return (String)content;
-			  }
+			Clipboard systemClipboard = Toolkit.getDefaultToolkit()
+					.getSystemClipboard();
+			Transferable transferData = systemClipboard.getContents(null);
+			for (DataFlavor dataFlavor : transferData.getTransferDataFlavors()) {
+				Object content = transferData.getTransferData(dataFlavor);
+				if (content instanceof String) {
+					return (String) content;
+				}
 			}
 		} catch (HeadlessException e) {
 			e.printStackTrace();
@@ -1352,7 +1584,8 @@ public class RCMain {
 
 	public void setAWTClipboardString (String content) {
 		try {
-			Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			Clipboard systemClipboard = Toolkit.getDefaultToolkit()
+					.getSystemClipboard();
 			systemClipboard.setContents(new StringSelection(content), null);
 		} catch (HeadlessException e) {
 			e.printStackTrace();
@@ -1361,25 +1594,37 @@ public class RCMain {
 		}
 	}
 
-	public void addAWTClipboardMonitor(){
+	public void addAWTClipboardMonitor () {
 		//AWT Listener for the clipboard
-		final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-/*		FlavorListener[] listeners = clipboard.getFlavorListeners();
-		for(FlavorListener listen:listeners){
-			clipboard.removeFlavorListener(listen);
-		}*/
-		clipboard.addFlavorListener(new FlavorListener(){
-			Pattern magnetPattern = Pattern.compile("^magnet:\\?xt=urn:btih:[A-Za-z2-7]{32}$",Pattern.CASE_INSENSITIVE);
+		final Clipboard clipboard = Toolkit.getDefaultToolkit()
+				.getSystemClipboard();
+		/*
+		 * FlavorListener[] listeners = clipboard.getFlavorListeners();
+		 * for(FlavorListener listen:listeners){
+		 * clipboard.removeFlavorListener(listen); }
+		 */
+		clipboard.addFlavorListener(new FlavorListener() {
+			Pattern	magnetPattern	= Pattern
+											.compile(
+													"^magnet:\\?xt=urn:btih:[A-Za-z2-7]{32}$",
+													Pattern.CASE_INSENSITIVE);
 
-			public void flavorsChanged(FlavorEvent event) {
+			public void flavorsChanged (FlavorEvent event) {
 				System.out.println("2");
-				if(connect && properties.getPropertyAsBoolean("auto_clipboard",Utilities.isLinux()? false : true)){
+				if (connect
+						&& properties.getPropertyAsBoolean("auto_clipboard",
+								Utilities.isLinux() ? false : true)) {
 					try {
 						Transferable contents = clipboard.getContents(this);
-						if ( ( contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor) ) {
+						if ((contents != null)
+								&& contents
+										.isDataFlavorSupported(DataFlavor.stringFlavor)) {
 							try {
-								final String string = ((String) contents.getTransferData(DataFlavor.stringFlavor)).trim();
-								if(!string.contains("torrent") && !string.contains("magnet")) {
+								final String string = ((String) contents
+										.getTransferData(DataFlavor.stringFlavor))
+										.trim();
+								if (!string.contains("torrent")
+										&& !string.contains("magnet")) {
 									return;
 								}
 								boolean valid = false;
@@ -1390,34 +1635,40 @@ public class RCMain {
 									try {
 										new URL(string);
 										valid = true;
-									} catch (MalformedURLException e) {}
+									} catch (MalformedURLException e) {
+									}
 								}
 								if (valid) {
-									clipboard.setContents(emptyTransfer,null); //clear Transfer
-									display.asyncExec(new SWTSafeRunnable(){
+									clipboard.setContents(emptyTransfer, null); //clear Transfer
+									display.asyncExec(new SWTSafeRunnable() {
 										@Override
-										public void runSafe() {
+										public void runSafe () {
 											OpenByURLDialog.openWithURL(string);
 										}
 									});
 								} else {
-									System.out.println("Not Valid URL: "+ string);
+									System.out.println("Not Valid URL: "
+											+ string);
 								}
-							} catch(Exception e) {
+							} catch (Exception e) {
 								//Just a regular string.. so ignore
 								e.printStackTrace();
 							}
 
-						} else if(( contents != null) && contents.isDataFlavorSupported(DataFlavor.javaFileListFlavor)){
-							try{
-								List<File> list = (List<File>) contents.getTransferData(DataFlavor.javaFileListFlavor);
+						} else if ((contents != null)
+								&& contents
+										.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+							try {
+								List<File> list = (List<File>) contents
+										.getTransferData(DataFlavor.javaFileListFlavor);
 								Iterator<File> iter = list.iterator();
-								while(iter.hasNext()){
+								while (iter.hasNext()) {
 									File file = iter.next();
-									logger.debug("*******FILE****" + file.getPath());
+									logger.debug("*******FILE****"
+											+ file.getPath());
 								}
 
-							}catch(Exception e){
+							} catch (Exception e) {
 								e.printStackTrace();
 							}
 
@@ -1432,12 +1683,12 @@ public class RCMain {
 		});
 	}
 
-
 	/**
 	 * Returns the intialized PluginManagerImpl used in RCMain
+	 * 
 	 * @return PluginManagerImpl
 	 */
-	public PluginManagerImpl getPluginManagerImpl(){
+	public PluginManagerImpl getPluginManagerImpl () {
 		return pluginManager;
 	}
 }//EOF
