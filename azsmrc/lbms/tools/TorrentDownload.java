@@ -5,16 +5,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.InflaterInputStream;
-
-import lbms.tools.stats.StatsInputStream;
 
 /**
  * @author Damokles
@@ -34,7 +33,7 @@ public class TorrentDownload extends Download {
 
 	private ByteArrayOutputStream			buffer;
 
-	private static final String				contentType					= "application/x-bittorrent";
+	private static final String				torrentContentType			= "application/x-bittorrent";
 
 	private static Pattern					hrefPattern					= Pattern
 																				.compile(
@@ -56,11 +55,16 @@ public class TorrentDownload extends Download {
 																						Pattern.CASE_INSENSITIVE
 																								| Pattern.DOTALL);
 
+	private static String[]					torrentLinkLikelines		= new String[] {
+			"get", "down", "download", "torrent"						};
+
 	private String							torrentLinkIdentifier;
 
 	private int								returnCode					= RTC_INIT;
 
 	private String							magnetURL;
+
+	private boolean							isXHTML						= false;
 
 	private HttpURLConnectionFactory		connectionFactory			= defaultConnectionFactory;
 
@@ -116,100 +120,38 @@ public class TorrentDownload extends Download {
 	 * @see java.util.concurrent.Callable#call()
 	 */
 	public Download call () throws Exception {
-		InputStream is = null;
 		try {
+			/* ################### Initialise Connection ################# */
 			debugMsg("TorrentDownloader: starting Download [" + source + "]");
-			HttpURLConnection conn = connectionFactory.getConnection(source,
-					proxy);
+			HTTPDownload httpDownload = new HTTPDownload(source);
+			//redirect all logging here
+			httpDownload.addDownloadListener(new DownloadListener() {
 
-			conn.setConnectTimeout(TIMEOUT);
-			conn.setReadTimeout(TIMEOUT);
-			conn.setDoInput(true);
+				@Override
+				public void debugMsg (String msg) {
+					debugMsg(msg);
 
-			conn.addRequestProperty("Accept-Encoding", "gzip, deflate");
-			conn.addRequestProperty("User-Agent", userAgent);
-			if (referer != null) {
-				conn.addRequestProperty("Referer", referer);
-			}
-
-			if (cookie != null) {
-				conn.addRequestProperty("Cookie", cookie);
-			}
-
-			if (login != null) {
-				conn.setRequestProperty("Authorization", "Basic: " + login);
-			}
-
-			callStateChanged(STATE_CONNECTING);
-			conn.connect();
-
-			int response = conn.getResponseCode();
-
-			//connection failed
-			if ((response != HttpURLConnection.HTTP_ACCEPTED)
-					&& (response != HttpURLConnection.HTTP_OK)) {
-				callStateChanged(STATE_FAILURE);
-				failed = true;
-				failureReason = conn.getResponseMessage() != null ? conn
-						.getResponseMessage()
-						: "Connection Failed unknown problem. [" + response
-								+ "]";
-				callStateChanged(STATE_FAILURE);
-				return this;
-			}
-
-			StatsInputStream sis = new StatsInputStream(conn.getInputStream());
-			is = sis;
-			String encoding = conn.getHeaderField("content-encoding");
-			int contentLength = conn.getContentLength();
-			if (conn.getHeaderField("cookie") != null) {
-				this.cookie = conn.getHeaderField("cookie");
-			}
-
-			boolean gzip = encoding != null
-					&& (encoding.equalsIgnoreCase("gzip") || encoding
-							.equalsIgnoreCase("x-gzip"));
-			boolean deflate = encoding != null
-					&& (encoding.equalsIgnoreCase("deflate") || encoding
-							.equalsIgnoreCase("x-deflate"));
-
-			if (gzip) {
-				is = new GZIPInputStream(is);
-			} else if (deflate) {
-				is = new InflaterInputStream(is);
-			}
-			callStateChanged(STATE_DOWNLOADING);
-			long last = System.currentTimeMillis();
-			long now;
-
-			byte[] buf = new byte[BUFFER_SIZE];
-
-			buffer = (contentLength > 0 && contentLength < 5242880) ? new ByteArrayOutputStream(
-					contentLength)
-					: new ByteArrayOutputStream(524288);
-			for (int read = is.read(buf); read > 0; read = is.read(buf)) {
-				if (abort) {
-					is.close();
-					callStateChanged(STATE_ABORTED);
-					failed = true;
-					failureReason = "Aborted by User";
-					return this;
 				}
-				buffer.write(buf, 0, read);
-				now = System.currentTimeMillis();
-				if (now - last >= 500) {
-					callProgress(sis.getBytesRead(), contentLength);
-					last = now;
+
+				@Override
+				public void progress (long bytesRead, long bytesTotal) {
+					callProgress(bytesRead, bytesTotal);
+
 				}
-			}
-			is.close();
-			conn.disconnect();
-			//finally call again
-			callProgress(sis.getBytesRead(), contentLength);
-			if (contentLength > 0 && !(gzip || deflate)
-					&& buffer.size() != contentLength) {
-				failed = true;
-				failureReason = "Content length doesn't Match.";
+
+				@Override
+				public void stateChanged (int oldState, int newState) {
+					callStateChanged(newState);
+				}
+			});
+			httpDownload.call();
+
+			/* ################### Analyse Content ################# */
+			buffer = httpDownload.getBuffer();
+
+			if (httpDownload.failed) {
+				failed = httpDownload.failed;
+				failureReason = httpDownload.failureReason;
 				callStateChanged(STATE_FAILURE);
 			} else {
 				if (isTorrent(buffer.toByteArray())) {
@@ -240,87 +182,32 @@ public class TorrentDownload extends Download {
 							+ source + "]");
 					try {
 						String html = buffer.toString("UTF-8");
-						Matcher tor = torrentHrefPattern.matcher(html);
-						if (tor.find()) {
-							try {
-								String torlink = tor.group(1);
-								//set new source and download again
-								URL torURL = resolveRelativeURL(source, torlink);
-
-								debugMsg("TorrentDownloader: found Torrent Link ["
-										+ torURL + "]");
-								if (isHrefTorrent(torURL)) {
-									source = torURL;
-									callStateChanged(STATE_RESET);
-									return call();
-								}
-							} catch (MalformedURLException e) {
-								e.printStackTrace();
-							}
+						if (html.substring(0, 100).toLowerCase().contains(
+								"xhtml")) {
+							isXHTML = true;
 						}
-						Matcher magnet = magnetPattern.matcher(html);
-						if (magnet.find()) {
-							magnetURL = magnet.group();
-							returnCode = RTC_MAGNET;
-							finished = true;
-							debugMsg("TorrentDownloader: found Magnet Link ["
-									+ magnetURL + "] from [" + source + "]");
-							callStateChanged(STATE_FINISHED);
+
+						if (findTorrentLink(html)) {
+							//findTorrentLink resets the target url so we need to call again.
+							return call();
+						}
+						if (findMagnetLink(html)) {
 							return this;
 						}
 
-						if (torrentLinkIdentifier != null) {
-							debugMsg("TorrentDownloader: trying to use torrentLinkIdentifier ["
-									+ torrentLinkIdentifier + "]");
-							Matcher m = Pattern
-									.compile(
-											"href\\s*=\\s*(?:\"|')([\\w:/.?&-=%\\[\\]{}\\(\\) ]*"
-													+ Pattern
-															.quote(torrentLinkIdentifier)
-													+ "[\\w:/.?&-=%\\[\\]{}\\(\\) ]*)(?:\"|')",
-											Pattern.CASE_INSENSITIVE).matcher(
-											html);
-							if (m.find()) {
-								try {
-									String torlink = m.group(1);
-									//set new source and download again
-									URL torURL = resolveRelativeURL(source,
-											torlink);
-									debugMsg("TorrentDownloader: found Torrent Link ["
-											+ torURL + "]");
-									if (isHrefTorrent(torURL)) {
-										source = torURL;
-										callStateChanged(STATE_RESET);
-										return call();
-									}
-								} catch (MalformedURLException e) {
-									e.printStackTrace();
-								}
-							} else {
-								debugMsg("TorrentDownloader: failed to find torrent by torrentLinkIdentifier ["
-										+ torrentLinkIdentifier + "]");
-							}
-
+						if (findTorrentByIdentifier(html)) {
+							return call();
 						}
 
-						//no direct torrent or magnet link was found
 						debugMsg("TorrentDownloader: parsing all links for torrent ["
 								+ source + "]");
-						Matcher links = hrefPattern.matcher(html);
-						while (links.find()) {
-							try {
-								URL torURL = resolveRelativeURL(source, links
-										.group(1));
-								if (isHrefTorrent(torURL)) {
-									setTorrentLinkIdentifier(links.group(1));
-									source = torURL;
-									callStateChanged(STATE_RESET);
-									return call();
-								}
-							} catch (MalformedURLException e) {
-								e.printStackTrace();
-							}
+
+						//no direct torrent or magnet link was found
+						if (findTorrentBySearchingAllLinks(html)) {
+							return call();
+
 						}
+
 						debugMsg("TorrentDownloader: failed to find torrent Link ["
 								+ source + "]");
 
@@ -343,27 +230,151 @@ public class TorrentDownload extends Download {
 			e.printStackTrace();
 			throw e;
 		} finally {
-			if (is != null) {
-				try {
-					is.close();
-				} catch (IOException e) {
-				}
-			}
 		}
 		return this;
+	}
+
+	private boolean findTorrentLink (String html) {
+		Matcher tor = torrentHrefPattern.matcher(html);
+		if (tor.find()) {
+			try {
+				String torlink = tor.group(1);
+				if (isXHTML) {
+					torlink = torlink.replace("&amp;", "&");
+				}
+				//set new source and download again
+				URL torURL = resolveRelativeURL(source, torlink);
+
+				debugMsg("TorrentDownloader: found Torrent Link [" + torURL
+						+ "]");
+				if (isHrefTorrent(torURL)) {
+					source = torURL;
+					callStateChanged(STATE_RESET);
+					return true;
+				}
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+		}
+		return false;
+	}
+
+	private boolean findMagnetLink (String html) {
+		Matcher magnet = magnetPattern.matcher(html);
+		if (magnet.find()) {
+			magnetURL = magnet.group();
+			returnCode = RTC_MAGNET;
+			finished = true;
+			debugMsg("TorrentDownloader: found Magnet Link [" + magnetURL
+					+ "] from [" + source + "]");
+			callStateChanged(STATE_FINISHED);
+			return true;
+		}
+		return false;
+	}
+
+	private boolean findTorrentByIdentifier (String html) {
+		if (torrentLinkIdentifier != null) {
+			debugMsg("TorrentDownloader: trying to use torrentLinkIdentifier ["
+					+ torrentLinkIdentifier + "]");
+			Matcher m = Pattern.compile(
+					"href\\s*=\\s*(?:\"|')([\\w:/.?&-=%\\[\\]{}\\(\\) ]*"
+							+ Pattern.quote(torrentLinkIdentifier)
+							+ "[\\w:/.?&-=%\\[\\]{}\\(\\) ]*)(?:\"|')",
+					Pattern.CASE_INSENSITIVE).matcher(html);
+			if (m.find()) {
+				try {
+					String torlink = m.group(1);
+					//set new source and download again
+					URL torURL = resolveRelativeURL(source, torlink);
+					debugMsg("TorrentDownloader: found Torrent Link [" + torURL
+							+ "]");
+					if (isHrefTorrent(torURL)) {
+						source = torURL;
+						callStateChanged(STATE_RESET);
+					}
+				} catch (MalformedURLException e) {
+					e.printStackTrace();
+				}
+			} else {
+				debugMsg("TorrentDownloader: failed to find torrent by torrentLinkIdentifier ["
+						+ torrentLinkIdentifier + "]");
+			}
+
+		}
+		return false;
+	}
+
+	private boolean findTorrentBySearchingAllLinks (String html) {
+		Matcher links = hrefPattern.matcher(html);
+		List<LinkAndURL> urls = new ArrayList<LinkAndURL>();
+		while (links.find()) {
+			try {
+				String torlink = links.group(1);
+				if (isXHTML) {
+					torlink = torlink.replace("&amp;", "&");
+				}
+				URL torURL = resolveRelativeURL(source, torlink);
+				urls.add(new LinkAndURL(torlink, torURL));
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		//sort all links an move the links that might be torrents to the beginning of the list
+		Collections.sort(urls, new Comparator<LinkAndURL>() {
+			@Override
+			public int compare (LinkAndURL o1, LinkAndURL o2) {
+				int rating1 = rateTorrentLinkLikelines(o1.getUrl());
+				int rating2 = rateTorrentLinkLikelines(o2.getUrl());
+				if (rating1 == rating2) {
+					return o1.getUrl().toExternalForm().compareTo(
+							o2.getUrl().toExternalForm());
+				} else if (rating1 > rating2) {
+					//we return -1 here because it sorts to the beginning of the list
+					return -1;
+				}
+				return 1;
+			}
+		});
+
+		for (LinkAndURL torURL : urls) {
+
+			if (isHrefTorrent(torURL.getUrl())) {
+				setTorrentLinkIdentifier(torURL.getLink());
+				source = torURL.getUrl();
+				callStateChanged(STATE_RESET);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private boolean isHrefTorrent (URL target) {
 		try {
 			HttpURLConnection conn = connectionFactory.getConnection(target,
 					proxy);
+			if (target.toExternalForm().contains("?page=download")) {
+				int x = 0;
+				x = x + 1;
+			}
 
 			conn.setRequestMethod("HEAD");
 			conn.connect();
-			String ct = conn.getContentType();
+			String contentType = conn.getContentType();
 			conn.disconnect();
-			if (ct != null) {
-				return ct.toLowerCase().startsWith(contentType);
+			if (contentType != null) {
+				if (contentType.toLowerCase().startsWith(torrentContentType)) {
+					return true;
+				}
+			}
+
+			String contentDisposition = conn
+					.getHeaderField("content-disposition");
+			if (contentDisposition != null) {
+				if (contentDisposition.toLowerCase().contains(".torrent")) {
+					return true;
+				}
 			}
 
 		} catch (IOException e) {
@@ -415,10 +426,10 @@ public class TorrentDownload extends Download {
 			fis = new FileInputStream(x);
 
 			//we only need the 10 fist chars
-			byte[] y = new byte[10];
-			fis.read(y);
+			byte[] header = new byte[10];
+			fis.read(header);
 
-			if (torrentDataPattern.matcher(new String(y, "UTF-8")).find()) {
+			if (torrentDataPattern.matcher(new String(header, "UTF-8")).find()) {
 				return true;
 			}
 		} catch (Exception e) {
@@ -433,6 +444,29 @@ public class TorrentDownload extends Download {
 		}
 
 		return false;
+	}
+
+	/**
+	 * This method is used for sorting the links that might be torrents at the
+	 * beginning of the list.
+	 * 
+	 * @param link
+	 * @return
+	 */
+	public int rateTorrentLinkLikelines (URL link) {
+		String url = link.toExternalForm().toLowerCase();
+		int rating = 0;
+		for (int i = 0; i < torrentLinkLikelines.length; i++) {
+			if (url.contains(torrentLinkLikelines[i])) {
+				rating += i + 1;
+			}
+		}
+		if (url.contains(source.getHost().toLowerCase())) {
+			rating += torrentLinkLikelines.length + 10;
+		}
+
+		//System.out.println("Rating: " + rating + " for: " + link);
+		return rating;
 	}
 
 	/**
@@ -493,4 +527,22 @@ public class TorrentDownload extends Download {
 		TorrentDownload.defaultConnectionFactory = defaultConnectionFactory;
 	}
 
+	protected class LinkAndURL {
+		private String	link;
+		private URL		url;
+
+		public LinkAndURL(String link, URL url) {
+			super();
+			this.link = link;
+			this.url = url;
+		}
+
+		public String getLink () {
+			return link;
+		}
+
+		public URL getUrl () {
+			return url;
+		}
+	}
 }

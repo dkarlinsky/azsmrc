@@ -39,6 +39,12 @@ public class HTTPDownload extends Download {
 		super(source, target);
 	}
 
+	/**
+	 * This will store the content in a byte buffer with the maximum size of
+	 * 5mb.
+	 * 
+	 * @param source Download Source
+	 */
 	public HTTPDownload(URL source) {
 		super(source);
 	}
