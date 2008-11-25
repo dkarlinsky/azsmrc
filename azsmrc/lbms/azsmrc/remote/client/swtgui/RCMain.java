@@ -906,20 +906,21 @@ public class RCMain {
 										+ DisplayFormatters
 												.formatTime(duration * 1000)
 										+ " " + avgDl);
-						new MessageSlideShell(
-								display,
-								SWT.ICON_INFORMATION,
-								I18N
-										.translate(PFX
-												+ "mainwindow.statusbar.downloadFinished"),
-								event.getAttributeValue("name")
-										+ "\n"
-										+ I18N
+						MessageDialog
+								.message(
+										display,
+										I18N
 												.translate(PFX
-														+ "mainwindow.statusbar.downloadFinished")
-										+ DisplayFormatters
-												.formatTime(duration * 1000)
-										+ " " + avgDl, (String) null);
+														+ "mainwindow.statusbar.downloadFinished"),
+										event.getAttributeValue("name")
+												+ "\n"
+												+ I18N
+														.translate(PFX
+																+ "mainwindow.statusbar.downloadFinished")
+												+ DisplayFormatters
+														.formatTime(duration * 1000)
+												+ " " + avgDl);
+
 						/*
 						 * MessageDialog.message(display,I18N.translate(PFX +
 						 * "mainwindow.statusbar.downloadFinished"),
