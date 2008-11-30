@@ -51,9 +51,9 @@ import lbms.azsmrc.remote.client.pluginsimpl.PluginLoader;
 import lbms.azsmrc.remote.client.pluginsimpl.PluginManagerImpl;
 import lbms.azsmrc.remote.client.swtgui.container.DownloadContainer;
 import lbms.azsmrc.remote.client.swtgui.container.SeedContainer;
+import lbms.azsmrc.remote.client.swtgui.dialogs.DefaultMessageDialogFactory;
 import lbms.azsmrc.remote.client.swtgui.dialogs.ErrorDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.InputShell;
-import lbms.azsmrc.remote.client.swtgui.dialogs.MessageDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.MessageSlideShell;
 import lbms.azsmrc.remote.client.swtgui.dialogs.MotdDialog;
 import lbms.azsmrc.remote.client.swtgui.dialogs.OpenByFileDialog;
@@ -622,6 +622,11 @@ public class RCMain {
 		System.out.println("Checking javaw.exe.manifest");
 		javawExeManifest();
 
+		//initialize the message service, this can later be extended
+		//to support other messaging systems like snarl or growl
+		MessageService.setMessageDialogFactory(new DefaultMessageDialogFactory(
+				display));
+
 		if (properties.getPropertyAsBoolean("show_splash")) {
 			SplashScreen.open(display, 20);
 		}
@@ -906,9 +911,8 @@ public class RCMain {
 										+ DisplayFormatters
 												.formatTime(duration * 1000)
 										+ " " + avgDl);
-						MessageDialog
-								.message(
-										display,
+						MessageService
+								.displayInformation(
 										I18N
 												.translate(PFX
 														+ "mainwindow.statusbar.downloadFinished"),
@@ -934,7 +938,7 @@ public class RCMain {
 						logger.info(I18N.translate(PFX
 								+ "mainwindow.statusbar.downloadFinished")
 								+ " " + event.getAttributeValue("name"));
-						MessageDialog.message(display, I18N.translate(PFX
+						MessageService.displayInformation(I18N.translate(PFX
 								+ "mainwindow.statusbar.downloadFinished"),
 								event.getAttributeValue("name"));
 					}
