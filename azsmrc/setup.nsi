@@ -72,7 +72,7 @@ Section -Main SEC0000
 	File AzSMRCupdate.xml.gz
 	File launch.properties
 	File AzSMRC.exe.manifest
-	File lbms\azsmrc\libs\jdom_1.0.jar
+	File lbms\azsmrc\libs\jdom_1.1.jar
 	File lbms\azsmrc\libs\commons-codec_1.3.jar
 	File lbms\azsmrc\libs\log4j_1.2.13.jar
 	WriteRegStr HKLM "${REGKEY}\Components" Main 1
@@ -82,7 +82,7 @@ SectionEnd
 Section -SWT SEC0001
 	SetOutPath $INSTDIR
 	SetOverwrite on
-	File ..\swt-3.3\swt.jar
+	File ..\Libs\swt-3.4\swt.jar
 SectionEnd
 !endif
 
