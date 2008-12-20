@@ -3,9 +3,26 @@
   <Update url="http://azsmrc.sourceforge.net" version="1.0.0" type="2" importance="50">
     <Changelog>
       <BugFix>Disable Popups now work as expected</BugFix>
+      <BugFix>fix for double confirm on exit</BugFix>
+      <BugFix>fixes for OSX in launcher - thx to Mirag3</BugFix>
+      <BugFix>modified azsmrc to not need swt.jar in classpath when ui=console</BugFix>
       <Feature>Added Download Histroy - You can now review a list of your downloads even after they have been removed</Feature>
       <Feature>New WebUI</Feature>
       <Feature>Alpha state FlashUI</Feature>
+      <Feature>Little Helper app that pops up if an fixable error was detected</Feature>
+      <Feature>Torrent Creation Wizzard</Feature>
+      <Feature>Categories can now be set</Feature>
+      <Feature>display name can now be changed</Feature>
+      <Feature>download directories can now be restricted to the user directory</Feature>
+      <Feature>enable binding to a specific ip</Feature>
+      <Feature>Firefox Plugin from AlexisBrunet.com</Feature>
+      <Feature>added RemoteBrowsing capability</Feature>
+      <Change>improved encoding handling in torrent name</Change>
+      <Change>added Preserve_Encoding for torrents</Change>
+      <Change>Scrape Dialog is now in open by file</Change>
+      <Change>better support for simultaneus multiple users</Change>
+      <Change>enabled the setting of dl speed to -1 (DnD)</Change>
+      <Change>better support for SSL downloads</Change>
     </Changelog>
     <Files>
       <File name="clientLibraries_1.1.zip" version="1.1" url="http://downloads.sourceforge.net/azsmrc/clientLibraries_1.1.zip" hash="3dcf81e833d7c5386459ec364d856f111b744f2" isArchive="true" type="2" size="518896">
