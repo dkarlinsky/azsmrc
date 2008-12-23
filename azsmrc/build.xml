@@ -53,6 +53,12 @@
 		<antcall target="cleanDist" />
 		<antcall target="jar" />
 	</target>
+	
+	<target name="setupBuild">
+		<antcall target="cleanDist" />
+		<antcall target="distribute" />
+		<antcall target="setupFiles" />
+	</target>
 
 	<target name="beta" depends="init, cleanDist">
 		<tstamp />
@@ -145,11 +151,11 @@
 			<fileset file="${root.dir}/launch.properties" />
 			<fileset file="${dist.dir}/launcher.jar" />
 			<fileset file="${swt.jar}/swt.jar" />
-			<zipfileset dir="${root.dir}/lbms/azsmrc/libs" includes="*" excludes="commons-io_1.2.jar" prefix="" />
+			<zipfileset dir="${root.dir}/lbms/azsmrc/libs" includes="*" excludes="commons-io_1.2.jar easymock.jar" prefix="" />
 		</zip>
 		<zip destfile="${root.dir}/${dist.dir}/azsmrcPlugin_${version}.zip">
 			<fileset file="${dist.dir}/azsmrcPlugin_${version}.jar" />
-			<zipfileset dir="${root.dir}/lbms/azsmrc/libs" includes="commons-codec_1.3.jar commons-io_1.2.jar jdom_1.0.jar" prefix="shared/lib" />
+			<zipfileset dir="${root.dir}/lbms/azsmrc/libs" includes="commons-codec_1.3.jar commons-io_1.2.jar jdom_1.1.jar" prefix="shared/lib" />
 			<fileset file="${root.dir}/Readme.txt" />
 		</zip>
 	</target>
@@ -172,6 +178,7 @@
 		<nsis script="setup.nsi" path="C:/Programme/NSIS/">
 			<define name="VERSION" value="${version}" />
 			<define name="SWT" value="true" />
+			<define name="SWTDIR" value="${swt.jar}" />
 		</nsis>
 	</target>
 
@@ -221,8 +228,8 @@
 			</compiler.include-libraries>
 		</mxmlc>
 		<copy todir="${build.dir}/lbms/azsmrc/plugin/web/resources" verbose="true">
-			<fileset file="${basedir}/flashui/azsmrc.swf"/>
-			<fileset file="${basedir}/flashui/flash.html"/>
+			<fileset file="${basedir}/flashui/azsmrc.swf" />
+			<fileset file="${basedir}/flashui/flash.html" />
 		</copy>
 	</target>
 

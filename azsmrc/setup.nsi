@@ -82,7 +82,7 @@ SectionEnd
 Section -SWT SEC0001
 	SetOutPath $INSTDIR
 	SetOverwrite on
-	File ..\Libs\swt-3.4\swt.jar
+	File ${SWTDIR}\swt.jar
 SectionEnd
 !endif
 

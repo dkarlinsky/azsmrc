@@ -29,8 +29,8 @@ AzSMRC is pronounced AzSmirk
 
 	Server system:
 	1. A running version of Azureus 2.5.0.0 or greater
-	2. Java 1.5 or greater
-	3. SWT version 3.2 or greater
+	2. Java 1.6 or greater
+	3. SWT version 3.4 or greater
 		Note:  A fresh installation of Azureus 2.5.0.0 will provide
 		this automatically
 	4. Functioning internet connection with at least one port
@@ -39,8 +39,8 @@ AzSMRC is pronounced AzSmirk
 
 
 	Remote system:
-	1.  Java 1.5 or greater
-	2.  SWT version 3.2
+	1.  Java 1.6 or greater
+	2.  SWT version 3.4
 	3.  Functioning internet connection with at least one port
 		available for communication to the server
 		(default port is 49009)
@@ -70,7 +70,7 @@ Installation of AzSMRC comes in two parts:
 	Go into this directory and copy the following items into there:
 
 		1.  azsmrcPlugin_x.x.x.jar
-		2.  jdom_1.0.jar
+		2.  jdom_1.1.jar
 		3.  commons-codec_1.3.jar
 		4.	commons-io_1.2.jar
 
@@ -95,6 +95,12 @@ Installation of AzSMRC comes in two parts:
 
 		To download visit here:
 		http://download.eclipse.org/eclipse/downloads/index.php
+		
+	For OS other than windows you need to download the appropriate SWT.jar
+	go to www.eclipse.org/swt and select the stable release for your OS.
+	If it is not Windows, Linux,  OS X, then you need to select more and
+	scroll all the way down. SWT release are about 3-5mb so don't download
+	the whole eclipse by mistake.
 
 
 4.  Setup

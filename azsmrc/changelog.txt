@@ -1,33 +1,32 @@
-Changelog for Version: 0.9.9
+Changelog for Version: 1.0.0
 
 ***New Features***
 
-- Encoding Selection for new Torrents
-- Plugins for AzSMRC (ScaneRSS)
-- Added Support StatusMailer
-- Added support for AzJabber plugin when it is ready in v1.1
-- Remote Azureus Plugin Configuration
-- Added FirstTime Configuration Wizard
-- AJAX based WebUI
-- Added a selectAll, unselectAll, and selectInverse menu to the details table for add torrent by file dialog
-- extended the ScrapeDialog with the ability to download torrents from an url and display them
-- SSL availability & status is shown in the Az plugin config
+- Added Download Histroy - You can now review a list of your downloads even after they have been removed
+- New WebUI
+- Alpha state FlashUI
+- Little Helper app that pops up if an fixable error was detected
+- Torrent Creation Wizzard
+- Categories can now be set
+- display name can now be changed
+- download directories can now be restricted to the user directory
+- enable binding to a specific ip
+- Firefox Plugin from AlexisBrunet.com
+- added RemoteBrowsing capability
 
 ***Changes***
 
-- New Logo and Splash Screen
-- Switched form COConfigurationManager  to PluginConfig Unsafe methods
-- Connection Dialog can now save unlimited profiles
-- Message Popup Shell was changed to behave like the Az one, especially not blocking AzSMRC when many messages are coming in
-- Shells now have custom icons
+- improved encoding handling in torrent name
+- added Preserve_Encoding for torrents
+- Scrape Dialog is now in open by file
+- better support for simultaneus multiple users
+- enabled the setting of dl speed to -1 (DnD)
+- better support for SSL downloads
 
 ***BugFixes***
 
-- When deselecting a File in the Add By Torrent by File dialog AzSMRC crashes
-- It was impossible to set specific Up/Download Speeds per Torrent
-- Confirmationdialog on Exit appears 2 times
-- Fix for "Ghost" torrents in the remote
-- Bug in Plugin Loader was fixed
-- allow to stop the torrent on error
-- "Core Update Checker"
+- Disable Popups now work as expected
+- fix for double confirm on exit
+- fixes for OSX in launcher - thx to Mirag3
+- modified azsmrc to not need swt.jar in classpath when ui=console
 
