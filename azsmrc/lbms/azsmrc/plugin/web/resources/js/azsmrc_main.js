@@ -130,7 +130,7 @@ function fetchData(xmlhttp) {
 						handlelistTransfers(doc);
 					break;
 					case "getRemoteInfo":
-						if (results[i].getAttribute("azureusVersion")[0] == 3)
+						if (results[i].getAttribute("azureusVersion")[0] >= 3)
 							version = "Vuze "+results[i].getAttribute("azureusVersion");
 						else
 							version = "Azureus "+results[i].getAttribute("azureusVersion");
