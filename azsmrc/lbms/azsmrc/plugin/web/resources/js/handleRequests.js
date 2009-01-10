@@ -362,10 +362,47 @@ function getAttributeFormat(attributeID, value) {
 			return document.createTextNode((value/1000));
 		break;
 		case "last_scrape":
-		case "next_scrape":
 			date = new Date();
 			date.setTime( value );
-			return document.createTextNode( date );
+			return document.createTextNode( date.toLocaleString() );
+		break;
+		case "next_scrape":
+			// get now
+			date = new Date();
+			now = date.getTime();
+			// calculate difference between now and next_scrape timestamp
+			diff = Math.round( (value - now) / 1000 );
+			hours = 0;
+			mins = 0;
+			secs = 0;
+			// at least one hour given
+			if ( diff >= 3600 )
+			{
+				hours = Math.floor( diff / 3600 );
+				diff = diff - (hours * 3600);
+			}
+			if ( diff >= 60 )
+			{
+				mins = Math.floor( diff / 60 );
+				diff = diff - (mins * 60);
+			}
+			secs = diff;
+
+			timeStr = "in ";
+			if ( hours )
+			{
+				timeStr += hours + "h ";
+			}
+			if ( mins )
+			{
+				timeStr += mins + "m ";
+			}
+			if ( secs )
+			{
+				timeStr += secs + "s ";
+			}
+
+			return document.createTextNode( timeStr );
 		break;
 		default:
 			return document.createTextNode(value);
