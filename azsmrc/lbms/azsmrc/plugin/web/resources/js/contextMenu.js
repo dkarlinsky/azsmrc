@@ -29,7 +29,7 @@ function renderContextMenuContent(event) {
 	switch (contextCallObj.tagName.toLowerCase()) {
 		case "td":
 			// is TC
-			if (contextCallObj.parentNode.getAttribute("hash") != "") {
+			if (contextCallObj.parentNode.hasAttribute("hash")) {
 				hash = contextCallObj.parentNode.getAttribute("hash");
 				addDebugEntry("hash: "+hash);
 				head.appendChild(document.createTextNode("Torrent Control"));
@@ -81,6 +81,10 @@ function renderContextMenuContent(event) {
 				menulist.appendChild(menuitem);
 
 				contextMenu.appendChild(menulist);
+			}
+			else
+			{
+				return false;
 			}
 		break;
 		default:

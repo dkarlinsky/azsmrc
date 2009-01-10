@@ -611,11 +611,13 @@ function handlelistTransfers(xmldoc) {
 		var nodl, noul;
 		downloads.setAttribute("summary", "List of current Downloads on Server");
 		downloads.setAttribute("rules", "groups");
+		downloads.setAttribute("id", "listTransferDownloads");
 		caption = document.createElement("caption");
 		caption.appendChild(document.createTextNode("Downloads"));
 		downloads.appendChild(caption);
 		uploads.setAttribute("summary", "List of current Uploads on Server");
 		uploads.setAttribute("rules", "groups");
+		uploads.setAttribute("id", "listTransferUploads");
 		caption = document.createElement("caption");
 		caption.appendChild(document.createTextNode("Uploads"));
 		uploads.appendChild(caption);
@@ -655,7 +657,6 @@ function handlelistTransfers(xmldoc) {
 		ulbody = document.createElement("tbody");
 		// filling tbody
 		var transferCtrl = null;
-		var dli, uli = 0;
 		for (j in transferDataField)
 			if (j > 0) {
 				// check dl or ul
@@ -692,27 +693,12 @@ function handlelistTransfers(xmldoc) {
 							tr.appendChild(td);
 						}
 				}
-				if (activeTable == 0) {
-					dli++;
-					if (dli % 2)
-					{
-						$(tr).addClass( 'odd' );
-					}
-					else
-					{
-						$(tr).addClass( 'even' );
-					}
+				if (activeTable == 0)
+				{
 					dlbody.appendChild(tr);
-				} else {
-					uli++;
-					if (uli % 2)
-					{
-						$(tr).addClass( 'odd' );
-					}
-					else
-					{
-						$(tr).addClass( 'even' );
-					}
+				}
+				else
+				{
 					ulbody.appendChild(tr);
 				}
 				positions[activeTable]++;
