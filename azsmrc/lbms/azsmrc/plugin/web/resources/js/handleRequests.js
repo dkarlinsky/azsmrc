@@ -549,7 +549,7 @@ function handlelistTransfers(xmldoc) {
 	if (transfer != null) {
 		var list = null;
 		//addDebugEntry("Tabs: "+tabs);
-		list = getTabByContent("listTransfers");
+		list = getContentFrameByTab(getTabByContent("listTransfers"));
 		if (list == null) {
 			addTab("listTransfers");
 			list = document.getElementById("tab_"+tabCount);

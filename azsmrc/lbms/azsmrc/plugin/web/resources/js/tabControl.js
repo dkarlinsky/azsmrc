@@ -63,10 +63,12 @@ function addTab(contentElement, isStartup) {
 		tabbar.appendChild(tab);
 		// tabcontent
 		var contentList = document.getElementById("tabcontents");
+		var tabContentFrame = document.createElement("div");
+		tabContentFrame.className = "tab";
+		tabContentFrame.setAttribute("id", "tab_"+tabCount);
+		tabContentFrame.setAttribute("tab", tabCount);
 		var tabContent = document.createElement("div");
-		tabContent.className = "tab";
-		tabContent.setAttribute("id", "tab_"+tabCount);
-		tabContent.setAttribute("tab", tabCount);
+		tabContent.className = "tabContent";
 		switch (contentElement) {
 			// simple tabs can be created here
 			// advanced tabs should use own function
@@ -118,6 +120,11 @@ function addTab(contentElement, isStartup) {
 		tabContent.onclick = function () {
 			ShowTab(this.getAttribute("tab"));
 		}
+		tabContentFrame.appendChild(tabContent);
+
+		// overwrite tabContent with new frame
+		tabContent = tabContentFrame;
+
 		contentList.appendChild(tabContent);
 		tabs[tabCount] = contentElement;
 		window.setTimeout("ShowTab(tabCount)", 200);
@@ -172,9 +179,25 @@ function addTab(contentElement, isStartup) {
 		if (labelID == savedMaxTab) {
 			maximizeTab(tabContent);
 			savedMaxTab = null;
+		// otherwise it might be necessary to mark oversized
+		} else {
+			// small timeout, so the tab is
+			window.setTimeout("checkTabOversize('"+contentElement+"')", 200);
 		}
 	} else {
 		window.setTimeout("ShowTab(getTabIdByContent('"+contentElement+"'))", 200);
+	}
+}
+function checkTabOversize( contentElement )
+{
+	tabObj = getTabByContent( contentElement );
+	if ( tabObj.clientHeight >= oversizeHeight )
+	{
+		markTabOversized( tabObj );
+	}
+	else
+	{
+		unmarkTabOversized( tabObj );
 	}
 }
 function closeTab(tabObj) {
@@ -199,6 +222,17 @@ function closeTab(tabObj) {
 		}
 		tabs[tabID] = "";
 		configAutoRefresh();
+	}
+}
+function getContentFrameByTab(tabObj)
+{
+	if ( tabObj != null)
+	{
+		return tabObj.lastChild;
+	}
+	else
+	{
+		return null;
 	}
 }
 function getRegTabById(tabID) {
@@ -269,6 +303,10 @@ function loadTabPos() {
 		}
 	}
 }
+function markTabOversized( tabObj )
+{
+	$(tabObj).addClass( 'oversizeTab' )
+}
 function maximizeTab(tabObj) {
 	// make tab "fullscreen"
 	var tabID = tabObj.getAttribute("tab");
@@ -281,6 +319,7 @@ function maximizeTab(tabObj) {
 		oldTab.style.zIndex = maxzIndex;
 		oldTab.style.height = 'auto';
 		oldTab.style.width = 'auto';
+		checkTabOversize( tabs[ maxTab ] );
 	}
 
 	// only set new if an other tab was chosen
@@ -288,7 +327,8 @@ function maximizeTab(tabObj) {
 		// set new max tab
 		maxTab = tabID;
 		maxzIndex = tabObj.style.zIndex;
-		$(tabObj).addClass('maximizedTab');
+		checkTabOversize( tabObj )
+		$(tabObj).addClass( 'maximizedTab' );
 		changeFixState(tabObj.firstChild);
 		tabObj.style.zIndex = 5000;
 		tabObj.style.height = maxHeight+'px';
@@ -373,5 +413,23 @@ function ShowTab(tab) {
 		activeTab = tab;
 		reindexStatusbar();
 		refreshTabbar();
+	}
+}
+function toggleTabOversized(tabObj)
+{
+	if ( $(tabObj).hasClass( 'oversizeTab' ) )
+	{
+		$(tabObj).removeClass( 'oversizeTab' );
+	}
+	else
+	{
+		$(tabObj).addClass( 'oversizeTab' );
+	}
+}
+function unmarkTabOversized(tabObj)
+{
+	if ( $(tabObj).hasClass( 'oversizeTab' ) )
+	{
+		$(tabObj).removeClass( 'oversizeTab' )
 	}
 }

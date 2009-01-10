@@ -374,6 +374,19 @@ div.moveTab {
 tr.odd {
 	background-color: #0053AF;
 }
+.oversizeTab {
+	max-height: 80%;
+	overflow: hidden;
+	padding: 0px;
+}
+.oversizeTab .tabContent {
+	height: 700px;
+	margin: -2px -1px -3px 0px;
+	overflow-x: hidden;
+	overflow-y: auto;
+	/* scrollbar */
+	padding-right: 18px;
+}
 li.subbreak a {
 	border-bottom: #FFF 1px solid;
 }

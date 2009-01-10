@@ -1,6 +1,6 @@
 var debugLog;
 function addDebugEntry(debugInfo) {
-	debugLog = getTabByContent("debug")
+	debugLog = getContentFrameByTab(getTabByContent("debug"));
 	if (debugLog) {
 		debugLog = debugLog.lastChild;
 		var newEntry = document.createElement("li");
@@ -9,7 +9,7 @@ function addDebugEntry(debugInfo) {
 	}
 }
 function clearDebugLog() {
-	debugLog = getTabByContent("debug")
+	debugLog = getContentFrameByTab(getTabByContent("debug"));
 	if (debugLog) {
 		debugLog = debugLog.lastChild;
 		while (debugLog.firstChild)
@@ -17,7 +17,7 @@ function clearDebugLog() {
 	}
 }
 function initDebugLog() {
-	debugLog = getTabByContent("debug");
+	debugLog = getContentFrameByTab(getTabByContent("debug"));
 	if (debugLog) {
 		debugLog.removeChild(debugLog.lastChild);
 		debugLog.appendChild(document.createElement("ul"));

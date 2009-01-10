@@ -63,7 +63,7 @@ function checkValidDropPosition()
 function drag(element) {
 	drag_object = element;
 	drag_object.style.position = "absolute";
-	drag_object.className = "moveTab";
+	$(drag_object).addClass('moveTab');
 	drag_pos[0] = mouse_pos[0] - drag_object.offsetLeft;
 	drag_pos[1] = mouse_pos[1] - drag_object.offsetTop;
 	zIndex++;
@@ -82,7 +82,8 @@ function drop() {
 		// check for valid position
 		checkValidDropPosition();
 
-		drag_object.className = "tab";
+		$(drag_object).removeClass('moveTab');
+		$(drag_object).addClass('tab')
 		drag_object = null;
 	}
 	if (optionSet("tabposonthefly")) {

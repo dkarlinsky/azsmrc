@@ -25,18 +25,30 @@ messageTypes["info"] = 1;
 messageTypes["error"] = 1;
 // max height of tab is view - position - statusbar
 var maxHeight = window.innerHeight - 110 - 22;
+// what height is required to gain status of oversizeTab?
+var oversizeHeight = Math.floor(maxHeight * 0.8)
 // max width of tab is view - padding
 var maxWidth = window.innerWidth - 4;
 // server online
 var serverOnline = 'first';
 function adjustMaxTabWidth() {
 	for (var s = 0; s < document.styleSheets.length; s++)
+	{
 		for (var r = 0; r < document.styleSheets[s]["cssRules"].length; r++)
-			if ((document.styleSheets[s]["cssRules"][r].selectorText == "div.tab") ||
-				(document.styleSheets[s]["cssRules"][r].selectorText == "div.moveTab")) {
+		{
+			if ((document.styleSheets[s]["cssRules"][r].selectorText == "div.tab") || (document.styleSheets[s]["cssRules"][r].selectorText == "div.moveTab"))
+			{
 				document.styleSheets[s]["cssRules"][r].style["maxWidth"] = maxWidth+"px";
 				document.styleSheets[s]["cssRules"][r].style["max-width"] = maxWidth+"px";
 			}
+
+			if (document.styleSheets[s]["cssRules"][r].selectorText == ".oversizeTab .tabContent" )
+			{
+				document.styleSheets[s]["cssRules"][r].style["height"] = oversizeHeight + "px";
+			}
+		}
+	}
+
 }
 function afterInit() {
 	$("table").tablesorter({widgets: ['zebra']});
