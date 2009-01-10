@@ -622,7 +622,10 @@ function handlelistTransfers(xmldoc) {
 				tr = document.createElement("tr");
 				tr.setAttribute("hash", transferDataField[j][hash]);
 				forceStates[transferDataField[j][hash]] = transferDataField[j][isForceCol];
-				tr.className = (getTCState(transferDataField[j][hash])) ? "activeTC" : "";
+				if (getTCState(transferDataField[j][hash]))
+				{
+					$(tr).addClass( 'activeTC' );
+				}
 				tr.onclick = function () { selectTC(this); };
 				td = document.createElement("td");
 				transferCtrl = document.createElement("input");
@@ -648,13 +651,25 @@ function handlelistTransfers(xmldoc) {
 				}
 				if (activeTable == 0) {
 					dli++;
-					if (dli % 2) tr.className = "odd";
-					else  tr.className = "even";
+					if (dli % 2)
+					{
+						$(tr).addClass( 'odd' );
+					}
+					else
+					{
+						$(tr).addClass( 'even' );
+					}
 					dlbody.appendChild(tr);
 				} else {
 					uli++;
-					if (uli % 2) tr.className = "odd";
-					else  tr.className = "even";
+					if (uli % 2)
+					{
+						$(tr).addClass( 'odd' );
+					}
+					else
+					{
+						$(tr).addClass( 'even' );
+					}
 					ulbody.appendChild(tr);
 				}
 				positions[activeTable]++;
