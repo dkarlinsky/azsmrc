@@ -7,13 +7,13 @@ function init_dragdrop(dragclass, setdragbar) {
 	document.onmouseup = drop;
 	var drags = [];
 	var divs = document.getElementsByTagName("div");
-	// against recollection of DOM nodes	
+	// against recollection of DOM nodes
 	for (var i in divs)
 		drags[drags.length] = divs[i];
 	// set dragbar if needed but dragability
 	for (var i in drags) {
 		if (drags[i].className == dragclass) {
-			if (setdragbar)		
+			if (setdragbar)
 				set_dragbar(drags[i]);
 			else
 				drags[i].onmousedown = function () { drag(this); }
@@ -21,8 +21,44 @@ function init_dragdrop(dragclass, setdragbar) {
 	}
 }
 function changeFixState(dragbar) {
-		dragbar.onmousedown = (dragbar.onmousedown == null) ? function () { drag(this.parentNode); } : null;
-		dragbar.className = (dragbar.className == "fixdragbar") ? "dragbar" : "fixdragbar";		
+	dragbar.onmousedown = (dragbar.onmousedown == null) ? function () { drag(this.parentNode); } : null;
+	dragbar.className = (dragbar.className == "fixdragbar") ? "dragbar" : "fixdragbar";
+}
+function checkValidDropPosition()
+{
+	// check for given object
+	if ( drag_object != null )
+	{
+		// current values
+		width = drag_object.clientWidth;
+		height = drag_object.clientHeight;
+
+		// check vertical positions
+		// object is above zero point (first pixel line of viewport)
+		compareValue = drag_object.style.top.split( 'px' )[0];
+		if ( compareValue < 0 )
+		{
+			drag_object.style.top = "0px";
+		}
+		// object is below viewport
+		if ( compareValue >= window.innerHeight )
+		{
+			drag_object.style.top = (window.innerHeight - 50) + "px";
+		}
+
+		// check horizontal positions
+		compareValue = drag_object.style.left.split( 'px' )[0];
+		// outside left
+		if ( (compareValue + width) < 0 )
+		{
+			drag_object.style.left = "0px";
+		}
+		// outside right
+		if ( compareValue > window.innerWidth )
+		{
+			drag_object.style.left = (window.innerWidth - 50) + "px";
+		}
+	}
 }
 function drag(element) {
 	drag_object = element;
@@ -43,6 +79,9 @@ function drag_move(e) {
 }
 function drop() {
 	if (drag_object != null) {
+		// check for valid position
+		checkValidDropPosition();
+
 		drag_object.className = "tab";
 		drag_object = null;
 	}
