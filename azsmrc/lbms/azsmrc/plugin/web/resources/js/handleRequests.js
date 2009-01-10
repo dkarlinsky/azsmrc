@@ -361,6 +361,12 @@ function getAttributeFormat(attributeID, value) {
 		case "shareRatio":
 			return document.createTextNode((value/1000));
 		break;
+		case "last_scrape":
+		case "next_scrape":
+			date = new Date();
+			date.setTime( value );
+			return document.createTextNode( date );
+		break;
 		default:
 			return document.createTextNode(value);
 		break;
