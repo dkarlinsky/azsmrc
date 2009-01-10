@@ -191,13 +191,16 @@ function addTab(contentElement, isStartup) {
 function checkTabOversize( contentElement )
 {
 	tabObj = getTabByContent( contentElement );
-	if ( tabObj.clientHeight >= oversizeHeight )
+	if ( tabObj )
 	{
-		markTabOversized( tabObj );
-	}
-	else
-	{
-		unmarkTabOversized( tabObj );
+		if ( tabObj.clientHeight >= oversizeHeight )
+		{
+			markTabOversized( tabObj );
+		}
+		else
+		{
+			unmarkTabOversized( tabObj );
+		}
 	}
 }
 function closeTab(tabObj) {
