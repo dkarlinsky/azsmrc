@@ -157,7 +157,7 @@ tbody > tr:hover {
 }
 /* Classes */
 .activeTC {
-	background-color: #2654F1;
+	background-color: #2654F1 !important;
 }
 .closeButton {
 	float: right;
