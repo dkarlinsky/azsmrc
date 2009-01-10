@@ -47,10 +47,10 @@ Var StartMenuGroup
 
 # Installer attributes
 !ifdef SWT
-OutFile dist\AzSMRC_${VERSION}.exe
+OutFile "dist\${JVERSION}\AzSMRC_${VERSION}.exe"
 !endif
 !ifndef SWT
-OutFile dist\AzSMRC_${VERSION}_NoSWT.exe
+OutFile "dist\${JVERSION}\AzSMRC_${VERSION}_NoSWT.exe"
 !endif
 
 InstallDir $PROGRAMFILES\AzSMRC
@@ -64,9 +64,9 @@ ShowUninstDetails show
 Section -Main SEC0000
 	SetOutPath $INSTDIR
 	SetOverwrite on
-	File dist\launcher.jar
-	File "dist\AzSMRC_${VERSION}.jar"
-	File dist\AzSMRC.exe
+	File "dist\${JVERSION}\launcher.jar"
+	File "dist\${JVERSION}\AzSMRC_${VERSION}.jar"
+	File "dist\${JVERSION}\AzSMRC.exe"
 	File license.txt
 	File Readme.txt
 	File AzSMRCupdate.xml.gz
@@ -82,7 +82,7 @@ SectionEnd
 Section -SWT SEC0001
 	SetOutPath $INSTDIR
 	SetOverwrite on
-	File ${SWTDIR}\swt.jar
+	File "${SWTDIR}\swt.jar"
 SectionEnd
 !endif
 

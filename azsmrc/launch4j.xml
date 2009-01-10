@@ -8,7 +8,7 @@
   <chdir>.</chdir>
   <customProcName>true</customProcName>
   <stayAlive>false</stayAlive>
-  <icon>Azureus_32x32x256.ico</icon>
+  <icon>AzSMRC.ico</icon>
   <classPath>
     <mainClass>lbms.tools.launcher.Launcher</mainClass>
     <cp>launcher.jar</cp>
@@ -25,11 +25,11 @@
     <fileVersion>0.9.8.0</fileVersion>
     <txtFileVersion>0.9.8.0</txtFileVersion>
     <fileDescription>AzSMRC</fileDescription>
-    <copyright>Leonard Brünings &amp; Marc Schaubach</copyright>
+    <copyright>Leonard Bruenings &amp; Marc Schaubach</copyright>
     <productVersion>0.9.8.0</productVersion>
     <txtProductVersion>0.9.8.0</txtProductVersion>
     <productName>AzSMRC</productName>
-    <companyName>Leonard Brünings &amp; Marc Schaubach</companyName>
+    <companyName>Leonard Bruenings &amp; Marc Schaubach</companyName>
     <internalName>AzSMRC</internalName>
     <originalFilename>AzSMRC.exe</originalFilename>
   </versionInfo>
