@@ -12,6 +12,11 @@ var autoRefresh = [5000, 0, 0, 0, 0, 0, 0];
 var refreshRequests = [1, -1, -1, 29, -1, -1, -1];
 // objects for deactivating autorefresh
 var autoRefreshObjs = [null, null, null, null, null, null];
+// rules are offsetLeft/Top and offsetWidth/Height
+// 1: left top
+// 2: right bottom
+// [x1, y1, x2, y2]
+var snapLines = [];
 // open tabs at position (default is set below)
 var tabs = [];
 var startupTabs = [false, true, false, false, false, false, false];
@@ -225,6 +230,9 @@ function closeTab(tabObj) {
 		}
 		tabs[tabID] = "";
 		configAutoRefresh();
+
+		// remove snaplines
+		snapLines[ tabID ] = null
 	}
 }
 function getContentFrameByTab(tabObj)
@@ -246,6 +254,14 @@ function getRegTabById(tabID) {
 			break;
 		}
 	return tab;
+}
+function getSnapLinesByObject(obj)
+{
+	x1 = obj.offsetLeft;
+	y1 = obj.offsetTop;
+	x2 = Number( obj.offsetLeft + obj.offsetWidth )
+	y2 = Number( obj.offsetTop + obj.offsetHeight )
+	return [x1, y1, x2, y2]
 }
 function getTabByContent(contentElement) {
 	var list = null;
@@ -416,6 +432,9 @@ function ShowTab(tab) {
 		activeTab = tab;
 		reindexStatusbar();
 		refreshTabbar();
+
+		// save snaplines for this new tab
+		snapLines[ tab ] = getSnapLinesByObject( toActivate );
 	}
 }
 function toggleTabOversized(tabObj)
