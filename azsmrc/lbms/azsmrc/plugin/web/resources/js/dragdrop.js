@@ -3,6 +3,7 @@ var drag_pos = [0,0];
 var mouse_pos = [0,0];
 var zIndex = 0;
 var snapDistance = 10;
+var currentRules = [];
 function init_dragdrop(dragclass, setdragbar) {
 	document.onmousemove = drag_move;
 	document.onmouseup = drop;
@@ -69,6 +70,49 @@ function drag(element) {
 	drag_pos[1] = mouse_pos[1] - drag_object.offsetTop;
 	zIndex++;
 	drag_object.style.zIndex = zIndex;
+
+	// calculate rules
+	currentPosition = getSnapLinesByObject( drag_object );
+	ownId = drag_object.getAttribute( "tab" );
+
+	// these rules are virtual
+	// not all are really present (explained below)
+	currentRules = [];
+	// vertical rules
+	currentRules[ 0 ] = [];
+	// horizontal rules
+	currentRules[ 1 ] = [];
+	for ( var i in snapLines )
+	{
+		// current window don't need to set up rules
+		// it won't be here anymore when dragged
+		if ( i != ownId && snapLines[ i ] != null )
+		{
+			// in order to check only for left and top position (rules)
+			// a virtual rule is created
+			// which is the right edge of a window set depending on the left edge of the dragged window
+			// defined by the width of the dragged window
+
+			// x1 coordinate of any tab
+			currentRules[ 0 ].push( snapLines[ i ][ 0 ] );
+			// virtual x1 coordinate
+			currentRules[ 0 ].push( snapLines[ i ][ 0 ] - drag_object.offsetWidth );
+			// x2 coordinate of any tab
+			currentRules[ 0 ].push( snapLines[ i ][ 2 ] );
+			// virtual x2 coordinate
+			currentRules[ 0 ].push( snapLines[ i ][ 2 ] - drag_object.offsetWidth );
+
+			// same goes for horizontal line with bottom
+			// y1 coordinate of any tab
+			currentRules[ 1 ].push( snapLines[ i ][ 1 ] );
+			// virtual y2 coordinate
+			currentRules[ 1 ].push( snapLines[ i ][ 1 ] - drag_object.offsetHeight );
+			// y2 coordinate of any tab
+			currentRules[ 1 ].push( snapLines[ i ][ 3 ] );
+			// virtual y2 coordinate
+			currentRules[ 1 ].push( snapLines[ i ][ 3 ] - drag_object.offsetHeight );
+		}
+	}
 }
 function drag_move(e) {
 	mouse_pos[0] = document.all ? window.event.clientX : e.pageX;
@@ -82,52 +126,12 @@ function drag_move(e) {
 		{
 			// calculate rules
 			currentPosition = getSnapLinesByObject( drag_object );
-			ownId = drag_object.getAttribute( "tab" );
-
-			// these rules are virtual
-			// not all are really present (explained below)
-			rules = [];
-			// vertical rules
-			rules[ 0 ] = [];
-			// horizontal rules
-			rules[ 1 ] = [];
-			for ( var i in snapLines )
-			{
-				// current window don't need to set up rules
-				// it won't be here anymore when dragged
-				if ( i != ownId && snapLines[ i ] != null )
-				{
-					// in order to check only for left and top position (rules)
-					// a virtual rule is created
-					// which is the right edge of a window set depending on the left edge of the dragged window
-					// defined by the width of the dragged window
-
-					// x1 coordinate of any tab
-					rules[ 0 ].push( snapLines[ i ][ 0 ] );
-					// virtual x1 coordinate
-					rules[ 0 ].push( snapLines[ i ][ 0 ] - drag_object.offsetWidth );
-					// x2 coordinate of any tab
-					rules[ 0 ].push( snapLines[ i ][ 2 ] );
-					// virtual x2 coordinate
-					rules[ 0 ].push( snapLines[ i ][ 2 ] - drag_object.offsetWidth );
-
-					// same goes for horizontal line with bottom
-					// y1 coordinate of any tab
-					rules[ 1 ].push( snapLines[ i ][ 1 ] );
-					// virtual y2 coordinate
-					rules[ 1 ].push( snapLines[ i ][ 1 ] - drag_object.offsetHeight );
-					// y2 coordinate of any tab
-					rules[ 1 ].push( snapLines[ i ][ 3 ] );
-					// virtual y2 coordinate
-					rules[ 1 ].push( snapLines[ i ][ 3 ] - drag_object.offsetHeight );
-				}
-			}
 
 			// check for vertical snap
-			for ( var snapLine in rules[ 0 ] )
+			for ( var snapLine in currentRules[ 0 ] )
 			{
 				// snapLine is an x value of a guide line (vertical rule)
-				snapLine = rules[ 0 ][ snapLine ];
+				snapLine = currentRules[ 0 ][ snapLine ];
 
 				// define distance from current guide line
 				if ( snapLine > currentPosition[ 0 ] )
@@ -147,10 +151,10 @@ function drag_move(e) {
 			}
 
 			// check for horizontal snap
-			for ( var snapLine in rules[ 1 ] )
+			for ( var snapLine in currentRules[ 1 ] )
 			{
 				// snapLine is an x value of a guide line (vertical rule)
-				snapLine = rules[ 1 ][ snapLine ];
+				snapLine = currentRules[ 1 ][ snapLine ];
 
 				// define distance from current guide line
 				if ( snapLine > currentPosition[ 1 ] )
