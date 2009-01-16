@@ -77,92 +77,96 @@ function drag_move(e) {
 		drag_object.style.left = (mouse_pos[0] - drag_pos[0]) + "px";
 		drag_object.style.top = (mouse_pos[1] - drag_pos[1]) + "px";
 
-		// calculate rules
-		currentPosition = getSnapLinesByObject( drag_object );
-		ownId = drag_object.getAttribute( "tab" );
-
-		// these rules are virtual
-		// not all are really present (explained below)
-		rules = [];
-		// vertical rules
-		rules[ 0 ] = [];
-		// horizontal rules
-		rules[ 1 ] = [];
-		for ( var i in snapLines )
+		// only try to snap, if there are more than this tab
+		if ( snapLinesCount > 1 )
 		{
-			// current window don't need to set up rules
-			// it won't be here anymore when dragged
-			if ( i != ownId && snapLines[ i ] != null )
+			// calculate rules
+			currentPosition = getSnapLinesByObject( drag_object );
+			ownId = drag_object.getAttribute( "tab" );
+
+			// these rules are virtual
+			// not all are really present (explained below)
+			rules = [];
+			// vertical rules
+			rules[ 0 ] = [];
+			// horizontal rules
+			rules[ 1 ] = [];
+			for ( var i in snapLines )
 			{
-				// in order to check only for left and top position (rules)
-				// a virtual rule is created
-				// which is the right edge of a window set depending on the left edge of the dragged window
-				// defined by the width of the dragged window
+				// current window don't need to set up rules
+				// it won't be here anymore when dragged
+				if ( i != ownId && snapLines[ i ] != null )
+				{
+					// in order to check only for left and top position (rules)
+					// a virtual rule is created
+					// which is the right edge of a window set depending on the left edge of the dragged window
+					// defined by the width of the dragged window
 
-				// x1 coordinate of any tab
-				rules[ 0 ].push( snapLines[ i ][ 0 ] );
-				// virtual x1 coordinate
-				rules[ 0 ].push( snapLines[ i ][ 0 ] - drag_object.offsetWidth );
-				// x2 coordinate of any tab
-				rules[ 0 ].push( snapLines[ i ][ 2 ] );
-				// virtual x2 coordinate
-				rules[ 0 ].push( snapLines[ i ][ 2 ] - drag_object.offsetWidth );
+					// x1 coordinate of any tab
+					rules[ 0 ].push( snapLines[ i ][ 0 ] );
+					// virtual x1 coordinate
+					rules[ 0 ].push( snapLines[ i ][ 0 ] - drag_object.offsetWidth );
+					// x2 coordinate of any tab
+					rules[ 0 ].push( snapLines[ i ][ 2 ] );
+					// virtual x2 coordinate
+					rules[ 0 ].push( snapLines[ i ][ 2 ] - drag_object.offsetWidth );
 
-				// same goes for horizontal line with bottom
-				// y1 coordinate of any tab
-				rules[ 1 ].push( snapLines[ i ][ 1 ] );
-				// virtual y2 coordinate
-				rules[ 1 ].push( snapLines[ i ][ 1 ] - drag_object.offsetHeight );
-				// y2 coordinate of any tab
-				rules[ 1 ].push( snapLines[ i ][ 3 ] );
-				// virtual y2 coordinate
-				rules[ 1 ].push( snapLines[ i ][ 3 ] - drag_object.offsetHeight );
-			}
-		}
-
-		// check for vertical snap
-		for ( var snapLine in rules[ 0 ] )
-		{
-			// snapLine is an x value of a guide line (vertical rule)
-			snapLine = rules[ 0 ][ snapLine ];
-
-			// define distance from current guide line
-			if ( snapLine > currentPosition[ 0 ] )
-			{
-				distance = snapLine - currentPosition[ 0 ];
-			}
-			else
-			{
-				distance = currentPosition[ 0 ] - snapLine;
+					// same goes for horizontal line with bottom
+					// y1 coordinate of any tab
+					rules[ 1 ].push( snapLines[ i ][ 1 ] );
+					// virtual y2 coordinate
+					rules[ 1 ].push( snapLines[ i ][ 1 ] - drag_object.offsetHeight );
+					// y2 coordinate of any tab
+					rules[ 1 ].push( snapLines[ i ][ 3 ] );
+					// virtual y2 coordinate
+					rules[ 1 ].push( snapLines[ i ][ 3 ] - drag_object.offsetHeight );
+				}
 			}
 
-			// check for snap range
-			if ( distance <= snapDistance )
+			// check for vertical snap
+			for ( var snapLine in rules[ 0 ] )
 			{
-				drag_object.style.left = snapLine + "px";
-			}
-		}
+				// snapLine is an x value of a guide line (vertical rule)
+				snapLine = rules[ 0 ][ snapLine ];
 
-		// check for horizontal snap
-		for ( var snapLine in rules[ 1 ] )
-		{
-			// snapLine is an x value of a guide line (vertical rule)
-			snapLine = rules[ 1 ][ snapLine ];
+				// define distance from current guide line
+				if ( snapLine > currentPosition[ 0 ] )
+				{
+					distance = snapLine - currentPosition[ 0 ];
+				}
+				else
+				{
+					distance = currentPosition[ 0 ] - snapLine;
+				}
 
-			// define distance from current guide line
-			if ( snapLine > currentPosition[ 1 ] )
-			{
-				distance = snapLine - currentPosition[ 1 ];
-			}
-			else
-			{
-				distance = currentPosition[ 1 ] - snapLine;
+				// check for snap range
+				if ( distance <= snapDistance )
+				{
+					drag_object.style.left = snapLine + "px";
+				}
 			}
 
-			// check for snap range
-			if ( distance <= snapDistance )
+			// check for horizontal snap
+			for ( var snapLine in rules[ 1 ] )
 			{
-				drag_object.style.top = snapLine + "px";
+				// snapLine is an x value of a guide line (vertical rule)
+				snapLine = rules[ 1 ][ snapLine ];
+
+				// define distance from current guide line
+				if ( snapLine > currentPosition[ 1 ] )
+				{
+					distance = snapLine - currentPosition[ 1 ];
+				}
+				else
+				{
+					distance = currentPosition[ 1 ] - snapLine;
+				}
+
+				// check for snap range
+				if ( distance <= snapDistance )
+				{
+					drag_object.style.top = snapLine + "px";
+				}
 			}
 		}
 	}

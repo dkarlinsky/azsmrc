@@ -17,6 +17,7 @@ var autoRefreshObjs = [null, null, null, null, null, null];
 // 2: right bottom
 // [x1, y1, x2, y2]
 var snapLines = [];
+var snapLinesCount = 0;
 // open tabs at position (default is set below)
 var tabs = [];
 var startupTabs = [false, true, false, false, false, false, false];
@@ -232,7 +233,8 @@ function closeTab(tabObj) {
 		configAutoRefresh();
 
 		// remove snaplines
-		snapLines[ tabID ] = null
+		delete( snapLines[ tabID ] );
+		snapLinesCount -= 1;
 	}
 }
 function getContentFrameByTab(tabObj)
@@ -429,6 +431,10 @@ function ShowTab(tab) {
 		refreshTabbar();
 
 		// save snaplines for this new tab
+		if ( snapLines[ tab ] == null )
+		{
+			snapLinesCount += 1;
+		}
 		snapLines[ tab ] = getSnapLinesByObject( toActivate );
 	}
 }
