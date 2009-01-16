@@ -133,7 +133,7 @@ function addTab(contentElement, isStartup) {
 		contentList.appendChild(tabContent);
 		tabs[tabCount] = contentElement;
 		window.setTimeout("ShowTab(tabCount)", 200);
-		refreshView();
+		refreshView(contentElement);
 		configAutoRefresh();
 		set_dragbar(tabContent);
 		var dragbar = tabContent.firstChild;
@@ -187,7 +187,7 @@ function addTab(contentElement, isStartup) {
 		// otherwise it might be necessary to mark oversized
 		} else {
 			// small timeout, so the tab is
-			window.setTimeout("checkTabOversize('"+contentElement+"')", 200);
+			window.setTimeout("checkTabOversize('"+contentElement+"')", 400);
 		}
 	} else {
 		window.setTimeout("ShowTab(getTabIdByContent('"+contentElement+"'))", 200);
@@ -422,11 +422,6 @@ function saveTabPosCookie() {
 function ShowTab(tab) {
 	var toActivate = document.getElementById("tab_"+tab);
 	if (toActivate != null) {
-		/*
-		if (activeTab > -1)
-			document.getElementById("tab_"+activeTab).style.display = "none";
-		toActivate.style.display = "block";
-		*/
 		zIndex++;
 		toActivate.style.zIndex = zIndex;
 		activeTab = tab;

@@ -356,8 +356,12 @@ function PingToServer() {
 	ping = pingMsg;
 	SendRequestToServer(0);
 }
-function refreshView() {
-	switch (tabs[activeTab]) {
+function refreshView(contentElement) {
+	if ( contentElement == null )
+	{
+		contentElement = tabs[ activeTab ]
+	}
+	switch (contentElement) {
 		case "listTransfers":
 			// listTransfers
 			SendRequestToServer(1);
@@ -368,6 +372,9 @@ function refreshView() {
 		case "about":
 			// getRemoteInfo
 			SendRequestToServer(40);
+		break;
+		case "userManagement":
+			SendRequestToServer(29);
 		break;
 		default:
 			PingToServer();
