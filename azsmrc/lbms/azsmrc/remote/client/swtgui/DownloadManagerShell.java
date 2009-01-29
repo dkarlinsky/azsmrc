@@ -1,6 +1,5 @@
 /*
  * Created on Apr 30, 2005 Created by omschaub
- * 
  */
 package lbms.azsmrc.remote.client.swtgui;
 
@@ -229,7 +228,9 @@ public class DownloadManagerShell {
 	// status bar labels
 	private CLabel										statusBarText;
 	private Composite									statusbarComp;
-	private CLabelPadding								statusDown, statusUp, /* statusBarText, */
+	private CLabelPadding								statusDown, statusUp, /*
+																			 * statusBarText,
+																			 */
 														connectionStatusIcon,
 			sslStatusIcon;
 
@@ -494,9 +495,7 @@ public class DownloadManagerShell {
 		});
 
 		MenuItem menuConsole = new MenuItem(toolSubmenu, SWT.PUSH);
-		menuConsole.setText(I18N.translate(PFX + "menu.tools.console")
-				+ "\tCtrl+C");
-		menuConsole.setAccelerator(SWT.CTRL + 'C');
+		menuConsole.setText(I18N.translate(PFX + "menu.tools.console"));
 		menuConsole.addListener(SWT.Selection, new Listener() {
 			public void handleEvent (Event e) {
 				ConsoleTab.open(tabFolder, true);
@@ -2140,18 +2139,19 @@ public class DownloadManagerShell {
 		 * String[] viewIDs = pm.getUIManager().getViewsIDs(ViewID.MAIN);
 		 * for(String viewIDString:viewIDs){ //TODO Make this work //I'm
 		 * confused //From what I can tell.. it looks like I need a listener to
-		 * use in initializing the UIPluginViewImpl & in addPluginView??? //TODO --
-		 * ask Leonard UIPluginEventListener uiPEL = new
+		 * use in initializing the UIPluginViewImpl & in addPluginView??? //TODO
+		 * -- ask Leonard UIPluginEventListener uiPEL = new
 		 * UIPluginEventListener(){ public boolean eventOccurred(UIPluginEvent
 		 * event) { System.out.println(event); return false; } }; //Why is there
 		 * 2 that look like they are doing the same thing //Ask Leonard
 		 * UIPluginViewImpl pluginView = new UIPluginViewImpl(ViewID.MAIN,
 		 * uiPEL); pluginView.initialize(openPluginView(viewIDString)); //This
 		 * looks just like above but does not involve the composite?
-		 * RCMain.getRCMain().getPluginManagerImpl().getUIManager().addPluginView(ViewID.MAIN,
+		 * RCMain.getRCMain
+		 * ().getPluginManagerImpl().getUIManager().addPluginView(ViewID.MAIN,
 		 * viewIDString,uiPEL);
-		 * RCMain.getRCMain().getPluginManagerImpl().getUIManager().getViewInstance(parentID,
-		 * viewID, datasource) }
+		 * RCMain.getRCMain().getPluginManagerImpl().getUIManager
+		 * ().getViewInstance(parentID, viewID, datasource) }
 		 */
 
 		// addView(ViewID.MAIN, "MyID", Eventlistener);
@@ -2715,7 +2715,7 @@ public class DownloadManagerShell {
 				int newSpeed;
 				try {
 					newSpeed = (int) (Double.valueOf(sReturn).doubleValue()/*
-																			 * *
+																			 * 
 																			 * 1024
 																			 */);
 				} catch (NumberFormatException er) {
@@ -2941,7 +2941,9 @@ public class DownloadManagerShell {
 			/*
 			 * (non-Javadoc)
 			 * 
-			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)t)
+			 * @see
+			 * org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse
+			 * .swt.events.SelectionEvent)t)
 			 */
 			@Override
 			public void widgetSelected (SelectionEvent e) {
@@ -3831,7 +3833,10 @@ public class DownloadManagerShell {
 
 			if (SWT.getVersion() >= 3107) {
 				dropTarget.setTransfer(new Transfer[] {
-						FileTransfer.getInstance(), /* HTMLTransfer.getInstance(), */
+						FileTransfer.getInstance(), /*
+													 * HTMLTransfer.getInstance()
+													 * ,
+													 */
 						/* URLTransfer.getInstance(), */TextTransfer
 								.getInstance() });
 			} else {
@@ -4026,8 +4031,8 @@ public class DownloadManagerShell {
 											+ filename);
 							files.add(filename);
 							/*
-							 * openTorrentWindow(null, new String[] { filename },
-							 * bOverrideToStopped);
+							 * openTorrentWindow(null, new String[] { filename
+							 * }, bOverrideToStopped);
 							 */
 						}
 					} catch (Exception e) {
