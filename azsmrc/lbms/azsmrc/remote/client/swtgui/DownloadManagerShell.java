@@ -1403,6 +1403,7 @@ public class DownloadManagerShell {
 		createTableColumns(downloadsTable, DownloadContainer.getColumns());
 
 		downloadsTable.addListener(SWT.SetData, new Listener() {
+			@SuppressWarnings("unchecked")
 			public void handleEvent (Event event) {
 				downloadsArray = downloadsMap.values().toArray(emptyArray);
 				if (downloadsArray.length == 0) {
@@ -1545,6 +1546,7 @@ public class DownloadManagerShell {
 
 		seedsTable.addListener(SWT.SetData, new Listener() {
 
+			@SuppressWarnings("unchecked")
 			public void handleEvent (Event event) {
 				seedsArray = seedsMap.values().toArray(emptyArray);
 				if (seedsArray.length == 0) {
@@ -2131,30 +2133,6 @@ public class DownloadManagerShell {
 		if (RCMain.getRCMain().connected()) {
 			RCMain.getRCMain().updateTimer(true);
 		}
-
-		/*
-		 * //---------- Plugin Initialization -------------------\\ //Now that
-		 * all GUI components are up, we need to bring up the plugin tabs
-		 * PluginManagerImpl pm = RCMain.getRCMain().getPluginManagerImpl();
-		 * String[] viewIDs = pm.getUIManager().getViewsIDs(ViewID.MAIN);
-		 * for(String viewIDString:viewIDs){ //TODO Make this work //I'm
-		 * confused //From what I can tell.. it looks like I need a listener to
-		 * use in initializing the UIPluginViewImpl & in addPluginView??? //TODO
-		 * -- ask Leonard UIPluginEventListener uiPEL = new
-		 * UIPluginEventListener(){ public boolean eventOccurred(UIPluginEvent
-		 * event) { System.out.println(event); return false; } }; //Why is there
-		 * 2 that look like they are doing the same thing //Ask Leonard
-		 * UIPluginViewImpl pluginView = new UIPluginViewImpl(ViewID.MAIN,
-		 * uiPEL); pluginView.initialize(openPluginView(viewIDString)); //This
-		 * looks just like above but does not involve the composite?
-		 * RCMain.getRCMain
-		 * ().getPluginManagerImpl().getUIManager().addPluginView(ViewID.MAIN,
-		 * viewIDString,uiPEL);
-		 * RCMain.getRCMain().getPluginManagerImpl().getUIManager
-		 * ().getViewInstance(parentID, viewID, datasource) }
-		 */
-
-		// addView(ViewID.MAIN, "MyID", Eventlistener);
 	}
 
 	public void close_shell () {
@@ -2387,7 +2365,7 @@ public class DownloadManagerShell {
 		queue.setImage(ImageRepository.getImage("menu_queue"));
 		queue.addListener(SWT.Selection, new Listener() {
 			public void handleEvent (Event arg0) {
-				if (table != null || !table.isDisposed()) {
+				if (table != null && !table.isDisposed()) {
 					TableItem[] items = table.getSelection();
 					RCMain.getRCMain().getClient().transactionStart();
 					for (TableItem item : items) {
@@ -2404,7 +2382,7 @@ public class DownloadManagerShell {
 		forceStart.setImage(ImageRepository.getImage("menu_force_start"));
 		forceStart.addListener(SWT.Selection, new Listener() {
 			public void handleEvent (Event arg0) {
-				if (table != null || !table.isDisposed()) {
+				if (table != null && !table.isDisposed()) {
 					TableItem[] items = table.getSelection();
 					RCMain.getRCMain().getClient().transactionStart();
 					for (TableItem item : items) {
@@ -2422,7 +2400,7 @@ public class DownloadManagerShell {
 		stop.setImage(ImageRepository.getImage("menu_stop"));
 		stop.addListener(SWT.Selection, new Listener() {
 			public void handleEvent (Event arg0) {
-				if (table != null || !table.isDisposed()) {
+				if (table != null && !table.isDisposed()) {
 					TableItem[] items = table.getSelection();
 					RCMain.getRCMain().getClient().transactionStart();
 					for (TableItem item : items) {
@@ -2439,7 +2417,7 @@ public class DownloadManagerShell {
 		remove.setImage(ImageRepository.getImage("menu_remove"));
 		remove.addListener(SWT.Selection, new Listener() {
 			public void handleEvent (Event arg0) {
-				if (table != null || !table.isDisposed()) {
+				if (table != null && !table.isDisposed()) {
 					TableItem[] items = table.getSelection();
 					RCMain.getRCMain().getClient().transactionStart();
 					for (TableItem item : items) {
@@ -2482,7 +2460,7 @@ public class DownloadManagerShell {
 		downloadDeleteTorrent.setText("Delete Torrent File");
 		downloadDeleteTorrent.addListener(SWT.Selection, new Listener() {
 			public void handleEvent (Event arg0) {
-				if (table != null || !table.isDisposed()) {
+				if (table != null && !table.isDisposed()) {
 					TableItem[] items = table.getSelection();
 					RCMain.getRCMain().getClient().transactionStart();
 					for (TableItem item : items) {
@@ -2520,7 +2498,7 @@ public class DownloadManagerShell {
 		downloadDeleteData.setText("Delete Data");
 		downloadDeleteData.addListener(SWT.Selection, new Listener() {
 			public void handleEvent (Event arg0) {
-				if (table != null || !table.isDisposed()) {
+				if (table != null && !table.isDisposed()) {
 					TableItem[] items = table.getSelection();
 					String names = "";
 					// Pull the names for the dialog
@@ -2570,7 +2548,7 @@ public class DownloadManagerShell {
 		downloadDeleteBoth.setText("Delete Both");
 		downloadDeleteBoth.addListener(SWT.Selection, new Listener() {
 			public void handleEvent (Event arg0) {
-				if (table != null || !table.isDisposed()) {
+				if (table != null && !table.isDisposed()) {
 					TableItem[] items = table.getSelection();
 					String names = "";
 					// Pull the names for the dialog
@@ -2630,7 +2608,7 @@ public class DownloadManagerShell {
 		forceRecheck.setImage(ImageRepository.getImage("menu_recheck"));
 		forceRecheck.addListener(SWT.Selection, new Listener() {
 			public void handleEvent (Event arg0) {
-				if (table != null || !table.isDisposed()) {
+				if (table != null && !table.isDisposed()) {
 					TableItem[] items = table.getSelection();
 					if (items.length > 1) {
 						return;
@@ -3665,7 +3643,7 @@ public class DownloadManagerShell {
 						} else if (download.getState() == Download.ST_STOPPED) {
 							setToolBarTorrentIcons(true, false, true);
 						} else if (download.getState() == Download.ST_ERROR) {
-							setToolBarTorrentIcons(false, true, true);
+							setToolBarTorrentIcons(true, true, true);
 						} else {
 							setToolBarTorrentIcons(false, false, false);
 						}
