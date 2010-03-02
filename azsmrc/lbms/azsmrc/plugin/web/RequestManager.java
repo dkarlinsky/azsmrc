@@ -36,6 +36,7 @@ import org.gudy.azureus2.core3.util.Constants;
 import org.gudy.azureus2.plugins.PluginConfig;
 import org.gudy.azureus2.plugins.PluginInterface;
 import org.gudy.azureus2.plugins.PluginManager;
+import org.gudy.azureus2.plugins.PluginState;
 import org.gudy.azureus2.plugins.disk.DiskManagerFileInfo;
 import org.gudy.azureus2.plugins.download.Download;
 import org.gudy.azureus2.plugins.download.DownloadException;
@@ -2250,20 +2251,21 @@ public class RequestManager {
 					PluginInterface[] piList = pi.getPluginManager()
 							.getPluginInterfaces();
 					for (PluginInterface plug : piList) {
+						PluginState state = plug.getPluginState();
 						Element pe = new Element("Plugin");
 						pe.setAttribute("id", plug.getPluginID());
 						pe.setAttribute("name", plug.getPluginName());
 						pe.setAttribute("version", plug.getPluginVersion());
 						pe.setAttribute("dir", plug.getPluginDirectoryName());
-						pe.setAttribute("disabled", Boolean.toString(plug
+						pe.setAttribute("disabled", Boolean.toString(state
 								.isDisabled()));
-						pe.setAttribute("builtin", Boolean.toString(plug
+						pe.setAttribute("builtin", Boolean.toString(state
 								.isBuiltIn()));
-						pe.setAttribute("operational", Boolean.toString(plug
+						pe.setAttribute("operational", Boolean.toString(state
 								.isBuiltIn()));
-						pe.setAttribute("mandatory", Boolean.toString(plug
+						pe.setAttribute("mandatory", Boolean.toString(state
 								.isMandatory()));
-						pe.setAttribute("unloadable", Boolean.toString(plug
+						pe.setAttribute("unloadable", Boolean.toString(state
 								.isUnloadable()));
 						response.addContent(pe);
 					}

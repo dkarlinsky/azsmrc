@@ -3,6 +3,7 @@
  */
 package lbms.azsmrc.plugin.main;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -93,10 +94,11 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 
 	private static boolean						firstRun;
 	private static User							currentUser		= null;
+	private static String						userPluginDirectory;
 
 	// new API startup code
-	UISWTInstance								swtInstance		= null;
-	UISWTViewEventListener						myView			= null;
+	private UISWTInstance						swtInstance		= null;
+	private UISWTViewEventListener				myView			= null;
 
 	public void initialize (final PluginInterface pluginInterface) {
 
@@ -107,6 +109,14 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		pi = pluginInterface;
 
 		firstRun = generateUID();
+
+		userPluginDirectory = pi.getUtilities().getAzureusUserDir()
+				+ System.getProperty("file.separator") + "plugins"
+				+ System.getProperty("file.separator") + pi.getPluginID();
+		try {
+			new File(userPluginDirectory).mkdirs();
+		} catch (Exception e) {
+		}
 
 		UIManager ui_manager = pluginInterface.getUIManager();
 		BasicPluginConfigModel config_model = ui_manager
@@ -145,8 +155,7 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		enablebindToIpParam.addEnabledOnSelection(bindToIpParam);
 
 		// Load the config file
-		config = XMLConfig.loadConfigFile(pluginInterface
-				.getPluginDirectoryName()
+		config = XMLConfig.loadConfigFile(userPluginDirectory
 				+ System.getProperty("file.separator") + "MultiUserConfig.xml");
 
 		// initialize the logger
@@ -310,15 +319,18 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 		 * MenuItemFillListener fill_listener = new MenuItemFillListener(){
 		 * public void menuWillBeShown(MenuItem menu, Object data) { TableRow[]
 		 * rows = (TableRow[])data; if(rows == null) return; //Code here to
-		 * control BEFORE menu is drawn //if(!admin) //menu.setEnabled(false); } };
-		 * MenuItemListener listener = new MenuItemListener() { public void
+		 * control BEFORE menu is drawn //if(!admin) //menu.setEnabled(false); }
+		 * }; MenuItemListener listener = new MenuItemListener() { public void
 		 * selected( MenuItem _menu, Object _target ) { Download download =
-		 * (Download)((TableRow)_target).getDataSource(); if ( download == null ||
-		 * download.getTorrent() == null )return; //do something with download
-		 * here } }; final TableContextMenuItem menu1 =
-		 * pluginInterface.getUIManager().getTableManager().addContextMenuItem(TableManager.TABLE_MYTORRENTS_COMPLETE,
-		 * "azsmrc.mytorrents.menutext1" ); final TableContextMenuItem menu2 =
-		 * pluginInterface.getUIManager().getTableManager().addContextMenuItem(TableManager.TABLE_MYTORRENTS_INCOMPLETE,
+		 * (Download)((TableRow)_target).getDataSource(); if ( download == null
+		 * || download.getTorrent() == null )return; //do something with
+		 * download here } }; final TableContextMenuItem menu1 =
+		 * pluginInterface.
+		 * getUIManager().getTableManager().addContextMenuItem(TableManager
+		 * .TABLE_MYTORRENTS_COMPLETE, "azsmrc.mytorrents.menutext1" ); final
+		 * TableContextMenuItem menu2 =
+		 * pluginInterface.getUIManager().getTableManager
+		 * ().addContextMenuItem(TableManager.TABLE_MYTORRENTS_INCOMPLETE,
 		 * "azsmrc.mytorrents.menutext1"); menu1.addFillListener(fill_listener);
 		 * menu2.addFillListener(fill_listener); menu1.addListener( listener );
 		 * menu2.addListener( listener );
@@ -462,7 +474,8 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 			/*
 			 * (non-Javadoc)
 			 * 
-			 * @see org.gudy.azureus2.plugins.PluginListener#closedownInitiated()
+			 * @see
+			 * org.gudy.azureus2.plugins.PluginListener#closedownInitiated()
 			 */
 			public void closedownInitiated () {
 				try {
@@ -476,7 +489,8 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 			/*
 			 * (non-Javadoc)
 			 * 
-			 * @see org.gudy.azureus2.plugins.PluginListener#initializationComplete()
+			 * @see
+			 * org.gudy.azureus2.plugins.PluginListener#initializationComplete()
 			 */
 			public void initializationComplete () {
 				registerUPnPMapping(pluginInterface.getPluginconfig()
@@ -514,8 +528,9 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 			/*
 			 * (non-Javadoc)
 			 * 
-			 * @see org.gudy.azureus2.plugins.ui.menus.MenuItemFillListener#menuWillBeShown(org.gudy.azureus2.plugins.ui.menus.MenuItem,
-			 *      java.lang.Object)
+			 * @seeorg.gudy.azureus2.plugins.ui.menus.MenuItemFillListener#
+			 * menuWillBeShown(org.gudy.azureus2.plugins.ui.menus.MenuItem,
+			 * java.lang.Object)
 			 */
 			public void menuWillBeShown (MenuItem menu, Object data) {
 				menu.removeAllChildItems();
@@ -557,8 +572,12 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 										/*
 										 * (non-Javadoc)
 										 * 
-										 * @see org.gudy.azureus2.plugins.ui.menus.MenuItemListener#selected(org.gudy.azureus2.plugins.ui.menus.MenuItem,
-										 *      java.lang.Object)
+										 * @see
+										 * org.gudy.azureus2.plugins.ui.menus
+										 * .MenuItemListener
+										 * #selected(org.gudy.azureus2
+										 * .plugins.ui.menus.MenuItem,
+										 * java.lang.Object)
 										 */
 										public void selected (MenuItem menu,
 												Object target) {
@@ -585,8 +604,11 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 									/*
 									 * (non-Javadoc)
 									 * 
-									 * @see org.gudy.azureus2.plugins.ui.menus.MenuItemListener#selected(org.gudy.azureus2.plugins.ui.menus.MenuItem,
-									 *      java.lang.Object)
+									 * @seeorg.gudy.azureus2.plugins.ui.menus.
+									 * MenuItemListener
+									 * #selected(org.gudy.azureus2
+									 * .plugins.ui.menus.MenuItem,
+									 * java.lang.Object)
 									 */
 									public void selected (MenuItem menu,
 											Object target) {
@@ -615,8 +637,12 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 										/*
 										 * (non-Javadoc)
 										 * 
-										 * @see org.gudy.azureus2.plugins.ui.menus.MenuItemListener#selected(org.gudy.azureus2.plugins.ui.menus.MenuItem,
-										 *      java.lang.Object)
+										 * @see
+										 * org.gudy.azureus2.plugins.ui.menus
+										 * .MenuItemListener
+										 * #selected(org.gudy.azureus2
+										 * .plugins.ui.menus.MenuItem,
+										 * java.lang.Object)
 										 */
 										public void selected (MenuItem menu,
 												Object target) {
@@ -672,8 +698,11 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 							/*
 							 * (non-Javadoc)
 							 * 
-							 * @see org.gudy.azureus2.plugins.ui.menus.MenuItemListener#selected(org.gudy.azureus2.plugins.ui.menus.MenuItem,
-							 *      java.lang.Object)
+							 * @see
+							 * org.gudy.azureus2.plugins.ui.menus.MenuItemListener
+							 * #
+							 * selected(org.gudy.azureus2.plugins.ui.menus.MenuItem
+							 * , java.lang.Object)
 							 */
 							public void selected (MenuItem menu, Object target) {
 								TableRow[] rows = (TableRow[]) target;
@@ -937,6 +966,13 @@ public class Plugin implements org.gudy.azureus2.plugins.Plugin {
 			return true;
 		}
 		return firstRun;
+	}
+
+	/**
+	 * @return the userPluginDirectory
+	 */
+	public static String getUserPluginDirectory () {
+		return userPluginDirectory;
 	}
 
 	/**

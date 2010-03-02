@@ -1,6 +1,5 @@
 /*
  * Created on Jan 27, 2006 Created by omschaub
- * 
  */
 package lbms.azsmrc.remote.client.swtgui.dialogs;
 
@@ -563,7 +562,9 @@ public class OpenByFileDialog {
 			/*
 			 * (non-Javadoc)
 			 * 
-			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+			 * @see
+			 * org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse
+			 * .swt.events.SelectionEvent)
 			 */
 			@Override
 			public void widgetSelected (SelectionEvent e) {
@@ -1385,7 +1386,7 @@ public class OpenByFileDialog {
 
 		Label date = new Label(cRight, SWT.NULL);
 		date.setText(DisplayFormatters.formatDate(atc.getTorrent()
-				.getCreationDate()));
+				.getCreationDate() * 1000));
 
 		// Created by
 		Label byL = new Label(cRight, SWT.NULL);

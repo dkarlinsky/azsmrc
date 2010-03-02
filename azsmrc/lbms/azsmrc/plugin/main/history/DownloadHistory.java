@@ -40,14 +40,14 @@ public class DownloadHistory {
 	private DownloadHistory() {
 	}
 
-	public static DownloadHistory getInstance() {
+	public static DownloadHistory getInstance () {
 		if (instance == null) {
 			instance = new DownloadHistory();
 		}
 		return instance;
 	}
 
-	public void addEntry(User user, Download dl) {
+	public synchronized void addEntry (User user, Download dl) {
 		loadDownloadHistory();
 		if (!downloadHistory.containsKey(user.getUsername())) {
 			downloadHistory.put(user.getUsername(),
@@ -59,7 +59,7 @@ public class DownloadHistory {
 		saveDownloadHistory();
 	}
 
-	public DownloadHistoryEntry[] getEntries(User user, long startDate,
+	public DownloadHistoryEntry[] getEntries (User user, long startDate,
 			long endDate) {
 		loadDownloadHistory();
 
@@ -80,7 +80,7 @@ public class DownloadHistory {
 		return resultList.toArray(new DownloadHistoryEntry[resultList.size()]);
 	}
 
-	private synchronized void loadDownloadHistory() {
+	private synchronized void loadDownloadHistory () {
 		if (downloadHistory != null) {
 			System.out.println("DownloadHistory was still loaded");
 			return; // already loaded
@@ -97,8 +97,8 @@ public class DownloadHistory {
 
 		downloadHistory = new HashMap<String, Set<DownloadHistoryEntry>>();
 
-		File dhFile = new File(Plugin.getPluginInterface()
-				.getPluginDirectoryName(), "DownloadHistory.xml.gz");
+		File dhFile = new File(Plugin.getUserPluginDirectory(),
+				"DownloadHistory.xml.gz");
 		if (dhFile.exists()) {
 			InputStream is = null;
 			try {
@@ -132,7 +132,7 @@ public class DownloadHistory {
 		}
 	}
 
-	private synchronized void saveDownloadHistory() {
+	private synchronized void saveDownloadHistory () {
 		if (downloadHistory == null) {
 			return; // error DH was already unloaded
 		}
@@ -154,8 +154,8 @@ public class DownloadHistory {
 				}
 			}
 		}
-		File dhFile = new File(Plugin.getPluginInterface()
-				.getPluginDirectoryName(), "DownloadHistory.xml.gz");
+		File dhFile = new File(Plugin.getUserPluginDirectory(),
+				"DownloadHistory.xml.gz");
 		OutputStream os = null;
 		try {
 			os = new GZIPOutputStream(new FileOutputStream(dhFile));
@@ -175,7 +175,7 @@ public class DownloadHistory {
 		unloadDownloadHistory();
 	}
 
-	private synchronized void unloadDownloadHistory() {
+	private synchronized void unloadDownloadHistory () {
 		if (downloadHistory == null) {
 			return; // error DH was already unloaded
 		}
