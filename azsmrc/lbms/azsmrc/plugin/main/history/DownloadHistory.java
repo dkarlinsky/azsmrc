@@ -29,7 +29,7 @@ import org.jdom.output.XMLOutputter;
 
 /**
  * @author Damokles
- * 
+ *
  */
 public class DownloadHistory {
 
@@ -59,6 +59,12 @@ public class DownloadHistory {
 		saveDownloadHistory();
 	}
 
+	/**
+	 * @param user
+	 * @param startDate in sec
+	 * @param endDate in sec
+	 * @return
+	 */
 	public DownloadHistoryEntry[] getEntries (User user, long startDate,
 			long endDate) {
 		loadDownloadHistory();

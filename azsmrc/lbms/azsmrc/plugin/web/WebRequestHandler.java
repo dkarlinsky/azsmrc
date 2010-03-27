@@ -28,13 +28,29 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
-import java.util.Hashtable;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import lbms.azsmrc.plugin.main.Plugin;
 import lbms.azsmrc.plugin.main.User;
+import lbms.azsmrc.plugin.main.history.DownloadHistory;
+import lbms.azsmrc.plugin.main.history.DownloadHistoryEntry;
 import lbms.azsmrc.shared.UserNotFoundException;
 
 import org.gudy.azureus2.core3.util.Debug;
@@ -47,8 +63,10 @@ import org.gudy.azureus2.plugins.tracker.web.TrackerWebPageRequest;
 import org.gudy.azureus2.plugins.tracker.web.TrackerWebPageResponse;
 import org.gudy.azureus2.plugins.utils.Utilities;
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.jdom.output.DOMOutputter;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
@@ -206,10 +224,10 @@ public class WebRequestHandler	/*extends WebPlugin*/ implements TrackerWebPageGe
 	  return (url_in);
 	}
 
-	protected Hashtable decodeParams(
+	protected Map<String, String> decodeParams (
 		String	str )
 	{
-		Hashtable	params = new Hashtable();
+		Map<String, String> params = new HashMap<String, String>();
 
 		int	pos = 0;
 
@@ -235,7 +253,8 @@ public class WebRequestHandler	/*extends WebPlugin*/ implements TrackerWebPageGe
 				params.put(bit,"true");
 
 			}else{
-				params.put(bit.substring(0,p2), bit.substring(p2+1));
+				params.put(bit.substring(0, p2).toLowerCase(), bit
+						.substring(p2 + 1));
 
 			}
 
@@ -267,7 +286,7 @@ public class WebRequestHandler	/*extends WebPlugin*/ implements TrackerWebPageGe
 			//is.reset();
 		}
 		boolean useCompression = false;
-		if (headers.containsKey("accept-encoding") && headers.get("accept-encoding").toLowerCase().contains("gzip")) {
+		if (useOutputCompression(headers)) {
 			useCompression = true;
 			Plugin.addToLog("Usind Gzip Compression for output.");
 		}
@@ -293,6 +312,15 @@ public class WebRequestHandler	/*extends WebPlugin*/ implements TrackerWebPageGe
 			return false;
 		}
 		return true;
+	}
+
+
+	/**
+	 * @param headers
+	 * @return
+	 */
+	private boolean useOutputCompression (Map<String, String> headers) {
+		return headers.containsKey("accept-encoding") && headers.get("accept-encoding").toLowerCase().contains("gzip");
 	}
 
 	public boolean processFileUpload (
@@ -464,14 +492,15 @@ public class WebRequestHandler	/*extends WebPlugin*/ implements TrackerWebPageGe
 			}
 		}
 
-		Plugin.addToLog("URL was requested: "+request.getURL().toString());
+		final String requestUrlString = request.getURL().toString();
+		Plugin.addToLog("URL was requested: "+requestUrlString);
 
-		if ( request.getURL().toString().endsWith(".class")){
+		if ( requestUrlString.endsWith(".class")){
 
 			System.out.println( "WebPlugin::generate:" + request.getURL());
 		}
 
-		if ( request.getURL().toString().equalsIgnoreCase("/process.cgi")) {
+		if ( requestUrlString.equalsIgnoreCase("/process.cgi")) {
 			try {
 				return processXMLRequest(request, response);
 			} catch (IOException e) {
@@ -480,7 +509,19 @@ public class WebRequestHandler	/*extends WebPlugin*/ implements TrackerWebPageGe
 			}
 		}
 
-		if ( request.getURL().toString().equalsIgnoreCase("/fileupload.cgi")) {
+		if (requestUrlString.toLowerCase().startsWith("/downloadhistory")) {
+			try {
+				return processDownloadHistory(request, response);
+			} catch (IOException e) {
+				Plugin.addToLog("Download History error", e);
+				throw e;
+			} catch (Exception e) {
+				Plugin.addToLog("Download History error", e);
+				throw new IOException(e);
+			}
+		}
+
+		if ( requestUrlString.equalsIgnoreCase("/fileupload.cgi")) {
 			try {
 				return processFileUpload(request, response);
 			} catch (IOException e) {
@@ -497,7 +538,150 @@ public class WebRequestHandler	/*extends WebPlugin*/ implements TrackerWebPageGe
 		return( false );
 	}
 
+	/**
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws JDOMException
+	 * @throws TransformerException
+	 */
+	@SuppressWarnings("unchecked")
+	private boolean processDownloadHistory (TrackerWebPageRequest request,
+			TrackerWebPageResponse response) throws IOException,
+			TransformerException, JDOMException {
 
+		String url = request.getURL().toString();
+
+		User user = null;
+		try {
+			user = Plugin.getXMLConfig().getUser(request.getUser());
+			if (user == null) {
+				return false;
+			}
+		} catch (UserNotFoundException e1) {
+			e1.printStackTrace();
+			return false;
+		}
+
+		int p_pos = url.indexOf('?');
+		Map<String, String> params = null;
+		if (p_pos != -1) {
+
+			params = decodeParams(url.substring(p_pos + 1));
+
+			url = url.substring(0, p_pos);
+		}
+		if (params == null) {
+			params = new HashMap<String, String>();
+		}
+
+		long now = System.currentTimeMillis();
+
+		long endDate = now;
+		long startDate = now - 24 * 60 * 60 * 1000; // one day history
+
+		if (params.containsKey("last")) {
+			Pattern lastFormat = Pattern.compile("(?:(\\d+)(d|h|m))+",
+					Pattern.CASE_INSENSITIVE);
+			Matcher m = lastFormat.matcher(params.get("last"));
+			if (m.find()) {
+				startDate = now;
+				int count = m.groupCount();
+				for (int i = 1; i <= count; i += 2) {
+					int x = Integer.parseInt(m.group(i));
+					String modifier = m.group(i + 1);
+					if ("d".equalsIgnoreCase(modifier)) {
+						startDate -= x * 24 * 60 * 60 * 1000;
+					} else if ("h".equalsIgnoreCase(modifier)) {
+						startDate -= x * 60 * 60 * 1000;
+					} else if ("m".equalsIgnoreCase(modifier)) {
+						startDate -= x * 60 * 1000;
+					}
+
+				}
+			}
+		} else if (params.containsKey("startDate")
+				&& params.containsKey("endDate")) {
+			startDate = Long.parseLong(params.get("startDate"));
+			endDate = Long.parseLong(params.get("endDate"));
+		}
+
+
+		ContentEncoding ce = ContentEncoding.parseFromHeaders(request
+				.getHeaders());
+
+		DownloadHistoryEntry[] entries = DownloadHistory.getInstance()
+				.getEntries(user, startDate / 1000, endDate / 1000);
+
+		Arrays.sort(entries);
+
+		if ("desc".equalsIgnoreCase(params.get("sort"))) {
+			Arrays.sort(entries, Collections.reverseOrder());
+		}
+
+		OutputStream os = ce.wrapStream(response);
+
+		Document rssDocument = renderDownloadHistoryAsRssDocument(entries, user
+				.getUsername());
+
+		if (params.containsKey("render")) {
+			String render = params.get("render");
+			if ("html".equalsIgnoreCase(render)) {
+				TransformerFactory transformerFactory = TransformerFactory.newInstance();
+				Transformer transformer = transformerFactory.newTransformer(new StreamSource(WebRequestHandler.class.getClassLoader().getResourceAsStream(resource_root + "/rss2html.xsl" )));
+				transformer.transform(new DOMSource(new DOMOutputter()
+						.output(rssDocument)), new StreamResult(os));
+			}
+		} else {
+			XMLOutputter out = new XMLOutputter();
+			response.setContentType("text/xml");
+			out.output(rssDocument, os);
+		}
+
+		os.close();
+
+		return true;
+	}
+
+	/**
+	 * @param entries
+	 * @param os
+	 * @param username
+	 * @throws IOException
+	 */
+	private Document renderDownloadHistoryAsRssDocument (
+			DownloadHistoryEntry[] entries, String username) throws IOException {
+
+		final SimpleDateFormat rfc822dateFormat = new SimpleDateFormat(
+				"EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z", Locale.US);
+
+		Element root = new Element("rss");
+		root.setAttribute("version", "2.0");
+		Element channel = new Element("channel");
+		root.addContent(channel);
+
+		channel.addContent(new Element("title").setText("Download History ["
+				+ username + "]"));
+		channel.addContent(new Element("description")
+				.setText("Download History provided by AzSMRC."));
+		channel.addContent(new Element("ttl").setText("5"));
+
+		for (DownloadHistoryEntry entry : entries) {
+			final String rfc822Date = rfc822dateFormat.format(new Date(entry
+					.getTimestamp()));
+
+			Element item = new Element("item");
+			item.addContent(new Element("title").setText(entry.getDlName()));
+			item.addContent(new Element("description").setText(entry
+					.getDlName()
+					+ " has finished Downloading on " + rfc822Date));
+			item.addContent(new Element("pubDate").setText(rfc822Date));
+
+			channel.addContent(item);
+		}
+
+		return new Document(root);
+	}
 
 }
 
