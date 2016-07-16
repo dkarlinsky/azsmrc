@@ -1,0 +1,32 @@
+Changelog for Version: 1.0.0
+
+***New Features***
+
+- Added Download Histroy - You can now review a list of your downloads even after they have been removed
+- New WebUI
+- Alpha state FlashUI
+- Little Helper app that pops up if an fixable error was detected
+- Torrent Creation Wizzard
+- Categories can now be set
+- display name can now be changed
+- download directories can now be restricted to the user directory
+- enable binding to a specific ip
+- Firefox Plugin from AlexisBrunet.com
+- added RemoteBrowsing capability
+
+***Changes***
+
+- improved encoding handling in torrent name
+- added Preserve_Encoding for torrents
+- Scrape Dialog is now in open by file
+- better support for simultaneus multiple users
+- enabled the setting of dl speed to -1 (DnD)
+- better support for SSL downloads
+
+***BugFixes***
+
+- Disable Popups now work as expected
+- fix for double confirm on exit
+- fixes for OSX in launcher - thx to Mirag3
+- modified azsmrc to not need swt.jar in classpath when ui=console
+

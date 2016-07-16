@@ -1,0 +1,281 @@
+<?xml version="1.0"?>
+<project name="AzSMRC" default="jar" basedir=".">
+
+	<property file="build.properties" />
+	<property file="azsmrc.properties" />
+	<property name="root.dir" value="." />
+
+	<property name="generic.excludes" value="**/*.jar **/*.txt **/*.jardesc **/.classpath **/.project **/aereg.lib **/aereg.dll **/.svn" />
+	<property name="dist.jar.excludes" value="${generic.excludes} **/*.java " />
+
+
+	<target name="init">
+		<echo message="Preparing to build AzSMRC..." />
+
+		<tstamp />
+		<mkdir dir="${root.dir}/${dist.dir}" />
+		<mkdir dir="${root.dir}/${dist.dir}/5" />
+		<mkdir dir="${root.dir}/${dist.dir}/6" />
+		<mkdir dir="${root.dir}/${build.dir}" />
+
+	</target>
+
+	<target name="checkAzFiles">
+		<condition property="azFilesOk">
+			<isfileselected file="${azureus.dir}/org">
+				<type type="dir" />
+			</isfileselected>
+		</condition>
+		<echo message="azFilesOk = ${azFilesOk}" />
+	</target>
+
+	<target name="azLangFiles" depends="checkAzFiles, compile-All" if="azFilesOk">
+		<taskdef name="linefilter" classname="lbms.tools.anttasks.LineFilter" classpath="${root.dir}/${bin.dir}" />
+		<linefilter source="${azureus.dir}/org/gudy/azureus2/internat" target="${root.dir}/${build.dir}/${jversion}/lbms/azsmrc/remote/client/swtgui/flexyconf" filter="^ConfigView\..+" />
+	</target>
+
+	<target name="beta" depends="init, cleanDist">
+		<tstamp />
+		<property name="beta" value=".${DSTAMP}" />
+		<antcall target="jar" />
+		<antcall target="copyBeta" />
+	</target>
+
+	<target name="copyBeta" if="moveBetaBuildsTo">
+		<copy todir="${moveBetaBuildsTo}" overwrite="true">
+			<fileset file="${root.dir}/${dist.dir}/AzSMRC_${version}${beta}.jar" />
+			<fileset file="${root.dir}/${dist.dir}/azsmrcPlugin_${version}${beta}.jar" />
+		</copy>
+	</target>
+
+	<target name="compile-All" unless="compileDone">
+		<delete dir="${root.dir}/${build.dir}/5" />
+		<delete dir="${root.dir}/${build.dir}/6" />
+		<mkdir dir="${root.dir}/${build.dir}" />
+		<mkdir dir="${root.dir}/${build.dir}/5" />
+		<javac srcdir="${source.dir}" destdir="${root.dir}/${build.dir}/5" source="1.5" target="1.5" nowarn="true" optimize="true" />
+		<copy todir="${root.dir}/${build.dir}/5/lbms">
+			<fileset dir="${source.dir}" includes="**/*" excludes="**/*.java **/*.jar" />
+		</copy>
+		<mkdir dir="${root.dir}/${build.dir}/6" />
+		<javac srcdir="${source.dir}" destdir="${root.dir}/${build.dir}/6" source="1.6" target="1.6" nowarn="true" optimize="true" />
+		<copy todir="${root.dir}/${build.dir}/6/lbms">
+			<fileset dir="${source.dir}" includes="**/*" excludes="**/*.java **/*.jar" />
+		</copy>
+		<property name="compileDone" value="true" />
+	</target>
+
+	<target name="buildAll" depends="cleanDist, init,compile-All, flash_main">
+		<antcall target="azLangFiles">
+			<param name="jversion" value="5" />
+		</antcall>
+        <antcall target="azLangFiles">
+            <param name="jversion" value="6" />
+        </antcall>
+        
+        <antcall target="setupFiles">
+            <param name="jversion" value="5" />
+        </antcall>
+        <antcall target="setupFiles">
+            <param name="jversion" value="6" />
+        </antcall>
+		
+		<antcall target="distribute">
+			<param name="jversion" value="5" />
+		</antcall>
+		<antcall target="distribute">
+			<param name="jversion" value="6" />
+		</antcall>
+	</target>
+
+	<target name="jar" if="jversion">
+        <echo message="Creating JARs for Java ${jversion}" />
+		<property name="beta" value="" />
+		<propertyfile file="${root.dir}/plugin.properties">
+			<entry key="plugin.class" value="lbms.azsmrc.plugin.main.Plugin" />
+			<entry key="plugin.name" value="AzSMRC" />
+			<entry key="plugin.langfile" value="lbms.azsmrc.plugin.internat.Messages" />
+			<entry key="plugin.version" value="${version}${beta}" />
+			<entry key="plugin.id" value="azsmrc" />
+			<entry key="plugin.jdk.min_version" value="1.${jversion}" />
+		</propertyfile>
+		<echo message="Creating azsmrcPlugin_${version}${beta}.jar..." />
+		<jar destfile="${root.dir}/${dist.dir}/${jversion}/azsmrcPlugin_${version}${beta}.jar" basedir="${root.dir}/${build.dir}/${jversion}" excludes="${dist.jar.excludes}">
+			<include name="lbms/azsmrc/plugin/**/*" />
+			<include name="lbms/azsmrc/shared/**/*" />
+			<include name="lbms/tools/flexyconf/**/*" />
+			<include name="lbms/tools/Crypto*" />
+			<include name="lbms/tools/*" />
+			<include name="lbms/tools/stats/*" />
+			<fileset file="${root.dir}/plugin.properties" />
+		</jar>
+		<echo message="Creating AzSMRC_${version}${beta}.jar..." />
+		<jar destfile="${root.dir}/${dist.dir}/${jversion}/AzSMRC_${version}${beta}.jar" basedir="${root.dir}/${build.dir}/${jversion}" excludes="${dist.jar.excludes}">
+			<include name="lbms/azsmrc/remote/**/*" />
+			<include name="lbms/azsmrc/shared/**/*" />
+			<include name="lbms/tools/launcher/Launchable.class" />
+			<include name="lbms/tools/updater/*" />
+			<include name="lbms/tools/*" />
+			<include name="lbms/tools/i18n/*" />
+			<include name="lbms/tools/stats/*" />
+			<include name="lbms/tools/flexyconf/**/*" />
+			<fileset file="${root.dir}/default.cfg" />
+			<fileset file="${root.dir}/azsmrc.properties" />
+			<fileset file="${root.dir}/log4j.properties" />
+		</jar>
+		<echo message="Creating launcher.jar..." />
+		<jar destfile="${root.dir}/${dist.dir}/${jversion}/launcher.jar" basedir="${root.dir}/${build.dir}/${jversion}" excludes="${dist.jar.excludes}">
+			<include name="lbms/tools/launcher/*" />
+			<manifest>
+				<attribute name="Main-Class" value="lbms.tools.launcher.Launcher" />
+				<attribute name="Class-Path" value="launcher.jar" />
+			</manifest>
+		</jar>
+		<echo message="Creating Sources..." />
+		<zip destfile="${root.dir}/${dist.dir}/azsmrcPlugin_${version}${beta}_src.zip" basedir="${root.dir}" excludes="${generic.excludes}">
+			<include name="lbms/azsmrc/plugin/**/*" />
+			<include name="lbms/azsmrc/shared/**/*" />
+			<include name="lbms/tools/flexyconf/**/*" />
+			<include name="lbms/tools/Crypto*" />
+			<include name="lbms/tools/*" />
+			<include name="lbms/tools/stats/*" />
+			<fileset file="${root.dir}/plugin.properties" />
+		</zip>
+		<zip destfile="${root.dir}/${dist.dir}/AzSMRC_${version}${beta}_src.zip" basedir="${root.dir}" excludes="${generic.excludes}">
+			<include name="lbms/azsmrc/remote/**/*" />
+			<include name="lbms/azsmrc/shared/**/*" />
+			<include name="lbms/tools/launcher/Launchable.class" />
+			<include name="lbms/tools/updater/*" />
+			<include name="lbms/tools/*" />
+			<include name="lbms/tools/i18n/*" />
+			<include name="lbms/tools/stats/*" />
+			<include name="lbms/tools/flexyconf/**/*" />
+			<fileset file="${root.dir}/default.cfg" />
+			<fileset file="${root.dir}/azsmrc.properties" />
+			<fileset file="${root.dir}/log4j.properties" />
+		</zip>
+	</target>
+
+	<target name="distribute">
+		<zip destfile="${root.dir}/${dist.dir}/${jversion}/AzSMRC_${version}.zip">
+			<fileset file="${root.dir}/Readme.txt" />
+			<fileset file="${root.dir}/javaw.exe.manifest" />
+			<fileset file="${root.dir}/AzSMRCupdate.xml.gz" />
+			<fileset file="${root.dir}/changelog.txt" />
+			<fileset file="${dist.dir}/AzSMRC_${version}.jar" />
+			<fileset file="${dist.dir}/AzSMRC.exe" />
+			<fileset file="${root.dir}/launch.properties" />
+			<fileset file="${dist.dir}/launcher.jar" />
+			<fileset file="${swt.jar}/swt.jar" />
+			<zipfileset dir="${root.dir}/lbms/azsmrc/libs" includes="*" excludes="commons-io_1.2.jar easymock.jar" prefix="" />
+		</zip>
+		<zip destfile="${root.dir}/${dist.dir}/${jversion}/azsmrcPlugin_${version}.zip">
+			<fileset file="${dist.dir}/azsmrcPlugin_${version}.jar" />
+			<zipfileset dir="${root.dir}/lbms/azsmrc/libs" includes="commons-codec_1.3.jar commons-io_1.2.jar jdom_1.1.jar" prefix="shared/lib" />
+			<fileset file="${root.dir}/Readme.txt" />
+		</zip>
+	</target>
+
+	<target name="createExeFile" depends="jar">
+		<taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask" classpath="${launch4j.dir}/launch4j.jar:${launch4j.dir}/lib/xstream.jar" />
+		<launch4j configfile="${root.dir}/launch4j.xml" fileVersion="${version}.0" txtFileVersion="${version}.0" productVersion="${version}.0" txtProductVersion="${version}.0" outfile="${dist.dir}/${jversion}/AzSMRC.exe" />
+	</target>
+
+	<target name="setupFiles" depends="createExeFile">
+		<taskdef name="nsis" classname="net.sf.nsisant.Task">
+			<classpath location="${nsisant.dir}/nsisant-1.2.jar" />
+		</taskdef>
+		<!-- grab the NSIS Ant Tasks here http://sourceforge.net/projects/nsisant/ -->
+		<echo message="Creating Setup no SWT version" />
+		<nsis script="setup.nsi" path="${nsis.dir}" verbosity="4">
+			<define name="VERSION" value="${version}" />
+			<define name="JVERSION" value="${jversion}" />
+		</nsis>
+		<echo message="Creating Setup SWT version" />
+		<nsis script="setup.nsi" path="C:/Programme/NSIS/" verbosity="4">
+			<define name="VERSION" value="${version}" />
+			<define name="SWT" value="true" />
+			<define name="SWTDIR" value="${swt.jar}" />
+			<define name="JVERSION" value="${jversion}" />
+		</nsis>
+	</target>
+
+	<target name="source" depends="init">
+		<zip destfile="${dist.dir}/AzSMRC_src_${version}.zip" basedir="${source.dir}">
+			<include name="**/*.java" />
+			<exclude name="**/resources" />
+		</zip>
+	</target>
+
+	<target name="clean" depends="cleanDist">
+		<delete quiet="true">
+			<fileset dir="${root.dir}/${build.dir}" includes="**/*.class" />
+		</delete>
+	</target>
+
+	<target name="cleanDist">
+		<delete dir="${root.dir}/${dist.dir}" />
+	</target>
+
+	<target name="etc" depends="cleanDist, init">
+		<taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask" classpath="${launch4j.dir}/launch4j.jar:${launch4j.dir}/lib/xstream.jar" />
+		<!-- <launch4j configfile="${root.dir}/launch4j_ETC.xml" fileVersion="1.0" txtFileVersion="1.0" productVersion="1.0" txtProductVersion="1.0" outfile="${dist.dir}/ETC.exe" /> -->
+
+		<jar destfile="${root.dir}/${dist.dir}/ETC.jar" basedir="${root.dir}/${build.dir}" excludes="${dist.jar.excludes}">
+			<include name="lbms/tools/i18n/*" />
+			<include name="lbms/tools/i18n/**/*" />
+			<manifest>
+				<attribute name="Main-Class" value="lbms.tools.i18n.swt.ETC" />
+			</manifest>
+		</jar>
+
+		<zip destfile="${root.dir}/${dist.dir}/ETC.zip">
+			<fileset file="${root.dir}/lbms/tools/i18n/swt/readme.txt" />
+			<fileset file="${root.dir}/${dist.dir}/ETC.exe" />
+			<fileset file="${root.dir}/${dist.dir}/ETC.jar" />
+		</zip>
+	</target>
+
+	<taskdef resource="flexTasks.tasks" classpath="${basedir}/flashui/lib/flexTasks.jar" />
+	<target name="flash_main" depends="flash_checkfiles,flash_images" unless="flash_done">
+		<mxmlc file="${basedir}/flashui/azsmrc.mxml" keep-generated-actionscript="true">
+			<load-config filename="${FLEX_HOME}/frameworks/flex-config.xml" />
+			<source-path path-element="${FLEX_HOME}/frameworks" />
+			<compiler.include-libraries dir="${basedir}/flashui" append="true">
+				<include name="images.swc" />
+			</compiler.include-libraries>
+		</mxmlc>
+		<copy todir="${build.dir}/5/lbms/azsmrc/plugin/web/resources" verbose="true">
+			<fileset file="${basedir}/flashui/azsmrc.swf" />
+			<fileset file="${basedir}/flashui/flash.html" />
+		</copy>
+        <copy todir="${build.dir}/6/lbms/azsmrc/plugin/web/resources" verbose="true">
+            <fileset file="${basedir}/flashui/azsmrc.swf" />
+            <fileset file="${basedir}/flashui/flash.html" />
+        </copy>
+        <property name="flash_done" value="true" />
+	</target>
+
+	<target name="flash_images" depends="flash_checkfiles">
+		<compc output="${basedir}/flashui/images.swc">
+			<include-file name="open_by_file_new.png" path="${build.img}/open_by_file_new.png" />
+			<include-file name="refresh.png" path="${build.img}/refresh.png" />
+			<include-file name="open_by_url_new.png" path="${build.img}/open_by_url_new.png" />
+			<include-file name="delete.png" path="${build.img}/delete.png" />
+			<include-file name="Health_yellow.png" path="${build.img}/Health_yellow.png" />
+			<include-file name="Health_blue.png" path="${build.img}/Health_blue.png" />
+			<include-file name="Health_gray.png" path="${build.img}/Health_gray.png" />
+			<include-file name="Health_green.png" path="${build.img}/Health_green.png" />
+			<include-file name="Health_red.png" path="${build.img}/Health_red.png" />
+		</compc>
+	</target>
+
+
+	<target name="flash_checkfiles">
+		<available file="${FLEX_HOME}/bin/mxmlc" property="FlexOK" />
+		<fail unless="FlexOK" message="Flex SDK path not set. See the Readme.txt" />
+
+		<available file="${build.img}/Health_green.png" property="ImageOK" />
+		<fail unless="ImageOK" message="Cant find Images. Set the build.img variable in build.properties. See the Readme.txt" />
+	</target>
+</project>

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Updates>
+   <Update url="http://azsmrc.sourceforge.net" version="0.9.9" type="1" importance="100">
+    <Changelog>
+      <BugFix>When deselecting a File in the Add By Torrent by File dialog AzSMRC crashes</BugFix>
+      <BugFix>It was impossible to set specific Up/Download Speeds per Torrent</BugFix>
+      <BugFix>Confirmationdialog on Exit appears 2 times</BugFix>
+      <BugFix>Fix for "Ghost" torrents in the remote</BugFix>
+      <BugFix>Bug in Plugin Loader was fixed</BugFix>
+      <BugFix>allow to stop the torrent on error</BugFix>
+      <BugFix>"Core Update Checker"</BugFix>
+      <Feature>Encoding Selection for new Torrents</Feature>
+      <Feature>Plugins for AzSMRC (ScaneRSS)</Feature>
+      <Feature>Added Support StatusMailer</Feature>
+      <Feature>Added support for AzJabber plugin when it is ready in v1.1</Feature>
+      <Feature>Remote Azureus Plugin Configuration</Feature>
+      <Feature>Added FirstTime Configuration Wizard</Feature>
+      <Feature>AJAX based WebUI</Feature>
+      <Feature>Added a selectAll, unselectAll, and selectInverse menu to the details table for add torrent by file dialog</Feature>
+      <Feature>extended the ScrapeDialog with the ability to download torrents from an url and display them</Feature>
+      <Feature>SSL availability &amp; status is shown in the Az plugin config</Feature>
+      <Change>New Logo and Splash Screen</Change>
+      <Change>Connection Dialog can now save unlimited profiles</Change>
+      <Change>Message Popup Shell was changed to behave like the Az one, especially not blocking AzSMRC when many messages are coming in</Change>
+      <Change>Shells now have custom icons</Change>
+      <Change>Switched from COConfigurationManager  to PluginConfig Unsafe methods</Change>
+    </Changelog>
+    <Files>
+      <File name="clientLibraries_1.1.zip" version="1.1" url="http://downloads.sourceforge.net/azsmrc/clientLibraries_1.1.zip" hash="3dcf81e833d7c5386459ec364d856f111b744f2" isArchive="true" type="1" size="518896">
+        <File name="jdom_1.0.jar" version="1.0" hash="a2ac1cd690ab4c80defe7f9bce14d35934c35cec" isInArchive="true" type="0" size="153253" />
+        <File name="launch.properties" version="0" hash="b481ffdefe4a9297c185ef4804d22424a1fdf49" isInArchive="true" type="0" size="52" />
+        <File name="launcher.jar" version="0" hash="4766c8c9727edde385daa0a68c56e74f566f94" isInArchive="true" type="0" size="8287" />
+        <File name="commons-codec_1.3.jar" version="1.3" hash="fd32786786e2adb664d5ecc965da47629dca14ba" isInArchive="true" type="0" size="46725" />
+        <File name="log4j_1.2.13.jar" version="1.2.13" hash="8b1b85d04eea979c33109ea4288b7d3f6d355ab" isInArchive="true" type="0" size="358180" />
+      </File>
+      <File name="AzSMRC_0.9.9.jar" version="0.9.9" url="http://downloads.sourceforge.net/azsmrc/AzSMRC_0.9.9.jar" hash="403d92dcf1e6795959cd23fdcebd1f7c5c3ea22" type="1" size="1903080" />
+    </Files>
+  </Update>
+  <Update url="http://azsmrc.sourceforge.net" version="0.9.7" type="1" importance="50">
+    <Changelog>
+      <BugFix>Fix 'Manage Users' so that all features now work</BugFix>
+      <BugFix>Fixed many SWT errors for Update Dialog and ServerUpdate Dialog</BugFix>
+      <BugFix>Fixed the updater so that it works correctly now</BugFix>
+      <BugFix>Fixed many Null Point Errors and Widget is Disposed Errors</BugFix>
+      <Feature>Main tables are now sortable by column</Feature>
+      <Feature>My Tracker tab added to manage shares.  Includes Hosting and Publishing of a torrent file</Feature>
+      <Feature>Added the ability to use sounds</Feature>
+      <Feature>A normal user can now change their password remotely</Feature>
+      <Feature>Added a Scrape and Announce button to the torrent details tab</Feature>
+      <Feature>Double-Clicking on the connection icon or the SSL icon will now open the Server Details tab</Feature>
+      <Change>Display the how long it took to complete the download in the sliding alert window</Change>
+      <Change>Major work on the Downloads and Seeding tables to increase speed and stability</Change>
+      <Change>Tray menu now includes a 'silent mode' to disable all sounds</Change>
+      <Change>Tray menu now includes disable all Popups switch</Change>
+      <Change>Tray menu and ToolBar menu now includes a quick pause feature to pause torrents for a given amount of time</Change>
+      <Change>Added an Update File stats button to the files sub tab of the torrent details</Change>
+      <Change>Enhanced Scrape Dialog some to allow for passing a torrent file to it directly</Change>
+      <Change>Many tweaks to the transfer packages to reduce their size, especially if there are many stopped torrents</Change>
+    </Changelog>
+    <Files>
+      <File name="clientLibraries.zip" version="1.0" url="http://prdownloads.sourceforge.net/azsmrc/clientLibraries.zip" hash="cffac64429174b5adc11f775a34974ceb5b7c96e" isArchive="true" type="2" size="194216">
+        <File name="jdom_1.0.jar" version="1.0" hash="a2ac1cd690ab4c80defe7f9bce14d35934c35cec" isInArchive="true" type="0" size="153253" />
+        <File name="launch.properties" version="0" hash="b481ffdefe4a9297c185ef4804d22424a1fdf49" isInArchive="true" type="0" size="52" />
+        <File name="launcher.jar" version="0" hash="4766c8c9727edde385daa0a68c56e74f566f94" isInArchive="true" type="0" size="8287" />
+        <File name="commons-codec_1.3.jar" version="1.3" hash="fd32786786e2adb664d5ecc965da47629dca14ba" isInArchive="true" type="0" size="46725" />
+      </File>
+      <File name="AzSMRC_0.9.7.jar" version="0.9.7" url="http://prdownloads.sourceforge.net/azsmrc/AzSMRC_0.9.7.jar" hash="449ff54b356b65a80e9548fbf742e77eb6ced2" type="2" size="1693170" />
+      <File name="Readme.txt" version="0.9.7" hash="7260a4c674f803d4630ac45a77b5e4fbee8e886" type="1" size="5337" />
+    </Files>
+  </Update>
+  <Update url="http://azsmrc.sourceforge.net" version="0.9.6" type="1" importance="50">
+    <Changelog>
+      <BugFix>fixed crash in Azureus Remote Configuration</BugFix>
+      <BugFix>fixed crash in AddByFile</BugFix>
+      <Feature>Automatic ErrorReporter</Feature>
+      <Feature>Graphical Updater</Feature>
+    </Changelog>
+    <Files>
+      <File name="clientLibraries.zip" version="1.0" url="http://prdownloads.sourceforge.net/azsmrc/clientLibraries.zip" hash="cffac64429174b5adc11f775a34974ceb5b7c96e" isArchive="true" type="2" size="194216">
+        <File name="jdom_1.0.jar" version="1.0" hash="a2ac1cd690ab4c80defe7f9bce14d35934c35cec" isInArchive="true" type="0" size="153253" />
+        <File name="launch.properties" version="0" hash="b481ffdefe4a9297c185ef4804d22424a1fdf49" isInArchive="true" type="0" size="52" />
+        <File name="launcher.jar" version="0" hash="4766c8c9727edde385daa0a68c56e74f566f94" isInArchive="true" type="0" size="8287" />
+        <File name="commons-codec_1.3.jar" version="1.3" hash="fd32786786e2adb664d5ecc965da47629dca14ba" isInArchive="true" type="0" size="46725" />
+      </File>
+      <File name="Readme.txt" version="0.9.6" hash="524ed92d124d3888ae261adbfbb737bf7bce4725" type="1" size="5471" />
+      <File name="AzSMRC_0.9.6.jar" version="0.9.6" url="http://prdownloads.sourceforge.net/azsmrc/AzSMRC_0.9.6.jar" hash="afd717fbd3ff67d91c16c32d12be7742fbcf6" type="2" size="1556806" />
+    </Files>
+  </Update>
+  <Update url="http://azsmrc.sourceforge.net" version="0.9.5" type="1" importance="50">
+    <Changelog>
+      <BugFix>Fixed the AutoUpdater</BugFix>
+      <BugFix>Fixed the timer not switching to tray mode when the main window was 'hidden' instead of disposed</BugFix>
+      <Feature>Displays Remote Drive Size</Feature>
+      <Feature>Remote Azureus Config (will be extended)</Feature>
+      <Feature>uploaded torrents can now be deleted locally</Feature>
+      <Feature>More than one connection can now be saved</Feature>
+      <Feature>Remote Info with remote Azureus Version, as well as remote Plugin version</Feature>
+      <Feature>Experiemental Azureus remote update</Feature>
+      <Feature>Individual torrent speeds can now be set</Feature>
+      <Feature>You can enable showing the Server Url in title bar now</Feature>
+      <Feature>FastMode: this will make AzSMRC more responsive at the cost of more bandwidth</Feature>
+      <Feature>You can create a SSL Certificate on the server now via AzSMRC</Feature>
+      <Feature>You can now drop Torrents on AzSMRC</Feature>
+      <Change>The Tray Icon behaivior was changed to One-Click</Change>
+      <Change>Improved Clipboard monitor</Change>
+    </Changelog>
+    <Files>
+      <File name="Libraries.zip" version="1.1" url="http://prdownloads.sourceforge.net/azsmrc/Libraries.zip" hash="bdcac03ab3419d3818b86f99a185444abd3e5ae" isArchive="true" type="2" size="245648">
+        <File name="commons-codec_1.3.jar" version="1.3" hash="fd32786786e2adb664d5ecc965da47629dca14ba" isInArchive="true" type="0" size="46725" />
+        <File name="jdom_1.0.jar" version="1.0" hash="a2ac1cd690ab4c80defe7f9bce14d35934c35cec" isInArchive="true" type="0" size="153253" />
+        <File name="commons-io_1.2.jar" version="1.2" hash="ad6ae511ca4608a18317fcb1985fd113bb2ae8" isInArchive="true" type="0" size="65621" />
+      </File>
+      <File name="AzSMRC_0.9.5.jar" version="0.9.5" url="http://prdownloads.sourceforge.net/azsmrc/AzSMRC_0.9.5.jar" hash="dd977c352f33767b48680fb6b992e8d83f1e" type="2" size="1521602" />
+      <File name="Readme.txt" version="0" hash="524ed92d124d3888ae261adbfbb737bf7bce4725" type="1" size="5471" />
+    </Files>
+  </Update>
+  <Update url="http://azsmrc.sourceforge.net" version="0.9.4" type="1" importance="50">
+    <Changelog>
+      <BugFix>UserManager Bug: Users were not read correctly</BugFix>
+      <BugFix>QuickConnect did not request userinfo</BugFix>
+      <BugFix>Download move and reordering fixed</BugFix>
+      <Feature>Serverless Torrent Scraper with ability to select files and send torrent to server</Feature>
+      <Feature>Remote Azureus restart</Feature>
+      <Feature>Ability to move Data Files of a seeding torrent</Feature>
+      <Feature>File Selection for a torrent</Feature>
+      <Feature>Added splash screen with ability to disable it in the Preferences</Feature>
+      <Feature>Added ability to enable/disable Single User Mode through the remote control via Preferences</Feature>
+      <Change>Improved the Updater</Change>
+      <Change>Preferences were expanded to allow more control over exiting and tray behavior</Change>
+      <Change>Enhanced top menu with more quick access to many features</Change>
+    </Changelog>
+    <Files>
+      <File name="Libraries.zip" version="1.0" url="http://prdownloads.sourceforge.net/azsmrc/Libraries.zip" hash="be2950f730f825b5a5d98f26cc9cecda7f71e4" isArchive="true" type="2" size="186472">
+        <File name="commons-codec_1.3.jar" version="1.3" hash="fd32786786e2adb664d5ecc965da47629dca14ba" isInArchive="true" type="0" size="46725" />
+        <File name="jdom_1.0.jar" version="1.0" hash="a2ac1cd690ab4c80defe7f9bce14d35934c35cec" isInArchive="true" type="0" size="153253" />
+      </File>
+      <File name="AzSMRC_0.9.4.jar" version="0.9.4" url="http://prdownloads.sourceforge.net/azsmrc/AzSMRC_0.9.4.jar" hash="604188e9e2ce37539f7e0aa27e77240eaa8369" type="2" size="883958" />
+    </Files>
+  </Update>
+  <Update url="http://azsmrc.sourceforge.net" version="0.9.3" type="1" importance="50">
+    <Changelog>
+      <BugFix>column share ratio can now be selected</BugFix>
+      <Feature>File Selection on addDownload</Feature>
+      <Feature>Builtin - Updater</Feature>
+      <Feature>SingleUserMode for all those who don't want to use the multiuser part</Feature>
+      <Feature>Clipboardmonitor for Torrent URLs</Feature>
+      <Change>Totally improved preferences Tab</Change>
+      <Change>You can disable AutoImport now</Change>
+      <Change>Added some more buttons to the Toolsbar, like start, stop and remove</Change>
+      <Change>Added MenuBar</Change>
+      <Change>You can disable minimize to tray on close, this will close the program if you close the shell</Change>
+    </Changelog>
+    <Files>
+      <File name="AzSMRC_0.9.3.jar" version="0.9.3" url="http://prdownloads.sourceforge.net/azsmrc/AzSMRC_0.9.3.jar" hash="974b8e3055e1cb6a93bbfdbaad2d169582d274f" type="2" size="664494" />
+    </Files>
+  </Update>
+</Updates>
+
