@@ -1,2 +1,6 @@
 rootProject.name = 'azsmrc'
 
+include 'plugin'
+include 'remote'
+include 'shared'
+

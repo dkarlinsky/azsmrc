@@ -1,4 +1,4 @@
-Changelog for Version: 1.0.0
+`Changelog for Version: 1.0.0
 
 ***New Features***
 
