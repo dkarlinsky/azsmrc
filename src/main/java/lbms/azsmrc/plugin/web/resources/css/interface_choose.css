@@ -1,0 +1,60 @@
+/*
+ * CSS file for AzSMRC Webinterface
+ * file used for interface choose screen
+ * all objects are sorted ascending
+ */
+html, body {
+	height: 300px;
+	margin: 0px auto;
+	width: 760px;
+}
+body {
+	background: #FFF url(../img/interface_choose.jpg) no-repeat;
+	color: #FFF;
+	font-size: 12px;
+	padding: 10px 50px 10px 50px;
+}
+h1 {
+	display: none;
+}
+h2 {
+	font-size: 14px;
+	margin: 70px 0px 10px 0px;
+}
+.javascriptavailable {
+	color: #0A0 !important;
+}
+.nojavascript {
+	color: #F00 !important;
+}
+#tabbar {
+	color: #000;
+	display: block;
+	height: 35px;
+	margin: 0px 0px 10px 75px;
+	padding: 0px 5% 0px 2%;
+	position: absolute;
+	top: 225px;
+}
+#tabbar li {
+	color: #888;
+	display: block;
+	font-size: 8px;
+	float: left;
+	height: 26px;
+	margin: 0px 50px 0px 0px;
+	padding: 3px 10px 5px 10px;
+}
+#tabbar li a {
+	color: #555;
+	display: block;
+	font-size: 12px;
+	font-weight: bold;
+}
+#tabbar li:hover a,
+#tabbar li a:hover {
+	color: #000;
+}
+#tabbar li:hover {
+	cursor: pointer;
+}
