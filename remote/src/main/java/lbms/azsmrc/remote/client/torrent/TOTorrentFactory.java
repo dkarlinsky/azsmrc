@@ -88,7 +88,7 @@ TOTorrentFactory
 	public static TOTorrentCreator
 	createFromFileOrDirWithFixedPieceLength(
 		File						file,
-		URL							announce_url )
+		URI							announce_url )
 
 		throws TOTorrentException
 	{
@@ -98,7 +98,7 @@ TOTorrentFactory
 	public static TOTorrentCreator
 	createFromFileOrDirWithFixedPieceLength(
 		File						file,
-		URL							announce_url,
+		URI						announce_url,
 		boolean						add_hashes )
 
 		throws TOTorrentException
@@ -109,7 +109,7 @@ TOTorrentFactory
 	public static TOTorrentCreator
 	createFromFileOrDirWithFixedPieceLength(
 		File						file,
-		URL							announce_url,
+		URI						announce_url,
 		long						piece_length )
 
 		throws TOTorrentException
@@ -120,7 +120,7 @@ TOTorrentFactory
 	public static TOTorrentCreator
 	createFromFileOrDirWithFixedPieceLength(
 		File						file,
-		URL							announce_url,
+		URI						announce_url,
 		boolean						add_hashes,
 		long						piece_length )
 
@@ -134,7 +134,7 @@ TOTorrentFactory
 	public static TOTorrentCreator
 	createFromFileOrDirWithComputedPieceLength(
 		File						file,
-		URL							announce_url )
+		URI						announce_url )
 
 		throws TOTorrentException
 	{
@@ -144,7 +144,7 @@ TOTorrentFactory
 	public static TOTorrentCreator
 	createFromFileOrDirWithComputedPieceLength(
 		File						file,
-		URL							announce_url,
+		URI						announce_url,
 		boolean						add_hashes )
 
 		throws TOTorrentException
@@ -163,7 +163,7 @@ TOTorrentFactory
 	public static TOTorrentCreator
 	createFromFileOrDirWithComputedPieceLength(
 		File						file,
-		URL							announce_url,
+		URI							announce_url,
 		long						piece_min_size,
 		long						piece_max_size,
 		long						piece_num_lower,
@@ -180,7 +180,7 @@ TOTorrentFactory
 	public static TOTorrentCreator
 	createFromFileOrDirWithComputedPieceLength(
 		File						file,
-		URL							announce_url,
+		URI							announce_url,
 		boolean						add_hashes,
 		long						piece_min_size,
 		long						piece_max_size,

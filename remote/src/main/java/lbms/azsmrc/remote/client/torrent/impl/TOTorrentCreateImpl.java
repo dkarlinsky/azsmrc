@@ -59,7 +59,7 @@ TOTorrentCreateImpl
 	public static TOTorrentCreator
 	create(
 		File						_torrent_base,
-		URL							_announce_url,
+		URI							_announce_url,
 		boolean						_add_other_hashes,
 		long						_piece_length )
 
@@ -78,7 +78,7 @@ TOTorrentCreateImpl
 	public static TOTorrentCreator
 	create(
 		File						_torrent_base,
-		URL							_announce_url,
+		URI							_announce_url,
 		boolean						_add_other_hashes,
 		long						_piece_min_size,
 		long						_piece_max_size,
@@ -104,7 +104,7 @@ TOTorrentCreateImpl
 	protected
 	TOTorrentCreateImpl(
 		File						_torrent_base,
-		URL							_announce_url,
+		URI							_announce_url,
 		boolean						_add_other_hashes,
 		long						_piece_length )
 
@@ -120,7 +120,7 @@ TOTorrentCreateImpl
 	protected
 	TOTorrentCreateImpl(
 		File						_torrent_base,
-		URL							_announce_url,
+		URI							_announce_url,
 		boolean						_add_other_hashes,
 		long						_piece_min_size,
 		long						_piece_max_size,

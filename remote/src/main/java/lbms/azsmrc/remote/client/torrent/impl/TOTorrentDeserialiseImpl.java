@@ -233,172 +233,162 @@ TOTorrentDeserialiseImpl
 
 				// decode the stuff
 
-			Iterator root_it = meta_data.keySet().iterator();
+			for (Object o : meta_data.keySet()) {
 
-			while( root_it.hasNext()){
+				String key = (String) o;
 
-				String	key = (String)root_it.next();
+				if (key.equalsIgnoreCase(TK_ANNOUNCE)) {
 
-				if ( key.equalsIgnoreCase( TK_ANNOUNCE )){
+					got_announce = true;
 
-					got_announce	= true;
+					announce_url = readStringFromMetaData(meta_data, TK_ANNOUNCE);
 
-					announce_url = readStringFromMetaData( meta_data, TK_ANNOUNCE );
+					announce_url = announce_url.replaceAll(" ", "");
 
-					announce_url = announce_url.replaceAll( " ", "" );
+					try {
 
-					try{
+						setAnnounceURL(new URI(announce_url));
 
-						setAnnounceURL( new URL( announce_url ));
+					} catch (URISyntaxException e) {
 
-					}catch( MalformedURLException e ){
+						if (!announce_url.contains("://")) {
 
-						if ( announce_url.indexOf( "://" ) == -1 ){
-
-							announce_url = "http:/" + (announce_url.startsWith("/")?"":"/") + announce_url;
+							announce_url = "http:/" + (announce_url.startsWith("/") ? "" : "/") + announce_url;
 						}
 
-						try{
+						try {
 
-							setAnnounceURL( new URL( announce_url ));
+							setAnnounceURL(new URI(announce_url));
 
-						}catch( MalformedURLException f ){
+						} catch (URISyntaxException f) {
 
-							bad_announce	= true;
+							bad_announce = true;
 						}
 					}
 
-				}else if ( key.equalsIgnoreCase( TK_ANNOUNCE_LIST )){
+				} else if (key.equalsIgnoreCase(TK_ANNOUNCE_LIST)) {
 
-					got_announce_list	= true;
+					got_announce_list = true;
 
-					List	announce_list = (List)meta_data.get( TK_ANNOUNCE_LIST );
+					List<List<byte[]>> announce_list = (List<List<byte[]>>) meta_data.get(TK_ANNOUNCE_LIST);
 
-					if ( announce_list != null && announce_list.size() > 0 ){
+					if (announce_list != null && announce_list.size() > 0) {
 
-						announce_url = readStringFromMetaData( meta_data, TK_ANNOUNCE );
+						announce_url = readStringFromMetaData(meta_data, TK_ANNOUNCE);
 
-						announce_url = announce_url.replaceAll( " ", "" );
+						announce_url = announce_url.replaceAll(" ", "");
 
 						boolean announce_url_found = false;
 
-						for (int i=0;i<announce_list.size();i++){
+						for (List<byte[]> anAnnounce_list : announce_list) {
 
-							List	set = (List)announce_list.get(i);
+							List<URI> urls = new ArrayList<URI>();
 
-							Vector urls = new Vector();
+							for (byte[] bytes : anAnnounce_list) {
 
-							for (int j=0;j<set.size();j++){
+								String url_str = readStringFromMetaData(bytes);
 
-								String url_str = readStringFromMetaData((byte[])set.get(j));
+								url_str = url_str.replaceAll(" ", "");
 
-								url_str=url_str.replaceAll( " ", "" );
+								//check to see if the announce url is somewhere in the announce-list
 
-										//check to see if the announce url is somewhere in the announce-list
+								try {
+									urls.add(new URI(url_str));
 
-								try{
-									urls.add( new URL( url_str ));
-
-									if ( url_str.equalsIgnoreCase( announce_url )) {
+									if (url_str.equalsIgnoreCase(announce_url)) {
 
 										announce_url_found = true;
 									}
 
-								}catch( MalformedURLException e ){
+								} catch (URISyntaxException e) {
 
-									if ( url_str.indexOf( "://" ) == -1 ){
+									if (!url_str.contains("://")) {
 
-										url_str = "http:/" + (url_str.startsWith("/")?"":"/") + url_str;
+										url_str = "http:/" + (url_str.startsWith("/") ? "" : "/") + url_str;
 									}
 
-									try{
-										   urls.add( new URL( url_str ));
+									try {
+										urls.add(new URI(url_str));
 
-										   if ( url_str.equalsIgnoreCase( announce_url )) {
+										if (url_str.equalsIgnoreCase(announce_url)) {
 
 											announce_url_found = true;
 										}
 
-									}catch( MalformedURLException f ){
+									} catch (URISyntaxException f) {
 
 										f.printStackTrace();
 									}
 								}
 							}
 
-							if ( urls.size() > 0 ){
+							if (urls.size() > 0) {
 
-								URL[]	url_array = new URL[urls.size()];
-
-								urls.copyInto( url_array );
-
-								addTorrentAnnounceURLSet( url_array );
+								addTorrentAnnounceURLSet(urls.toArray(new URI[urls.size()]));
 							}
 						}
 
-							//if the original announce url isn't found, add it to the list
-							// watch out for those invalid torrents with announce url missing
+						//if the original announce url isn't found, add it to the list
+						// watch out for those invalid torrents with announce url missing
 
-						if ( !announce_url_found && announce_url.length() > 0) {
-						  try {
-							  Vector urls = new Vector();
-							  urls.add( new URL( announce_url ));
-							  URL[] url_array = new URL[ urls.size() ];
-							  urls.copyInto( url_array );
-							  addTorrentAnnounceURLSet( url_array );
-						  }
-						  catch (Exception e) {  e.printStackTrace(); }
+						if (!announce_url_found && announce_url.length() > 0) {
+							try {
+								addTorrentAnnounceURLSet(new URI[] {new URI(announce_url)});
+							} catch (Exception e) {
+
+								e.printStackTrace();
+							}
 						}
 
 					}
-				}else if ( key.equalsIgnoreCase( TK_COMMENT )){
+				} else if (key.equalsIgnoreCase(TK_COMMENT)) {
 
-					setComment((byte[])meta_data.get( TK_COMMENT ));
+					setComment((byte[]) meta_data.get(TK_COMMENT));
 
-				}else if ( key.equalsIgnoreCase( TK_CREATED_BY )){
+				} else if (key.equalsIgnoreCase(TK_CREATED_BY)) {
 
-					setCreatedBy((byte[])meta_data.get( TK_CREATED_BY ));
+					setCreatedBy((byte[]) meta_data.get(TK_CREATED_BY));
 
-				}else if ( key.equalsIgnoreCase( TK_CREATION_DATE )){
+				} else if (key.equalsIgnoreCase(TK_CREATION_DATE)) {
 
 					// non standard, don't fail if format wrong
 
-					try{
+					try {
 
-						Long creation_date = (Long)meta_data.get( TK_CREATION_DATE );
+						Long creation_date = (Long) meta_data.get(TK_CREATION_DATE);
 
-						if ( creation_date != null ){
+						if (creation_date != null) {
 
-							setCreationDate( creation_date.longValue());
+							setCreationDate(creation_date.longValue());
 						}
-					}catch( Exception e ){
+					} catch (Exception e) {
 
-						System.out.println( "TOTorrentDeserialise: creation_date extraction fails, ignoring");
+						System.out.println("TOTorrentDeserialise: creation_date extraction fails, ignoring");
 					}
 
-				}else if ( key.equalsIgnoreCase( TK_INFO )){
+				} else if (key.equalsIgnoreCase(TK_INFO)) {
 
 					// processed later
 
-				}else{
+				} else {
 
-					Object	prop = meta_data.get( key );
+					Object prop = meta_data.get(key);
 
-					if ( prop instanceof byte[] ){
+					if (prop instanceof byte[]) {
 
-						setAdditionalByteArrayProperty( key, (byte[])prop );
+						setAdditionalByteArrayProperty(key, (byte[]) prop);
 
-					}else if ( prop instanceof Long ){
+					} else if (prop instanceof Long) {
 
-						setAdditionalLongProperty( key, (Long)prop );
+						setAdditionalLongProperty(key, (Long) prop);
 
-					}else if ( prop instanceof List ){
+					} else if (prop instanceof List) {
 
-						setAdditionalListProperty( key, (List)prop );
+						setAdditionalListProperty(key, (List) prop);
 
-					}else{
+					} else {
 
-						setAdditionalMapProperty( key, (Map)prop );
+						setAdditionalMapProperty(key, (Map) prop);
 					}
 				}
 			}
@@ -414,7 +404,7 @@ TOTorrentDeserialiseImpl
 						setAnnounceURL( sets[0].getAnnounceURLs()[0]);
 					}else{
 
-						throw( new TOTorrentException( 	"ANNOUNCE_URL malformed ('" + announce_url + "' and no usable announce list",
+						throw( new TOTorrentException( 	"ANNOUNCE_URL malformed ('" + announce_url + "') and no usable announce list",
 														TOTorrentException.RT_DECODE_FAILS ));
 
 					}
@@ -428,7 +418,7 @@ TOTorrentDeserialiseImpl
 
 			if ( ! ( got_announce_list || got_announce )){
 
-				setAnnounceURL( new URL( "dht://" ));
+				setAnnounceURL( new URI( "dht://" ));
 			}
 
 			Map	info = (Map)meta_data.get( TK_INFO );

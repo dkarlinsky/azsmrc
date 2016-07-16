@@ -53,5 +53,5 @@ TOTorrentAnnounceURLGroup
 		
 	public TOTorrentAnnounceURLSet
 	createAnnounceURLSet(
-		URL[]	urls );
+		URI[]	urls );
 }

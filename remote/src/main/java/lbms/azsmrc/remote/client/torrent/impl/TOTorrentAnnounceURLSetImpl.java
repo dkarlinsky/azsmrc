@@ -21,6 +21,7 @@
 
 package lbms.azsmrc.remote.client.torrent.impl;
 
+import java.net.URI;
 import java.net.URL;
 
 import lbms.azsmrc.remote.client.torrent.*;
@@ -30,19 +31,19 @@ TOTorrentAnnounceURLSetImpl
 	implements TOTorrentAnnounceURLSet
 {
 	private TOTorrentImpl	torrent;
-	private URL[]			urls;
+	private URI[]			urls;
 
 	protected
 	TOTorrentAnnounceURLSetImpl(
 		TOTorrentImpl	_torrent,
-		URL[]			_urls )
+		URI[]			_urls )
 	{
 		torrent	= _torrent;
 
 		setAnnounceURLs( _urls );
 	}
 
-	public URL[]
+	public URI[]
 	getAnnounceURLs()
 	{
 		return( urls );
@@ -51,9 +52,9 @@ TOTorrentAnnounceURLSetImpl
 
 	public void
 	setAnnounceURLs(
-		URL[]	_urls )
+		URI[]	_urls )
 	{
-		urls	= new URL[_urls.length];
+		urls	= new URI[_urls.length];
 
 		for (int i=0;i<urls.length;i++){
 

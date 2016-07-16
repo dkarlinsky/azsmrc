@@ -6,6 +6,7 @@ package lbms.azsmrc.remote.client.swtgui.dialogs;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1225,8 +1226,8 @@ public class OpenByFileDialog {
 					.getAnnounceURLSets();
 			// crawl through them and pull the titles for the table
 			for (TOTorrentAnnounceURLSet urlSet : urlSets) {
-				URL[] urls = urlSet.getAnnounceURLs();
-				for (URL url : urls) {
+				URI[] urls = urlSet.getAnnounceURLs();
+				for (URI url : urls) {
 					if (!url.toString().equalsIgnoreCase(
 							atc.getTorrent().getAnnounceURL().toString())) {
 						combo.add(url.toString());

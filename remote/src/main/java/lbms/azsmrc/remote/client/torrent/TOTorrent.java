@@ -90,7 +90,7 @@ TOTorrent
 	 * See below
 	 * @return
 	 */	
-	public URL
+	public URI
 	getAnnounceURL();
 
 	/**
@@ -100,7 +100,7 @@ TOTorrent
 	 */
 	public boolean
 	setAnnounceURL(
-		URL		url );
+		URI		url );
 
 	/**
 	 * When a group of sets of trackers is defined their URLs are accessed via this method

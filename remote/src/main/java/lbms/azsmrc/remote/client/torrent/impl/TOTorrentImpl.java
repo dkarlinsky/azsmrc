@@ -60,14 +60,14 @@ TOTorrentImpl
 	protected static final String TK_PATH_UTF8			= "path.utf-8";
 	protected static final String TK_COMMENT_UTF8		= "comment.utf-8";
 
-	protected static final List	TK_ADDITIONAL_OK_ATTRS =
+	protected static final List<String> TK_ADDITIONAL_OK_ATTRS =
 		Arrays.asList(new String[]{TK_COMMENT_UTF8, AZUREUS_PROPERTIES });
 
 	private byte[]							torrent_name;
 	private byte[]							torrent_name_utf8;
 
 	private byte[]							comment;
-	private URL								announce_url;
+	private URI								announce_url;
 	private TOTorrentAnnounceURLGroupImpl	announce_group = new TOTorrentAnnounceURLGroupImpl(this);
 
 	private long		piece_length;
@@ -103,7 +103,7 @@ TOTorrentImpl
 	protected
 	TOTorrentImpl(
 		String		_torrent_name,
-		URL			_announce_url,
+		URI			_announce_url,
 		boolean		_simple_torrent )
 
 		throws TOTorrentException
@@ -213,7 +213,7 @@ TOTorrentImpl
 
 		throws TOTorrentException
 	{
-		Map	root = new HashMap();
+		Map<String, Object>	root = new HashMap<String, Object>();
 
 		writeStringToMetaData( root, TK_ANNOUNCE, announce_url.toString());
 
@@ -221,26 +221,24 @@ TOTorrentImpl
 
 		if (sets.length > 0 ){
 
-			List	announce_list = new ArrayList();
+			List<List<byte[]>>	announce_list = new ArrayList<List<byte[]>>();
 
-			for (int i=0;i<sets.length;i++){
+			for (TOTorrentAnnounceURLSet set : sets) {
 
-				TOTorrentAnnounceURLSet	set = sets[i];
+				URI[] urls = set.getAnnounceURLs();
 
-				URL[]	urls = set.getAnnounceURLs();
-
-				if ( urls.length == 0 ){
+				if (urls.length == 0) {
 
 					continue;
 				}
 
-				List sub_list = new ArrayList();
+				List<byte[]> sub_list = new ArrayList<byte[]>();
 
-				announce_list.add( sub_list );
+				announce_list.add(sub_list);
 
-				for (int j=0;j<urls.length;j++){
+				for (URI url : urls) {
 
-					sub_list.add( writeStringToMetaData( urls[j].toString()));
+					sub_list.add(writeStringToMetaData(url.toString()));
 				}
 			}
 
@@ -429,7 +427,7 @@ TOTorrentImpl
 		}
 	}
 
-	public URL
+	public URI
 	getAnnounceURL()
 	{
 		return( announce_url );
@@ -437,9 +435,9 @@ TOTorrentImpl
 
 	public boolean
 	setAnnounceURL(
-		URL		url )
+		URI		url )
 	{
-		URL newURL = anonymityTransform( url );
+		URI newURL = anonymityTransform( url );
 		String s0 = (newURL == null) ? "" : newURL.toString();
 		String s1 = (announce_url == null) ? "" : announce_url.toString();
 		if (s0.equals(s1))
@@ -593,7 +591,7 @@ TOTorrentImpl
 
 	protected void
 	addTorrentAnnounceURLSet(
-		URL[]		urls )
+		URI[]		urls )
 	{
 		announce_group.addSet( new TOTorrentAnnounceURLSetImpl( this, urls ));
 	}
@@ -940,9 +938,9 @@ TOTorrentImpl
 		}
 	}
 
-	protected URL
+	protected URI
 	anonymityTransform(
-		URL		url )
+		URI		url )
 	{
 		/*
 		 * 	hmm, doing this is harder than it looks as we have issues hosting

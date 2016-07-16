@@ -1,6 +1,7 @@
 package lbms.azsmrc.remote.client.torrent.scraper;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -33,10 +34,9 @@ public class Scraper implements Runnable {
 	 * 
 	 * @return true if scrape is supported, false if not
 	 */
-	public boolean doScrape() {
-		URL announceUrl = torrent.getAnnounceURL();
-		if (getInfoHash() == "") return false;
-		return scrape (announceUrl.toExternalForm());
+	private boolean doScrape() {
+		URI announceUrl = torrent.getAnnounceURL();
+		return !getInfoHash().isEmpty() && scrape(announceUrl.toString());
 	}
 
 
