@@ -63,3 +63,6 @@ fabric.properties
 .gitignore
 .gradle/
 
+config.cfg
+.certs
+

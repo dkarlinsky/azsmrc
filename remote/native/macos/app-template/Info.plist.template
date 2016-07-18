@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>torrent</string>
+				<string>tor</string>
+				<string>vuze</string>
+				<string>vuz</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>Azureus.icns</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>application/x-bittorrent</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>AzSMRC Download</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>TORR</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+		</dict>
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>start</string>
+	<key>CFBundleGetInfoString</key>
+	<string>AzSMRC</string>
+	<key>CFBundleIconFile</key>
+	<string>Azureus.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>org.azsmrc</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>AzSMRC</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$version</string>
+	<key>CFBundleVersion</key>
+	<string>$version</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>magnet url</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>magnet</string>
+				<string>dht</string>
+				<string>vuze</string>
+			</array>
+		</dict>
+	</array>
+	<key>Java</key>
+	<dict>
+		<key>ClassPath</key>
+		<string>/System/Library/Java:$classpath</string>
+		<key>JVMVersion</key>
+		<string>1.4+</string>
+		<key>MainClass</key>
+		<string>lbms.azsmrc.remote.client.swtgui.RCMain</string>
+		<key>Properties</key>
+		<dict>
+			<key>java.library.path</key>
+			<string>\$JAVAROOT</string>
+		</dict>
+		<key>StartOnMainThread</key>
+		<true/>
+		<key>VMOptions</key>
+		<string>-Xmx128m</string>
+	</dict>
+</dict>
+</plist>

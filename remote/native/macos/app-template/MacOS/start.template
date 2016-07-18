@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+JAVAROOT=\$( dirname "\${BASH_SOURCE[0]}" )/../Resources/Java
+mkdir -p ~/.azsmrc
+cd ~/.azsmrc
+/usr/bin/java -Xmx2G -XstartOnFirstThread -classpath $classpath lbms.azsmrc.remote.client.swtgui.RCMain

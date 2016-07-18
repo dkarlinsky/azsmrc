@@ -1,3 +1,60 @@
 dependencies {
     compile project(':shared')
 }
+
+task packageMac(type: Tar, dependsOn: ['jar']) {
+
+    archiveName "AzSmrc.${version}.app.tar"
+
+    from ("native/macos/app-template") {
+
+        into 'AzSmrc.app/Contents'
+
+        include "**"
+        exclude 'Info.plist.template'
+        exclude '**/start.template'
+        exclude '**/placeholder.txt'
+    }
+
+    from ("native/macos/app-template/Info.plist.template") {
+
+        into 'AzSmrc.app/Contents'
+        expand(version: version, classpath: '')
+        rename { 'Info.plist' }
+
+    }
+
+    from ("native/macos/app-template/MacOS/start.template") {
+
+        def cp = (jar.outputs.files +
+                configurations.compile
+                        .filter { !it.name.startsWith("Vuze") && !it.name.startsWith("ant") })
+                .collect { "\$JAVAROOT/${it.name}" } .join(":")
+
+        println("classpath: $cp")
+
+        into 'AzSmrc.app/Contents/MacOS'
+        expand(version: version,
+                classpath: cp )
+        rename { 'start' }
+
+        fileMode = 0755
+
+    }
+
+    from (configurations.compile) {
+        into 'AzSmrc.app/Contents/Resources/Java'
+        exclude 'ant*'
+        exclude 'Vuze*.jar'
+    }
+
+    from (jar.outputs) {
+        into 'AzSmrc.app/Contents/Resources/Java'
+    }
+
+    destinationDir buildDir
+
+
+
+
+}
