@@ -169,99 +169,7 @@ public class OpenByFileDialog {
 		open_file_button.setImage(ImageRepository.getImage("open_by_file"));
 		open_file_button.addListener(SWT.Selection, new Listener() {
 			public void handleEvent (Event e) {
-				FileDialog dialog = new FileDialog(shell, SWT.OPEN);
-				dialog.setFilterExtensions(new String[] { "*.torrent", "*.*" });
-				dialog
-						.setText(I18N.translate(PFX
-								+ "openfile.filedialog.text"));
-				if (lastDir != null) {
-					dialog.setFilterPath(lastDir);
-				}
-				String choosen_file = dialog.open();
-
-				if (choosen_file != null) {
-					try {
-						File test = new File(choosen_file);
-						if (test.isFile() && test.canRead()) {
-							AddTorrentContainer container = new AddTorrentContainer(
-									test);
-
-							// check the encoding of the file
-							if (container.getTorrent().getAdditionalProperty(
-									"encoding") == null) {
-								EncodingDialog.open(RCMain.getRCMain()
-										.getDisplay(), container);
-
-							}
-
-							// Check to see if it is already there, and if so,
-							// alert the user and cancel
-							if (tMap.containsKey(container.getName())) {
-								MessageBox messageBox = new MessageBox(shell,
-										SWT.ICON_INFORMATION | SWT.OK);
-								messageBox
-										.setText(I18N
-												.translate(PFX
-														+ "openfile.filedialog.duplicate.title"));
-								messageBox
-										.setMessage(I18N
-												.translate(PFX
-														+ "openfile.filedialog.duplicate.message"));
-								messageBox.open();
-								return;
-							}
-
-							TableItem item = new TableItem(filesTable, SWT.NULL);
-
-							item.setText(0, container.getName());
-							item.setText(1, container.getFilePath());
-
-							tMap.put(container.getName(), container);
-							setTotalSize();
-							item.setData(container);
-							generateDetails(container.getName());
-							lastDir = container.getFilePath();
-							RCMain.getRCMain().getProperties().setProperty(
-									"Last.Directory", lastDir);
-							RCMain.getRCMain().saveConfig();
-
-							// select the item in the table
-							try {
-								filesTable.setSelection(filesTable
-										.indexOf(item));
-							} catch (Exception e1) {
-								e1.printStackTrace();
-								filesTable.setSelection(0);
-							}
-
-						}
-					} catch (UnsupportedEncodingException e1) {
-						e1.printStackTrace();
-						MessageBox messageBox = new MessageBox(shell,
-								SWT.ICON_ERROR | SWT.OK);
-						messageBox.setText(I18N.translate("global.error"));
-						messageBox.setMessage(I18N.translate(PFX
-								+ "openfile.error1"));
-						messageBox.open();
-					} catch (TOTorrentException e1) {
-						e1.printStackTrace();
-						MessageBox messageBox = new MessageBox(shell,
-								SWT.ICON_ERROR | SWT.OK);
-						messageBox.setText(I18N.translate("global.error"));
-						messageBox.setMessage(I18N.translate(PFX
-								+ "openfile.error2"));
-						messageBox.open();
-					} catch (Exception e1) {
-						e1.printStackTrace();
-						MessageBox messageBox = new MessageBox(shell,
-								SWT.ICON_ERROR | SWT.OK);
-						messageBox.setText(I18N.translate("global.error"));
-						messageBox.setMessage(I18N.translate(PFX
-								+ "openfile.error3"));
-						messageBox.open();
-						e1.printStackTrace();
-					}
-				}
+                openFileDialog();
 			}
 		});
 
@@ -728,16 +636,16 @@ public class OpenByFileDialog {
 		gridData.horizontalSpan = 2;
 		deleteOnSend.setLayoutData(gridData);
 		deleteOnSend.setSelection(Boolean.parseBoolean(RCMain.getRCMain()
-				.getProperties().getProperty("delete.on.send", "false")));
+                .getProperties().getProperty("delete.on.send", "false")));
 		deleteOnSend.addListener(SWT.Selection, new Listener() {
 
 			public void handleEvent (Event arg0) {
 				if (deleteOnSend.getSelection()) {
 					RCMain.getRCMain().getProperties().setProperty(
-							"delete.on.send", "true");
+                            "delete.on.send", "true");
 				} else {
 					RCMain.getRCMain().getProperties().setProperty(
-							"delete.on.send", "false");
+                            "delete.on.send", "false");
 				}
 				// Store the new setting
 				RCMain.getRCMain().saveConfig();
@@ -748,88 +656,186 @@ public class OpenByFileDialog {
 		Button sendTorrents = new Button(button_comp, SWT.PUSH);
 		sendTorrents.setText(I18N.translate(PFX + "sendfiles.text"));
 		sendTorrents.addListener(SWT.Selection, new Listener() {
-			public void handleEvent (Event e) {
-				if (tMap.size() == 0) {
-					MessageBox messageBox = new MessageBox(shell,
-							SWT.ICON_ERROR | SWT.OK);
-					messageBox.setText(I18N.translate("global.error"));
-					messageBox.setMessage(I18N.translate(PFX
-							+ "sendfiles.error1"));
-					messageBox.open();
-					return;
-				} else {
-					RCMain.getRCMain().getClient().transactionStart();
-					for (AddTorrentContainer container : tMap.values()) {
+            public void handleEvent(Event e) {
+                if (tMap.size() == 0) {
+                    MessageBox messageBox = new MessageBox(shell,
+                            SWT.ICON_ERROR | SWT.OK);
+                    messageBox.setText(I18N.translate("global.error"));
+                    messageBox.setMessage(I18N.translate(PFX
+                            + "sendfiles.error1"));
+                    messageBox.open();
+                    return;
+                } else {
+                    RCMain.getRCMain().getClient().transactionStart();
+                    for (AddTorrentContainer container : tMap.values()) {
 
-						// Check to see if the whole file is sent and if so,
-						// just add it normally
-						// else send it with the properties int[]
-						if (container.isWholeFileSent()) {
-							if (container.getSaveToDirectory()
-									.equalsIgnoreCase("")) {
-								RCMain.getRCMain().getClient()
-										.getDownloadManager().addDownload(
-												container.getTorrent());
-							} else {
-								RCMain.getRCMain().getClient()
-										.getDownloadManager().addDownload(
-												container.getTorrent(),
-												container.getSaveToDirectory());
-							}
-						} else {
-							int[] props = container.getFileProperties();
-							// Main add to Azureus
-							if (container.getSaveToDirectory()
-									.equalsIgnoreCase("")) {
-								RCMain.getRCMain().getClient()
-										.getDownloadManager().addDownload(
-												container.getTorrent(), props);
-							} else {
-								RCMain.getRCMain().getClient()
-										.getDownloadManager().addDownload(
-												container.getTorrent(), props,
-												container.getSaveToDirectory());
-							}
-						}
+                        // Check to see if the whole file is sent and if so,
+                        // just add it normally
+                        // else send it with the properties int[]
+                        if (container.isWholeFileSent()) {
+                            if (container.getSaveToDirectory()
+                                    .equalsIgnoreCase("")) {
+                                RCMain.getRCMain().getClient()
+                                        .getDownloadManager().addDownload(
+                                        container.getTorrent());
+                            } else {
+                                RCMain.getRCMain().getClient()
+                                        .getDownloadManager().addDownload(
+                                        container.getTorrent(),
+                                        container.getSaveToDirectory());
+                            }
+                        } else {
+                            int[] props = container.getFileProperties();
+                            // Main add to Azureus
+                            if (container.getSaveToDirectory()
+                                    .equalsIgnoreCase("")) {
+                                RCMain.getRCMain().getClient()
+                                        .getDownloadManager().addDownload(
+                                        container.getTorrent(), props);
+                            } else {
+                                RCMain.getRCMain().getClient()
+                                        .getDownloadManager().addDownload(
+                                        container.getTorrent(), props,
+                                        container.getSaveToDirectory());
+                            }
+                        }
 
-						if (Boolean.parseBoolean(RCMain.getRCMain()
-								.getProperties().getProperty("delete.on.send",
-										"false"))) {
-							if (!container.deleteFile()) {
-								MessageBox messageBox = new MessageBox(shell,
-										SWT.ICON_ERROR | SWT.OK);
-								messageBox.setText(I18N
-										.translate("global.error"));
-								messageBox.setMessage(I18N.translate(PFX
-										+ "sendfiles.error2")
-										+ " "
-										+ container.getTorrentFile().getName());
-								messageBox.open();
-							}
-						}
-					}
-					RCMain.getRCMain().getClient().transactionCommit();
-				}
-				shell.close();
-			}
-		});
+                        if (Boolean.parseBoolean(RCMain.getRCMain()
+                                .getProperties().getProperty("delete.on.send",
+                                        "false"))) {
+                            if (!container.deleteFile()) {
+                                MessageBox messageBox = new MessageBox(shell,
+                                        SWT.ICON_ERROR | SWT.OK);
+                                messageBox.setText(I18N
+                                        .translate("global.error"));
+                                messageBox.setMessage(I18N.translate(PFX
+                                        + "sendfiles.error2")
+                                        + " "
+                                        + container.getTorrentFile().getName());
+                                messageBox.open();
+                            }
+                        }
+                    }
+                    RCMain.getRCMain().getClient().transactionCommit();
+                }
+                shell.close();
+            }
+        });
 
 		Button cancel = new Button(button_comp, SWT.PUSH);
 		cancel.setText(I18N.translate("global.cancel"));
 		cancel.addListener(SWT.Selection, new Listener() {
-			public void handleEvent (Event e) {
-				shell.close();
-			}
-		});
+            public void handleEvent(Event e) {
+                shell.close();
+            }
+        });
 
 		mainTab.setControl(comp);
 
 		// Center Shell and open
 		GUI_Utilities.centerShellandOpen(shell);
 
+        openFileDialog();
+
 	}
 
-	/**
+    private void openFileDialog() {
+        FileDialog dialog = new FileDialog(shell, SWT.OPEN);
+        dialog.setFilterExtensions(new String[] { "*.torrent", "*.*" });
+        dialog
+                .setText(I18N.translate(PFX
+                        + "openfile.filedialog.text"));
+        if (lastDir != null) {
+            dialog.setFilterPath(lastDir);
+        }
+        String choosen_file = dialog.open();
+
+        if (choosen_file != null) {
+            try {
+                File test = new File(choosen_file);
+                if (test.isFile() && test.canRead()) {
+                    AddTorrentContainer container = new AddTorrentContainer(
+                            test);
+
+                    // check the encoding of the file
+                    if (container.getTorrent().getAdditionalProperty(
+                            "encoding") == null) {
+                        EncodingDialog.open(RCMain.getRCMain()
+                                .getDisplay(), container);
+
+                    }
+
+                    // Check to see if it is already there, and if so,
+                    // alert the user and cancel
+                    if (tMap.containsKey(container.getName())) {
+                        MessageBox messageBox = new MessageBox(shell,
+                                SWT.ICON_INFORMATION | SWT.OK);
+                        messageBox
+                                .setText(I18N
+                                        .translate(PFX
+                                                + "openfile.filedialog.duplicate.title"));
+                        messageBox
+                                .setMessage(I18N
+                                        .translate(PFX
+                                                + "openfile.filedialog.duplicate.message"));
+                        messageBox.open();
+                        return;
+                    }
+
+                    TableItem item = new TableItem(filesTable, SWT.NULL);
+
+                    item.setText(0, container.getName());
+                    item.setText(1, container.getFilePath());
+
+                    tMap.put(container.getName(), container);
+                    setTotalSize();
+                    item.setData(container);
+                    generateDetails(container.getName());
+                    lastDir = container.getFilePath();
+                    RCMain.getRCMain().getProperties().setProperty(
+                            "Last.Directory", lastDir);
+                    RCMain.getRCMain().saveConfig();
+
+                    // select the item in the table
+                    try {
+                        filesTable.setSelection(filesTable
+                                .indexOf(item));
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                        filesTable.setSelection(0);
+                    }
+
+                }
+            } catch (UnsupportedEncodingException e1) {
+                e1.printStackTrace();
+                MessageBox messageBox = new MessageBox(shell,
+                        SWT.ICON_ERROR | SWT.OK);
+                messageBox.setText(I18N.translate("global.error"));
+                messageBox.setMessage(I18N.translate(PFX
+                        + "openfile.error1"));
+                messageBox.open();
+            } catch (TOTorrentException e1) {
+                e1.printStackTrace();
+                MessageBox messageBox = new MessageBox(shell,
+                        SWT.ICON_ERROR | SWT.OK);
+                messageBox.setText(I18N.translate("global.error"));
+                messageBox.setMessage(I18N.translate(PFX
+                        + "openfile.error2"));
+                messageBox.open();
+            } catch (Exception e1) {
+                e1.printStackTrace();
+                MessageBox messageBox = new MessageBox(shell,
+                        SWT.ICON_ERROR | SWT.OK);
+                messageBox.setText(I18N.translate("global.error"));
+                messageBox.setMessage(I18N.translate(PFX
+                        + "openfile.error3"));
+                messageBox.open();
+                e1.printStackTrace();
+            }
+        }
+    }
+
+    /**
 	 * public open method without a string
 	 * 
 	 */

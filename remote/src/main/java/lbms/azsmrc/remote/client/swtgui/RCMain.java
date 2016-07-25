@@ -576,7 +576,7 @@ public class RCMain {
 			}
 		}
 
-		System.out.println("Loading Properties.");
+		System.out.println("Loading Properties, from: " + confFile.getAbsolutePath());
 		if (confFile.exists() && confFile.canRead()) {
 			FileInputStream fin = null;
 			try {

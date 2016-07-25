@@ -13,6 +13,7 @@ import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.shared.SWTSafeRunnable;
 
+import lbms.tools.ExtendedProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -50,8 +51,18 @@ public class BrowseDirectoryDialog {
 	private Label				errorLabel;
 	private ProgressBar			busyBar;
 
+	private ExtendedProperties configProperties;
+
+
+
 	private BrowseDirectoryDialog(final DirectorySelectedCallback callback,
 			Shell parentShell) {
+
+		this.configProperties = RCMain.getRCMain().getProperties();
+
+		loadRecentDirs();
+
+
 		shell = new Shell(parentShell, SWT.PRIMARY_MODAL | SWT.DIALOG_TRIM
 				| SWT.RESIZE);
 		shell.setLayout(new GridLayout(2, false));
@@ -179,6 +190,14 @@ public class BrowseDirectoryDialog {
 			public void widgetSelected (SelectionEvent e) {
 				callback.directorySelected(currentDirectory.getText());
 				recentDirectories.add(currentDirectory.getText());
+
+				BrowseDirectoryDialog.recentDirectories.add(BrowseDirectoryDialog.this.currentDirectory.getText());
+
+				BrowseDirectoryDialog.this.configProperties.setProperty("rerecent.remote.dirs", BrowseDirectoryDialog.this.toDelimitedList(BrowseDirectoryDialog.recentDirectories, "|"));
+
+				RCMain.getRCMain().saveConfig();
+
+
 				shell.close();
 			}
 		});
@@ -194,6 +213,27 @@ public class BrowseDirectoryDialog {
 		browseDirectory(null);
 
 		GUI_Utilities.centerShellandOpen(shell);
+	}
+
+	private void loadRecentDirs()
+	{
+		String recentDirsProp = this.configProperties.getProperty("rerecent.remote.dirs");
+		if (recentDirsProp != null) {
+			recentDirectories.addAll(Arrays.asList(recentDirsProp.split("\\|")));
+		}
+	}
+
+	private String toDelimitedList(Set<String> collection, String delimiter)
+	{
+		StringBuilder res = new StringBuilder(100);
+		for (String element : collection)
+		{
+			if (res.length() > 0) {
+				res.append(delimiter);
+			}
+			res.append(element);
+		}
+		return res.toString();
 	}
 
 	private void browseDirectory (String dir) {
