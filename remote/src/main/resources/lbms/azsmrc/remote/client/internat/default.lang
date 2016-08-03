@@ -166,6 +166,7 @@ dialog.openbyfiledialog.serverdrive.notreceivedyet=Directory not set or not rece
 dialog.openbyfiledialog.shell.text=Send Torrent File(s) to Server
 dialog.openbyfiledialog.torrentdetail.group.text=Files in Torrent
 dialog.openbyfiledialog.torrentdetail.saveToLabel.text=Save Torrent To:\n(If the directory does not exist on the server, then the torrent will be saved to the default directory)
+dialog.openbyurldialog.torrentdetail.saveToLabel.text=Save Torrent To:\n(If the directory does not exist on the server, then the torrent will be saved to the default directory)
 dialog.openbyfiledialog.torrentdetail.table.column.name=File Name
 dialog.openbyfiledialog.torrentdetail.table.column.size=Size
 dialog.openbyfiledialog.totalsize.text=Total size of selected downloads to send to server:

@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import lbms.azsmrc.remote.client.Constants;
+import lbms.azsmrc.remote.client.config.ConfigManager;
 import lbms.azsmrc.remote.client.events.ClientUpdateListener;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.ColorUtilities;
@@ -113,13 +114,14 @@ public class OpenByFileDialog {
 	// I18N prefix
 	public static final String					PFX			= "dialog.openbyfiledialog.";
 
+    private ConfigManager configManager = new ConfigManager(RCMain.getRCMain());
+
 	private OpenByFileDialog(Display display) {
 		// set the static instance
 		instance = this;
 
 		// pull last dir if available
-		lastDir = RCMain.getRCMain().getProperties().getProperty(
-				"Last.Directory");
+		lastDir = configManager.getLastDir();
 
 		// Shell
 		shell = new Shell(display);
@@ -434,18 +436,7 @@ public class OpenByFileDialog {
 			}
 		});
 
-		Group detailsGroup = new Group(sash, SWT.NULL);
-		detailsGroup.setText(I18N.translate(PFX + "torrentdetail.group.text"));
-		gl = new GridLayout();
-		gl.numColumns = 2;
-		gl.marginHeight = 0;
-		gl.marginWidth = 0;
-		detailsGroup.setLayout(gl);
-		gridData = new GridData(GridData.FILL_BOTH);
-		gridData.horizontalSpan = 3;
-		gridData.verticalSpan = 50;
-		gridData.grabExcessVerticalSpace = true;
-		detailsGroup.setLayoutData(gridData);
+        Group detailsGroup = saveToGroup(sash);
 
 		Label saveToLabel = new Label(detailsGroup, SWT.NULL);
 		saveToLabel.setText(I18N.translate(PFX
@@ -739,6 +730,23 @@ public class OpenByFileDialog {
 
 	}
 
+    private Group saveToGroup(Composite parent) {
+
+        Group detailsGroup = new Group(parent, SWT.NULL);
+        detailsGroup.setText(I18N.translate(PFX + "torrentdetail.group.text"));
+        GridLayout gl = new GridLayout();
+        gl.numColumns = 2;
+        gl.marginHeight = 0;
+        gl.marginWidth = 0;
+        detailsGroup.setLayout(gl);
+        GridData gridData = new GridData(GridData.FILL_BOTH);
+        gridData.horizontalSpan = 3;
+        gridData.verticalSpan = 50;
+        gridData.grabExcessVerticalSpace = true;
+        detailsGroup.setLayoutData(gridData);
+        return detailsGroup;
+    }
+
     private void openFileDialog() {
         FileDialog dialog = new FileDialog(shell, SWT.OPEN);
         dialog.setFilterExtensions(new String[] { "*.torrent", "*.*" });
@@ -792,9 +800,8 @@ public class OpenByFileDialog {
                     item.setData(container);
                     generateDetails(container.getName());
                     lastDir = container.getFilePath();
-                    RCMain.getRCMain().getProperties().setProperty(
-                            "Last.Directory", lastDir);
-                    RCMain.getRCMain().saveConfig();
+                    configManager.setLastDir(lastDir);
+                    configManager.saveConfig();
 
                     // select the item in the table
                     try {

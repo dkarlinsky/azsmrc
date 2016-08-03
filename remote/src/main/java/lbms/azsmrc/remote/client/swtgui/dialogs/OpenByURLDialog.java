@@ -5,6 +5,7 @@
  */
 package lbms.azsmrc.remote.client.swtgui.dialogs;
 
+import lbms.azsmrc.remote.client.config.ConfigManager;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.ImageRepository;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
@@ -14,6 +15,8 @@ import lbms.azsmrc.shared.SWTSafeRunnable;
 import org.eclipse.swt.SWT;
 //import org.eclipse.swt.dnd.Clipboard;
 //import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -36,6 +39,10 @@ public class OpenByURLDialog {
 	private static OpenByURLDialog instance;
 
 	private Shell shell;
+
+	private Text saveTo;
+
+    private ConfigManager configManager = new ConfigManager(RCMain.getRCMain());
 
 	private OpenByURLDialog(final String url){
 		instance = this;
@@ -71,17 +78,10 @@ public class OpenByURLDialog {
 		url_text.setLayoutData(gridData);
 
 
-		//pull the clipboard
-		/*final Clipboard cb = new Clipboard(display);
-		TextTransfer transfer = TextTransfer.getInstance();
-		String clipboard = (String)cb.getContents(transfer);*/
-
 		if(url != null){
 			if(url.startsWith("http") || url.startsWith("magnet")){
 				url_text.setText(url);
-			}/*else if(clipboard.startsWith("www")){
-				url_text.setText("http://" + clipboard);
-			}*/
+			}
 		}
 
 		//Second Line
@@ -118,38 +118,41 @@ public class OpenByURLDialog {
 		password_label.setEnabled(false);
 		password_text.setEnabled(false);
 
-		needUserPass_button.addListener(SWT.Selection, new Listener(){
-			public void handleEvent(Event e) {
-				if(needUserPass_button.getSelection()){
-					username_label.setEnabled(true);
-					username_text.setEnabled(true);
-					password_label.setEnabled(true);
-					password_text.setEnabled(true);
-				}else{
-					username_label.setEnabled(false);
-					username_text.setEnabled(false);
-					password_label.setEnabled(false);
-					password_text.setEnabled(false);
-				}
-			}
-		});
+		needUserPass_button.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event e) {
+                if (needUserPass_button.getSelection()) {
+                    username_label.setEnabled(true);
+                    username_text.setEnabled(true);
+                    password_label.setEnabled(true);
+                    password_text.setEnabled(true);
+                } else {
+                    username_label.setEnabled(false);
+                    username_text.setEnabled(false);
+                    password_label.setEnabled(false);
+                    password_text.setEnabled(false);
+                }
+            }
+        });
+
+        createSaveToPanel(comp);
 
 
 		//Buttons
 		Composite button_comp = new Composite(shell, SWT.NULL);
-		gridData = new GridData(GridData.GRAB_HORIZONTAL);
-		button_comp.setLayoutData(gridData);
+		button_comp.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL));
 
 		gridLayout = new GridLayout();
 		gridLayout.numColumns = 2;
 		gridLayout.marginWidth = 0;
-		button_comp.setLayout(gridLayout);
+        button_comp.setLayout(gridLayout);
 
-		Button connect = new Button(button_comp,SWT.PUSH);
+
+
+		Button connect = new Button(button_comp, SWT.PUSH);
 		connect.setText("Send URL to Server");
-		connect.addListener(SWT.Selection, new Listener(){
+		connect.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
-				if(url_text.getText().length() <= 1){
+				if (url_text.getText().length() <= 1) {
 					MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
 					messageBox.setText(I18N.translate("global.error"));
 					messageBox.setMessage(I18N.translate(PFX + "error1"));
@@ -157,23 +160,28 @@ public class OpenByURLDialog {
 					return;
 				}
 				String url = url_text.getText();
-				if(!url.startsWith("http://") && !url.startsWith("magnet")){
+				if (!url.startsWith("http://") && !url.startsWith("magnet")) {
 					url = "http://" + url;
 				}
 
-				if(needUserPass_button.getSelection()){
-					if(username_text.getText().equalsIgnoreCase("")
-							||password_text.getText().equalsIgnoreCase("")){
+				if (needUserPass_button.getSelection()) {
+					if (username_text.getText().equalsIgnoreCase("")
+							|| password_text.getText().equalsIgnoreCase("")) {
 						MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
 						messageBox.setText(I18N.translate("global.error"));
 						messageBox.setMessage(I18N.translate(PFX + "error2"));
 						messageBox.open();
 						return;
-					}else
-						RCMain.getRCMain().getClient().getDownloadManager().addDownload(url, username_text.getText(), password_text.getText(), null, null);
-				}else{
-					RCMain.getRCMain().getClient().getDownloadManager().addDownload(url);
+					} else {
 
+                        RCMain.getRCMain().getClient().getDownloadManager().addDownload(url, username_text.getText(), password_text.getText(), null, saveTo.getText());
+                        configManager.setLastDir(saveTo.getText());
+                        configManager.saveConfig();
+                    }
+				} else {
+					RCMain.getRCMain().getClient().getDownloadManager().addDownload(url, saveTo.getText());
+                    configManager.setLastDir(saveTo.getText());
+                    configManager.saveConfig();
 				}
 				shell.close();
 				//Re-Add the AWT monitor
@@ -181,6 +189,7 @@ public class OpenByURLDialog {
 				//FireFrogMain.getFFM().addAWTClipboardMonitor();
 			}
 		});
+
 
 
 		Button cancel = new Button(button_comp,SWT.PUSH);
@@ -199,6 +208,49 @@ public class OpenByURLDialog {
 		GUI_Utilities.centerShellOpenAndFocus(shell);
 	}
 
+	private void createSaveToPanel(Composite button_comp) {
+
+		Group saveToGroup = new Group(button_comp, SWT.NULL);
+		saveToGroup.setText(I18N.translate(PFX + "torrentdetail.saveToLabel.text"));
+		GridLayout gl = new GridLayout();
+		gl.numColumns = 2;
+		gl.marginHeight = 0;
+		gl.marginWidth = 0;
+		saveToGroup.setLayout(gl);
+		GridData gridData = new GridData(GridData.GRAB_HORIZONTAL);
+		gridData.horizontalSpan = 3;
+		gridData.verticalSpan = 2;
+		gridData.grabExcessHorizontalSpace = true;
+
+		saveToGroup.setLayoutData(gridData);
+
+		saveTo = new Text(saveToGroup, SWT.BORDER | SWT.SINGLE);
+        gridData = new GridData(GridData.FILL_HORIZONTAL);
+        gridData.widthHint = 400;
+		saveTo.setLayoutData(gridData);
+        saveTo.setText(configManager.getLastDir());
+
+		Button browseButton = new Button(saveToGroup, SWT.PUSH);
+		browseButton.setText(I18N.translate("global.browse"));
+		browseButton.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				BrowseDirectoryDialog.open(new BrowseDirectoryDialog.DirectorySelectedCallback() {
+					@Override
+					public void directorySelected(final String directory) {
+						shell.getDisplay().asyncExec(new SWTSafeRunnable() {
+							@Override
+							public void runSafe() {
+								saveTo.setText(directory);
+							}
+						});
+					}
+				}, shell);
+			}
+		});
+	}
+
 
 	/**
 	 * Open a OpenByURLDialog with a URL
@@ -209,7 +261,6 @@ public class OpenByURLDialog {
 		if(display == null) return;
 		display.asyncExec(new SWTSafeRunnable(){
 			public void runSafe() {
-				if(display == null) return;
 				if (instance == null || instance.shell == null || instance.shell.isDisposed()){
 					new OpenByURLDialog(URL);
 				}else
@@ -231,8 +282,7 @@ public class OpenByURLDialog {
 		if(display == null) return;
 		display.asyncExec(new SWTSafeRunnable(){
 			public void runSafe() {
-				if(display == null) return;
-				if (instance == null || instance.shell == null || instance.shell.isDisposed()){
+                if (instance == null || instance.shell == null || instance.shell.isDisposed()){
 					new OpenByURLDialog(url);
 				}else
 					instance.shell.setActive();

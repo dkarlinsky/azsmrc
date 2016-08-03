@@ -39,6 +39,7 @@ import lbms.azsmrc.remote.client.LoginData;
 import lbms.azsmrc.remote.client.SESecurityManager;
 import lbms.azsmrc.remote.client.SESecurityManagerListener;
 import lbms.azsmrc.remote.client.Utilities;
+import lbms.azsmrc.remote.client.config.ConfigStore;
 import lbms.azsmrc.remote.client.events.ClientEventListener;
 import lbms.azsmrc.remote.client.events.ClientUpdateListener;
 import lbms.azsmrc.remote.client.events.ConnectionListener;
@@ -96,7 +97,7 @@ import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
 import org.jdom.Element;
 
-public class RCMain {
+public class RCMain implements ConfigStore {
 
 	public static final String		LOGGER_ROOT		= "lbms.azsmrc";
 	public static final String		USER_DIR		= System
@@ -1358,7 +1359,8 @@ public class RCMain {
 		return timer;
 	}
 
-	public ExtendedProperties getProperties () {
+	@Override
+	public ExtendedProperties getProperties() {
 		return properties;
 	}
 
@@ -1426,7 +1428,8 @@ public class RCMain {
 		return manifestInUse;
 	}
 
-	public void saveConfig () {
+	@Override
+	public void saveConfig() {
 		if (properties != null) {
 			FileOutputStream fos = null;
 			try {
