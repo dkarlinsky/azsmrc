@@ -1,0 +1,36 @@
+<launch4jConfig>
+  <dontWrapJar>true</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar></jar>
+  <outfile>AzSMRC.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <customProcName>true</customProcName>
+  <stayAlive>false</stayAlive>
+  <icon>Azureus_32x32x256.ico</icon>
+  <classPath>
+    <mainClass>lbms.tools.launcher.Launcher</mainClass>
+    <cp>$classpath</cp>
+  </classPath>
+  <jre>
+    <path></path>
+    <minVersion>1.8.0</minVersion>
+    <maxVersion></maxVersion>
+    <dontUsePrivateJres>false</dontUsePrivateJres>
+    <initialHeapSize>0</initialHeapSize>
+    <maxHeapSize>0</maxHeapSize>
+  </jre>
+  <versionInfo>
+    <fileVersion>$version</fileVersion>
+    <txtFileVersion>$version</txtFileVersion>
+    <fileDescription>AzSMRC</fileDescription>
+    <copyright>Leonard Bruenings &amp; Marc Schaubach</copyright>
+    <productVersion>$version</productVersion>
+    <txtProductVersion>$version</txtProductVersion>
+    <productName>AzSMRC</productName>
+    <companyName>Leonard Bruenings &amp; Marc Schaubach</companyName>
+    <internalName>AzSMRC</internalName>
+    <originalFilename>AzSMRC.exe</originalFilename>
+  </versionInfo>
+</launch4jConfig>

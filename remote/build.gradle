@@ -1,5 +1,61 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'edu.sc.seis.gradle:launch4j:2.3.0'
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.1"
+    }
+}
+
+apply plugin: 'edu.sc.seis.launch4j'
+apply plugin: "com.github.johnrengelman.shadow"
+
+shadowJar {
+    exclude 'a2.properties'
+}
+
+configurations {
+    win32
+}
+
+def bits = System.getProperty("bits")?:"64"
+def winArch = "x86_64"
+if(bits == "32") {
+    winArch = "x86"
+}
+else {
+    winArch = "x86_$bits"
+}
+
+launch4j {
+//    println("roject.tasks.shadowJar.outputs.files: $project.tasks.shadowJar.outputs.files")
+    mainClassName = 'lbms.azsmrc.remote.client.swtgui.RCMain'
+    icon = "${project.rootDir}/remote/native/windows/Azureus_32x32x256.ico"
+    copyConfigurable = project.tasks.shadowJar.outputs.files
+    outfile = "AzSmrc-${winArch}.exe"
+    jar = "lib/${project.tasks.shadowJar.archiveName}"
+}
+
+shadowJar {
+    configurations = [project.configurations.runtime, project.configurations.win32]
+    dependencies {
+        exclude(dependency('org.eclipse.swt:org.eclipse.swt.cocoa.macosx.x86_64:'))
+        exclude(dependency('org.apache.ant::'))
+//        exclude(dependency {
+//          println "dependency $it"
+//        })
+    }
+    manifest {
+        attributes 'Main-Class': 'lbms.azsmrc.remote.client.swtgui.RCMain'
+    }
+}
+
+
+
 dependencies {
     compile project(':shared')
+    win32  group: 'org.eclipse.swt', name: "org.eclipse.swt.win32.win32.$winArch", version: '4.3'
 }
 
 task packageMac(type: Tar, dependsOn: ['jar']) {
@@ -53,8 +109,5 @@ task packageMac(type: Tar, dependsOn: ['jar']) {
     }
 
     destinationDir buildDir
-
-
-
 
 }
