@@ -3,24 +3,11 @@
  */
 package lbms.azsmrc.remote.client.swtgui.dialogs;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import lbms.azsmrc.remote.client.Constants;
 import lbms.azsmrc.remote.client.config.ConfigManager;
 import lbms.azsmrc.remote.client.events.ClientUpdateListener;
 import lbms.azsmrc.remote.client.internat.I18N;
-import lbms.azsmrc.remote.client.swtgui.ColorUtilities;
-import lbms.azsmrc.remote.client.swtgui.DownloadManagerShell;
-import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
-import lbms.azsmrc.remote.client.swtgui.ImageRepository;
-import lbms.azsmrc.remote.client.swtgui.RCMain;
+import lbms.azsmrc.remote.client.swtgui.*;
 import lbms.azsmrc.remote.client.swtgui.URLTransfer;
 import lbms.azsmrc.remote.client.swtgui.container.AddTorrentContainer;
 import lbms.azsmrc.remote.client.swtgui.dialogs.BrowseDirectoryDialog.DirectorySelectedCallback;
@@ -36,49 +23,25 @@ import lbms.azsmrc.shared.EncodingUtil;
 import lbms.azsmrc.shared.SWTSafeRunnable;
 import lbms.tools.DownloadListener;
 import lbms.tools.TorrentDownload;
-
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.dnd.DND;
-import org.eclipse.swt.dnd.DropTarget;
-import org.eclipse.swt.dnd.DropTargetAdapter;
-import org.eclipse.swt.dnd.DropTargetEvent;
-import org.eclipse.swt.dnd.FileTransfer;
-import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.MenuListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.events.ShellEvent;
-import org.eclipse.swt.events.ShellListener;
+import org.eclipse.swt.dnd.*;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.ProgressBar;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.*;
+
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 public class OpenByFileDialog {
 
@@ -86,7 +49,7 @@ public class OpenByFileDialog {
 
 	private CTabFolder							tabFolder;
 
-	Button										deleteOnSend;
+	private Button								deleteOnSend;
 
 	private String								lastDir;
 
@@ -455,6 +418,7 @@ public class OpenByFileDialog {
 				}
 			}
 		});
+		saveTo.setText(configManager.getLastDir());
 
 		Button browseButton = new Button(detailsGroup, SWT.PUSH);
 		browseButton.setText(I18N.translate("global.browse"));
@@ -468,13 +432,15 @@ public class OpenByFileDialog {
 			 */
 			@Override
 			public void widgetSelected (SelectionEvent e) {
-				BrowseDirectoryDialog.open(new DirectorySelectedCallback() {
+				BrowseDirectoryDialog.open(startRemoteDir() ,new DirectorySelectedCallback() {
 					@Override
 					public void directorySelected (final String directory) {
 						shell.getDisplay().asyncExec(new SWTSafeRunnable() {
 							@Override
 							public void runSafe () {
 								saveTo.setText(directory);
+								configManager.setLastDir(directory);
+								configManager.saveConfig();
 							}
 						});
 					}
@@ -658,6 +624,8 @@ public class OpenByFileDialog {
                     return;
                 } else {
                     RCMain.getRCMain().getClient().transactionStart();
+                    configManager.setLastDir(activeATC.getSaveToDirectory());
+                    configManager.saveConfig();
                     for (AddTorrentContainer container : tMap.values()) {
 
                         // Check to see if the whole file is sent and if so,
@@ -709,7 +677,7 @@ public class OpenByFileDialog {
                     }
                     RCMain.getRCMain().getClient().transactionCommit();
                 }
-                shell.close();
+                closeDialog();
             }
         });
 
@@ -717,17 +685,26 @@ public class OpenByFileDialog {
 		cancel.setText(I18N.translate("global.cancel"));
 		cancel.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event e) {
-                shell.close();
+                closeDialog();
             }
         });
 
 		mainTab.setControl(comp);
+	}
 
-		// Center Shell and open
+	private void closeDialog() {
+		shell.close();
+	}
+
+	private String startRemoteDir() {
+		if(saveTo.getText().trim().isEmpty()) return configManager.getLastDir();
+		else return saveTo.getText().trim();
+	}
+
+	public void showDialog(boolean preOpenFileSelectionDialog) {
 		GUI_Utilities.centerShellandOpen(shell);
-
-        openFileDialog();
-
+		if(preOpenFileSelectionDialog)
+			openFileDialog();
 	}
 
     private Group saveToGroup(Composite parent) {
@@ -853,7 +830,8 @@ public class OpenByFileDialog {
 		}
 		if (instance == null || instance.shell == null
 				|| instance.shell.isDisposed()) {
-			new OpenByFileDialog(display);
+			new OpenByFileDialog(display)
+					.showDialog(true);
 		} else {
 			instance.shell.setActive();
 		}
@@ -861,9 +839,6 @@ public class OpenByFileDialog {
 
 	/**
 	 * Static open with fileNames
-	 * 
-	 * @param display
-	 * @param fileNames
 	 */
 	public static void open (final String[] fileNames) {
 		final Display display = RCMain.getRCMain().getDisplay();
@@ -882,6 +857,7 @@ public class OpenByFileDialog {
 						|| instance.shell.isDisposed()) {
 					new OpenByFileDialog(display);
 					instance.addFileToInstance(fileNames);
+					instance.showDialog(false);
 				} else {
 					instance.shell.setActive();
 					instance.addFileToInstance(fileNames);
@@ -1010,15 +986,12 @@ public class OpenByFileDialog {
 		if (event.data instanceof String[] || event.data instanceof String) {
 			final String[] sourceNames = (event.data instanceof String[]) ? (String[]) event.data
 					: new String[] { (String) event.data };
-			if (sourceNames == null) {
-				event.detail = DND.DROP_NONE;
-			}
 			if (event.detail == DND.DROP_NONE) {
 				return;
 			}
 
-			for (int i = 0; (i < sourceNames.length); i++) {
-				final File source = new File(sourceNames[i]);
+			for (String sourceName : sourceNames) {
+				final File source = new File(sourceName);
 				if (source.isFile()) {
 					String filename = source.getAbsolutePath();
 					try {
@@ -1116,23 +1089,22 @@ public class OpenByFileDialog {
 
 	public void setTotalSize () {
 		long totalSize = 0;
-		Iterator<String> it = tMap.keySet().iterator();
-		while (it.hasNext()) {
-			AddTorrentContainer atc = tMap.get(it.next());
+		for (String s : tMap.keySet()) {
+			AddTorrentContainer atc = tMap.get(s);
 			if (atc != null) {
 				totalSize += atc.getTotalSizeOfDownloads();
 			}
 		}
-		long totalSizeAdj = totalSize / 1024l;
+		long totalSizeAdj = totalSize / 1024L;
 		if (driveMap.containsKey("save.dir")
 				&& driveMap.containsKey("save.dir.path")) {
 			long saveDirFree = Long.parseLong(driveMap.get("save.dir"));
 			// System.out.println(saveDirFree + " | " + (1024l*1024l*2l) + " | "
 			// + totalSizeAdj + " | " + (saveDirFree - totalSizeAdj));
-			if ((saveDirFree - totalSizeAdj) > (1024l * 1024l * 2l/* 2 GB */)) {
+			if ((saveDirFree - totalSizeAdj) > (1024L * 1024L * 2L/* 2 GB */)) {
 				totalS.setForeground(RCMain.getRCMain().getDisplay()
 						.getSystemColor(SWT.COLOR_DARK_GREEN));
-			} else if ((saveDirFree - totalSizeAdj) > (1024l * 20l /* 20 MB */)) {
+			} else if ((saveDirFree - totalSizeAdj) > (1024L * 20L /* 20 MB */)) {
 				totalS.setForeground(RCMain.getRCMain().getDisplay()
 						.getSystemColor(SWT.COLOR_DARK_YELLOW));
 			} else {
@@ -1152,10 +1124,10 @@ public class OpenByFileDialog {
 		if (driveMap.containsKey("destination.dir")
 				&& driveMap.containsKey("destination.dir.path")) {
 			long destDirFree = Long.parseLong(driveMap.get("destination.dir"));
-			if ((destDirFree - totalSizeAdj) > (1024l * 1024l * 2l/* 2 GB */)) {
+			if ((destDirFree - totalSizeAdj) > (1024L * 1024L * 2L/* 2 GB */)) {
 				totalS.setForeground(RCMain.getRCMain().getDisplay()
 						.getSystemColor(SWT.COLOR_DARK_GREEN));
-			} else if ((destDirFree - totalSizeAdj) > (1024l * 20l /* 20 MB */)) {
+			} else if ((destDirFree - totalSizeAdj) > (1024L * 20L /* 20 MB */)) {
 				totalS.setForeground(RCMain.getRCMain().getDisplay()
 						.getSystemColor(SWT.COLOR_DARK_YELLOW));
 			} else {
@@ -1181,9 +1153,6 @@ public class OpenByFileDialog {
 
 	/**
 	 * The main torrent details tab
-	 * 
-	 * @param tabFolder
-	 * @param atc
 	 */
 	private void torrentTabOpen (CTabFolder tabFolder,
 			final AddTorrentContainer atc) {
@@ -1580,7 +1549,6 @@ public class OpenByFileDialog {
 	/**
 	 * Opens the scrape dialog with an array of files already in place
 	 * 
-	 * @param File[] torrents
 	 */
 	public static void openFilesAndScrape (final File[] torrents) {
 

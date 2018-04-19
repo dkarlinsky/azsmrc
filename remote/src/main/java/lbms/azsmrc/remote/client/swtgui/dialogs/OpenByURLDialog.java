@@ -208,6 +208,11 @@ public class OpenByURLDialog {
 		GUI_Utilities.centerShellOpenAndFocus(shell);
 	}
 
+	private String startRemoteDir() {
+		if(saveTo.getText().trim().isEmpty()) return configManager.getLastDir();
+		else return saveTo.getText().trim();
+	}
+
 	private void createSaveToPanel(Composite button_comp) {
 
 		Group saveToGroup = new Group(button_comp, SWT.NULL);
@@ -236,13 +241,15 @@ public class OpenByURLDialog {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				BrowseDirectoryDialog.open(new BrowseDirectoryDialog.DirectorySelectedCallback() {
+				BrowseDirectoryDialog.open(startRemoteDir(), new BrowseDirectoryDialog.DirectorySelectedCallback() {
 					@Override
 					public void directorySelected(final String directory) {
 						shell.getDisplay().asyncExec(new SWTSafeRunnable() {
 							@Override
 							public void runSafe() {
 								saveTo.setText(directory);
+								configManager.setLastDir(directory);
+								configManager.saveConfig();
 							}
 						});
 					}
@@ -254,7 +261,6 @@ public class OpenByURLDialog {
 
 	/**
 	 * Open a OpenByURLDialog with a URL
-	 * @param URL
 	 */
 	public static void openWithURL(final String URL){
 		final Display display = RCMain.getRCMain().getDisplay();

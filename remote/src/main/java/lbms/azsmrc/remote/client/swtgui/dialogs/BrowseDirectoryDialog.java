@@ -3,16 +3,11 @@
  */
 package lbms.azsmrc.remote.client.swtgui.dialogs;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import lbms.azsmrc.remote.client.callbacks.BrowseDirectoryCallback;
 import lbms.azsmrc.remote.client.internat.I18N;
 import lbms.azsmrc.remote.client.swtgui.GUI_Utilities;
 import lbms.azsmrc.remote.client.swtgui.RCMain;
 import lbms.azsmrc.shared.SWTSafeRunnable;
-
 import lbms.tools.ExtendedProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
@@ -21,16 +16,10 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.ProgressBar;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.*;
+
+import java.util.*;
+import java.util.List;
 
 /**
  * @author Leonard
@@ -55,7 +44,7 @@ public class BrowseDirectoryDialog {
 
 
 
-	private BrowseDirectoryDialog(final DirectorySelectedCallback callback,
+	private BrowseDirectoryDialog(String startDir, final DirectorySelectedCallback callback,
 			Shell parentShell) {
 
 		this.configProperties = RCMain.getRCMain().getProperties();
@@ -152,7 +141,8 @@ public class BrowseDirectoryDialog {
 		directoryList.setLayoutData(gd);
 
 		final Combo oldDirs = new Combo(shell, SWT.BORDER);
-		for (String recentDir : recentDirectories) {
+
+		for (String recentDir : dirHistorySorted()) {
 			oldDirs.add(recentDir);
 		}
 		if (oldDirs.getItemCount() == 0) {
@@ -210,9 +200,26 @@ public class BrowseDirectoryDialog {
 				shell.close();
 			}
 		});
-		browseDirectory(null);
+
+		browseDirectory(emptyToNull(startDir));
 
 		GUI_Utilities.centerShellandOpen(shell);
+	}
+
+	private String emptyToNull(String str) {
+	   if(str == null || str.trim().isEmpty()) return null;
+	   return str;
+    }
+
+	private List<String> dirHistorySorted() {
+		ArrayList<String> list = new ArrayList<String>(recentDirectories);
+		Collections.sort(list, new Comparator<String>() {
+            @Override
+            public int compare(String s1, String s2) {
+                return s1.toLowerCase().compareTo(s2.toLowerCase());
+            }
+        });
+		return list;
 	}
 
 	private void loadRecentDirs()
@@ -309,9 +316,9 @@ public class BrowseDirectoryDialog {
 				});
 	}
 
-	public static void open (DirectorySelectedCallback callback,
+	public static void open (String startDir, DirectorySelectedCallback callback,
 			Shell parentShell) {
-		new BrowseDirectoryDialog(callback, parentShell);
+		new BrowseDirectoryDialog(startDir, callback, parentShell);
 	}
 
 	public static interface DirectorySelectedCallback {

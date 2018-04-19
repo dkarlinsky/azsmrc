@@ -7,6 +7,7 @@ import lbms.tools.ExtendedProperties;
  */
 public class ConfigManager {
     private static final String LAST_DIRECTORY_KEY = "Last.Directory";
+
     private ExtendedProperties properties;
     private ConfigStore configStore;
 
