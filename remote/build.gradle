@@ -28,12 +28,15 @@ else {
     winArch = "x86_$bits"
 }
 
+task packageWin(dependsOn: 'createExe')
+
 launch4j {
-//    println("roject.tasks.shadowJar.outputs.files: $project.tasks.shadowJar.outputs.files")
     mainClassName = 'lbms.azsmrc.remote.client.swtgui.RCMain'
     icon = "${project.rootDir}/remote/native/windows/Azureus_32x32x256.ico"
     copyConfigurable = project.tasks.shadowJar.outputs.files
-    outfile = "AzSmrc-${winArch}.exe"
+    outfile = "AzSmrc-${project.version}-${winArch}.exe"
+    outputDir = "."
+
     jar = "lib/${project.tasks.shadowJar.archiveName}"
 }
 
