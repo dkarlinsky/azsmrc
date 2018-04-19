@@ -1,3 +1,12 @@
+# About
+This is a fork of [AzSMRC](http://azsmrc.sourceforge.net) by Leonard Brünings, Dr. Marc Schaubach and Toni Uebernicke
+
+Main Changes:
+* Converted to Gradle build
+* Added remote dir history "Select Remote Directory" dialog
+* Added support for torrents with 'udp://' announce URLS
+* Added "save location" selection to "Add by URL" dialog
+
 # AzSmrc Vuze Plugin
 
 # AzSmrc Remote Control App
