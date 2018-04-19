@@ -20,7 +20,8 @@ The (tar) packaged app will be under:
 The `-Dbits=[bits]` defaults to 64
 The resulting binary is under:
 
-    remote/build/AzSmrc-${version}-x86_${bits}.exe
+    remote/build/AzSmrc-${version}-x86.exe
+    remote/build/AzSmrc-${version}-x86_64.exe
     
     
             
